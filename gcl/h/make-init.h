@@ -1,5 +1,6 @@
 #include "include.h"
 #include "num_include.h"
+
 #define IN_NEW_INIT
 #include "funlink.h"
 #define SI 0
@@ -34,6 +35,10 @@
    when STATIC_FUNCTION_POINTERS not defined */
 #undef DEFUN_NEW
 #define DEFUN_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) \
+  {extern void Mjoin(fname,_init)(); Mjoin(fname,_init)();}
+
+#undef DEFUNB_NEW
+#define DEFUNB_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,p,doc) \
   {extern void Mjoin(fname,_init)(); Mjoin(fname,_init)();}
 
 #undef DEFUNO_NEW

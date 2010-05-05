@@ -71,9 +71,12 @@
 (defvar *suppress-compiler-warnings* nil)
 
 (defmacro maybe-to-wn-stack (&rest body)
-  (let ((cf (gensym)))
-  `(if (boundp '*warning-note-stack*)
-       (let ((,cf *current-form*)) (push (lambda nil (let ((*current-form* ,cf)) ,@body)) *warning-note-stack*))
+  (let ((cf (tmpsym))(sri (tmpsym)))
+  `(if (and (boundp '*warning-note-stack*) (not *note-keys*))
+       (let ((,cf *current-form*)(,sri *src-inline-recursion*)) 
+	 (push (lambda nil
+		 (let ((*current-form* ,cf)
+		       (*src-inline-recursion* ,sri)) ,@body)) *warning-note-stack*))
      (progn ,@body))))
 
 (defun output-warning-note-stack nil
@@ -82,26 +85,57 @@
 	((not *warning-note-stack*))
       (funcall (pop *warning-note-stack*)))))
   
-  
+(defun print-sri-stack nil
+  (let ((*print-length* 2)
+	(*print-level* 2)
+	(f (cadr *current-form*)))
+    (dolist (s *src-inline-recursion*)
+      (unless (eq (caar s) f)
+	(format t ";   inlining ~s~%" (caar s))))))
+
 (defun cmpwarn (string &rest args &aux (*print-case* :upcase))
   (unless *suppress-compiler-warnings*
     (maybe-to-wn-stack
      (print-current-form)
+     (print-sri-stack)
      (format t ";; Warning: ")
      (apply #'format t string args)
      (terpri)))
   nil)
 
 (defvar *suppress-compiler-notes* t)
+(defvar *note-keys* nil)
+(defun watch (key)
+  (pushnew key *note-keys*))
+(defun unwatch (&rest keys)
+  (setq *note-keys* (when keys (nset-difference *note-keys* keys))))
 
 (defun cmpnote (string &rest args &aux (*print-case* :upcase))
-  (unless *suppress-compiler-notes* 
-    (maybe-to-wn-stack
-     (print-current-form)
-     (format t ";; Note: ")
-     (apply #'format t string args)
-     (terpri)))
+  (maybe-to-wn-stack
+   (print-current-form)
+   (print-sri-stack)
+   (format t ";; Note: ")
+   (apply #'format t string args)
+   (terpri))
   nil)
+
+(defun do-keyed-cmpnote (k string &rest args &aux (*print-case* :upcase))
+  (do ((k k (when (consp k) (cdr k)))) ((not k))
+      (let ((k (if (consp k) (car k) k)))
+	(when (member k *note-keys* :test (lambda (x y) (or (eq x y) (eq 'all y))))
+	  (apply 'cmpnote string args)
+	  (return)))))
+  
+(defmacro keyed-cmpnote (key string &rest args)
+  `(when *note-keys*
+     (do-keyed-cmpnote ,key ,string ,@args)))
+
+;; (defun keyed-cmpnote (key string &rest args &aux (*print-case* :upcase))
+;;   (when *note-keys*
+;;     (let ((keys (if (atom key) (list key) key)))
+;;       (when (intersection keys *note-keys* :test (lambda (x y) (or (eq x y) (eq 'all y))))
+;; 	(apply 'cmpnote string args)))))
+;; (declaim (inline keyed-cmpnote))
 
 (defun print-current-form ()
   (when *first-error*
@@ -134,28 +168,28 @@
 ;;; Internal Macros with type declarations
 
 (defmacro dolist* ((v l &optional (val nil)) . body)
-  (let ((temp (gensym)))
+  (let ((temp (tmpsym)))
   `(do* ((,temp ,l (cdr ,temp)) (,v (car ,temp) (car ,temp)))
 	((endp ,temp) ,val)
 	(declare (object ,v))
 	,@body)))
 
 (defmacro dolist** ((v l &optional (val nil)) . body)
-  (let ((temp (gensym)))
+  (let ((temp (tmpsym)))
   `(do* ((,temp ,l (cdr ,temp)) (,v (car ,temp) (car ,temp)))
 	((endp ,temp) ,val)
 	(declare (object ,temp ,v))
 	,@body)))
 
 (defmacro dotimes* ((v n &optional (val nil)) . body)
-  (let ((temp (gensym)))
+  (let ((temp (tmpsym)))
    `(do* ((,temp ,n) (,v 0 (1+ ,v)))
 	 ((>= ,v ,temp) ,val)
 	 (declare (fixnum ,v))
 	 ,@body)))
 
 (defmacro dotimes** ((v n &optional (val nil)) . body)
-  (let ((temp (gensym)))
+  (let ((temp (tmpsym)))
    `(do* ((,temp ,n) (,v 0 (1+ ,v)))
 	 ((>= ,v ,temp) ,val)
 	 (declare (fixnum ,temp ,v))
@@ -207,7 +241,7 @@
 ;				   args)))))
 
 (defmacro macroexpand-helper (pre meth form)
-  (let ((c (gensym))(x (gensym))(e (gensym)))
+  (let ((c (tmpsym))(x (tmpsym))(e (tmpsym)))
     `(let ((,c (when (consp ,form) (car ,form))))
        ,@(when pre `(,pre))
        (cond ((not ,c) ,form)

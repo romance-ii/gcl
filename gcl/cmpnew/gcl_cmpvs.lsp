@@ -23,8 +23,8 @@
 (in-package 'compiler)
 
 (si:putprop 'vs 'set-vs 'set-loc)
-(si:putprop 'vs 'wt-vs 'wt-loc)
 (si:putprop 'vs* 'wt-vs* 'wt-loc)
+(si:putprop 'vs 'wt-vs 'wt-loc)
 (si:putprop 'ccb-vs 'wt-ccb-vs 'wt-loc)
 
 (defvar *vs* 0)
@@ -66,29 +66,36 @@
 	((eq (car vs) 'cs)
 	 (setq *vcs-used* t)
 	 (wt "Vcs[" (cdr vs) "]"))
-	(t
-	 (if (= (car vs) *level*)
-	     (wt "base[" (cdr vs) "]")
-	   (wt "base" (car vs) "[" (cdr vs) "]")))))
+	((= (car vs) *level*) (wt "base[" (cdr vs) "]"))
+	((wt "base" (car vs) "[" (cdr vs) "]"))))
 
 (defun wt-vs* (vs)
-  (wt "(" )(wt-vs vs) (wt "->c.c_car)"))
+  (wt "(") (wt-vs vs) (wt "->c.c_car)"))
+
+(defun ccb-vs-str (ccb-vs)
+  (format nil "(base0[~a])->c.c_car" (- *initial-ccb-vs* ccb-vs)))
 
 (defun wt-ccb-vs (ccb-vs)
-  (wt "(base0[" (- *initial-ccb-vs* ccb-vs) "]->c.c_car)"))
+  (wt (ccb-vs-str ccb-vs)))
 
-(defun clink (vs) (setq *clink* vs))
+(defun clink (vs &optional (loc nil locp)) 
+  (wt-nl)
+  (wt-vs vs)
+  (wt "=MMcons(")
+  (if locp (wt loc) (wt-vs vs))
+  (wt ",")
+  (wt-clink)
+  (wt ");")
+  (setq *clink* vs))
 
 (defun wt-clink (&optional (clink *clink*))
   (if (null clink) (wt "Cnil") (wt-vs clink)))
 
 (defun ccb-vs-push () (incf *ccb-vs*))
 
-
-(defun cvs-push ()
+(defun cvs-push nil
   (prog1 (cons 'cs *cs*)
-    (incf *cs*)
-    ))
+    (incf *cs*)))
 
 
 (defun wt-list (l)

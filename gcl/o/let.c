@@ -238,6 +238,7 @@ is an illegal function definition in FLET.",
 		{
 		  object x=alloc_object(t_ifun);
 		  x->ifn.ifn_self=top[0];
+		  x->ifn.ifn_name=x->ifn.ifn_call=Cnil;
 		  top[0]=x;
 		}
 		lex_fun_bind(MMcar(def), top[0]);
@@ -287,6 +288,7 @@ is an illegal function definition in LABELS.",1, def);
 		{
 		  object x=alloc_object(t_ifun);
 		  x->ifn.ifn_self=top[0];
+		  x->ifn.ifn_name=x->ifn.ifn_call=Cnil;
 		  top[0]=x;
 		}
 		lex_fun_bind(MMcar(def), top[0]);

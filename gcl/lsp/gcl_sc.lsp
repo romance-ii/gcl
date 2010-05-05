@@ -13,20 +13,262 @@
 		 string-trim string-left-trim string-right-trim))
 
 (in-package 'si)
-(defCfun "object char_to_string(char c)" 0 "{ object x;char s[2];s[0]=1;s[1]=0;x=make_simple_string(s);x->st.st_self[0]=c;return(x);}")
-(defentry char-to-string (char) (object char_to_string))
-(declaim (ftype (function (t) string) char-to-string))
-(add-hash 'char-to-string '((t) string) nil nil nil)
 
-(defun string (x)
+(defun character-designator-p (s)
+  (or (typep s 'fixnum)
+      (typep s 'fixnum)
+      (= (c::stdesig-fillp s) 1)))
+
+(deftype character-designator nil `(and string-designator (satisfies character-designator-p)))
+(deftype string-designator    nil `(or string symbol character (integer 0 255)))
+
+(eval-when
+ (compile)
+
+ (defmacro with-aref-shadow (&body body)
+   `(labels ((lower-case-p (x) (<= #.(char-code #\a) x #.(char-code #\z)))
+	     (upper-case-p (x) (<= #.(char-code #\A) x #.(char-code #\Z)))
+	     (char-upcase (x) 
+		     (if (lower-case-p x)
+			 (+ x #.(- (char-code #\A) (char-code #\a))) x))
+	     (char-downcase (x) 
+			    (if (upper-case-p x)
+				(+ x #.(- (char-code #\a) (char-code #\A))) x))
+	     (aref (s i) (c::stdesig-self s i))
+	     (aset (v s i) (c::set-string-self v s i))
+	     (length (s) (c::stdesig-fillp s))
+	     (char= (x z) (= x z))
+	     (char< (x z) (< x z))
+	     (char> (x z) (> x z))
+	     (char-equal (x z) (or (= x z) (= (char-up x) (char-up z))))
+	     (char-greaterp (x z) (> (char-up x) (char-up z)))
+	     (char-lessp    (x z) (< (char-up x) (char-up z))))
+	    ,@body))
+
+(defmacro defstr (name (s1 s2) = &body body)
+   `(defun ,name (,s1 ,s2  &key (start1 0) end1 (start2 0) end2)
+      (declare (optimize (safety 1)))
+      (check-type s1 string-designator)
+      (check-type s2 string-designator)
+      (check-type start1 seqind)
+      (check-type end1 (or null seqind))
+      (check-type start2 seqind)
+      (check-type end2 (or null seqind))
+      (with-aref-shadow
+       (let* ((s1 (if (typep s1 'fixnum) (code-char s1) s1))
+	      (s2 (if (typep s2 'fixnum) (code-char s2) s2))
+	      (l1 (length s1))
+	      (l2 (length s2))
+	      (e1 end1)(c1 0)
+	      (e2 end2)(c2 0)
+	      (end1 (or end1 l1))
+	      (end2 (or end2 l2)))
+	 (unless (if e1 (<= start1 end1 l1) (<= start1 l1))
+	   (error 'type-error "Bad array bounds"))
+	 (unless (if e2 (<= start2 end2 l2) (<= start2 l2))
+	   (error 'type-error "Bad array bounds"))
+	 (do ((i1 start1 (1+ i1))
+	      (i2 start2 (1+ i2)))
+	     ((or (>= i1 end1) (>= i2 end2) (not (,= (setq c1 (aref s1 i1)) (setq c2 (aref s2 i2)))))
+	      ,@body))))))
+
+ (defmacro defchr (n (comp key))
+   `(defun ,n (c1 &optional (c2 c1 c2p) &rest r) 
+      (declare (optimize (safety 1)) (list r) (:dynamic-extent r));fixme
+      (check-type c1 character)
+      (or (not c2p)
+	  (when (,comp (,key c1) (,key c2))
+	    (or (null r) (apply ',n c2 r))))))
+ 
+ (defmacro defnchr (n (test key))
+   `(defun ,n (c1 &rest r) 
+      (declare (optimize (safety 1)) (list r) (:dynamic-extent r));fixme
+      (check-type c1 character)
+      (cond ((null r))
+	    ((member (,key c1) r :test ',test :key ',key) nil)
+	    ((apply ',n r)))))
+
+
+ (defmacro defstr1 (n query case &optional copy)
+   `(defun ,n (s &key (start 0) end)
+      (declare (optimize (safety 1)))
+      (check-type s ,(if copy 'string-designator 'string))
+      (check-type start seqind)
+      (check-type end (or null seqind))
+      (with-aref-shadow
+       (flet ((cpy (s start end)
+		   (let ((n (make-array (- end start) :element-type 'character)))
+		     (do ((j start (1+ j))) ((>= j end) n)
+			 (aset (aref s j) n (- j start))))))
+	    (let* ((s (if (typep s 'fixnum) (code-char s) s))
+		   (l (length s))
+		   (e end)
+		   (end (or end l))
+		   (n (if (stringp s) s (cpy s start end))))
+	      (unless (if e (<= start end l) (<= start l)) 
+		(error 'type-error "Bad sequence bounds"))
+	      (do ((i start (1+ i))) ((>= i end) n)
+		  (let ((ch (aref s i)))
+		    (unless (,query ch)
+		      ,@(when copy `((when (eq n s) (setq n (cpy s start end)))))
+		      (aset (,case ch) n (- i start)))))))))))
+
+(defun character (c)
   (declare (optimize (safety 1)))
-  (etypecase 
-   x
-   (string x)
-   (symbol (symbol-name x))
-   (character (char-to-string x))
-   ((integer 0 255) (char-to-string x))))
+  (check-type c character-designator)
+  (if (typep c 'character) c
+    (code-char
+     (if (typep c 'fixnum) c
+       (c::stdesig-self c 0)))))
 
+
+(defun char-int (c)
+  (declare (optimize (safety 1)))
+  (check-type c character-designator)
+  (char-code c))
+
+(defun int-char (c)
+  (declare (optimize (safety 1)))
+  (check-type c character-designator)
+  (code-char c))
+
+(defun char-name (c)
+  (declare (optimize (safety 1)))
+  (check-type c character-designator)
+  (let ((c (char-code c)))
+    (case c
+	  (#.(char-code #\Return) "Return")
+	  (#.(char-code #\Space) "Space")
+	  (#.(char-code #\Rubout) "Rubout")
+	  (#.(char-code #\Page) "Page")
+	  (#.(char-code #\Tab) "Tab")
+	  (#.(char-code #\Backspace) "Backspace")
+	  (#.(char-code #\Newline) "Newline")
+	  (otherwise (string c)))))
+
+(defun name-char (s)
+  (declare (optimize (safety 1)))
+  (check-type s string-designator)
+  (cond ((cdr (assoc s '(("Return" . #\Return)
+			 ("Space" . #\Space)
+			 ("Rubout" . #\Rubout)
+			 ("Page" . #\Page)
+			 ("Tab" . #\Tab)
+			 ("Backspace" . #\Backspace)
+			 ("Newline" . #\Newline)
+			 ("Linefeed" . #\Newline)) :test 'string-equal)))
+	((with-length-aref-shadow
+	  (let ((l (length s)))
+	    (case l
+		  (1 (aref s 0))
+		  ((2 3) (when (and (char= #\^ (aref s 0)) (or (= l 2) (char= #\\ (aref s 2))))
+			   (code-char (- (char-code (aref s 1)) #.(- (char-code #\A) 1)))))
+		  (4 (when (char= #\\ (aref s 0))
+		       (code-char 
+			(+ (* 64 (- (char-code (aref s 1)) #.(char-code #\0)))
+			  (* 8 (- (char-code (aref s 2)) #.(char-code #\0)))
+			  (- (char-code (aref s 3)) #.(char-code #\0))))))))))))
+		
+   
+(defun char-code (c)
+  (declare (optimize (safety 1)))
+  (check-type c character)
+  (let ((b #.(- (1- (integer-length (- (address #\^A) (address #\^@)))))))
+    (the unsigned-char (ash (the seqind (- (address c) (address #\^@))) b))))
+
+(defun code-char (d)
+  (declare (optimize (safety 1)))
+  (check-type d unsigned-char)
+  (let ((b #.(1- (integer-length (- (address #\^A) (address #\^@))))))
+   (the character (nani (+ (address #\^@) (ash d b))))));FIXME
+
+
+(defchr char=  (= address))
+(defchr char>  (> address))
+(defchr char>= (>= address))
+(defchr char<  (< address))
+(defchr char<= (<= address))
+
+(defchr char-equal        (char= char-upcase))
+(defchr char-greaterp     (char> char-upcase))
+(defchr char-lessp        (char< char-upcase))
+(defchr char-not-greaterp (char<= char-upcase))
+(defchr char-not-lessp    (char>= char-upcase))
+
+(defnchr char/=         (= address))
+(defnchr char-not-equal (char-equal identity))
+
+(defun upper-case-p (c)
+  (declare (optimize (safety 1)))
+  (check-type c character)
+  (char>= #\Z c #\A))
+
+(defun lower-case-p (c)
+  (declare (optimize (safety 1)))
+  (check-type c character)
+  (char>= #\z c #\a))
+
+(defun both-case-p (c)
+  (declare (optimize (safety 1)))
+  (check-type c character)
+  (or (upper-case-p c) (lower-case-p c)))
+
+(defun char-upcase (c)
+  (declare (optimize (safety 1)))
+  (check-type c character)
+  (if (lower-case-p c)
+      (nani (+ (address c) #.(- (address #\A) (address #\a))))
+    c))
+
+(defun char-downcase (c)
+  (declare (optimize (safety 1)))
+  (check-type c character)
+  (if (upper-case-p c)
+      (nani (+ (address c) #.(- (address #\a) (address #\A))))
+    c))
+
+(defun alphanumericp (c)
+  (declare (optimize (safety 1)))
+  (check-type c character)
+  (or (char<= #\0 c #\9)
+      (alpha-char-p c)))
+
+(defun alpha-char-p (c)
+  (declare (optimize (safety 1)))
+  (check-type c character)
+  (both-case-p c))
+
+(defun digit-char-p (c &optional (r 10))
+  (declare (optimize (safety 1)))
+  (check-type c character)
+  (check-type r (integer 0))
+  (when (typep r 'fixnum)
+    (let* ((r r)(r (1- r))(i (char-code c))
+	   (j (- i #.(char-code #\0)))
+	   (k (- i #.(- (char-code #\a) 10)))
+	   (l (- i #.(- (char-code #\A) 10))))
+      (cond ((<=  0 j r 9) j);FIXME infer across inlines
+	    ((<= 10 k r 36) k)
+	    ((<= 10 l r 36) l)))))
+
+(defun digit-char (w &optional (r 10))
+  (declare (optimize (safety 1)))
+  (check-type w (integer 0))
+  (check-type r (integer 0))
+  (when (and (typep w 'fixnum) (typep r 'fixnum))
+    (let ((w w)(r r))
+      (when (< w r)
+	(code-char (if (< w 10) (+ w #.(char-code #\0)) (+ w #.(- (char-code #\A) 10))))))))
+
+(defun graphic-char-p (c)
+  (declare (optimize (safety 1)))
+  (check-type c character)
+  (char<= #\Space c #\~))
+
+(defun standard-char-p (c)
+  (declare (optimize (safety 1)))
+  (check-type c character)
+  (or (graphic-char-p c) (char= c #\Newline)))
 
 (defun char (x i)
   (declare (optimize (safety 1)))
@@ -41,40 +283,25 @@
   (check-type i seqind)
   (aref x i))
 
-(defmacro defstr1 (n case copy)
-  `(defun ,n (s &key (start 0) end)
-     (declare (optimize (safety 1)))
-     (check-type start seqind)
-     (check-type end (or null seqind))
-     (let* ((s (string s))
-	    (end (or end (length s)))
-	    (n (,copy s)))
-       (do ((i start (1+ i))) ((>= i end) n)
-	   (setf (aref n i) (,case (aref s i)))))))
-
-(defstr1  string-upcase   char-upcase   copy-seq)
-(defstr1  string-downcase char-downcase copy-seq)
-(defstr1 nstring-upcase   char-upcase   identity)
-(defstr1 nstring-downcase char-downcase identity)
 
 
-(defmacro defstr (name (s1 s2) = &body body)
-  `(defun ,name (,s1 ,s2  &key (start1 0) end1 (start2 0) end2)
-     (declare (optimize (safety 1)))
-     (check-type start1 seqind)
-     (check-type end1 (or null seqind))
-     (check-type start2 seqind)
-     (check-type end2 (or null seqind))
-     (let* ((s1 (string s1));fixme symbol direct
-	    (s2 (string s2))
-	    (end1 (or end1 (length s1)))
-	    (end2 (or end2 (length s2))))
-       (do ((i1 start1 (1+ i1))
-	    (i2 start2 (1+ i2)))
-	   ((or (>= i1 end1) (>= i2 end2) (not (,= (aref ,s1 i1) (aref ,s2 i2))))
-	    ,@body)))))
+
+(defun string (x)
+  (declare (optimize (safety 1)))
+  (check-type x string-designator)
+  (typecase 
+   x
+   (string x)
+   (symbol (symbol-name x))
+   (character (let ((n (make-array 1 :element-type 'character))) (setf (aref n 0) x) n))
+   ((integer 0 255) (string (code-char x)))))
 
 
+
+(defstr1  string-upcase   upper-case-p char-upcase   t)
+(defstr1  string-downcase lower-case-p char-downcase t)
+(defstr1 nstring-upcase   upper-case-p char-upcase)
+(defstr1 nstring-downcase lower-case-p char-downcase)
 
 (defstr string= (s1 s2) char=
   (and (>= i1 end1) (>= i2 end2)))
@@ -85,23 +312,22 @@
 (defstr string> (s1 s2) char=
   (cond ((>= i1 end1) nil)
 	((>= i2 end2) i1)
-	((char> (aref s1 i1) (aref s2 i2)) i1)))
+	((char> c1 c2) i1)))
 
 (defstr string>= (s1 s2) char=
   (cond ((>= i2 end2) i1)
 	((>= i1 end1) nil)
-	((char> (aref s1 i1) (aref s2 i2)) i1)))
-  
+	((char> c1 c2) i1)))
 
 (defstr string< (s1 s2) char=
   (cond ((>= i2 end2) nil)
 	((>= i1 end1) i1)
-	((char< (aref s1 i1) (aref s2 i2)) i1)))
+	((char< c1 c2) i1)))
 
 (defstr string<= (s1 s2) char=
   (cond ((>= i1 end1) i1)
 	((>= i2 end2) nil)
-	((char< (aref s1 i1) (aref s2 i2)) i1)))
+	((char< c1 c2) i1)))
 
 
 (defstr string-equal (s1 s2) char-equal
@@ -113,115 +339,24 @@
 (defstr string-greaterp (s1 s2) char-equal
   (cond ((>= i1 end1) nil)
 	((>= i2 end2) i1)
-	((char-greaterp (aref s1 i1) (aref s2 i2)) i1)))
+	((char-greaterp c1 c2) i1)))
 
 (defstr string-not-lessp (s1 s2) char-equal
   (cond ((>= i2 end2) i1)
 	((>= i1 end1) nil)
-	((char-greaterp (aref s1 i1) (aref s2 i2)) i1)))
-  
+	((char-greaterp c1 c2) i1)))
 
 (defstr string-lessp (s1 s2) char-equal
   (cond ((>= i2 end2) nil)
 	((>= i1 end1) i1)
-	((char-lessp (aref s1 i1) (aref s2 i2)) i1)))
+	((char-lessp c1 c2) i1)))
 
 (defstr string-not-greaterp (s1 s2) char-equal
   (cond ((>= i1 end1) i1)
 	((>= i2 end2) nil)
-	((char-lessp (aref s1 i1) (aref s2 i2)) i1)))
+	((char-lessp c1 c2) i1)))
 
 
-(push '((character) unsigned-char #.(compiler::flags compiler::rfa) "(#0)") 
-      (get 'char-code-int 'compiler::inline-always));FIXME
-(defun char-code-int (c)
- (let ((b #.(- (1- (integer-length (- (address #\^A) (address #\^@)))))))
-  (the unsigned-char (ash (the seqind (- (address c) (load-time-value (address #\^@)))) b))))
-
-(defun char-code (c)
-  (declare (optimize (safety 1)))
-  (check-type c character)
-  (char-code-int c))
-
-;; (defun char-code (c)
-;;   (declare (optimize (safety 1)))
-;;   (check-type c character)
-;;   (ash (the unsigned-char (- (si::address c) #.(si::address #\^@))) -3))
-
-(defun code-char (d)
-  (declare (optimize (safety 1)))
-  (check-type d unsigned-char)
-  (let ((b #.(1- (integer-length (- (address #\^A) (address #\^@))))))
-   (the character (nani (+ (load-time-value (address #\^@)) (ash d b))))))
-
-
-
-
-(defun upper-case-p (c)
-  (declare (optimize (safety 1)))
-  (check-type c character)
-  (let ((c (char-code c)))
-    (>= #.(char-code #\Z) c #.(char-code #\A))))
-
-(defun lower-case-p (c)
-  (declare (optimize (safety 1)))
-  (check-type c character)
-  (let ((c (char-code c)))
-    (>= #.(char-code #\z) c #.(char-code #\a))))
-
-(defun both-case-p (c)
-  (declare (optimize (safety 1)))
-  (check-type c character)
-  (let ((c (char-code c)))
-    (or (>= #.(char-code #\Z) c #.(char-code #\A))
-	(>= #.(char-code #\z) c #.(char-code #\a)))))
-
-(defun char-upcase (c)
-  (declare (optimize (safety 1)))
-  (check-type c character)
-  (if (lower-case-p c)
-      (code-char (+ (char-code c) #.(- (char-code #\A) (char-code #\a))))
-    c))
-
-
-(defun char-downcase (c)
-  (declare (optimize (safety 1)))
-  (check-type c character)
-  (if (upper-case-p c)
-      (code-char (+ (char-code c) #.(- (char-code #\a) (char-code #\A))))
-    c))
-
-(defmacro defchr (n (comp key))
-  `(defun ,n (c1 &optional (c2 c1 c2p) &rest r) 
-     (declare (optimize (safety 1)) (list r) (:dynamic-extent r));fixme
-     (check-type c1 character)
-     (or (not c2p)
-	 (when (,comp (,key c1) (,key c2))
-	   (or (null r) (apply ',n c2 r))))))
-
-(defchr char= (= char-code))
-(defchr char> (> char-code))
-(defchr char>= (>= char-code))
-(defchr char< (< char-code))
-(defchr char<= (<= char-code))
-
-(defchr char-equal (char= char-upcase))
-(defchr char-greaterp (char> char-upcase))
-(defchr char-lessp (char< char-upcase))
-(defchr char-not-greaterp (char<= char-upcase))
-(defchr char-not-lessp (char>= char-upcase))
-
-
-(defmacro defnchr (n (test key))
-  `(defun ,n (c1 &rest r) 
-     (declare (optimize (safety 1)) (list r) (:dynamic-extent r));fixme
-     (check-type c1 character)
-     (cond ((null r))
-	   ((member (,key c1) r :test ',test :key ',key) nil)
-	   ((apply ',n r)))))
-
-(defnchr char/= (= char-code))
-(defnchr char-not-equal (char-equal identity))
 
 (defun string-left-trim (b s)
   (declare (optimize (safety 1)))

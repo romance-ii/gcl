@@ -572,26 +572,28 @@ LFD(Lnstring_capitalize)() { casefun = char_capitalize;  FFN(Lnstring_case)(); }
 DEFUNO_NEW("STRING-CONCATENATE",object,fLstring_concatenate,SI,
 	   0,63,NONE,OO,OO,OO,OO,void,siLstring_concatenate,(object first,...),"") {
 
-  int narg, i, l, m;
-  object x;
+  fixnum i,l,m,narg=INIT_NARGS(0);
+  object x,ll=Cnil,z;
   va_list ap;
-  
-  narg = VFUN_NARGS;
+
   va_start(ap,first);
   vs_base=vs_top;
-  for (i = 0, l = 0;  i < narg;  i++) {
-    vs_push(coerce_to_string(i ? va_arg(ap,object) : first));
-    l += vs_base[i]->st.st_fillp;
+  for (l=i=0;(z=NEXT_ARG(narg,ap,ll,first,(object)0));i++) {
+    vs_push(coerce_to_string(z));
+    l += vs_head->st.st_fillp;
   }
-  {BEGIN_NO_INTERRUPT;	
-  x=alloc_simple_string(l);
-  (x)->st.st_self = alloc_relblock(l);
-  for (i = 0, l = 0;  i < narg;  i++)
-    for (m = 0;  m < vs_base[i]->st.st_fillp;  m++)
-      (x)->st.st_self[l++]=vs_base[i]->st.st_self[m];
-  END_NO_INTERRUPT;}	
-
   va_end(ap);
+
+  {
+    object *p;
+    BEGIN_NO_INTERRUPT;	
+    x=alloc_simple_string(l);
+    (x)->st.st_self = alloc_relblock(l);
+    for (l=0,p=vs_base;p<vs_top && (m=(*p)->st.st_fillp)>=0;p++,l+=m)
+      memcpy(x->st.st_self+l,(*p)->st.st_self,m);
+    END_NO_INTERRUPT;
+
+  }	
 
   RETURN1(x);
 

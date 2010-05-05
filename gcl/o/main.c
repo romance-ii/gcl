@@ -686,6 +686,7 @@ initlisp(void) {
 	
 	set_type_of(Ct,t_symbol);
  	Ct->s.s_dbind = Ct;
+	Ct->s.tt=1;
  	Ct->s.s_sfdef = NOT_SPECIAL;
  	Ct->s.s_fillp = 1;
  	Ct->s.s_self = "T";
@@ -869,22 +870,28 @@ segmentation_catcher(int i, long code, void *scp, char *addr) {
 }
 
 DEFUNO_NEW("BYE",object,fLbye,LISP
-       ,0,1,NONE,OI,OO,OO,OO,void,Lby,(fixnum exitc),"")
-{	int n=VFUN_NARGS;
-	int exit_code;
-	if (n>=1) exit_code=exitc;else exit_code=0;
+	   ,0,1,NONE,OI,OO,OO,OO,void,Lby,(ufixnum exit_code,...),"") {
+
+  fixnum n=INIT_NARGS(0);
+  object l=Cnil,f=(object)(exit_code+1);
+  va_list ap;
+
+  va_start(ap,exit_code);
+  exit_code=((fixnum)NEXT_ARG(n,ap,l,f,(object)1))-1;
+  va_end(ap);
 
 #ifdef UNIX
-	exit(exit_code);
+  exit(exit_code);
 #else
-	RETURN(1,int,exit_code, 0); 
+  RETURN(1,int,exit_code, 0); 
 #endif
 
 }
 
 DEFUN_NEW("QUIT",object,fLquit,LISP
-       ,0,1,NONE,OI,OO,OO,OO,(fixnum exitc),"")
-{	return FFN(fLbye)(exitc); }
+       ,0,1,NONE,OI,OO,OO,OO,(fixnum exitc),"") {
+  return FFN(fLbye)(exitc); 
+}
  
 
 static void
@@ -953,8 +960,7 @@ FFN(siLcheck_vs)(void) {
   vs_base[0] = Cnil;
 }
 
-static object
-FFN(siLcatch_fatal)(int i) {
+DEFUN_NEW("CATCH-FATAL",object,fScatch_fatal,SI,1,1,NONE,OI,OO,OO,OO,(fixnum i),"") {
   catch_fatal=i;
   return Cnil;
 }
@@ -1002,7 +1008,7 @@ LFD(siLreset_stack_limits)(void)
  do{int leng,topl;      \
   bcopy(org,p,leng=(stack_multiple*size*sizeof(typ))); \
   topl= top - org; \
-  org=(typ *)p; top = org +topl;\
+  org=(typ *)p; top = org +topl;	    \
   p=p+leng+(STACK_OVER+1)*geta*sizeof(typ); \
   lim = ((typ *)p) - (STACK_OVER+1)*geta;   \
   }while (0)
@@ -1022,6 +1028,7 @@ multiply_stacks(int m) {
   array_allocself(stack_space,1,code_char(0));
   p=stack_space->st.st_self;
   COPYSTACK(vs_org,p,object,vs_limit,vs_top,VSGETA,VSSIZE);
+  vs_base=vs_org;
   COPYSTACK(bds_org,p,struct bds_bd,bds_limit,bds_top,BDSGETA,BDSSIZE);
   COPYSTACK(frs_org,p,struct frame,frs_limit,frs_top,FRSGETA,FRSSIZE);
   COPYSTACK(ihs_org,p,struct invocation_history,ihs_limit,ihs_top,
@@ -1036,6 +1043,7 @@ LFD(siLinit_system)(void) {
   check_arg(0);
   gcl_init_system(sSAno_initA);
   vs_base[0] = Cnil;
+  vs_top=vs_base+1;
 }
 
 static void
@@ -1302,7 +1310,7 @@ init_main(void) {
   make_special("*FEATURES*",features);}
   
   make_si_function("SAVE-SYSTEM", siLsave_system);
-  make_si_sfun("CATCH-FATAL",siLcatch_fatal,ARGTYPE1(f_fixnum));
+/*   make_si_sfun("CATCH-FATAL",siLcatch_fatal,ARGTYPE1(f_fixnum)); */
   make_si_function("WARN-VERSION",Lidentity);
   
 }

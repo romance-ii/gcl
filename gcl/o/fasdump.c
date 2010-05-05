@@ -1383,7 +1383,7 @@ read_fasd1(int i, object *loc)
 	 object y;
 	 object x=alloc_object(t_vector);
 	 GET4(leng);
-	 x->v.v_elttype = GETD("v_elttype=%d");
+	 x->v.tt=x->v.v_elttype = GETD("v_elttype=%d");
 	 x->v.v_defrank=1;
 	 x->v.v_dim=x->v.v_fillp=leng;
 	 x->v.v_self=0;

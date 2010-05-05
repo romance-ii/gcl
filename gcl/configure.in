@@ -470,6 +470,7 @@ AC_USE_SYSTEM_EXTENSIONS
 AC_PROG_CC
 AC_PROG_CPP
 AC_SUBST(CC)
+AC_SUBST(CPP)
 
 
 # can only test for numbers -- CM
@@ -483,7 +484,7 @@ AC_SUBST(CC)
 # subst GCC not only under 386-linux, but where available -- CM
 
 
-TCFLAGS="-fsigned-char"
+TCFLAGS="-fsigned-char "
 if test "$GCC" = "yes" ; then
 	TCFLAGS="$TCFLAGS -pipe -Wall "
 	case $use in
@@ -610,20 +611,20 @@ if test "$enable_pic" = "yes" ; then
 	TCFLAGS="$TCFLAGS -fPIC"
 fi
 
-FDEBUG=`echo $CFLAGS | tr ' ' '\012' |grep "^\-g$"`
+FDEBUG=`echo $CFLAGS | tr ' ' '\012' |grep "^\-g$"|tr '\012' ' '`
 #CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-g$"`
-FOMITF=`echo $CFLAGS | tr ' ' '\012' |grep "^\-fomit-frame-pointer$"`
-CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-fomit-frame-pointer$"`
-FOOPT3=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O3$"`
-CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O3$"`
-FOOPT2=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O2$"`
-CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O2$"`
-FOOPT1=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O1$"`
-TMP=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O$"`
+FOMITF=`echo $CFLAGS | tr ' ' '\012' |grep "^\-fomit-frame-pointer$"|tr '\012' ' '`
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-fomit-frame-pointer$"|tr '\012' ' '`
+FOOPT3=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O3$"|tr '\012' ' '`
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O3$"|tr '\012' ' '`
+FOOPT2=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O2$"|tr '\012' ' '`
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O2$"|tr '\012' ' '`
+FOOPT1=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O1$"|tr '\012' ' '`
+TMP=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O$"|tr '\012' ' '`
 FOOPT1="$FOOPT1$TMP"
-CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O1$"|grep -v "^\-O$"`
-FOOPT0=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O0$"`
-CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O0$"`
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O1$"|grep -v "^\-O$"|tr '\012' ' '`
+FOOPT0=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O0$"|tr '\012' ' '`
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O0$"|tr '\012' ' '`
 
 if test "$FOOPT0" != "" ; then
    TO3FLAGS=`echo $TO3FLAGS | sed 's,\-O[[123 ]],-O0 ,g' | sed 's,\-O$,-O0 ,g'`
@@ -793,6 +794,8 @@ if test "$NEED_LOCAL_GMP" != "" ; then
 		MPFILES=gmp_all
 	fi
 
+else
+	cp /usr/include/gmp.h h/gmp.h
 fi
 
 AC_MSG_CHECKING([for size of gmp limbs])
@@ -1097,6 +1100,30 @@ AC_CHECK_SIZEOF(long)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(short)
 AC_CHECK_SIZEOF(char)
+
+AC_RUN_IFELSE(AC_LANG_PROGRAM([[
+	#include <stdio.h>
+	]],[[
+	    FILE *fp=fopen("conftest1","w");
+	    unsigned long c;
+	    int i;
+	    for (i=0,c=1;c;c<<=1,i++);
+	    fprintf(fp,"%d",i-9);
+	    return 0;]]),size=`cat conftest1`
+  AC_DEFINE_UNQUOTED(LM9BITS,$size,[fill bits needed in certain lisp structures]),
+  AC_MSG_ERROR([Cannot find fill bits]))
+
+AC_RUN_IFELSE(AC_LANG_PROGRAM([[
+	#include <stdio.h>
+	]],[[
+	    FILE *fp=fopen("conftest1","w");
+	    unsigned long c;
+	    int i;
+	    for (i=0,c=1;c;c<<=1,i++);
+	    fprintf(fp,"%d",i-27);
+	    return 0;]]),size=`cat conftest1`
+  AC_DEFINE_UNQUOTED(LM27BITS,$size,[fill bits needed in certain lisp structures]),
+  AC_MSG_ERROR([Cannot find fill bits]))
 
 AC_RUN_IFELSE(AC_LANG_PROGRAM([[
 	#include <stdio.h>
@@ -1526,6 +1553,11 @@ AC_ARG_ENABLE(maxpage,
 AC_MSG_CHECKING(CSTACK_ADDRESS)
 AC_RUN_IFELSE(AC_LANG_PROGRAM([[
 	#include <stdio.h>
+	void *
+	foo() {
+	      int i;
+	      return (void *)&i;
+        }
 	]],[[
 	void *v ;
 	FILE *fp = fopen("conftest1","w");
@@ -1534,8 +1566,9 @@ AC_RUN_IFELSE(AC_LANG_PROGRAM([[
 	j=1;
 	j<<=$PAGEWIDTH;
 	j<<=16;
-	j--;
 	i=(unsigned long)&v;
+	if (foo()>i) i-=j;
+	j--;
 	i+=j;
 	i&=~j;
 	fprintf(fp,"0x%lx",i-1);

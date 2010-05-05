@@ -46,7 +46,7 @@
 	  ((and (not (member-if-not 'nval tps))
 		(inline-possible 'multiple-value-bind))
 	   (let* ((n (reduce '+ (mapcar 'nval tps)))
-		  (syms (mapcar (lambda (x) (declare (ignore x)) (gensym)) (make-list n)))
+		  (syms (mapcar (lambda (x) (declare (ignore x)) (tmpsym)) (make-list n)))
 		  (r syms))
 	     (c1expr
 	      (reduce (lambda (x y) 
@@ -64,13 +64,13 @@
 
 (defun c2multiple-value-call (funob forms &aux (*vs* *vs*) loc top sup)
   (cond ((endp (cdr forms))
-         (setq loc (save-funob funob))
+         (setq loc (save-funob funob t))
          (let ((*value-to-go* 'top)) (c2expr* (car forms)))
          (c2funcall funob 'args-pushed loc))
         (t
          (setq top (cs-push t t))
          (setq sup (cs-push t t))
-         (setq loc (save-funob funob))
+         (setq loc (save-funob funob t))
          (base-used)
 	 ;; Add (sup .var) handling in unwind-exit -- in
 	 ;; c2multiple-value-prog1 and c2-multiple-value-call, apparently
@@ -82,24 +82,23 @@
 	 ;; evaluations.  We unwind this stack supremum variable change here
 	 ;; when necessary.  CM 20040301
          (wt-nl "{object *V" top "=base+" *vs* ",*V" sup "=sup;")
-	 (dolist** (form forms)
-		   (let ((*value-to-go* 'top)
-			 (*unwind-exit* (cons (cons 'sup sup) *unwind-exit*)))
-		     (c2expr-top* form top))
-		   (wt-nl "while(vs_base<vs_top)")
-		   (wt-nl "{V" top "[0]=vs_base[0];V" top "++;vs_base++;}"))
+	 (dolist (form forms)
+	   (let ((*value-to-go* 'top)
+		 (*unwind-exit* (cons (cons 'sup sup) *unwind-exit*)))
+	     (c2expr-top* form top))
+	   (wt-nl "while(vs_base<vs_top)")
+	   (wt-nl "{V" top "[0]=vs_base[0];V" top "++;vs_base++;}"))
          (wt-nl "vs_base=base+" *vs* ";vs_top=V" top ";sup=V" sup ";")
          (c2funcall funob 'args-pushed loc)
-         (wt "}")))
-  )
+         (wt "}"))))
 
 (defun c1multiple-value-prog1 (args &aux (info (make-info)) form)
   (when (endp args) (too-few-args 'multiple-value-prog1 1 0))
   (setq form (c1expr* (car args) info))
   (let ((tp (info-type (cadr form))))
-    (cond ((single-type-p tp) (let ((s (gensym))) (c1expr `(let ((,s ,(car args))) ,@(cdr args) ,s))))
+    (cond ((single-type-p tp) (let ((s (tmpsym))) (c1expr `(let ((,s ,(car args))) ,@(cdr args) ,s))))
 	  ((and (consp tp) (eq (car tp) 'returns-exactly))
-	   (let ((syms (mapcar (lambda (x) (declare (ignore x)) (gensym)) (cdr tp))))
+	   (let ((syms (mapcar (lambda (x) (declare (ignore x)) (tmpsym)) (cdr tp))))
 	     (c1expr `(multiple-value-bind (,@syms) ,(car args) ,@(cdr args) (values ,@syms)))))
 	  (t 
 	   (setq args (c1args (cdr args) info))
@@ -137,89 +136,82 @@
   (unwind-exit 'fun-val nil (if top-data (car top-data))))
 
 (defun c1values (args &aux (info (make-info)))
-      (cond ((and args (not (cdr args)))
-	     (let ((nargs (c1args args info)))
-	       (if (type>= t (info-type (cadar nargs)))
-		   (c1expr (car args))
-		 (c1expr (let ((s (gensym))) `(let ((,s ,(car args))) ,s))))))
-	    (t  (setq args (c1args args info))
-		(setf (info-type info) 
-		      (cmp-norm-tp 
-		       (cons 'returns-exactly (mapcar (lambda (x) (coerce-to-one-value (info-type (cadr x)))) args))))
-		(list 'values info args))))
+  (let ((a (mapcar (lambda (x) (c1expr* x info)) args)))
+    (setf (info-type info)
+	  (cmp-norm-tp 
+	   (cons 'returns-exactly
+		 (mapcar (lambda (x) (coerce-to-one-value (info-type (cadr x)))) a))))
+    (list 'values info a)))
 
-(defun c2values (forms &aux (base *vs*) (*vs* *vs*))
-  (when (and (eq *value-to-go* 'return-object)
-	     (cdr forms)
-	     (consp *current-form*)
-	     (eq 'defun (car *current-form*))
-	     (single-type-p (get-return-type (cadr *current-form*))))
-    (cmpwarn "Trying to return multiple values. ~%;But ~a was proclaimed to have single value.~%;Only first one will assured."
-	     (cadr *current-form*)))
-  
-  (cond 
-   (*mv-var*
+;; (defun c1values (args &aux (info (make-info)))
+;;       (cond ((and args (not (cdr args)))
+;; 	     (let ((nargs (c1args args info)))
+;; 	       (if (type>= t (info-type (cadar nargs)))
+;; 		   (c1expr (car args))
+;; 		 (c1expr (let ((s (tmpsym))) `(let ((,s ,(car args))) ,s))))))
+;; 	    (t  
+;; 	     (setq args (c1args args info))
+;; 	     (setf (info-type info) 
+;; 		   (cmp-norm-tp 
+;; 		    (cons 'returns-exactly
+;; 			  (mapcar (lambda (x) (coerce-to-one-value (info-type (cadr x)))) args))))
+;; 	     (list 'values info args))))
+
+(defun c2values (forms)
+  (if *mv-var*
     (let* ((*inline-blocks* 0)
 	   (types (mapcar (lambda (x) (let ((x (info-type (cadr x)))) (if (type>= #tboolean x) t x))) forms))
-	   (in (list (inline-type (car types))
-		     (flags)
-		     (list* (si::string-concatenate 
-			     "({"
-			     (apply 'si::string-concatenate
-				    (let ((i 0)) 
-				      (mapcan (lambda (x) (declare (ignore x))
-						(let ((s (write-to-string (incf i))))
-						  (list (si::string-concatenate "@" s "(#" s ")@")))) (cdr forms))))
-			     "#0;})")
-			    (mapcar 'inline-type (cdr types)))
-		    (inline-args forms types))))
+	   (i (char-code #\0))
+	   (s (mapcar (lambda (x &aux (x (when x (incf i)))) (strcat "@" x "(#" x ")@")) (cdr forms)))
+	   (s (strcat "({" (apply 'strcat s) "#0;})"))
+	   (s (cons s (mapcar 'inline-type (cdr types))))
+	   (in (list (inline-type (car types)) (flags) s (inline-args forms types))))
       (unwind-exit in nil (cons 'values (length forms)))
-      (close-inline-blocks)
-      (return-from c2values nil)))
-   ((null forms)
-    (wt-nl "vs_base=vs_top=base+" base ";")
-    (base-used)
-    (wt-nl "vs_base[0]=Cnil;"))
-   (t
-    (dolist** (form forms)
-	      (let ((*value-to-go* (list 'vs (vs-push)))) (c2expr* form)))
-    (wt-nl "vs_top=(vs_base=base+" base ")+" (- *vs* base) ";")
-    (base-used)))
-  (unwind-exit 'fun-val nil (cons 'values (length forms))))
+      (close-inline-blocks))
+   (c2expr (car forms))))
 
-;; (defun multiple-value-setq-expander (args)
-;;   (let ((syms (mapcar (lambda (x) (declare (ignore x)) (gensym)) (car args))))
-;;     (if syms
-;; 	`(multiple-value-bind ,syms ,(cadr args) (setq ,@(nreverse (mapcan 'list syms (car args)))))
-;;       `(values ,(cadr args)))))
+;; (defun c2values (forms &aux (base *vs*) (*vs* *vs*))
+;;   (when (and (eq *value-to-go* 'return-object)
+;; 	     (cdr forms)
+;; 	     (consp *current-form*)
+;; 	     (eq 'defun (car *current-form*))
+;; 	     (single-type-p (get-return-type (cadr *current-form*))))
+;;     (cmpwarn "Trying to return multiple values. ~%;But ~a was proclaimed to have single value.~%;Only first one will assured."
+;; 	     (cadr *current-form*)))
+  
+;;   (cond 
+;;    (*mv-var*
+;;     (let* ((*inline-blocks* 0)
+;; 	   (types (mapcar (lambda (x) (let ((x (info-type (cadr x)))) (if (type>= #tboolean x) t x))) forms))
+;; 	   (in (list (inline-type (car types))
+;; 		     (flags)
+;; 		     (list* (si::string-concatenate 
+;; 			     "({"
+;; 			     (apply 'si::string-concatenate
+;; 				    (let ((i 0)) 
+;; 				      (mapcan (lambda (x) (declare (ignore x))
+;; 						(let ((s (write-to-string (incf i))))
+;; 						  (list (si::string-concatenate "@" s "(#" s ")@")))) (cdr forms))))
+;; 			     "#0;})")
+;; 			    (mapcar 'inline-type (cdr types)))
+;; 		    (inline-args forms types))))
+;;       (unwind-exit in nil (cons 'values (length forms)))
+;;       (close-inline-blocks)
+;;       (return-from c2values nil)))
+;;    ((null forms)
+;;     (wt-nl "vs_base=vs_top=base+" base ";")
+;;     (base-used)
+;;     (wt-nl "vs_base[0]=Cnil;"))
+;;    (t
+;;     (dolist** (form forms)
+;; 	      (let ((*value-to-go* (list 'vs (vs-push)))) (c2expr* form)));FIXME
+;;     (wt-nl "vs_top=(vs_base=base+" base ")+" (- *vs* base) ";")
+;;     (base-used)))
+;;   (unwind-exit 'fun-val nil (cons 'values (length forms))))
+
 
 (defun c1multiple-value-setq (args)
   (c1expr (apply 'multiple-value-setq-expander args)))
-
-;; (defun c1multiple-value-setq (args &aux (info (make-info)) (vrefs nil))
-;;   (when (or (endp args) (endp (cdr args)))
-;;         (too-few-args 'multiple-value-setq 2 0))
-;;   (unless (endp (cddr args))
-;;           (too-many-args 'multiple-value-setq 2 (length args)))
-;;   (dolist (var (car args))
-;;           (cmpck (not (symbolp var)) "The variable ~s is not a symbol." var)
-;;           (cmpck (constantp var)
-;;                  "The constant ~s is being assigned a value." var)
-;;           (setq var (c1vref var))
-;;           (push var vrefs)
-;;           (push-changed (car var) info)
-;;           )
-;;   (setf (info-type info) (type-and (info-type (cadar (last (c1args (car args) info))))
-;; 				   (info-type (cadar (last (c1args (cdr args) info))))))
-;;   (let* ((v (c1expr* (cadr args) info))
-;; 	 (it (info-type (cadr v))))
-;;     (cond ((and (consp it) (eq (car it) 'values))
-;; 	   (do ((tp (cdr it) (cdr tp)) (a (car args) (cdr a)))
-;; 	       ((or (not tp) (not a)) (dolist (a a) (do-setq-tp (car (c1vref a)) '(opaque-function) t)))
-;; 	       (do-setq-tp (car (c1vref (car a))) '(opaque-function) (car tp))))
-;; 	  ((dolist (a (car args)) (do-setq-tp (car (c1vref a)) '(opaque-function) t))))
-;;     (list 'multiple-value-setq info (reverse vrefs) v)))
-
 
 (defun multiple-value-check (vrefs form)
   (and (cdr vrefs)
@@ -227,137 +219,8 @@
        (let ((fname (third form)))
 	 (cond ((and (symbolp fname)
 		     (single-type-p (get-return-type fname)))
-;; 		       (and tem
-;; 			    ;; proclaimed to have 1 arg:
-;; 			    (consp tem)
-;; 			    (not (eq tem '*))
-;; 			    (null (cdr tem)))))
 		(cmpwarn "~A was proclaimed to have only one return value. ~%;But you appear to want multiple values." fname))))))
 		
-;; (defun c2multiple-value-setq (vrefs form &aux top-data)
-
-;;   (multiple-value-check vrefs form)
-
-;;   (let ((exit-label (next-label)))
-;;     (let ((*multiple-value-exit-label* exit-label)
-;; 	  (*value-to-go* (or (mapcar (lambda (x) (list 'var (car x) nil)) vrefs) 'trash))
-;; 	  *top-data*)
-;;       (c2expr* form) (setq top-data *top-data*))
-;;     (and *record-call-info* (record-call-info nil (car top-data)))
-;;     (do ((vs vrefs (cdr vs)))
-;; 	((endp vs))
-;;       (declare (object vs))
-;;       (let ((vref (car vs)))
-;; 	(declare (object vref))
-;; 	(wt-nl "if(vs_base<vs_top){")
-;; 	(set-var 'fun-val (car vref) (cadr vref))
-;; 	(unless (endp (cdr vs)) (wt-nl "vs_base++;"))
-;; 	(wt-nl "}else{") (set-var nil (car vref) (cadr vref))
-;; 	(wt "}")))
-   
-;;     (wt-label exit-label))
-
-;;   (cond ((null vrefs)
-;; 	 (wt-nl "if(vs_base==vs_top){vs_base[0]=Cnil;vs_top=vs_base+1;}")
-;; 	 (unwind-exit 'fun-val))
-;; 	(t (unless (eq *exit* 'return) (wt-nl) (reset-top))
-;; 	   (unwind-exit (cons 'var (car vrefs))))))
-
-;(defun form-to-values-type (form)
-;  (if (and (consp form) (eq (car form) 'values)) form
-;    (let ((frt (info-type (cadr (c1symbol-fun (car form) (cdr form))))))
-;      (if (and (consp frt) (eq (car frt) 'values)) frt
-;	(list 'values frt)))))
-
-
-;(defvar *dmbs* 0)
-;(defvar *dmbsrl* 2)
-
-;;FIXME -- rewrite this more in line with let case, to catch certain changed bindings too.
-;; (defun declare-multiple-value-bindings (args specials)
-;;   (if (>= *dlbs* *dlbsrl*) args
-;;     (let ((*dlbs* (1+ *dlbs*))
-;; 	  (info (make-info))
-;; 	  (newvars *vars*))
-;;       (dolist (var (car args))
-;; 	(push (c1make-var var nil nil nil) newvars))
-;;       (let ((expt (let ((*suppress-compiler-warnings* t)
-;; 			(*suppress-compiler-notes* t))
-;; 		    (prog1 
-;; 			(info-type (cadr (c1expr (cadr args))))
-;; 		      (let ((*vars* newvars)
-;; 			    (*undefined-vars* *undefined-vars*))
-;; 			(c1args (c1body (cddr args) nil) info))))))
-;; 	(let* ((decls (remove-if-not 
-;; 		       't-to-nil
-;; 		       (if (and (consp expt) (eq (car expt) 'values))
-;; 			   (mapcar 'list (cdr expt) (car args))
-;; 			 (list (list expt (caar args)))) :key 'car))
-;; 	       (decls (remove-if
-;; 		       (lambda (x)
-;; 			 (or (si::specialp x) (member x specials)
-;; 			     (let ((nv (car (member x newvars :key 'var-name :test 'eq))))
-;; 			       (when (is-changed nv info)
-;; 				 (cmpnote "Multiple-value-binding ~S is changed and cannot be declared~%" x)
-;; 				 t)))) decls :key 'cadr)))
-;; 	  (if decls
-;; 	      (progn (cmpnote "Multiple-value bindings ~S of type ~S~%" (car args) decls )
-;; 		     (cons (car args) (cons (cadr args) (cons (cons 'declare decls) (cddr args)))))
-;; 	    args))))))
-
-;(defun multiple-binding-decls (vars mv-form body &optional expn vls)
-;  (cond ((and (not expn) (not vls) (not (eq (car mv-form) 'values)) (symbolp (car mv-form)))
-;	 (let ((mv-form (form-to-values-type mv-form)))
-;	   (multiple-binding-decls vars mv-form body t vls)))
-;	((eq (car mv-form) 'values)
-;	 (multiple-binding-decls vars (cdr mv-form) body expn t))
-;	((or (null vars) (null mv-form)) nil)
-;	(t
-;	 (let ((var (car vars)))
-;	   (let ((outer (var-type-from-symbol-name (car mv-form)))
-;		 (inf (t-to-nil (var-is-inferred var body)))
-;		 (exp (and (not expn) (consp (car mv-form)) (eq (caar mv-form) 'the) (cadar mv-form)))
-;		 (typ (and expn (t-to-nil (car mv-form))))
-;		 (frt (and (not expn) (consp (car mv-form))
-;			   (symbolp (caar mv-form))
-;			   (t-to-nil
-;			    (coerce-to-one-value
-;			     (info-type
-;			      (cadr
-;			       (c1symbol-fun (caar mv-form) (cdar mv-form))))))))
-;		 (dec (var-is-declared var body))
-;		 (chb (var-is-changed var body)))
-;	     (let ((type (or exp typ frt inf outer))
-;		   (ublk (not (or chb))))
-;	       (if type
-;		   (progn
-;		     (cmpnote "var ~S is type ~S from ~a, ~a~%"
-;			      var type (cond (exp "explicit declaration")
-;					     (typ "deduced multiple-value function return type")
-;					     (frt "deduced function return type")
-;					     (inf "argument inference")
-;					     (outer "outer scope"))
-;			      (cond (dec "is already declared, but amending declaration")
-;				    (chb "but is changed in body")
-;				    (t "declaring")))
-;		     (if ublk
-;			 (cons (list type var)
-;			       (multiple-binding-decls (cdr vars) (cdr mv-form) body expn vls))
-;		       (multiple-binding-decls (cdr vars) (cdr mv-form) body expn vls)))
-;		 (multiple-binding-decls (cdr vars) (cdr mv-form) body expn vls))))))))
-
-
-;(defun declare-multiple-value-bindings (args)
-;  (let ((decls (multiple-binding-decls
-;		(car args)
-;		(recursively-cmp-macroexpand (cadr args))
-;		(recursively-cmp-macroexpand (cddr args)))))
-;    (if decls
-;	(progn (cmpnote "multiple-value bindings ~S ~S declared ~S~%" (car args) (cadr args) decls)
-;	       (cons (car args) (cons (cadr args) (cons (cons 'declare decls) (cddr args)))))
-;      args)))
-
-
 (defun c1multiple-value-bind (args &aux (info (make-info))
                                    (vars nil) (vnames nil) init-form
                                    ss is ts body other-decls
@@ -369,13 +232,9 @@
     (return-from c1multiple-value-bind
 		 (c1expr `(let ((,(caar args) ,(cadr args))) ,@(cddr args)))))
 
-;  (setq args (declare-multiple-value-bindings args ss))
-
   (multiple-value-setq (body ss ts is other-decls) (c1body (cddr args) nil))
 
-;  (c1add-globals ss)
-
-  (dolist** (s (car args))
+  (dolist (s (car args))
     (let ((v (c1make-var s ss is ts)))
       (push s vnames)
       (push v vars)))
@@ -437,7 +296,8 @@
     (setq lbs
 	  (mapcar (lambda (x)
 		    (let ((kind (c2var-kind x))(f (eq x (car vars))))
-		      (if kind (setf (var-kind x) (if f kind 'object) (var-loc x) (cs-push (if f (var-type x) t) t))
+		      (if kind (setf (var-kind x) (if f kind 'object)
+				     (var-loc x) (cs-push (if f (var-type x) t) t))
 			(setf (var-ref x) (vs-push) x (cs-push (if f (var-type x) t) t)))))
 		  vars))
     (wt-nl "{")

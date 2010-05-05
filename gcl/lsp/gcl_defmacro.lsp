@@ -30,9 +30,6 @@
 (in-package 'system)
 
 
-;(eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))
-
-
 ;;; valid lambda-list to DEFMACRO is:
 ;;;
 ;;;	( [ &whole sym ]
@@ -102,20 +99,20 @@
   (setq *dl* `(&aux ,env ,whole))
   (setq ppn (dm-vl vl whole t))
   (dolist (kc *key-check*)
-          (push `(unless (getf ,(car kc) :allow-other-keys);FIXME order?
-                         (do ((vl ,(car kc) (cddr vl)))
-                             ((endp vl))
-                             (unless (member (car vl) ',(cons :allow-other-keys (cdr kc)))
-                                     (dm-key-not-allowed (car vl))
-                                     )))
-                body))
+    (push `(unless (getf ,(car kc) :allow-other-keys);FIXME order?
+	     (do ((vl ,(car kc) (cddr vl)))
+		 ((endp vl))
+		 (unless (member (car vl) ',(cons :allow-other-keys (cdr kc)))
+		   (dm-key-not-allowed (car vl)))))
+	  body))
   (dolist (ac *arg-check*)
-          (push `(when ,(dm-nth-cdr (cdr ac) (car ac))
-                         (dm-too-many-arguments)) body))
+    (push `(when ,(dm-nth-cdr (cdr ac) (car ac))
+	     (dm-too-many-arguments)) body))
   (unless envp (push `(declare (ignore ,env)) decls))
 ;  (list doc ppn `(lambda-block ,name ,(reverse *dl*) ,@(append decls body)))
-;  (list doc ppn (eval `(lambda ,(reverse *dl*) ,@decls (block ,name ,@body))))
-  (list doc ppn (let ((nn (gensym))) (eval `(defun ,nn ,(reverse *dl*) ,@decls (block ,name ,@body))) (symbol-function nn))))
+  (list doc ppn (eval `(function (lambda ,(reverse *dl*) ,@decls (block ,name ,@body)))))
+;  (list doc ppn (let ((nn (gensym))) (eval `(defun ,nn ,(reverse *dl*) ,@decls (block ,name ,@body))) (symbol-function nn)))
+  )
 
 (defun dm-vl (vl whole top)
   (when (consp whole)
@@ -252,30 +249,6 @@
 (defun dm-key-not-allowed (key)
        (error "The key ~s is not allowed." key))
 
-(defun find-doc (body ignore-doc)
-  (if (endp body)
-      (values nil nil nil)
-    (let ((d (macroexpand (car body))))
-      (cond ((stringp d)
-	     (if (or (endp (cdr body)) ignore-doc)
-		 (values nil nil (cons d (cdr body)))
-	       (multiple-value-bind
-		(doc decls b)
-		(find-doc (cdr body) t)
-		(declare (ignore doc))
-		(values d decls b))))
-	    ((and (consp d) (eq (car d) 'declare))
-	     (multiple-value-bind
-	      (doc decls b)
-	      (find-doc (cdr body) ignore-doc)
-	      (values doc (cons d decls) b)))
-	    ((and (consp (car body)) (eq (caar body) 'check-type))
-	     (multiple-value-bind
-	      (doc decls b)
-	      (find-doc (cdr body) ignore-doc)
-	      (values doc (cons (car body) decls) b)))
-	    (t (values nil nil body))))))
-
 (defun find-declarations (body)
   (if (endp body)
       (values nil nil)
@@ -293,3 +266,26 @@
               (t
                (values nil (cons d (cdr body))))))))
 
+
+(defmacro symbol-to-function (sym)
+  (let* ((n (gensym))
+	 (gf (find-symbol "SYMBOL-GFDEF" (find-package "C"))))
+    `(when (symbolp ,sym)
+       ,(if (fboundp gf) `(let ((,n (address (,gf ,sym))))
+			    (unless (= 0 ,n) (nani ,n)))
+	  `(let* ((,n (when (fboundp ,sym) (symbol-function ,sym)))
+		  (,n (if (and (consp ,n) (eq (car ,n) 'macro)) (cdr ,n) ,n)))
+	     (unless (consp ,n) ,n))))))
+
+(defmacro call (sym &optional f &rest keys) ;FIXME macro
+  (let* ((fnf (gensym))(n (gensym))
+	 (cc (find-symbol "CFUN-CALL" (find-package "C")))
+	 (cc (if (fboundp cc) cc 'cfun-call))
+	 (sc (find-symbol "SET-CFUN-CALL" (find-package "C")))
+	 (sc (if (fboundp sc) sc  'set-cfun-call)))
+    `(let* ((,fnf (if (functionp ,sym) ,sym (symbol-to-function ,sym))))
+       (or (when ,fnf (,cc ,fnf))
+	   (when ,f
+	     (let ((,n (make-call ,@keys)))
+	       (when ,fnf (,sc ,n ,fnf))
+	       ,n))))))

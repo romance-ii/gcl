@@ -1,3 +1,30 @@
+gclcvs (2.7.0-100) unstable; urgency=low
+
+  * static function pointer wrapper for gcl_cmp_allocfun, stabilizing gmp
+    on hppa/ia64
+
+ -- Camm Maguire <camm@debian.org>  Mon, 12 Apr 2010 22:22:42 +0000
+
+gclcvs (2.7.0-99) unstable; urgency=low
+
+  * fix cstack rounding error for rising stacks (hppa)
+
+ -- Camm Maguire <camm@debian.org>  Fri, 09 Apr 2010 17:57:00 +0000
+
+gclcvs (2.7.0-98) unstable; urgency=low
+
+  * Workaround gcc pathname -O2 bug
+  * Bug fix: "FTBFS: /bin/sh: ./tmp_image: No such file or directory",
+    thanks to Lucas Nussbaum (Closes: #534044).
+  * Bug fix: "FTBFS in various ways", thanks to Cyril Brulebois (Closes:
+    #567697).
+  * Bug fix: "replacing libreadline5-dev build dependency with
+    libreadline-dev", thanks to Matthias Klose (Closes: #553762).
+  * Bug fix: "[INTL:es] Spanish debconf template translation for gclcvs",
+    thanks to Francisco Javier Cuadrado (Closes: #549666).
+
+ -- Camm Maguire <camm@debian.org>  Tue, 02 Feb 2010 21:13:20 +0000
+
 gclcvs (2.7.0-97) unstable; urgency=low
 
   * Non-maintainer upload.
@@ -5,8 +32,12 @@ gclcvs (2.7.0-97) unstable; urgency=low
   * sync with latest 2.6.8 cleanups
   * strict aliasing fixes
   * new config.guess config.sub
+  * if cmpinclude.h is not available, use *cmpinclude-string* in compiler-pass2
+  * SGC fix, debian override fix, xgcl update
+  * SGC fix for relocatable and contiguous gmp storage
+  * __builtin___clear_cache on arm
 
- -- Camm Maguire <camm@debian.org>  Wed, 13 Jan 2010 21:55:47 +0000
+ -- Camm Maguire <camm@debian.org>  Wed, 27 Jan 2010 23:02:34 +0000
 
 gclcvs (2.7.0-96) unstable; urgency=low
 

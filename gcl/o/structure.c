@@ -181,42 +181,39 @@ structure_to_list(object x)
 	return(vs_pop);
 }
 
-LFD(siLmake_structure)(void)
-{
-  object x,name,*base;
+DEFUNO_NEW("MAKE-STRUCTURE",object,fSmake_structure,SI,1,63,NONE,OO,OO,OO,OO,void,siLmake_structure,(object name,...),"") {/*FIXME*/
+
+  fixnum narg=INIT_NARGS(1),i,size;
+  object l=Cnil,f=OBJNULL,v,x;
   struct s_data *def=NULL;
-  int narg, i,size;
-  base=vs_base;
-  if ((narg = vs_top - base) == 0)
-    too_few_arguments();
-  {BEGIN_NO_INTERRUPT;
-  x = alloc_object(t_structure);
-  name=base[0];
-  COERCE_DEF(name);
-  if (type_of(name)!=t_structure  ||
-      (def=S_DATA(name))->length != --narg)
-    FEerror("Bad make_structure args for type ~a",1,
-	    base[0]);
-  x->str.str_def = name;
-  x->str.str_self = NULL;
-  size=S_DATA(name)->size;
-  base[0] = x;
-  x->str.str_self = (object *)
-    (def->staticp == Cnil ? alloc_relblock(size)
-     : alloc_contblock(size));
+  va_list ap;
+  unsigned char *s_type;
+  unsigned short *s_pos;
+
+  {
+    BEGIN_NO_INTERRUPT;
+    x = alloc_object(t_structure);
+    COERCE_DEF(name);
+    if (type_of(name)!=t_structure  ||
+	(def=S_DATA(name))->length != narg)
+      FEerror("Bad make_structure args for type ~a",1,name);
+    x->str.str_def = name;
+    x->str.str_self = NULL;
+    size=S_DATA(name)->size;
+    x->str.str_self=(object *)(def->staticp == Cnil ? alloc_relblock(size) : alloc_contblock(size));
   /* There may be holes in the structure.
      We want them zero, so that equal can work better.
      */
-  if (S_DATA(name)->has_holes != Cnil)
-    bzero(x->str.str_self,size);
-  {unsigned char *s_type;
-   unsigned short *s_pos;
-   s_pos= (&SLOT_POS(x->str.str_def,0));
-   s_type = (&(SLOT_TYPE(x->str.str_def,0)));
-   base=base+1;
-   for (i = 0;  i < narg;  i++)
-     {object v=base[i];
-      switch(s_type[i]){
+    if (S_DATA(name)->has_holes != Cnil)
+      bzero(x->str.str_self,size);
+
+    s_pos= (&SLOT_POS(x->str.str_def,0));
+    s_type = (&(SLOT_TYPE(x->str.str_def,0)));
+
+    va_start(ap,name);
+    for (i=0;(v=NEXT_ARG(narg,ap,l,f,OBJNULL));i++) {
+
+      switch(s_type[i]) {
 	     
       case aet_object: STREF(object,x,s_pos[i])=v; break;
       case aet_fix:case aet_nnfix:  (STREF(fixnum,x,s_pos[i]))=fix(v); break;
@@ -233,31 +230,36 @@ LFD(siLmake_structure)(void)
       default:
 	bad_raw_type();
 
-      }}
-   vs_top = base;
-   vs_base=base-1;
-  END_NO_INTERRUPT;}
- }
+      }
+    }
+
+    va_end(ap);
+    END_NO_INTERRUPT;
+
+  }
+
+  RETURN1(x);
+
 }
 
-static void
-FFN(siLcopy_structure)(void)
-{
-	object x, y;
-	struct s_data *def;
+DEFUN_NEW("COPY-STRUCTURE",object,fScopy_structure,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
-	check_arg(1);
-/*  	if (vs_top-vs_base < 1) too_few_arguments(); */
-	x = vs_base[0];
-	check_type_structure(x);
-	{BEGIN_NO_INTERRUPT;
-	vs_base[0] = y = alloc_object(t_structure);
-	def=S_DATA(y->str.str_def = x->str.str_def);
-	y->str.str_self = NULL;
-	y->str.str_self = (object *)alloc_relblock(def->size);
-	bcopy(x->str.str_self,y->str.str_self,def->size);
-	vs_top=vs_base+1;
-        END_NO_INTERRUPT;}
+  object y;
+  struct s_data *def;
+  
+  check_type_structure(x);
+  {
+    BEGIN_NO_INTERRUPT;
+    y = alloc_object(t_structure);
+    def=S_DATA(y->str.str_def = x->str.str_def);
+    y->str.str_self = NULL;
+    y->str.str_self = (object *)alloc_relblock(def->size);
+    memcpy(y->str.str_self,x->str.str_self,def->size);
+    END_NO_INTERRUPT;
+  }
+
+  return y;
+
 }
 
 LFD(siLstructure_name)(void)
@@ -419,9 +421,9 @@ gcl_init_structure_function(void)
 {
 
 
-	make_si_function("MAKE-STRUCTURE", siLmake_structure);
+/* 	make_si_function("MAKE-STRUCTURE", siLmake_structure); */
 	make_si_function("MAKE-S-DATA-STRUCTURE",siLmake_s_data_structure);
-	make_si_function("COPY-STRUCTURE", siLcopy_structure);
+/* 	make_si_function("COPY-STRUCTURE", siLcopy_structure); */
 	make_si_function("STRUCTURE-NAME", siLstructure_name);
 	make_si_function("STRUCTURE-REF", siLstructure_ref);
 	make_si_function("STRUCTURE-DEF", siLstructure_def);

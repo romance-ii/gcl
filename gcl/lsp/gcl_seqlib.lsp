@@ -37,13 +37,11 @@
           remove-duplicates delete-duplicates
           mismatch search
 	  with-hash-table-iterator
-          sort stable-sort merge map-into))
+          sort stable-sort merge))
 
 
 (in-package 'system)
 
-
-;(proclaim '(optimize (safety 2) (space 3)))
 
 (eval-when (compile eval)
 
@@ -162,7 +160,11 @@
 						(declare ((array ,(car x)) ,a ,@(unless (eq a b) `(,b))))
 						(rotatef (aref ,a ,i)(aref ,b ,j))))) +grouped-array-types+))))
 	   
-	   (defmacro raref (a seq n i j l) `(if ,l (rotatef (car (aref ,a ,i)) (car (aref ,a ,j))) (rotate-same-array ,n ,seq ,i ,seq ,j)))
+	   (defmacro raref (a seq n i j l) 
+	     `(if ,l 
+		  (rotatef (car (aref ,a ,i)) (car (aref ,a ,j)))
+		(rotate-same-array ,n ,seq ,i ,seq ,j)))
+
 	   (defmacro garef (a seq i l) `(if ,l (car (aref ,a ,i)) (aref ,seq ,i)))
 
 	   (defconstant +seq-ll+ '(from-end key start end))
@@ -182,8 +184,8 @@
 		  
 		  (let* ,(when countp `((count (if count count array-dimension-limit))
 					(count (min array-dimension-limit (max 0 count)))))
-		    (let* ((startp (when start t))(start (if startp start 0))
-			   (endp (when end t))(end (if endp end array-dimension-limit))
+		    (let* ((startp (when start t))(start (if start start 0))
+			   (endp (when end t))(end (if end end array-dimension-limit))
 			   ,@(when countp `((count count)))
 			   ,@(when testp `((test (or test test-not #'eql))
 					   (test (if (functionp test) test (funcallable-symbol-function test)))
@@ -215,14 +217,24 @@
 (defun length (x)
   (declare (optimize (safety 2)))
   (check-type x proper-sequence)
-  (if (listp x)
-      (cond ((endp x) 0) 
-	    ((endp (setq x (cdr x))) 1)
-	    ((endp (setq x (cdr x))) 2)
-	    ((endp (setq x (cdr x))) 3)
-	    ((endp (setq x (cdr x))) 4)
-	    ((do ((i 5 (1+ i))(x (cdr x) (cdr x))) ((endp x) i) (declare (seqind i)))))
-    (vec-length x)))
+  (labels ((ll (x &optional (i 0)) 
+	       (declare (seqind i))
+	       (if (endp x) i (ll (cdr x) (1+ i)))))
+	  (if (listp x)
+	      (ll x 0)
+	      (if (array-has-fill-pointer-p x) (fill-pointer x) (array-dimension x 0)))))
+
+;; (defun length (x)
+;;   (declare (optimize (safety 2)))
+;;   (check-type x proper-sequence)
+;;   (if (listp x)
+;;       (cond ((endp x) 0) 
+;; 	    ((endp (setq x (cdr x))) 1)
+;; 	    ((endp (setq x (cdr x))) 2)
+;; 	    ((endp (setq x (cdr x))) 3)
+;; 	    ((endp (setq x (cdr x))) 4)
+;; 	    ((do ((i 5 (1+ i))(x (cdr x) (cdr x))) ((endp x) i) (declare (seqind i)))))
+;;     (vec-length x)))
   
 ;  (if (listp x) (do ((i 0 (1+ i))(x x (cdr x))) ((endp x) i) (declare (seqind i))) (vec-length x)))
 
@@ -258,10 +270,11 @@
 		(aet (array-element-type s))
 		(r (make-array ls :element-type aet))
 		(n (comp-array aet)))
-	   (do ((i 0 (1+ i))(j (1- ls) (1- j))) ((>= i ls) r)
+	   (do ((i 0 (1+ i))(j (1- ls) (1- j))) ((or (>= i ls) (< j 0)) r)
 	       (set-same-array n r i s j))))))
 
 (defun subseq (s start &optional end)
+  (declare (optimize (safety 1)))
   (check-type s sequence)
   (check-type start seqind)
   (unless end (setq end array-dimension-limit))
@@ -495,8 +508,8 @@
        (f (if (functionp f) f (funcallable-symbol-function f)))
        (red-comp (comp-red f))
        (rx initial-value (let* ((el (do-key key key-comp (if l (car p) (aref s i))))
-			       (ry (if from-end rx el))
-			       (rx (if from-end el rx)))
+				(ry (if from-end rx el))
+				(rx (if from-end el rx)))
 			  (cond (ivsp (do-red f red-comp rx ry))
 				((setq ivsp t) el)))))
       ((or (>= i end) (when l (endp p))) (if ivsp rx (values (funcall f))))))
@@ -569,7 +582,6 @@
 	 (call-test ,tst ,tstn ,i1 ,i2)))))
 
 
-(proclaim '(function check-seq-start-end (t t) t))
 (defun check-seq-start-end (start end)
   (unless (and (si:fixnump start) (si:fixnump end))
           (error "Fixnum expected."))
@@ -1066,24 +1078,6 @@
 	  (t
 	   (setf (elt newseq j) (elt sequence2 i2))
 	   (setf  i2 (f+ 1  i2))))))
-
-(defun map-into (result-sequence function &rest sequences)
-;  "map-into:  (result-sequence function &rest sequences)"
-  (declare (optimize (safety 2)))
-  (check-type result-sequence sequence)
-  (let ((nel (apply #'min (if (subtypep (type-of result-sequence) 'vector)
-			      (array-dimension result-sequence 0)
-			    (length result-sequence))
-		    (mapcar #'length sequences))))
-    ;; Set the fill pointer to the number of iterations
-    (when (and (subtypep  (type-of result-sequence) 'vector)
-		(array-has-fill-pointer-p result-sequence))
-      (setf (fill-pointer result-sequence) nel))
-    ;; Perform mapping
-    (dotimes (k nel result-sequence)
-      (setf (elt result-sequence k)
-	    (apply function (mapcar #'(lambda (v) (elt v k)) sequences))))))
-
 
 (defmacro with-hash-table-iterator ((name hash-table) &body body)
   (declare (optimize (safety 2)))

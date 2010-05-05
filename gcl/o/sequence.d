@@ -51,7 +51,7 @@ enum aelttype aet;
 	x->v.v_displaced = Cnil;
 	x->v.v_dim = x->v.v_fillp = l;
 	x->v.v_self = NULL;
-	x->v.v_elttype = (short)aet;
+	x->v.tt=x->v.v_elttype = (short)aet;
 	x->v.v_defrank = 1;
 	return(x);
 }

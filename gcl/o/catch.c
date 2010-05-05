@@ -56,38 +56,36 @@ of the FORM has successfully completed, SI:ERROR-SET returns NIL as the first \
 value and the result of the evaluation as the rest of the values.  If, in the \
 course of the evaluation, a non-local jump from the FORM is atempted, \
 SI:ERROR-SET traps the jump and returns the corresponding jump tag as its \
-value.")
+value.") {
 
-{
-	object *old_lex = lex_env;
+  object *old_lex = lex_env;
+  object *vals=(object *)fcall.valp;
+  
+  vs_push(Cnil);
+  frs_push(FRS_CATCHALL, Cnil);
 
-	/* 1 args */
-	vs_push(Cnil);
-	frs_push(FRS_CATCHALL, Cnil);
-	if (nlj_active) {
-		nlj_active = FALSE;
-		x0 = nlj_tag;
-		frs_pop();
-		lex_env = old_lex;
-		RETURN1(x0);
-	} else {
-		lex_env = vs_top;
-		vs_push(Cnil);
-		vs_push(Cnil);
-		vs_push(Cnil);
-		x0 = Ieval(x0);
-	}
-	frs_pop();
-	lex_env = old_lex;
-	{int i = fcall.nvalues;
-	if (i+1>=sizeof(fcall.values)/sizeof(*fcall.values))
-	  FEerror("Too many function call values",0);
-	while (i > 0)
-	{ fcall.values[i+1] = fcall.values[i];
-	  i--;}
-	 fcall.nvalues++;
-	 fcall.values[1] = x0;}
-	return Cnil;
+  if (nlj_active) {
+
+    nlj_active = FALSE;
+    x0 = nlj_tag;
+    frs_pop();
+    lex_env = old_lex;
+    RETURN1(x0);
+
+  }
+
+  lex_env = vs_top;
+  vs_push(Cnil);
+  vs_push(Cnil);
+  vs_push(Cnil);
+  if (vals)
+    vals[0]=Ievaln(x0,vals+1);
+  else
+    Ieval1(x0);
+  frs_pop();
+  lex_env = old_lex;
+  RETURN1(Cnil);
+
 }
 
 static void

@@ -97,7 +97,7 @@ FFN(Fsetq)(object form)
 			vs_top = top;
 			if (endp(MMcdr(form)))
 			FEinvalid_form("No value for ~S.", form->c.c_car);
-			setq(MMcar(form),ans=Ieval(MMcadr(form)));
+			setq(MMcar(form),ans=Ieval1(MMcadr(form)));
 			form = MMcddr(form);
 		} while (!endp(form));
 		top[0]=ans;
@@ -116,7 +116,7 @@ FFN(Fpsetq)(object arg)
 		if(endp(MMcdr(arg)))
 			FEinvalid_form("No value for ~S.", arg->c.c_car);
 		
-		top[0] = Ieval(MMcadr(arg));
+		top[0] = Ieval1(MMcadr(arg));
 		vs_top = top + 1;
 	}
 	for (arg = argsv, top = old_top; !endp(arg); arg = MMcddr(arg), top++)
@@ -143,10 +143,9 @@ DEFUNO_NEW("FUNCTION-NAME",object,fSfunction_name,SI
 	   ,1,1,NONE,OO,OO,OO,OO,void,siLfunction_name,(object x),"") {
 
   switch(type_of(x)) {
-  case t_sfun:
-  case t_gfun:
-  case t_vfun:
-  case t_afun:	
+  case t_function: 
+    x=Cnil;
+    break;
   case t_cfun:
     x=x->cf.cf_name;
     break;
@@ -157,10 +156,6 @@ DEFUNO_NEW("FUNCTION-NAME",object,fSfunction_name,SI
        x->c.c_cdr->c.c_car :
        (x->c.c_car==sLlambda_block_closure ? 
 	x->c.c_cdr->c.c_cdr->c.c_cdr->c.c_cdr->c.c_car : Cnil)) : Cnil;
-    break;
-  case t_closure:
-  case t_cclosure:
-    x=x->cc.cc_name;
     break;
   default:
     TYPE_ERROR(x,sLfunction);
@@ -200,21 +195,14 @@ DEFUNO_NEW("FSET",object,fSfset,SI
 			FEerror("~S, a special form, cannot be redefined.",
 				1, sym);
 	}
-	sym = clear_compiler_properties(sym,function);
 	if (sym->s.s_hpack == lisp_package &&
-	    sym->s.s_gfdef != OBJNULL && initflag) {
+	    sym->s.s_gfdef != OBJNULL && initflag && sLwarn->s.s_gfdef)
 		ifuncall2(sLwarn,make_simple_string("~S is being redefined."),
 			 sym);
-	}
+	sym = clear_compiler_properties(sym,function);
 	if (type_of(function) == t_cfun ||
-	    type_of(function) == t_sfun ||
-	    type_of(function) == t_vfun ||
-	    type_of(function) == t_gfun ||
 	    type_of(function) == t_ifun ||
-	    type_of(function) == t_cclosure||
-	    type_of(function) == t_closure ||
-	    type_of(function) == t_afun 
-	    ) {
+	    type_of(function) == t_function) {
 		sym->s.s_gfdef = function;
 		sym->s.s_mflag = FALSE;
 	} else if (car(function) == sLspecial)
@@ -237,27 +225,25 @@ fSfset(object sym,object function) {
 #endif
 
 static void
-FFN(Fmultiple_value_setq)(object form)
-{
-	object vars;
-	int n, i;
+FFN(Fmultiple_value_setq)(object form) {
 
-	if (endp(form) || endp(form->c.c_cdr) ||
-	    !endp(form->c.c_cdr->c.c_cdr))
-	    FEinvalid_form("~S is an illegal argument to MULTIPLE-VALUE-SETQ",
-			   form);
-	vars = form->c.c_car;
+  object vars,*vals;
+  int n, i;
+  
+  if (endp(form) || endp(form->c.c_cdr) ||
+      !endp(form->c.c_cdr->c.c_cdr))
+    FEinvalid_form("~S is an illegal argument to MULTIPLE-VALUE-SETQ",form);
 
-	fcall.values[0]=Ieval(form->c.c_cdr->c.c_car);
-	n = fcall.nvalues;
-	
-	for (i = 0;  !endp(vars);  i++, vars = vars->c.c_cdr)
-		if (i < n)
-			setq(vars->c.c_car, fcall.values[i]);
-		else
-			setq(vars->c.c_car, Cnil);
-	vs_base[0]=fcall.values[0];
-	vs_top = vs_base+1;
+  vars = form->c.c_car;
+  vals=ZALLOCA(MULTIPLE_VALUES_LIMIT*sizeof(*vals));
+
+  vals[0]=Ievaln(form->c.c_cdr->c.c_car,vals+1);
+  for (i=0,n=vs_top-vals;!endp(vars);i++,vars=vars->c.c_cdr)
+    setq(vars->c.c_car,i<n ? vals[i] : Cnil);
+
+  vs_base[0]=vals[0];
+  vs_top=vs_base+1;
+
 }
 
 DEFUNO_NEW("MAKUNBOUND",object,fLmakunbound,LISP
@@ -319,35 +305,46 @@ DEFUNO_NEW("FMAKUNBOUND",object,fLfmakunbound,LISP,1,1,NONE,OO,OO,OO,OO,void,Lfm
 }
 
 static void
-FFN(Fsetf)(object form)
-{
-	object result,*t,*t1;
-	if (endp(form)) {
-		vs_base = vs_top;
-		vs_push(Cnil);
-	} else {
-		object *top = vs_top;
-		do {
-			vs_top = top;
-			if (endp(MMcdr(form)))
-			FEinvalid_form("No value for ~S.", form->c.c_car);
-			result = setf(MMcar(form), MMcadr(form));
-			form = MMcddr(form);
-		} while (!endp(form));
-		t=vs_base;
-		t1=vs_top;
-		vs_top = vs_base = top;
-		for (;t<t1;t++)
-		  vs_push(*t);
+FFN(Fsetf)(object form) {
 
-	}
+  object result=Cnil,*top=vs_top;
+
+  for (;!endp(form);form=MMcddr(form)) {
+    vs_top = top;
+    if (endp(MMcdr(form)))
+      FEinvalid_form("No value for ~S.", form->c.c_car);
+    result=setf(MMcar(form), MMcadr(form));
+  }
+  vs_base=top;
+  vs_base[0]=result;
+  vs_top=vs_base+1;
+
 }
+    
+/*   if (endp(form)) { */
+/*     vs_base = vs_top; */
+/*     vs_push(Cnil); */
+/*   } else { */
+/*     object *top = vs_top; */
+/*     do { */
+/*       vs_top = top; */
+/*       if (endp(MMcdr(form))) */
+/* 	FEinvalid_form("No value for ~S.", form->c.c_car); */
+/*       result = setf(MMcar(form), MMcadr(form)); */
+/*       form = MMcddr(form); */
+/*     } while (!endp(form)); */
+/*     vs_top = vs_base = top; */
+/*     vs_base[0]=result; */
+/*     vs_top=vs_base+1; */
+    
+/*   } */
+/* } */
 
 #define	eval_push(form)  \
 {  \
 	object *old_top = vs_top;  \
   \
-	*old_top = Ieval(form);  \
+	*old_top = Ieval1(form);  \
 	vs_top = old_top + 1;  \
 }
 
@@ -368,8 +365,7 @@ setf(object place, object form)
 	extern void siLhash_set();
 
 	if (!consp(place)) {
-	  setq(place, result=Ieval(form));
-	  vs_top=vs_base+1;
+	  setq(place, result=Ieval1(form));
 	  return result;
 	}
 	fun = place->c.c_car;
@@ -378,52 +374,39 @@ setf(object place, object form)
 	args = place->c.c_cdr;
 	if (fun == sLget) {
             object sym,val,key,deflt,deflt1;
-	  sym = Ieval(car(args));
-	  key = Ieval(car(Mcdr(args)));
+	  sym = Ieval1(car(args));
+	  key = Ieval1(car(Mcdr(args)));
           deflt1 = Mcddr(args);
-          if ( consp(deflt1) ) {
-              deflt = Ieval(car(deflt1));
-          }
-	  val = Ieval(form);
+          if (consp(deflt1))
+	    deflt = Ieval1(car(deflt1));
+	  val = Ieval1(form);
 	  return putprop(sym,val,key); 
 	}
 /* 	if (fun == sLgetf)  */
 /* 	  Ieval(Mcaddr(args)); */
-	if (fun == sLaref) { f = siLaset; goto EVAL; }
+	if (fun == sLaref) { f = siLaset; args=MMcons(form,args);goto EVAL; }
 	if (fun == sLsvref) { f = siLsvset; goto EVAL; }
 	if (fun == sLelt) { f = siLelt_set; goto EVAL; }
 	if (fun == sLchar) { f = siLchar_set; goto EVAL; }
 	if (fun == sLschar) { f = siLchar_set; goto EVAL; }
 	if (fun == sLfill_pointer) { f = siLfill_pointer_set; goto EVAL; }
-	if (fun == sLgethash) { f = siLhash_set; nka=2; goto EVAL; }
+/* 	if (fun == sLgethash) { f = siLhash_set; nka=2; goto EVAL; } */
 	if (fun == sLcar) {
-		x = Ieval(Mcar(args));
-		result = Ieval(form);
+		x = Ieval1(Mcar(args));
+		result = Ieval1(form);
 		if (!consp(x))
 			FEerror("~S is not a cons.", 1, x);
 		Mcar(x) = result;
 		return result;
 	}
 	if (fun == sLcdr) {
-		x = Ieval(Mcar(args));
-		result = Ieval(form);
+		x = Ieval1(Mcar(args));
+		result = Ieval1(form);
 		if (!consp(x))
 			FEerror("~S is not a cons.", 1, x);
 		Mcdr(x) = result;
 		return result;
 	}
-
-/* 	/\* FIXME should this be removed as it appears to usurp setf-expanders? *\/ */
-/* 	if ((x=getf(fun->s.s_plist,sSsetf_function,Cnil))!=Cnil) { */
-/* 	  object y=args; */
-/* 	  /\* FIXME do a direct funcall here *\/ */
-/* 	  y=append(list(1,form),y); */
-/* 	  x=type_of(x)==t_symbol ? symbol_function(x) : x; */
-/* 	  y=MMcons(x,y); */
-/* 	  y=MMcons(sLfuncall,y); */
-/* 	  result=Ieval(y); */
-/* 	  return result; */
-/* 	} */
 
 	x = getf(fun->s.s_plist, sSstructure_access, Cnil);
 	if (x == Cnil || !consp(x))
@@ -433,13 +416,9 @@ setf(object place, object form)
 	if (type_of(x->c.c_cdr) != t_fixnum)
 		goto OTHERWISE;
 	i = fix(x->c.c_cdr);
-/*
-	if (i < 0)
-		goto OTHERWISE;
-*/
 	x = x->c.c_car;
-	y = Ieval(Mcar(args));
-	result = Ieval(form);
+	y = Ieval1(Mcar(args));
+	result = Ieval1(form);
 	if (x == sLvector) {
 		if (type_of(y) != t_vector || i >= y->v.v_fillp)
 			goto OTHERWISE;
@@ -456,10 +435,9 @@ setf(object place, object form)
 	return result;
 
 EVAL:
-	for (;  !endp(args);  args = args->c.c_cdr) {
-		eval_push(args->c.c_car);
-	}
-	eval_push(form);
+	for (;!endp(args);args=args->c.c_cdr)
+	  eval_push(args->c.c_car);
+	if (f!=siLaset) eval_push(form);
 	if (nka && vs_top-vs>nka) {
 	  vs[nka]=vs_base[0];
 	  vs_top=vs+nka+1;
@@ -489,7 +467,7 @@ OTHERWISE:
 	if (!sLsetf->s.s_mflag || sLsetf->s.s_gfdef == OBJNULL)
 		FEerror("Where is SETF?", 0);
 	funcall(sLsetf->s.s_gfdef);
-	return Ieval(vs_base[0]);
+	return Ieval1(vs_base[0]);
 }
 
 static void
@@ -628,18 +606,6 @@ FFN(Fdecf)(object form)
 	eval(vs_base[0]);
 }
 
-
-/* object */
-/* clear_compiler_properties(object sym, object code) */
-/* { object tem; */
-/*   VFUN_NARGS=2; fSuse_fast_links(Cnil,sym); */
-/*   tem = getf(sym->s.s_plist,sStraced,Cnil); */
-/*   if (sSAinhibit_macro_specialA && sSAinhibit_macro_specialA->s.s_dbind != Cnil) */
-/*     (void)ifuncall2(sSclear_compiler_properties, sym,code); */
-/*   if (tem != Cnil) return tem; */
-/*   return sym; */
-  
-/* } */
 
 DEF_ORDINARY("CLEAR-COMPILER-PROPERTIES",sSclear_compiler_properties,SI,"");
 

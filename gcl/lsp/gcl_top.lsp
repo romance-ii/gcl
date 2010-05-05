@@ -28,7 +28,7 @@
 (in-package "LISP")
 ;(export 'lisp)
 (export '(+ ++ +++ - * ** *** / // ///))
-(export '(break warn))
+;(export '(break warn))
 (export '*break-on-warnings*)
 (export '*break-enable*)
 
@@ -102,8 +102,6 @@
     (setq *package* z)
     (format t "Emergency reset complete~%")))
 
-(defconstant +coerce-list+ '(list vector string array character short-float long-float float complex function null cons))
-
 (defun show-lib-syms nil
   (when (find-package "LIB")
     (do-external-symbols 
@@ -112,6 +110,17 @@
      (do-external-symbols 
       (s p)
       (print (list s (symbol-value s) (when (fboundp s) (symbol-function s))))))))
+
+(defun coerce-to-package (p)
+  (cond ((packagep p) p)
+	((find-package p))
+	(t 
+	 (cerror "Input new package" 'package-error
+		 :package p 
+		 :format-control "~a is not a package"
+		 :format-arguments (list p)) 
+	 (coerce-to-package (eval (read))))))
+;(declaim (inline coerce-to-package))
 
 (defun reset-lib-syms nil
   (when (find-package "LIB")
@@ -343,17 +352,17 @@
 (defvar *debug-print-level* 3)
 
 ;;FIXME elim
-(defun warn (format-string &rest args)
-  (let ((*print-level* 4)
-        (*print-length* 4)
-        (*print-case* :upcase))
-    (cond (*break-on-warnings*
-           (apply #'break format-string args))
-          (t (format *error-output* "~&Warning: ")
-             (let ((*indent-formatted-output* t))
-               (apply #'format *error-output* format-string args))
-	     (terpri *error-output*)
-             nil))))
+;; (defun warn (format-string &rest args)
+;;   (let ((*print-level* 4)
+;;         (*print-length* 4)
+;;         (*print-case* :upcase))
+;;     (cond (*break-on-warnings*
+;;            (apply #'break format-string args))
+;;           (t (format *error-output* "~&Warning: ")
+;;              (let ((*indent-formatted-output* t))
+;;                (apply #'format *error-output* format-string args))
+;; 	     (terpri *error-output*)
+;;              nil))))
 
 ;; (defun universal-error-handler
 ;;   (error-name correctable function-name
@@ -607,7 +616,12 @@
 (defun ihs-fname (ihs-index)
   (let ((fun (ihs-fun ihs-index)))
     (cond ((symbolp fun) fun)
-	  ((when (interpreted-function-p fun) (setq fun (interpreted-function-lambda fun)) nil))
+	  ((when (compiled-function-p fun) (compiled-function-name fun)));FIXME
+	  ((functionp fun) (multiple-value-bind ;FIXME faster
+			    (x y fun) 
+			    (function-lambda-expression fun)
+			    (declare (ignore x y))
+			    fun))
           ((consp fun)
            (case (car fun)
              (lambda 'lambda)
@@ -619,9 +633,7 @@
 			     (fboundp (car fun))))
 		    (car fun) :zombi)
 		    )))
-          ((compiled-function-p fun)
-           (compiled-function-name fun))
-          (t :zombi))))
+          (:zombi))))
 
 (defun ihs-not-interpreted-env (ihs-index)
   (let ((fun (ihs-fun ihs-index)))
@@ -842,6 +854,26 @@ First directory is checked for first name and all extensions etc."
 (defun set-dir (sym flag)
    (let ((tem (or (si::get-command-arg flag) (and (boundp sym) (symbol-value sym)))))
       (if tem (set sym (si::coerce-slash-terminated tem)))))
+
+(defun get-temp-dir ()
+  (dolist (x `(,@(mapcar 'si::getenv '("TMPDIR" "TMP" "TEMP")) "/tmp" ""))
+    (when x
+      (let* ((x (pathname x))
+	     (x (if (pathname-name x) x 
+		  (merge-pathnames
+		   (make-pathname :directory (butlast (pathname-directory x)) 
+				  :name (car (last (pathname-directory x))))
+		   x))))
+	(when (stat x) 
+	  (return-from 
+	   get-temp-dir 
+	   (namestring 
+	    (make-pathname 
+	     :device (pathname-device x)
+	     :directory (when (or (pathname-directory x) (pathname-name x))
+			  (append (pathname-directory x) (list (pathname-name x))))))))))))
+
+(defvar si::*lib-directory* (namestring (make-pathname :directory (list :parent))))
 
 (defun set-up-top-level ( &aux (i (argc)) tem)
   (declare (fixnum i))

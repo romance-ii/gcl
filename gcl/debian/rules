@@ -20,9 +20,9 @@ MCC:=gcc
 #ifeq ($(ARCHT),hppa)
 #MCC:=gcc-3.4
 #endif
-#ifeq ($(ARCHT),alpha)
-#MCC:=gcc-3.4
-#endif
+ifeq ($(ARCHT),alpha)
+MCC:=gcc-4.3
+endif
 #ifeq ($(ARCHT),m68k)
 #MCC:=gcc-3.4
 #endif

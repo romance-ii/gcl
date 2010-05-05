@@ -36,12 +36,12 @@ DECL := $(HDIR)/new_decl.h
 CPP=
 %.ini: %.c grab_defs #plt.h
 	[ -e $(DECL) ] || touch $(DECL)
-	$(CC) -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c | sed -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
+	$(CC) -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c | sed -e 's,^.* DEFUNB_NEW,DEFUNB_NEW,g' -e 's/DEF,//g' -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
 
 %.ini: %.d $(DPP) grab_defs
 	[ -e $(DECL) ] || touch $(DECL)
 	$(DPP) $*
-	$(CC) -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c | sed -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
+	$(CC) -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c | sed -e 's,^.* DEFUNB_NEW,DEFUNB_NEW,g' -e 's/DEF,//g' | sed -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
 	rm $*.c
 
 X11_INCLUDE=${TK_XINCLUDES} ${HAVE_X11}
@@ -179,8 +179,8 @@ plt.h: plttest.o pltd.h
 			grep -v _gp_disp | \
 			$(AWK) '{A[++k]=$$0} END {for (i=1;i<=k;i++) \
 				printf("MY_PLT(%s)%s\n",A[i],i==k ? "" : ",");}' >$@
-	rm $@
-	touch $@
+#	rm $@
+#	touch $@
 	echo Plt table:
 	cat $@
 

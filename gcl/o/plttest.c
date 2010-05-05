@@ -34,6 +34,12 @@ main(int argc,char * argv[],char *envp[]) {
   l/=ul/l;
   l/=((long)ul)/l;
 
+  l=__builtin_clzl(l);
+  l=__builtin_ctzl(l);
+  l=__builtin_popcountl(l);
+  l=__builtin_parityl(l);
+  l=__builtin_ffsl(l);
+
   ch=getc(f);
   ch&=putc(ch,f);
   ch&=feof(f);

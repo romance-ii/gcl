@@ -599,14 +599,19 @@ gcl_init_character()
 	  object x=(object)(character_table+i);
 	  set_type_of(x,t_character);
 	  x->ch.ch_code = i;
+	  x->ch.tt=((' ' <= i && i < '\177') || i == '\n');
 	  x->ch.ch_font = 0;
 	  x->ch.ch_bits = 0;
+	  x->ch.ch_self=&x->ch.ch_code;
+	  x->ch.ch_fillp=1;
 	}
 #ifdef AV
 	for (i = -128;  i < 0;  i++) {
 	  object x=(object)(character_table+i);
+	  int j=i+CHCODELIM;
 	  set_type_of(x,t_character);
-	  x->ch.ch_code = i+CHCODELIM;
+	  x->ch.ch_code = j;
+	  x->ch.tt=((' ' <= j && j < '\177') || j == '\n');
 	  x->ch.ch_font = 0;
 	  x->ch.ch_bits = 0;
 	}

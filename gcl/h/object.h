@@ -47,7 +47,8 @@ typedef unsigned short uhfixnum;
 #error No hfixnum size detected
 #endif
 
-typedef char character;
+/* typedef char character; */
+typedef unsigned char uchar;
 
 #if 4 * SIZEOF_SHORT == SIZEOF_LONG
 typedef short           qfixnum;
@@ -61,23 +62,29 @@ typedef unsigned char   uqfixnum;
 
 #if SIZEOF_LONG < 8
 #define SPAD object pad
+#define LM31BITS 1
 #else
 #define SPAD
+#define LM31BITS 33/*FIXME*/
 #endif
 
 #ifndef WORDS_BIGENDIAN
 
-#define FIRSTWORD fixnum e:1,m:1,f:1,s:1,z:4,t:8,w:LM16BITS
-#define MARKWORD  fixnum e:1,mf:2,   s:1,z:4,t:8,w:LM16BITS
-#define SGCMWORD  fixnum e:1,mfs:3,      z:4,t:8,w:LM16BITS
-#define TYPEWORD  fixnum emf:3,      s:1,z:4,t:8,w:LM16BITS
+#define FIRSTWORD ufixnum e:1,m:1,f:1,s:1,t:5,tt:4,st:3,w:LM16BITS
+#define FSTPWORD  ufixnum emfs:4,         tp:9,    st:3,w:LM16BITS
+#define MARKWORD  ufixnum e:1,mf:2,   s:1,t:5,w:LM9BITS
+#define SGCMWORD  ufixnum e:1,mfs:3,      t:5,w:LM9BITS
+#define TYPEWORD  ufixnum emf:3,      s:1,t:5,w:LM9BITS
+#define FUNWORD   ufixnum e:1,m:1,f:1,s:1,t:5,tt:4,fun_minarg:6,fun_maxarg:6,fun_neval:5,fun_vv:1,w:LM31BITS
 
 #else
 
-#define FIRSTWORD fixnum w:LM16BITS,t:8,z:4,s:1,f:1,m:1,e:1
-#define MARKWORD  fixnum w:LM16BITS,t:8,z:4,s:1,mf:2,   e:1
-#define SGCMWORD  fixnum w:LM16BITS,t:8,z:4,mfs:3,      e:1
-#define TYPEWORD  fixnum w:LM16BITS,t:8,z:4,s:1,emf:3
+#define FIRSTWORD ufixnum w:LM16BITS,st:3,tt:4,t:5,s:1,f:1,m:1,e:1
+#define FSTPWORD  ufixnum w:LM16BITS,st:3,tp:9,    emfs:4
+#define MARKWORD  ufixnum w:LM9BITS,           t:5,s:1,mf:2,   e:1
+#define SGCMWORD  ufixnum w:LM9BITS,           t:5,mfs:3,      e:1
+#define TYPEWORD  ufixnum w:LM9BITS,           t:5,s:1,emf:3
+#define FUNWORD   ufixnum w:LM31BITS,fun_vv:1,fun_neval:5,fun_maxarg:6,fun_minarg:6,tt:4,t:5,s:1,f:1,m:1,e:1
 
 #endif
 
@@ -265,9 +272,30 @@ struct character {
 
   FIRSTWORD;
 
-  uhfixnum ch_code; /*  code  */
-  uqfixnum ch_font; /*  font  */
-  uqfixnum ch_bits; /*  bits  */
+  uqfixnum          ch_code; /*  code  */
+  uqfixnum          pad;     /*  pad  */
+  uqfixnum          ch_font; /*  font  */
+  uqfixnum          ch_bits; /*  bits  */
+  ufixnum           pad1;
+  uchar            *ch_self;
+  ufixnum           pad5:4;
+  ufixnum           ch_fillp:LM4BITS;
+  ufixnum           pad2;
+  ufixnum           pad3;
+  ufixnum           pad4;
+
+};
+
+struct stdesig {
+
+  FIRSTWORD;
+
+  ufixnum           pad;
+  ufixnum           pad1;
+  char             *sd_self;
+  ufixnum           pad2:4;
+  ufixnum           sd_fillp:LM4BITS;
+  ufixnum           pad3;
 
 };
 
@@ -293,10 +321,10 @@ struct symbol {
 
   FIRSTWORD;
 
-  vfunc      s_sfdef;        /*  special form definition  */
+  fixnum     s_sfdef;        /*  special form definition  */
                             /*  This field coincides with c_car  */
   object     s_dbind;        /*  dynamic binding  */
-  character *s_self;         /*  print name  */
+  char      *s_self;         /*  print name  */
                             /*  These fields coincide with  */
                             /*  st_fillp and st_self.  */
   ufixnum    s_pad1:4;       /*  print name length  */
@@ -331,7 +359,7 @@ EXTER union lispunion Ct_body OBJ_ALIGN;
 #define sLnil Cnil
 #define sLt Ct
 
-#define NOT_SPECIAL  ((void (*)())Cnil)
+#define NOT_SPECIAL  (fixnum)Cnil
 
 struct package {
 
@@ -473,7 +501,7 @@ struct vector {           /*  vector header  */
 
 struct string {           /*  string header  */
 
-  vtempl(character,st_);
+  vtempl(char,st_);
 
 };
 
@@ -713,6 +741,18 @@ struct pathname {
 
 };
 
+struct function {
+
+  FUNWORD;
+  
+  ofunc   fun_self;
+  object  fun_data;
+  plist   fun_plist;/* sig callees callers src file */
+  ufixnum fun_argd; /*checking*/
+  object *fun_env;
+
+};
+
 struct cfun {        /*  compiled function header  */
 
   FIRSTWORD;
@@ -723,22 +763,6 @@ struct cfun {        /*  compiled function header  */
   object cf_data;    /*  data the function uses  */
                      /*  for GBC  */
   SPAD;
-
-};
-
-struct cclosure {    /*  compiled closure header  */
-
-  FIRSTWORD;
-
-  symbol  cc_name;           /*  compiled closure name  */
-  vfunc   cc_self;           /*  entry address  */
-  object  cc_call;
-  plist   cc_env;            /*  environment  */
-  object  cc_data;           /*  data the closure uses  */
-                             /*  for GBC  */
-  ufixnum cc_pad:4;
-  ufixnum cc_envdim:LM4BITS;
-  object *cc_turbo;          /*  turbo charger */
 
 };
 
@@ -757,61 +781,18 @@ struct closure {
 
 };
 
-struct sfun {
-
-  FIRSTWORD; 
-
-  symbol   sfn_name;       /* name */
-  ofunc    sfn_self;       /* C start address of code */
-  object   sfn_call;
-  object   sfn_data;       /* To object holding VV vector */
-  ufixnum  sfn_argd;       /* description of args + number */
-  ufixnum  sfn_nval;
-  SPAD;
-
-};
-
 struct ifun {
 
   FIRSTWORD; 
 
+  symbol  ifn_name;
   plist   ifn_self;       /* list def */
+  object  ifn_call;
 
 };
 
 #define CMVFUNP(x_) ({enum type _t=type_of(x_);((_t==t_sfun || _t==t_vfun || _t==t_gfun) && x_->sfn.sfn_argd&MVRET_BIT);})
 
-/* #if SIZEOF_LONG == 4 */
-/* #define VFILL_BITS 8 */
-/* #elif SIZEOF_LONG == 8 */
-/* #define VFILL_BITS 40 */
-/* #else */
-/* #error Cannot calculate VFILL_BITS */
-/* #endif */
-
-struct vfun {
-
-  FIRSTWORD; 
-
-  symbol           vfn_name;       /* name */
-  ofunc            vfn_self;    /* C start address of code */
-  object           vfn_call;
-  object           vfn_data;       /* To object holding VV data */
-#ifndef WORDS_BIGENDIAN
-  ufixnum          vfn_minargs:8;  /* Min args and where varargs start */
-  ufixnum          vfn_mv     :8;  /* mv bits */
-  ufixnum          vfn_maxargs:8;  /* Max number of args */
-  ufixnum          vfn_unused :LM24BITS; 
-#else
-  ufixnum          vfn_unused :LM24BITS; 
-  ufixnum          vfn_maxargs:8;  /* Max number of args */
-  ufixnum          vfn_mv     :8;  /* mv bits */
-  ufixnum          vfn_minargs:8;  /* Min args and where varargs start */
-#endif
-  ufixnum          vfn_nval;
-  SPAD;
-
-};
 struct cfdata {
 
   FIRSTWORD;
@@ -838,6 +819,8 @@ struct spice {
  dummy type
 */
 struct dummy      {FIRSTWORD;};
+struct fstpw      {FSTPWORD;};
+union  fstp       {ufixnum f;struct fstpw t;};
 struct mark       {MARKWORD;};
 struct typew      {TYPEWORD;};
 struct sgcm       {SGCMWORD;};
@@ -860,6 +843,7 @@ union lispunion {
  struct array               a; /*  array  */
  struct vector              v; /*  vector  */
  struct string             st; /*  string  */
+ struct stdesig            sd; /*  array character symbol -- phony for c package ref  */
  struct ustring           ust;
  struct bitvector          bv; /*  bit-vector  */
  struct structure         str; /*  structure  */
@@ -868,15 +852,14 @@ union lispunion {
  struct readtable          rt; /*  read table  */
  struct pathname           pn; /*  path name  */
  struct cfun               cf; /*  compiled function  uses value stack] */
- struct cclosure           cc; /*  compiled closure  uses value stack */
  struct closure            cl; /*  compiled closure  uses c stack */
- struct sfun              sfn; /*  simple function */
+ struct function          fun; /*  compiled closure  uses c stack */
  struct ifun              ifn; /*  interpreted function */
- struct vfun              vfn; /*  function with variable number of args */
  struct cfdata            cfd; /* compiled fun data */
  struct spice             spc; /*  spice  */
 
  struct dummy               d; /*  dummy  */
+ union  fstp             fstp; /*  fast type  */
  struct mark               md; /*  mark dummy  */
  struct sgcm              smd; /*  sgc mark dummy  */
  struct typew              td; /*  type dummy  */
@@ -955,6 +938,8 @@ C predicates
 #define stringp(a_)    SPP(a_,string)
 #define fixnump(a_)    SPP(a_,fixnum)
 #define readtablep(a_) SPP(a_,readtable)
+#define functionp(a_)  ({enum type _t=type_of(a_);(_t>=t_ifun && _t<=t_function);})
+#define compiled_functionp(a_)  ({enum type _t=type_of(a_);(_t>=t_cfun && _t<=t_function);})
 
 extern int big_sign(object);
 #define integerp(a_) ({enum type _tp=type_of(a_); _tp >= t_fixnum     && _tp <= t_bignum;})
@@ -1193,25 +1178,30 @@ object  fun;
 hfixnum argd;
 hfixnum nvalues;
 object  values[MULTIPLE_VALUES_LIMIT];
+fixnum  valp;
 double  double_return;
 
 };
 EXTER struct call_data fcall;
 
 #define  VFUN_NARGS fcall.argd
-#define RETURN3(x,y,z) do{fcall.values[2]=z;fcall.values[1]=y;fcall.nvalues=3;return (x) ;} while(0)
-#define RETURN2(x,y) do{fcall.values[1]=y;fcall.nvalues=2;return (x) ;} while(0)
-#define RETURN1(x) do{fcall.nvalues=1; return (x) ;} while(0)
-#define RETURN0  do{fcall.nvalues=0; return Cnil ;} while(0)
+#define  FUN_VALP   fcall.valp
+#define RETURN3(x,y,z)  RETURN(3,object,x,(RV(y),RV(z)))
+#define RETURN2(x,y)    RETURN(2,object,x,(RV(y)))
+#define RETURN3I(x,y,z) RETURN(3,fixnum,x,(RV(y),RV(z)))
+#define RETURN2I(x,y)   RETURN(2,fixnum,x,(RV(y)))
+/* #define RETURN1(x) RETURN(1,object,x,) */
+#define RETURN1(x) return(x)
+#define RETURN0 do {vs_top=(object *)vals-1;return Cnil;} while (0)
 
-#define RV(x) (*_p++ = x)
+#define RV(x) ({if (_p) *_p++ = x;})
 
 #define RETURNI(n,val1,listvals) RETURN(n,int,val1,listvals)
 #define RETURNO(n,val1,listvals) RETURN(n,object,val1,listvals)
 
 /* eg: RETURN(3,object,val1,(RV(val2),RV(val3))) */
 #define RETURN(n,typ,val1,listvals) \
-   do{typ _val1 = val1; object *_p=&fcall.values[1]; listvals; fcall.nvalues= n; return _val1;}while(0)
+  do{typ _val1 = val1; object *_p=(object *)vals; listvals; vs_top=_p ? _p : base; return _val1;} while(0)
 /* #define CALL(n,form) (VFUN_NARGS=n,form) */
 
  
@@ -1401,3 +1391,19 @@ EXTER object null_string;
                       sKformat_arguments,list(1,(b_)))
 #define FEinvalid_variable(a_,b_) FEinvalid_form(a_,b_)
 #define FEwrong_type_argument(a_,b_) TYPE_ERROR(b_,a_)
+
+#define VA_ARG(_a,_f,_n) \
+  ({object _z=_f!=OBJNULL ? _f : va_arg(_a,object);\
+    _f=OBJNULL;_n+=((_n<0) ? 1 : -1);_z;})
+
+#define NEXT_ARG(_n,_a,_l,_f,_d)\
+  ({object _z;\
+    switch (_n) {\
+    case -1: _l=VA_ARG(_a,_f,_n);						\
+    case  0: if (_l==Cnil) _z=_d; else {_z=_l->c.c_car;_l=_l->c.c_cdr;};break;\
+    default: _z=VA_ARG(_a,_f,_n);break;					\
+    } _z;}) 
+
+#define INIT_NARGS(_n) ({fixnum _v=VFUN_NARGS;_v=_v<0 ? _v+_n : _v-_n;_v;})
+
+#define object_to_object(x) x

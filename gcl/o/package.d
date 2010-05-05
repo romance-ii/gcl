@@ -397,7 +397,9 @@ object x;
   return(h);
 }}
 
-
+DEFUN_NEW("PACK-HASH",fixnum,fSpack_hash,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {
+  RETURN1(pack_hash(x));
+}
 
 /*
 	Intern(st, p) interns string st in package p.
@@ -440,6 +442,7 @@ object st, p;
 	vs_push(x);
 	if (p == keyword_package) {
 		x->s.s_stype = (short)stp_constant;
+		x->s.tt=2;
 		x->s.s_dbind = x;
 		*ep = make_cons(x, *ep);
 		keyword_package->p.p_external_fp ++;
@@ -534,8 +537,10 @@ L:
 
 UNINTERN:
 	delete_eq(s, lp);
-	if (s->s.s_hpack == p)
+	if (s->s.s_hpack == p) {
 		s->s.s_hpack = Cnil;
+		s->s.tt=0;
+	}
 	if ((enum stype)s->s.s_stype != stp_ordinary)
 		uninterned_list = make_cons(s, uninterned_list);
 	END_NO_INTERRUPT;return(TRUE);
@@ -640,7 +645,7 @@ object s, p;
 	ip = &P_INTERNAL(p ,j);
 	p->p.p_internal_fp++;
 	*ip = make_cons(s, *ip);
-	if (s->s.s_hpack==Cnil) s->s.s_hpack=p;
+	if (s->s.s_hpack==Cnil) {if (p==keyword_package) s->s.tt=2;s->s.s_hpack=p;}
 }
 
 static void
@@ -663,8 +668,10 @@ object s, p;
 			delete_eq(x, &P_INTERNAL(p,pack_hash(x)));
 		else
 			delete_eq(x, &P_EXTERNAL(p ,pack_hash(x)));
-		if (x->s.s_hpack == p)
+		if (x->s.s_hpack == p) {
 			x->s.s_hpack = Cnil;
+			x->s.tt=0;
+		}
 		if ((enum stype)x->s.s_stype != stp_ordinary)
 			uninterned_list = make_cons(x, uninterned_list);
 	}
@@ -691,6 +698,7 @@ object s, p;
 	ip = &P_INTERNAL(p ,j);
 	vs_push(make_symbol(s));
 	vs_head->s.s_hpack = p;
+	if (p==keyword_package) vs_head->s.tt=2;
 	*ip = make_cons(vs_head, *ip);
 	p->p.p_internal_fp++;
 	p->p.p_shadowings = make_cons(vs_head, p->p.p_shadowings);
@@ -850,9 +858,9 @@ DEFUN_NEW("IN-PACKAGE-INTERNAL",object,fSin_package_internal,SI,2,2,NONE,OO,OO,O
   /*fixme non-std error check?*/
   for (;consp(r) && consp(r->c.c_cdr);r=r->c.c_cdr->c.c_cdr) {
     if (r->c.c_car==sKuse)
-      use=Ieval(r->c.c_cdr->c.c_car);
+      use=Ieval1(r->c.c_cdr->c.c_car);
     if (r->c.c_car==sKnicknames)
-      nick=Ieval(r->c.c_cdr->c.c_car);
+      nick=Ieval1(r->c.c_cdr->c.c_car);
   }
 
   RETURN1(in_package(p,nick,use,0,0));
@@ -866,8 +874,7 @@ FFN(Fin_package)(void) {
 
   object x;
 
-  VFUN_NARGS=vs_top-vs_base;
-  check_arg_range(2,2);
+  check_arg_range(vs_top-vs_base,2,2);
   x=MMcadr(vs_base[0]);
   x=type_of(x)==t_symbol ? list(2,sLquote,x) : x;
   vs_base[0]=list(3,sSin_package_internal,x,list(2,sLquote,MMcddr(vs_base[0])));
@@ -877,11 +884,8 @@ FFN(Fin_package)(void) {
 
 #endif
 
-LFD(Lfind_package)()
-{
-	check_arg(1);
-
-	vs_base[0] = find_package(vs_base[0]);
+DEFUN_NEW("FIND-PACKAGE",object,fLfind_package,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(find_package(x));/*FIXME p->p_link not exposable in lisp*/
 }
 
 LFD(Ldelete_package_internal)()
@@ -1286,6 +1290,9 @@ gcl_init_package()
 #endif
 #endif
 
+	make_package(make_simple_string("C"),Cnil,Cnil,0,0);
+	gmp_package=make_package(make_simple_string("GMP"),Cnil,Cnil,0,0);
+
 	/*  There is no need to enter a package as a mark origin.  */
 
 	uninterned_list = Cnil;
@@ -1303,7 +1310,7 @@ gcl_init_package_function()
 #else
 	make_function("IN-PACKAGE", Lin_package);
 #endif
-	make_function("FIND-PACKAGE", Lfind_package);
+/* 	make_function("FIND-PACKAGE", Lfind_package); */
 	make_function("PACKAGE-NAME", Lpackage_name);
 	make_function("PACKAGE-NICKNAMES", Lpackage_nicknames);
 	make_function("RENAME-PACKAGE", Lrename_package);

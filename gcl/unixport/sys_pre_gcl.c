@@ -63,7 +63,9 @@ gcl_init_init()
   lsp_init("../lsp/gcl_export.lsp");
   lsp_init("../lsp/gcl_pl.lsp");
 
-  lsp_init("../lsp/gcl_callhash.lsp");
+  lsp_init("../lsp/gcl_dl.lsp");
+  lsp_init("../lsp/gcl_fle.lsp");
+  lsp_init("../lsp/gcl_rm.lsp");
 
   lsp_init("../lsp/gcl_defmacro.lsp");
   lsp_init("../lsp/gcl_evalmacros.lsp");
@@ -82,6 +84,7 @@ gcl_init_system(object no_init)
     error("Supplied no_init is not of type symbol\n");
 
   lsp_init("../lsp/gcl_predlib.lsp");
+  lsp_init("../lsp/gcl_callhash.lsp");
   lsp_init("../lsp/gcl_assert.lsp");
 /*   lsp_init("../lsp/gcl_listlib.lsp"); */
   lsp_init("../lsp/gcl_mislib.lsp");
@@ -90,6 +93,7 @@ gcl_init_system(object no_init)
 
   lsp_init("../lsp/gcl_seq.lsp");
   lsp_init("../lsp/gcl_seqlib.lsp");
+  lsp_init("../lsp/gcl_nr.lsp");
   lsp_init("../lsp/gcl_bnum.lsp");
   lsp_init("../lsp/gcl_numlib.lsp");
 
@@ -121,10 +125,11 @@ gcl_init_system(object no_init)
 
   lsp_init("../cmpnew/gcl_cmpbind.lsp");
   lsp_init("../cmpnew/gcl_cmpblock.lsp");
+  lsp_init("../cmpnew/gcl_cmpvar.lsp");
+  lsp_init("../cmpnew/gcl_cmpeval.lsp");
   lsp_init("../cmpnew/gcl_cmpcall.lsp");
   lsp_init("../cmpnew/gcl_cmpcatch.lsp");
   lsp_init("../cmpnew/gcl_cmpenv.lsp");
-  lsp_init("../cmpnew/gcl_cmpeval.lsp");
   lsp_init("../cmpnew/gcl_cmpflet.lsp");
   lsp_init("../cmpnew/gcl_cmpfun.lsp");
   lsp_init("../cmpnew/gcl_cmpif.lsp");
@@ -137,7 +142,7 @@ gcl_init_system(object no_init)
   lsp_init("../cmpnew/gcl_cmpspecial.lsp");
   lsp_init("../cmpnew/gcl_cmptag.lsp");
   lsp_init("../cmpnew/gcl_cmptop.lsp");
-  lsp_init("../cmpnew/gcl_cmpvar.lsp");
+  /* lsp_init("../cmpnew/gcl_cmpvar.lsp"); */
   lsp_init("../cmpnew/gcl_cmpvs.lsp");
   lsp_init("../cmpnew/gcl_cmpwt.lsp");
   lsp_init("../cmpnew/gcl_cmpmain.lsp");

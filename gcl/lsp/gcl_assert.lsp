@@ -31,9 +31,6 @@
 (in-package 'system)
 
 
-;(proclaim '(optimize (safety 2) (space 3)))
-
-
 (defun check-type-symbol (symbol value typespec &optional s)
   (do nil
       ((typep value typespec) value)
@@ -49,7 +46,7 @@
 
 (defmacro check-type (place typespec &optional string)
   (declare (optimize (safety 2)))
-  `(progn (setf ,place (the ,typespec (if (typep ,place ',typespec) ,place (check-type-symbol ',place ,place ',typespec ',string)))) nil))
+  `(progn (,(if (symbolp place) 'setq 'setf) ,place (the ,typespec (if (typep ,place ',typespec) ,place (check-type-symbol ',place ,place ',typespec ',string)))) nil))
 ;  `(unless (typep ,place ',typespec) (setf ,place (the ,typespec (check-type-symbol ',place ,place ',typespec ',string))) nil))
   
 
@@ -67,7 +64,7 @@
        (,test-form nil)
      ,(if string
 	  `(cerror "" ,string ,@args)
-	`(cerror "" "The assertion ~:@(~S~) is failed." ',test-form))
+	`(cerror "" "The assertion ~:@(~S~) failed." ',test-form))
      ,@(mapcar 'ask-for-form places)))
 
 

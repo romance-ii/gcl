@@ -58,7 +58,10 @@
   (setq form (c1expr (cadr args)))
   (setq info (copy-info (cadr form)))
   (setq dtype (max-vtp (car args)))
-  (when (eq dtype #tboolean) (unless (type>= dtype (info-type info)) (return-from c1the (c1expr `(when ,(cadr args) t)))))
+  (when *compiler-new-safety* (setq dtype t))
+  (when (eq dtype #tboolean) 
+    (unless (type>= dtype (info-type info))
+      (return-from c1the (c1expr `(when ,(cadr args) t)))))
   (setq type (type-and dtype (info-type info)))
   (when (null type)
     (when (eq (car form) 'var)
@@ -104,92 +107,179 @@
 (defun c2compiler-let (symbols values body)
   (progv symbols values (c2expr body)))
 
-(defun funid-to-fun (id)
+(defvar *fun-id-hash* (make-hash-table :test 'eq))
+(defvar *fun-ev-hash* (make-hash-table :test 'eq))
+(defvar *fun-tp-hash* (make-hash-table :test 'eq))
+
+(defun funid-to-fun1 (id)
   (cond ((let ((id (si::funid-sym-p id)))
-	   (cond ((when (fboundp id) 
-		    (let ((fun (symbol-function id))) (when (eq (si::function-name fun) id) fun))))
-		 (id (cmp-eval `(function (lambda (&rest r) (declare (:dynamic-extent r)) (apply ',id r))))))))
+	   (cond ((local-fun-fun id))
+		 ((when (fboundp id) (symbol-function id)))
+		 (id (cmp-eval `(function (lambda (&rest r) 
+					    (declare (:dynamic-extent r))
+					    (apply ',id r))))))))
 	((functionp id) id)
-	((not (consp id)) nil)
-;	((is-setf-function id) nil)
 	((cmp-eval `(function ,id)))))
+
+(defun funid-to-fun (id)
+  (let ((fun (funid-to-fun1 id)))
+    (setf (gethash fun *fun-id-hash*) id)
+    fun))
+
+(defun portable-closure-src (fn)
+  (let* ((lam (when (si::interpreted-function-p fn) (si::interpreted-function-lambda fn)))
+	 (src (when lam (function-lambda-expression fn)))
+	 (p (car (member-if-not 
+		 (lambda (x) 
+		   (eq x (car (member (var-name x) *vars* :key (lambda (x) (when (var-p x) (var-name x)))))))
+		 (cadr lam)))))
+    (if p (keyed-cmpnote '(closure inline)
+			 "Not inlining ~s due to redefinition of closure variable ~s." src (var-name p))
+      src)))
 
 (defun coerce-to-funid (fn)
   (cond ((symbolp fn) fn)
 	((not (functionp fn)) nil)
+	((gethash fn *fun-id-hash*))
 	((si::function-name fn))
-	((and (si::interpreted-function-p fn)
-	      (not (member-if-not 
-		    (lambda (x) (eq x (car (member (var-name x) *vars* 
-						   :key (lambda (x) (when (var-p x) (var-name x)))))))
-		    (cadr (si::interpreted-function-lambda fn))))
-	      (function-lambda-expression fn)))))
+	((portable-closure-src fn))))
 
-(defun c1function (args &aux fd)
+(defun find-special-var (l f)
+  (cond ((atom l) nil)
+	((eq (car l) 'block) nil)
+	((eq (car l) 'let*)
+	 (car (member-if f (third l))))
+	((or (find-special-var (car l) f) (find-special-var (cdr l) f)))))
+
+
+(defun is-narg-le (l)
+  (find-special-var l 'is-narg-var))
+
+(defun mv-var (l)
+  (find-special-var l 'is-mv-var))
+
+(defun fun-var (l)
+  (find-special-var l 'is-fun-var))
+
+(defun export-sig (sig)
+  `((,@(mapcar 'export-type (car sig))) ,(export-type (cadr sig))))
+
+(defun lam-e-to-sig (l &aux (args (caddr l)) (regs (car args)) (narg (is-narg-le l))
+		       (first (is-first-var (car regs))) (regs (if first (cdr regs) regs)))
+  `((,@(mapcar 'var-type regs)
+	  ,@(when (or narg (member-if 'identity (cdr args))) `(*)))
+	,(info-type (cadar (last l)))))
+
+(defun compress-fle (l y z)
+  (let* ((fname (pop l))
+	 (fname (or z fname))
+	 (args  (pop l))
+	 (w   (make-string-output-stream))
+	 (ss  (si::open-fasd w :output nil nil))
+	 (out (pd fname args l))
+	 (out (if y `(lambda-closure ,y nil nil ,@(cdr out)) out)))
+    (si::find-sharing-top out (aref ss 1))
+    (si::write-fasd-top out ss)
+    (si::close-fasd ss)
+    (get-output-stream-string w)))
+
+(defun fn-to-src (l)
+  (multiple-value-bind
+   (l y z)
+   (function-lambda-expression l)
+   (compress-fle l y z)))
+
+(defun c1function (args &optional (provisional *provisional-inline*) b f)
+
   (when (endp args) (too-few-args 'function 1 0))
   (unless (endp (cdr args)) (too-many-args 'function 1 (length args)))
+  
   (let* ((fun (car args))
-	 (h (load-time-value (make-hash-table :test 'equal :size 128)))
-	 (fn (or (gethash fun h) (let ((z (funid-to-fun fun))) (when z (setf (gethash fun h) z)))))
-	 (tp (if fn (cmp-norm-tp `(eql ,fn)) #tfunction)))
-    (cond ((let ((fun (si::funid-sym-p fun)))
-	     (when fun
-	       (cond ((and (setq fd (c1local-closure fun))
-			   (eq (car fd) 'call-local))
-		      (list 'function (make-info :type #tfunction) fd))
-		     ((let ((info (make-info :type tp :sp-change (if (null (get fun 'no-sp-change)) 1 0))))
-			(list 'function info (list 'call-global info fun))))))))
+	 (fid (si::funid-sym-p fun))
+	 (fn (funid-to-fun (or fid fun)))
+	 (tp (if fn `(member ,fn) #tfunction))
+	 (info (make-info :type tp)))
+    (cond (provisional
+	   (or (gethash fn *fun-tp-hash*);FIXME?
+	       (setf (gethash fn *fun-tp-hash*)
+		     (list 'foo info args
+			   (setf (gethash fn *fun-ev-hash*) (list *vars* *blocks* *tags* *funs*))))))
+	  (fid
+	   (let ((fd (c1local-fun fun)))
+	     (unless fd
+	       (setf (info-sp-change info) (if (null (get fun 'no-sp-change)) 1 0)))
+	     (list 'function info (or fd (list 'call-global info fun)))))
 	  ((and (consp fun) (eq (car fun) 'lambda))
-	   (cmpck (endp (cdr fun))
-		  "The lambda expression ~s is illegal." fun)
-	   (let* ((*vars* (cons 'cb *vars*))
-		  (*funs* (cons 'cb *funs*))
-		  (*blocks* (cons 'cb *blocks*))
-		  (*tags* (cons 'cb *tags*)))
-	     (setq fun (c1lambda-expr (cdr fun)))
-	     (let ((l (si::interpreted-function-lambda (cadr tp)))) 
-	       (setf (cadr l) (remove-if-not 'var-cb 
-			       (coerce (info-referred-array (cadr fun)) 'list))))
-	     (setf (info-type (cadr fun)) tp)
-	     (list 'function (cadr fun) fun)))
-	  (t (cmperr "The function ~s is illegal." fun)))))
+	   (cmpck (endp (cdr fun)) "The lambda expression ~s is illegal." fun)
+	   (let ((r (process-local-fun 
+		     (or b 'cb)
+		     (or f (make-fun :name 'lambda :src fun :info (make-info :type '*))) fun tp)))
+	     (add-info info (cadadr r))
+	     (setf (info-flags info) (logandc2 (info-flags info) (iflags side-effects)))
+	     `(function ,info ,r)))
+	  ((cmperr "The function ~s is illegal." fun)))))
 
-(defun c2function (funob)
+(defun c2function (funob);FIXME
   (case (car funob)
         (call-global
          (unwind-exit (list 'symbol-function (add-symbol (caddr funob)))))
         (call-local
-         (if (cadddr funob)
-             (unwind-exit (list 'ccb-vs (fun-ref-ccb (caddr funob))))
-             (unwind-exit (list 'vs* (fun-ref (caddr funob))))))
-        (t
-         ;;; Lambda closure.
-         (let ((fun (make-fun :name 'closure :cfun (next-cfun))))
-              (push (list 'closure (if (null *clink*) nil (cons 0 0))
-                          *ccb-vs* fun funob)
-                    *local-funs*)
-              (push fun *closures*)
-	      (cond (*clink*
-		     (unwind-exit (list 'make-cclosure (fun-cfun fun) *clink* (fun-name fun))))
-		    (t (push-data-incf nil)
-		       (add-init `(si::setvv ,*next-vv*
-					     (si::mc nil ,(add-address
-							   (c-function-name "&LC" (fun-cfun fun) (fun-name fun)))))
-				 t) 
-		       (unwind-exit (list 'vv *next-vv*)))))
-             ))
-  )
+	 (let* ((funob (caddr funob))
+		(fun (pop funob)))
+	   (if (car funob)
+	       (unwind-exit (list 'ccb-vs (fun-ref-ccb fun)))
+	     (unwind-exit (list 'vs* (fun-ref fun))))))
+        (otherwise
+	 (let* ((fun (pop funob))
+		(funob (car funob))
+		(cl (fun-call fun))
+		(sig (pop cl))
+		(cle (pop cl))
+		(at (mapcar 'cmp-norm-tp (car sig)));FIXME
+		(rt (cmp-norm-tp (cadr sig)))
+		(ha (mapcar (lambda (x) `',x) (cons sig (cons cle cl))))
+		(clc `(let ((si::f #'(lambda nil nil)))
+			(si::add-hash si::f ,@ha)
+			(si::call si::f))))
+	   
+	   (pushnew (list 'closure (if (null *clink*) nil (cons 0 0)) *ccb-vs* fun funob)
+		    *local-funs* :key 'fourth)
+	   
+	   (cond (*clink*
+		  (unwind-exit (list 'make-cclosure (fun-cfun fun) (fun-name fun) 
+				     (or (fun-vv fun) (1+ *next-vv*))
+				     (new-proclaimed-argd at rt) (argsizes at rt (xa funob))
+				     *clink*))
+		  (unless (fun-vv fun)
+		    (push-data-incf nil)
+		    (setf (fun-vv fun) *next-vv*)
+		    (add-init `(si::setvv ,(fun-vv fun) ,clc) t)))
+		 (t  
+		  (unless (fun-vv fun)
+		    (push-data-incf nil)
+		    (setf (fun-vv fun) *next-vv*)
+		    (add-init
+		     `(si::setvv ,(fun-vv fun)
+				 (si::init-function 
+				  ,clc
+				  ,(add-address (c-function-name "&LC" (fun-cfun fun) (fun-name fun)))
+				  nil nil
+				  -1 ,(new-proclaimed-argd at rt) ,(argsizes at rt (xa funob)))) t))
+		  (unwind-exit (list 'vv (fun-vv fun)))))))))
 
 (si:putprop 'symbol-function 'wt-symbol-function 'wt-loc)
 (si:putprop 'make-cclosure 'wt-make-cclosure 'wt-loc)
 
 (defun wt-symbol-function (vv)
-       (if *safe-compile*
-           (wt "symbol_function(" (vv-str vv) ")")
-           (wt "(" (vv-str vv) "->s.s_gfdef)")))
+  (if *safe-compile*
+      (wt "symbol_function(" (vv-str vv) ")")
+    (wt "(" (vv-str vv) "->s.s_gfdef)")))
 
-(defun wt-make-cclosure (cfun clink fname)
-       (wt-nl "make_cclosure_new(" (c-function-name "LC" cfun fname) ",Cnil,")
-       (wt-clink clink)
-       (wt ",Cdata)"))
+(defun wt-make-cclosure (cfun fname call argd sizes args)
+  (declare (ignore args))
+  (wt "fSinit_function(")
+  (wt-vv call)
+  (wt ",(void *)" (c-function-name "LC" cfun fname) ",Cdata,")
+  (wt-clink)
+  (wt ",-1," argd "," sizes ")"))
 

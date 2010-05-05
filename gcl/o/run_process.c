@@ -206,10 +206,10 @@ void run_process ( char *name )
 #endif
 
     stream_in = (object) alloc_object(t_stream);
-    stream_in->sm.sm_mode = smm_input;
+    stream_in->sm.tt=stream_in->sm.sm_mode = smm_input;
     stream_in->sm.sm_fp = ofp;
     stream_out = (object) alloc_object(t_stream);
-    stream_out->sm.sm_mode = smm_output;
+    stream_out->sm.tt=stream_out->sm.sm_mode = smm_output;
     stream_out->sm.sm_fp = ifp;
     setup_stream_buffer ( stream_in );
     setup_stream_buffer ( stream_out );
@@ -431,7 +431,7 @@ enum smmode smm;
 
 	fp = fdopen(socket,mode);
 	stream = (object)  alloc_object(t_stream);
-	stream->sm.sm_mode = (short)smm;
+	stream->sm.tt=stream->sm.sm_mode = (short)smm;
 	stream->sm.sm_fp = fp;
 
 	stream->sm.sm_object0 = sLcharacter;
@@ -501,12 +501,12 @@ make_socket_pair()
 
 
   stream_in = (object) alloc_object(t_stream);
-  stream_in->sm.sm_mode = smm_input;
+  stream_in->sm.tt=stream_in->sm.sm_mode = smm_input;
   stream_in->sm.sm_fp = fp1;
   stream_in->sm.sm_int0 = sockets_in[1];
   stream_in->sm.sm_int1 = 0;
   stream_out = (object) alloc_object(t_stream);
-  stream_out->sm.sm_mode = smm_output;
+  stream_out->sm.tt=stream_out->sm.sm_mode = smm_output;
   stream_out->sm.sm_fp = fp2;
   setup_stream_buffer(stream_in);
   setup_stream_buffer(stream_out);

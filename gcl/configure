@@ -5090,6 +5090,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+
 # can only test for numbers -- CM
 # if test "${GCC}" -eq "yes" ; then
 #if [[ "${GCC}" = "yes" ]] ; then
@@ -5101,7 +5102,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 # subst GCC not only under 386-linux, but where available -- CM
 
 
-TCFLAGS="-fsigned-char"
+TCFLAGS="-fsigned-char "
 if test "$GCC" = "yes" ; then
 	TCFLAGS="$TCFLAGS -pipe -Wall "
 	case $use in
@@ -5237,20 +5238,20 @@ if test "$enable_pic" = "yes" ; then
 	TCFLAGS="$TCFLAGS -fPIC"
 fi
 
-FDEBUG=`echo $CFLAGS | tr ' ' '\012' |grep "^\-g$"`
+FDEBUG=`echo $CFLAGS | tr ' ' '\012' |grep "^\-g$"|tr '\012' ' '`
 #CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-g$"`
-FOMITF=`echo $CFLAGS | tr ' ' '\012' |grep "^\-fomit-frame-pointer$"`
-CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-fomit-frame-pointer$"`
-FOOPT3=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O3$"`
-CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O3$"`
-FOOPT2=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O2$"`
-CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O2$"`
-FOOPT1=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O1$"`
-TMP=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O$"`
+FOMITF=`echo $CFLAGS | tr ' ' '\012' |grep "^\-fomit-frame-pointer$"|tr '\012' ' '`
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-fomit-frame-pointer$"|tr '\012' ' '`
+FOOPT3=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O3$"|tr '\012' ' '`
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O3$"|tr '\012' ' '`
+FOOPT2=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O2$"|tr '\012' ' '`
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O2$"|tr '\012' ' '`
+FOOPT1=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O1$"|tr '\012' ' '`
+TMP=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O$"|tr '\012' ' '`
 FOOPT1="$FOOPT1$TMP"
-CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O1$"|grep -v "^\-O$"`
-FOOPT0=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O0$"`
-CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O0$"`
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O1$"|grep -v "^\-O$"|tr '\012' ' '`
+FOOPT0=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O0$"|tr '\012' ' '`
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O0$"|tr '\012' ' '`
 
 if test "$FOOPT0" != "" ; then
    TO3FLAGS=`echo $TO3FLAGS | sed 's,\-O[123 ],-O0 ,g' | sed 's,\-O$,-O0 ,g'`
@@ -5733,6 +5734,8 @@ $as_echo_n "checking use_gmp=yes, doing configure in gmp directory... " >&6; }
 		MPFILES=gmp_all
 	fi
 
+else
+	cp /usr/include/gmp.h h/gmp.h
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for size of gmp limbs" >&5
@@ -6526,7 +6529,7 @@ fi
 	if test "$enable_statsysbfd" = "yes" && ! $CC -v 2>&1 | fgrep ming > /dev/null ; then
 
 		echo 'int main() {bfd_init();bfd_openr("/dev/null",0);return 0;}' >foo.c
-		MP=`$CC  -Wl,-M  -static -o foo foo.c -lbfd -liberty 2>&1 | grep -v : | tr '()' '\012\012' | $AWK '{print $NF}' | sort | uniq`
+		MP=`$CC  -Wl,-M  -static -o foo foo.c -lbfd -liberty -ldl 2>&1 | grep -v : | tr '()' '\012\012' | $AWK '{print $NF}' | sort | uniq`
 		rm -f foo.c foo
 
 flib() {
@@ -6598,11 +6601,53 @@ else
   as_fn_error "Need zlib for bfd linking" "$LINENO" 5
 fi
 
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for dlsym in -ldl" >&5
+$as_echo_n "checking for dlsym in -ldl... " >&6; }
+if test "${ac_cv_lib_dl_dlsym+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ldl  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char dlsym ();
+int
+main ()
+{
+return dlsym ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_dl_dlsym=yes
+else
+  ac_cv_lib_dl_dlsym=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_dl_dlsym" >&5
+$as_echo "$ac_cv_lib_dl_dlsym" >&6; }
+if test "x$ac_cv_lib_dl_dlsym" = x""yes; then :
+  TLIBS="$TLIBS -ldl"
+else
+  as_fn_error "Need libdl for bfd linking" "$LINENO" 5
+fi
+
 
 
 
 	else
-		TLIBS="$TLIBS -lbfd -liberty"
+		TLIBS="$TLIBS -lbfd -liberty -ldl"
 	fi
 fi
 
@@ -6747,6 +6792,86 @@ cat >>confdefs.h <<_ACEOF
 #define SIZEOF_CHAR $ac_cv_sizeof_char
 _ACEOF
 
+
+
+if test "$cross_compiling" = yes; then :
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error "cannot run test program while cross compiling
+See \`config.log' for more details." "$LINENO" 5; }
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+	#include <stdio.h>
+
+int
+main ()
+{
+
+	    FILE *fp=fopen("conftest1","w");
+	    unsigned long c;
+	    int i;
+	    for (i=0,c=1;c;c<<=1,i++);
+	    fprintf(fp,"%d",i-9);
+	    return 0;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  size=`cat conftest1`
+
+cat >>confdefs.h <<_ACEOF
+#define LM9BITS $size
+_ACEOF
+
+else
+  as_fn_error "Cannot find fill bits" "$LINENO" 5
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+
+if test "$cross_compiling" = yes; then :
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error "cannot run test program while cross compiling
+See \`config.log' for more details." "$LINENO" 5; }
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+	#include <stdio.h>
+
+int
+main ()
+{
+
+	    FILE *fp=fopen("conftest1","w");
+	    unsigned long c;
+	    int i;
+	    for (i=0,c=1;c;c<<=1,i++);
+	    fprintf(fp,"%d",i-27);
+	    return 0;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  size=`cat conftest1`
+
+cat >>confdefs.h <<_ACEOF
+#define LM27BITS $size
+_ACEOF
+
+else
+  as_fn_error "Cannot find fill bits" "$LINENO" 5
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
 
 
 if test "$cross_compiling" = yes; then :
@@ -7875,6 +8000,11 @@ else
 /* end confdefs.h.  */
 
 	#include <stdio.h>
+	void *
+	foo() {
+	      int i;
+	      return (void *)&i;
+        }
 
 int
 main ()
@@ -7887,8 +8017,9 @@ main ()
 	j=1;
 	j<<=$PAGEWIDTH;
 	j<<=16;
-	j--;
 	i=(unsigned long)&v;
+	if (foo()>i) i-=j;
+	j--;
 	i+=j;
 	i&=~j;
 	fprintf(fp,"0x%lx",i-1);
@@ -9545,7 +9676,7 @@ if test "${ac_cv_lib_readline_main+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lreadline -lncurses $LIBS"
+LIBS="-lreadline  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -9573,7 +9704,7 @@ if test "x$ac_cv_lib_readline_main" = x""yes; then :
 
 $as_echo "#define HAVE_READLINE 1" >>confdefs.h
 
-			TLIBS="$TLIBS -lreadline -lncurses"
+			TLIBS="$TLIBS -lreadline"
 			RL_OBJS=gcl_readline.o
 # Readline support now initialized automatically when compiled in, this lisp
 # object no longer needed, 20040102 CM

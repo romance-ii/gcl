@@ -2267,111 +2267,110 @@ fmt_semicolon(bool colon, bool atsign)
 DEFVAR("*FORMAT-UNUSED-ARGS*",sSAformat_unused_argsA,SI,OBJNULL,"");
 
 DEFUNO_NEW("FORMAT",object,fLformat,LISP
-       ,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,void,Lformat,(object strm, object control,...),"")
-{       va_list ap; 
-        VOL int nargs= VFUN_NARGS;
-	VOL object x = OBJNULL;
-	jmp_buf fmt_jmp_buf0;
-	bool colon, e;
-	object *l;
-	fmt_old;
+	   ,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,void,Lformat,
+	   (object strm, object control,...),"") {
 
-	nargs=nargs-2;
-	if (nargs < 0)
-		too_few_arguments();
-	if (strm == Cnil) {
-		strm = make_string_output_stream(64);
-		x = strm->sm.sm_object0;
-	} else if (strm == Ct)
-		strm = symbol_value(sLAstandard_outputA);
-	else if (type_of(strm) == t_string) {
-		x = strm;
-		if (!x->st.st_hasfillp)
-		  FEerror("The string ~S doesn't have a fill-pointer.", 1, x);
-		strm = make_string_output_stream(0);
-		strm->sm.sm_object0 = x;
-	} else
-		check_type_stream(&strm);
+  va_list ap; 
+  VOL object x = OBJNULL;
+  jmp_buf fmt_jmp_buf0;
+  bool colon, e;
+  VOL fixnum nargs=INIT_NARGS(2);
 
-	/* check_type_string(&control); */
-	if (type_of(control) == t_string) {
-	    fmt_save;
-	    va_start(ap,control);
-	    frs_push(FRS_PROTECT, Cnil);
-	    if (nlj_active) {
-		    e = TRUE;
-		    goto L;
-	    }
-	{
-	    COERCE_VA_LIST(l,ap,nargs);
-	    fmt_base = l;
-	    fmt_index = 0;
-	    fmt_end = nargs;
-	    fmt_jmp_bufp = & fmt_jmp_buf0;
-	    if (symbol_value(sSAindent_formatted_outputA) != Cnil)
-		    fmt_indents = file_column(strm);
-	    else
-		    fmt_indents = 0;
-	    fmt_string = control;
-	    if ((colon = setjmp(*fmt_jmp_bufp))) {
-		    if (--colon)
-			    fmt_error("illegal ~:^");
-		    vs_base = vs_top;
-		    if (x != OBJNULL)
-			    vs_push(x);
-		    else
-			    vs_push(Cnil);
-		    e = FALSE;
-		    goto L;
-	    }
-	    format(strm, 0, control->st.st_fillp);
-	    if (sSAformat_unused_argsA->s.s_dbind) {
-	      int i;
-	      for (i=fmt_end-1;i>=fmt_index;i--)
-		sSAformat_unused_argsA->s.s_dbind=MMcons(fmt_base[i],sSAformat_unused_argsA->s.s_dbind);
-	    }
+  fmt_old;
 
-	    flush_stream(strm);
-	}
-	    e = FALSE;
-L:
-	    va_end(ap);
-	    frs_pop();
-	    fmt_restore;
-	    if (e) {
-		    nlj_active = FALSE;
-		    unwind(nlj_fr, nlj_tag);
-	    }
-	} else
-	switch (type_of(control)) {
-	    case t_cfun:
-	    case t_ifun:
-	    case t_gfun:
-	    case t_sfun:
-	    case t_vfun:
-	    case t_afun:
-	    case t_closure:
-	    case t_cclosure:
-	    case t_symbol:
-	    case t_cons:
-		if (nargs >= 64) FEerror("Too plong vl",0);
-	    {	int i;
-		object Xxvl[65];
-		vs_mark;
-		va_start(ap,control);
-		
-		Xxvl[0] = strm;
-		for (i=1 ; i <= nargs; i++) Xxvl[i]=va_arg(ap,object);
-		va_end(ap);
-		IapplyVector(control,nargs+1,Xxvl);
-		vs_reset;
-	    }
-	    	break;
-	    default:
-		FEwrong_type_argument(sLstring,control);
-	}
-    
-    RETURN1 (x ==0 ? Cnil : x);  
+  if (strm == Cnil) {
+    strm = make_string_output_stream(64);
+    x = strm->sm.sm_object0;
+  } else if (strm == Ct)
+    strm = symbol_value(sLAstandard_outputA);
+  else if (type_of(strm) == t_string) {
+    x = strm;
+    if (!x->st.st_hasfillp)
+      FEerror("The string ~S doesn't have a fill-pointer.", 1, x);
+    strm = make_string_output_stream(0);
+    strm->sm.sm_object0 = x;
+  } else
+    check_type_stream(&strm);
+  
+  /* check_type_string(&control); */
+  if (type_of(control) == t_string) {
+    fmt_save;
+    va_start(ap,control);
+    frs_push(FRS_PROTECT, Cnil);
+    if (nlj_active) {
+      e = TRUE;
+      goto L;
+    }
+    {
+      object l[MAX_ARGS],ll=Cnil,f=OBJNULL;
+      ufixnum i;
+      for (i=0;(l[i]=NEXT_ARG(nargs,ap,ll,f,(object)0));i++);
+      fmt_base = l;
+      fmt_index = 0;
+      fmt_end = i;
+      fmt_jmp_bufp = & fmt_jmp_buf0;
+      if (symbol_value(sSAindent_formatted_outputA) != Cnil)
+	fmt_indents = file_column(strm);
+      else
+	fmt_indents = 0;
+      fmt_string = control;
+      if ((colon = setjmp(*fmt_jmp_bufp))) {
+	if (--colon)
+	  fmt_error("illegal ~:^");
+	vs_base = vs_top;
+	if (x != OBJNULL)
+	  vs_push(x);
+	else
+	  vs_push(Cnil);
+	e = FALSE;
+	goto L;
+      }
+      format(strm, 0, control->st.st_fillp);
+      if (sSAformat_unused_argsA->s.s_dbind) {
+	int i;
+	for (i=fmt_end-1;i>=fmt_index;i--)
+	  sSAformat_unused_argsA->s.s_dbind=MMcons(fmt_base[i],sSAformat_unused_argsA->s.s_dbind);
+      }
+      
+      flush_stream(strm);
+    }
+    e = FALSE;
+  L:
+    va_end(ap);
+    frs_pop();
+    fmt_restore;
+    if (e) {
+      nlj_active = FALSE;
+      unwind(nlj_fr, nlj_tag);
+    }
+  } else
+    switch (type_of(control)) {
+    case t_cfun:
+    case t_ifun:
+    case t_function:
+    case t_symbol:
+    case t_cons:
+      if (nargs >= 64) FEerror("Too many arguments",0);
+      {	
+	int i;
+	object Xxvl[MAX_ARGS+1],ll=Cnil,f=OBJNULL;
+	vs_mark;
+
+	va_start(ap,control);
+	Xxvl[0] = strm;
+	for (i=1;(Xxvl[i]=NEXT_ARG(nargs,ap,ll,f,(object)0));i++);
+	va_end(ap);
+	fcall.valp=0,funcall_vec(control,i,Xxvl);
+	vs_reset;
+
+      }
+      break;
+    default:
+      FEwrong_type_argument(sLstring,control);
+    }
+  
+  RETURN1 (x ==0 ? Cnil : x);  
+
 }
 
 object 

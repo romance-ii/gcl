@@ -25,7 +25,7 @@
 
 (in-package 'lisp)
 
-(export '(with-open-stream with-input-from-string with-output-to-string))
+(export '(with-open-stream with-input-from-string with-output-to-string parse-integer))
 (export '(read-from-string))
 (export '(write-to-string prin1-to-string princ-to-string))
 (export 'file-string-length)
@@ -85,7 +85,6 @@
   (declare (optimize (safety 2)))
   (check-type stream synonym-stream)
   (stream-object0 stream))
-;(proclaim '(optimize (safety 2) (space 3)))
 
 (defun maybe-clear-input (&optional (x *standard-input*))
   (cond ((not (typep x 'stream)) nil)
@@ -157,6 +156,26 @@
         (values (read stream eof-error-p eof-value)
                 (si:get-string-input-stream-index stream)))))
 
+
+(defun write (x &key stream 
+		(array            *print-array*)
+		(base             *print-base*)
+		(case             *print-case*)
+		(circle           *print-circle*)
+		(escape           *print-escape*)
+		(gensym           *print-gensym*)
+		(length           *print-length*)
+		(level            *print-level*)
+		(lines            *print-lines*)
+		(miser-width      *print-miser-width*)
+		(pprint-dispatch  *print-pprint-dispatch*)
+		(pretty           *print-pretty*)
+		(radix            *print-radix*)
+		(readably         *print-readably*)
+		(right-margin     *print-right-margin*))
+  (write-int x stream array base case circle escape gensym
+	     length level lines miser-width pprint-dispatch
+	     pretty radix readably right-margin))
 
 (defun write-to-string (object &rest rest &key
 			    ( escape nil escape-supplied-p )
@@ -613,6 +632,11 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
 	 (nc (ceiling tp char-length)))
     nc))
 
+(defun parse-integer (s &key start end (radix 10) junk-allowed)
+  (declare (optimize (safety 1)))
+  (parse-integer-int s start end radix junk-allowed))
+
+
 (defun write-byte (j s)
   (declare (optimize (safety 2)))
   (let ((nc (get-byte-stream-nchars s))
@@ -710,12 +734,17 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
 	   (if lim `(,s ,lim) s)))
 	((check-type tp (member character integer)))))
 
-(defun open (f &rest args)
+(defun open (f &key (direction :input)
+	       (element-type 'character etp)
+	       (if-exists nil iesp)
+	       (if-does-not-exist nil idnesp)
+	       (external-format :default))
+
   (declare (optimize (safety 2)))
-  (let ((args (let ((et (cadr (member :element-type args))))
-		(if et `(:element-type ,(restrict-stream-element-type et) ,@args)
-		  args))))
-    (values (apply 'open1 f args))))
+  
+  (when etp (setq element-type (restrict-stream-element-type element-type)))
+  (open-int f direction element-type if-exists iesp if-does-not-exist idnesp external-format))
+
 
 (defun load (f &rest args)
   (values (apply 'load1 f args)))

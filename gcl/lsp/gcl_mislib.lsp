@@ -32,9 +32,6 @@
 (in-package 'system)
 
 
-;(proclaim '(optimize (safety 2) (space 3)))
-
-
 (defmacro time (form)
   (declare (optimize (safety 2)))
   (let ((real-start (gensym)) (real-end (gensym)) (gbc-time-start (gensym))

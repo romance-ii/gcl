@@ -527,20 +527,24 @@ object on_stack_cons(object x, object y)
 }
 
 
-DEFUNM_NEW("ALLOCATED",object,fSallocated,SI,1,1,NONE,OO,OO,OO,OO,(object typ),"")
-{ struct typemanager *tm=(&tm_table[t_from_type(typ)]);
+DEFUNM_NEW("ALLOCATED",object,fSallocated,SI,1,1,NONE,OO,OO,OO,OO,
+	   (object typ),"") { 
+
+  struct typemanager *tm=(&tm_table[t_from_type(typ)]);
+  fixnum vals=(fixnum)fcall.valp;
+  object *base=vs_top;
+
   tm = & tm_table[tm->tm_type];
-  if (tm->tm_type == t_relocatable)
-    { tm->tm_npage = (rb_end-rb_start)/PAGESIZE;
-      tm->tm_nfree = rb_end -rb_pointer;
-    }
-  else if (tm->tm_type == t_contiguous)
-    { int cbfree =0;
-      struct contblock **cbpp;
-      for(cbpp= &cb_pointer; (*cbpp)!=NULL; cbpp= &(*cbpp)->cb_link)
-	  cbfree += (*cbpp)->cb_size ;
-      tm->tm_nfree = cbfree;
-    }
+  if (tm->tm_type == t_relocatable) { 
+    tm->tm_npage = (rb_end-rb_start)/PAGESIZE;
+    tm->tm_nfree = rb_end -rb_pointer;
+  } else if (tm->tm_type == t_contiguous) { 
+    int cbfree =0;
+    struct contblock **cbpp;
+    for(cbpp= &cb_pointer; (*cbpp)!=NULL; cbpp= &(*cbpp)->cb_link)
+      cbfree += (*cbpp)->cb_size ;
+    tm->tm_nfree = cbfree;
+  }
   
   RETURN(6,object,make_fixnum(tm->tm_nfree),
 	    (RV(make_fixnum(tm->tm_npage)),
@@ -568,14 +572,24 @@ DEFUN_NEW("TOTAL-BYTES-ALLOCATED",object,fStotal_bytes_allocated,SI,0,0,NONE,OO,
 
 }
 
-DEFUN_NEW("RESET-NUMBER-USED",object,fSreset_number_used,SI,0,1,NONE,OO,OO,OO,OO,(object typ),"")
-{int i;
- if (VFUN_NARGS == 1)
-   { tm_table[t_from_type(typ)].tm_nused = 0;}
- else
- for (i=0; i <= t_relocatable ; i++)
-   { tm_table[i].tm_nused = 0;}
+DEFUN_NEW("RESET-NUMBER-USED",object,fSreset_number_used,SI,0,1,NONE,OO,OO,OO,OO,
+	  (object typ,...),"") {
+
+  fixnum i,nargs=INIT_NARGS(0);
+  object l=Cnil,z;
+  va_list ap;
+  
+  va_start(ap,typ);
+  z=NEXT_ARG(nargs,ap,l,typ,OBJNULL);
+  va_end(ap);
+
+  if (z) 
+    tm_table[t_from_type(z)].tm_nused = 0;
+  else for (i=0; i <= t_relocatable ; i++)
+	 tm_table[i].tm_nused = 0;
+
   RETURN1(sLnil);
+
 }
 
 
@@ -678,8 +692,13 @@ Use ALLOCATE-CONTIGUOUS-PAGES to expand the space.",
 		   swept when SGC was on.  Here we follow the behavior
 		   for other pages in add_to_freelist. CM 20030827  */
 #ifdef SGC
+
+		if (sgc_enabled)
+		  if (!WRITABLE_PAGE_P(page(p)+i)) 
+		    make_writable(page(p)+i,page(p)+i+1);
+
 		if (SGC_CONT_ENABLED)
-		  sgc_type_map[page(p)+i]|= SGC_PAGE_FLAG;
+		  sgc_type_map[page(p)+i]|= (SGC_PAGE_FLAG|SGC_TEMP_WRITABLE);
 #endif
 	}
 	ncbpage += m;
@@ -1068,7 +1087,6 @@ gcl_init_alloc(void) {
   init_tm(t_structure, "SSTRUCTURE", sizeof(struct structure), 5461,1,0 );
   init_tm(t_ifun, "iIFUN", sizeof(struct ifun), 4096,1,0  );
   init_tm(t_cfun, "fCFUN", sizeof(struct cfun), 4096,1,0  );
-  init_tm(t_sfun, "gSFUN", sizeof(struct sfun),409,1,0 );
   init_tm(t_string, "\"STRING", sizeof(struct string), 5461,1,0  );
   init_tm(t_array, "aARRAY", sizeof(struct array), 4681,1,0 );
   init_tm(t_symbol, "|SYMBOL", sizeof(struct symbol), 3640,1,0 );
@@ -1088,11 +1106,7 @@ gcl_init_alloc(void) {
   init_tm(t_random, "$RANDOM-STATE", sizeof(struct random), 256 ,1,0);
   init_tm(t_readtable, "rREADTABLE", sizeof(struct readtable), 256 ,1,0);
   init_tm(t_pathname, "pPATHNAME", sizeof(struct pathname), 73 ,1,0);
-  init_tm(t_cclosure, "cCCLOSURE", sizeof(struct cclosure), 85 ,1,0);
-  init_tm(t_closure, "cCLOSURE", sizeof(struct cclosure), 85 ,1,0);
-  init_tm(t_vfun, "VVFUN", sizeof(struct vfun), 102 ,1,0);
-  init_tm(t_gfun, "gGFUN", sizeof(struct sfun), 0 ,1,0);
-  init_tm(t_afun, "AAFUN", sizeof(struct sfun), 0 ,1,0);
+  init_tm(t_function, "xFUNCTION", sizeof(struct function), 85 ,1,0);
   init_tm(t_cfdata, "cCFDATA", sizeof(struct cfdata), 102 ,1,0);
   init_tm(t_spice, "!SPICE", sizeof(struct spice), PAGESIZE ,1,0);
   init_tm(t_relocatable, "%RELOCATABLE-BLOCKS", 2*PAGESIZE,0,20,0);
@@ -1192,39 +1206,32 @@ DEFUN_NEW("ALLOCATE-GROWTH",object,fSallocate_growth,SI,5,5,NONE,OO,II,II,OO,
 
 
 DEFUN_NEW("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
-       ,1,2,NONE,OI,OO,OO,OO,(fixnum npages,...),"")
-{
+	  ,1,2,NONE,OI,OO,OO,OO,(fixnum npages,...),"") {
 
-  int nargs=VFUN_NARGS;
-  long i,m;
-  object really_do;
+  object really_do,l=Cnil,f=OBJNULL;
   va_list ap;
   char *p=NULL;
+  fixnum i,m,nargs=INIT_NARGS(1);
   
-  really_do=Cnil;
-  if (nargs>=2) {
-    va_start(ap,npages);
-    really_do=va_arg(ap,object);
-    va_end(ap);
-  }
-  
-  CHECK_ARG_RANGE(1,2);
+  va_start(ap,npages);
+  really_do=NEXT_ARG(nargs,ap,l,f,Cnil);
+  va_end(ap);
+
   if  (npages  < 0)
     FEerror("Allocate requires positive argument.", 0);
-  if (ncbpage > npages) { 
-/*     printf("Allocate contiguous %ld: %d already there pages",npages,ncbpage); */
+  if (ncbpage > npages)
     npages=ncbpage;
-  }
+
   maxcbpage = npages;
   if (really_do == Cnil) 
     RETURN1(Ct);
+
   m = maxcbpage - ncbpage;
   if (available_pages < m || (p = alloc_page(m)) == NULL)
-    FEerror("Can't allocate ~D pages for contiguous blocks.",
-	    1, make_fixnum(npages));
+    FEerror("Can't allocate ~D pages for contiguous blocks.",1, make_fixnum(npages));
   
   /* alloc_page call above guaranteed to return p in range for type_map reference below. CM */
-  for (i = 0;  i < m;  i++) {
+  for (i=0;i<m;i++) {
     type_map[page(p)+i] = (char)t_contiguous;
     /* SGC cont pages: Before this point, GCL never marked contiguous
        pages for SGC, causing no contiguous pages to be
@@ -1232,13 +1239,12 @@ DEFUN_NEW("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
        for other pages in add_to_freelist. CM 20030827  */
 #ifdef SGC
     if (SGC_CONT_ENABLED)
-      sgc_type_map[page(p)+i]|= SGC_PAGE_FLAG;
+      sgc_type_map[page(p)+i]|= (SGC_PAGE_FLAG|SGC_TEMP_WRITABLE);
 #endif
   }
-
-  ncbpage += m;
-  insert_contblock(p, PAGESIZE*m);
-/*   if (pending_agbch_call) call_after_gbc_hook(t_contiguous); */
+  
+  ncbpage+=m;
+  insert_contblock(p,PAGESIZE*m);
   RETURN1(Ct);
 
 }
@@ -1260,33 +1266,25 @@ DEFUN_NEW("MAXIMUM-CONTIGUOUS-PAGES",object,fSmaximum_contiguous_pages,SI
 
 
 DEFUN_NEW("ALLOCATE-RELOCATABLE-PAGES",object,fSallocate_relocatable_pages,SI
-       ,1,2,NONE,OI,OO,OO,OO,(fixnum npages,...),"")
-{
+	  ,1,2,NONE,OI,OO,OO,OO,(fixnum npages,...),"") {
 
-  int nargs=VFUN_NARGS;
-  object really_do;
   va_list ap;
-  
-  really_do=Cnil;
-  if (nargs>=2) {
-    va_start(ap,npages);
-    really_do=va_arg(ap,object);
-    va_end(ap);
-  }
-    
-  CHECK_ARG_RANGE(1,2);
+  object l=Cnil,f=OBJNULL,really_do;
+  fixnum nargs=INIT_NARGS(1);
+
+  va_start(ap,npages);
+  really_do=NEXT_ARG(nargs,ap,l,f,Cnil);
+  va_end(ap);
+
   if (npages  <= 0)
     FEerror("Requires positive arg",0);
   if (nrbpage > npages || 2*npages > real_maxpage-page(heap_end)-new_holepage-real_maxpage/32) {
     RETURN1(make_fixnum(nrbpage));
   }
-/*     FEerror("Can't set the limit for relocatable blocks to ~D.", */
-/* 	    1, make_fixnum(npages)); */
   rb_end += (npages-nrbpage)*PAGESIZE;
   nrbpage = npages;
   rb_limit = rb_end - 2*RB_GETA;
   alloc_page(-(holepage + nrbpage));
-/*   if (pending_agbch_call) call_after_gbc_hook(t_relocatable); */
   vs_top = vs_base;
   vs_push(Ct);
   RETURN1(make_fixnum(npages));
@@ -1294,71 +1292,57 @@ DEFUN_NEW("ALLOCATE-RELOCATABLE-PAGES",object,fSallocate_relocatable_pages,SI
 }
 
 DEFUN_NEW("ALLOCATE",object,fSallocate,SI
-       ,2,3,NONE,OO,IO,OO,OO,(object type,fixnum npages,...),"")
-{
+	  ,2,3,NONE,OO,IO,OO,OO,(object type,fixnum npages,...),"") {
 
-  int nargs=VFUN_NARGS;
-  object really_do;
+  object really_do,l=Cnil,f=OBJNULL;
   va_list ap;
   struct typemanager *tm;
   char *pp=NULL;
   int t;
+  fixnum nargs=INIT_NARGS(2);
   
-  really_do=Cnil;
-  if (nargs>=3) {
-    va_start(ap,npages);
-    really_do=va_arg(ap,object);
-    va_end(ap);
-  }
-  
-  CHECK_ARG_RANGE(2,3);
-  t= t_from_type(type);
-  if  (npages <= 0)
-    FEerror("Allocate takes positive argument.", 1,
-			make_fixnum(npages));
-  tm = tm_of(t);
-  if (tm->tm_npage > npages) {npages=tm->tm_npage;}
-  tm->tm_maxpage = npages;
-  if (really_do != Cnil &&
-      tm->tm_maxpage > tm->tm_npage)
-    goto ALLOCATE;
+  va_start(ap,npages);
+  really_do=NEXT_ARG(nargs,ap,l,f,Cnil);
+  va_end(ap);
 
+  t=t_from_type(type);
+  if (npages <= 0)
+    FEerror("Allocate takes positive argument.",1,make_fixnum(npages));
+  tm = tm_of(t);
+  if (tm->tm_npage > npages) 
+    npages=tm->tm_npage;
+  tm->tm_maxpage = npages;
+  if (really_do!=Cnil && tm->tm_maxpage>tm->tm_npage)
+    goto ALLOCATE;
+  
   RETURN1(Ct);
   
-       ALLOCATE:
+ ALLOCATE:
   if (t == t_contiguous) 
-    FUNCALL(2,FFN(fSallocate_contiguous_pages)(npages,really_do));
-  
+    (VFUN_NARGS=2,FFN(fSallocate_contiguous_pages)(npages,really_do));
   else
     if (t==t_relocatable) 
-      FUNCALL(2,FFN(fSallocate_relocatable_pages)(npages,really_do));
+      (VFUN_NARGS=2,FFN(fSallocate_relocatable_pages)(npages));
     else {
-      
-      if (available_pages < tm->tm_maxpage - tm->tm_npage ||
-	  (pp = alloc_page(tm->tm_maxpage - tm->tm_npage)) == NULL) {
-	FEerror("Can't allocate ~D pages for ~A.", 2,
-		make_fixnum(npages), (make_simple_string(tm->tm_name+1)));
-      }
-      for (;  tm->tm_npage < tm->tm_maxpage;  pp += PAGESIZE)
-	add_page_to_freelist(pp,tm);}
+      if (available_pages<tm->tm_maxpage-tm->tm_npage ||
+	  (pp=alloc_page(tm->tm_maxpage-tm->tm_npage))==NULL)
+	FEerror("Can't allocate ~D pages for ~A.", 2,make_fixnum(npages),make_simple_string(tm->tm_name+1));
+      for (;tm->tm_npage<tm->tm_maxpage;pp+=PAGESIZE)
+	add_page_to_freelist(pp,tm);
+    }
   
-/*   if (pending_agbch_call) call_after_gbc_hook(t); */
   RETURN1(Ct);
 
 }
 
 DEFUN_NEW("ALLOCATED-RELOCATABLE-PAGES",object,fSallocated_relocatable_pages,SI
-       ,0,0,NONE,OO,OO,OO,OO,(void),"")
-{
-	/* 0 args */
-	RETURN1(make_fixnum(nrbpage));
+	  ,0,0,NONE,OO,OO,OO,OO,(void),"") {
+  RETURN1(make_fixnum(nrbpage));
 }
 
 DEFUN_NEW("GET-HOLE-SIZE",object,fSget_hole_size,SI
-       ,0,0,NONE,OO,OO,OO,OO,(void),"")
-{
-	/* 0 args */
-	RETURN1((make_fixnum(new_holepage)));
+       ,0,0,NONE,OO,OO,OO,OO,(void),"") {
+  RETURN1((make_fixnum(new_holepage)));
 }
 
 
@@ -1483,33 +1467,31 @@ DEFUN_NEW("GPROF-QUIT",object,fSgprof_quit,SI
 #endif
 
 DEFUNM_NEW("SET-HOLE-SIZE",object,fSset_hole_size,SI
-       ,1,2,NONE,OI,IO,OO,OO,(fixnum npages,...),"")
+	   ,1,2,NONE,OI,IO,OO,OO,(fixnum npages,...),"")
 {
 
-  int nargs=VFUN_NARGS;
   int reserve;
   va_list ap;
+  fixnum nargs=INIT_NARGS(1);
+  fixnum vals=(fixnum)fcall.valp;
+  object l=Cnil,f=OBJNULL;
+  object *base=vs_top;
 
   reserve=30;
-  if (nargs>=2) {
-    va_start(ap,npages);
-    reserve=va_arg(ap,fixnum);
-    va_end(ap);
-  }
+  va_start(ap,npages);
+  reserve=(fixnum)NEXT_ARG(nargs,ap,l,f,(object)30);
+  va_end(ap);
   
   if (npages < 1 ||
       npages > real_maxpage - page(heap_end)
       - 2*nrbpage - real_maxpage/32)
     FEerror("Illegal value for the hole size.", 0);
   new_holepage = npages;
-  if (VFUN_NARGS ==2)
-    {
-      if (reserve <0 || reserve > new_holepage)
-	FEerror("Illegal value for the hole size.", 0);
-      reserve_pages_for_signal_handler = reserve;}
+  if (reserve <0 || reserve > new_holepage)
+    FEerror("Illegal value for the hole size.", 0);
+  reserve_pages_for_signal_handler=reserve;
   
-  RETURN2(make_fixnum(npages),
-	  make_fixnum(reserve_pages_for_signal_handler));
+  RETURN2(make_fixnum(npages),make_fixnum(reserve_pages_for_signal_handler));
 
 }
 

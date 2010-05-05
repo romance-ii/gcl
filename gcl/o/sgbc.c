@@ -197,8 +197,10 @@ sgc_mark_object1(object x) {
     sgc_mark_cons(x->s.s_plist);});
     sgc_mark_object(x->s.s_gfdef);
     sgc_mark_object(x->s.s_dbind);
-    if (x->s.s_hpack!=Cnil && x->s.s_hpack->p.p_name==Cnil)
+    if (x->s.s_hpack!=Cnil && x->s.s_hpack->p.p_name==Cnil) {
       x->s.s_hpack=Cnil;
+      x->s.tt=0;
+    }
 /*       sgc_mark_object(x->s.s_hpack); */
     if (x->s.s_self == NULL)
       break;
@@ -245,8 +247,10 @@ sgc_mark_object1(object x) {
     if (x->ht.ht_self == NULL)
       break;
     for (i = 0, j = x->ht.ht_size;  i < j;  i++) {
-      sgc_mark_object(x->ht.ht_self[i].hte_key);
-      sgc_mark_object(x->ht.ht_self[i].hte_value);
+      if (ON_WRITABLE_PAGE(&x->ht.ht_self[i])) {
+	sgc_mark_object(x->ht.ht_self[i].hte_key);
+	sgc_mark_object(x->ht.ht_self[i].hte_value);
+      }
     }
     if ((short)what_to_collect >= (short)t_contiguous) {
       if (inheap(x->ht.ht_self)) {
@@ -460,12 +464,10 @@ sgc_mark_object1(object x) {
       break;
     {
       object def=x->str.str_def;
-      unsigned char * s_type = &SLOT_TYPE(def,0);
-      unsigned short *s_pos= & SLOT_POS(def,0);
+      unsigned char  *s_type = &SLOT_TYPE(def,0);
+      unsigned short *s_pos  = &SLOT_POS (def,0);
       for (i = 0, j = S_DATA(def)->length;  i < j;  i++)
-	if (s_type[i]==aet_object &&
-	    ON_WRITABLE_PAGE(& STREF(object,x,s_pos[i]))
-	    )
+	if (s_type[i]==aet_object && ON_WRITABLE_PAGE(&STREF(object,x,s_pos[i])))
 	  sgc_mark_object(STREF(object,x,s_pos[i]));
       if ((int)what_to_collect >= (int)t_contiguous) {
 	if (inheap(x->str.str_self)) {
@@ -582,28 +584,34 @@ sgc_mark_object1(object x) {
     sgc_mark_object(x->pn.pn_version);
     break;
     
-  case t_closure:
-    { 
-      int i ;
-      if (what_to_collect == t_contiguous)
-	mark_contblock(x->cc.cc_turbo,x->cc.cc_envdim);
-      for (i= 0 ; i < x->cc.cc_envdim ; i++) 
-	sgc_mark_object(x->cc.cc_turbo[i]);
-    }
-    
   case t_cfun:
-  case t_sfun:
-  case t_vfun:
-  case t_afun:
-  case t_gfun:
     sgc_mark_object(x->cf.cf_name);
     sgc_mark_object(x->cf.cf_data);
+    sgc_mark_object(x->cf.cf_call);
     break;
     
-  case t_ifun:
-    sgc_mark_object(x->ifn.ifn_self);
+  case t_function:	
+    sgc_mark_object(x->fun.fun_data);
+    sgc_mark_object(x->fun.fun_plist);
+    if (x->fun.fun_env != NULL) {
+      sgc_mark_object(x->fun.fun_env[0]);
+      if (what_to_collect >= t_contiguous) {
+	object *p=x->fun.fun_env-1;
+	if(SGC_RELBLOCK_P(p)) {
+	  ufixnum n=*(ufixnum *)p;
+	  p=copy_relblock((char *)p,n);
+	  x->fun.fun_env=p+1;
+	}
+      }
+    }
     break;
 
+  case t_ifun:
+    sgc_mark_object(x->ifn.ifn_name);
+    sgc_mark_object(x->ifn.ifn_self);
+    sgc_mark_object(x->ifn.ifn_call);
+    break;
+    
   case t_cfdata:
     
     sgc_mark_object(x->cfd.cfd_dlist);
@@ -621,18 +629,6 @@ sgc_mark_object1(object x) {
       mark_contblock(x->cfd.cfd_start, x->cfd.cfd_size);
     }
     break;
-  case t_cclosure:
-    sgc_mark_object(x->cc.cc_name);
-    sgc_mark_object(x->cc.cc_env);
-    sgc_mark_object(x->cc.cc_data);
-    if (x->cc.cc_turbo!=NULL) sgc_mark_object(*(x->cc.cc_turbo-1));
-    if (what_to_collect == t_contiguous) {
-      if (x->cc.cc_turbo != NULL)
-	mark_contblock((char *)(x->cc.cc_turbo-1),
-		       (1+fix(*(x->cc.cc_turbo-1)))*sizeof(object));
-    }
-    break;
-    
   case t_spice:
     break;
     
@@ -1423,7 +1419,7 @@ sgc_start(void) {
       if (i>=MAXPAGE || k>MAXPAGE)
 	error("Pages out of range in sgc_start");
       for (;i<k;i++) 
-	sgc_type_map[i]|= SGC_PAGE_FLAG;
+	sgc_type_map[i]|=(SGC_PAGE_FLAG|SGC_TEMP_WRITABLE);
     }
 
     for (cbpp=&cb_pointer;*cbpp;) {
@@ -1460,7 +1456,7 @@ sgc_start(void) {
       if (j>=MAXPAGE || i>MAXPAGE)
 	error("Pages out of range in sgc_start");
       for (;j<i;j++)
-	sgc_type_map[j]|= SGC_PAGE_FLAG;
+	sgc_type_map[j]|=(SGC_PAGE_FLAG|SGC_TEMP_WRITABLE);
     }
 
     /* SGC contblock pages: switch to new free SGC contblock list. CM
@@ -1488,6 +1484,11 @@ sgc_start(void) {
 	old_rb_start=rb_start;
 	new= PAGE_ROUND_UP(new);
 	rb_start=rb_pointer=new;
+	{
+	  unsigned long i=page(new);
+	  for (i=page(new);i<MAXPAGE;i++)
+	    sgc_type_map[i]|=(SGC_PAGE_FLAG|SGC_TEMP_WRITABLE);
+	}
       }
     }
   }

@@ -54,19 +54,6 @@ FFN(Fdefun)(object args)
 	if (type_of(name) != t_symbol)
 	  name=ifuncall1(sSfunid_to_sym,name);
 
-/* 	if (type_of(name) != t_symbol) { */
-/* 	  if (setf_fn_form(name)) { */
-/* 	    object x; */
-/* 	    vs_base = vs_top; */
-/* 	    x=alloc_object(t_ifun); */
-/* 	    x->ifn.ifn_self=list(3,sLlambda,MMcadr(args),listA(3,sLblock,MMcadr(name),MMcddr(args))); */
-/* 	    vs_push(x); */
-/* 	    putprop(MMcadr(name),vs_base[0],sSsetf_function); */
-/* 	    vs_base[0]=name; */
-/* 	    return; */
-/* 	  } else */
-/* 	    not_a_symbol(name); */
-/* 	} */
 	if (name->s.s_sfdef != NOT_SPECIAL) {
 	  if (name->s.s_mflag) {
 	    if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
@@ -75,7 +62,7 @@ FFN(Fdefun)(object args)
 	    FEerror("~S, a special form, cannot be redefined.", 1, name);
 	}
 	if (name->s.s_hpack == lisp_package &&
-	    name->s.s_gfdef != OBJNULL && initflag) {
+	    name->s.s_gfdef != OBJNULL && initflag && sLwarn->s.s_gfdef) {
 	  vs_push(make_simple_string("~S is being redefined."));
 	  ifuncall2(sLwarn, vs_head, name);
 	  vs_popp;
@@ -89,10 +76,13 @@ FFN(Fdefun)(object args)
 	  vs_base[0] = MMcons(lex_env[0], vs_base[0]);
 	  vs_base[0] = MMcons(sLlambda_block_closure, vs_base[0]);
 	}
-	{object fname =  clear_compiler_properties(name,vs_base[0]);
+	{object fname;
 	object x=alloc_object(t_ifun);
 	x->ifn.ifn_self=vs_base[0];
+	x->ifn.ifn_name=name;
+	x->ifn.ifn_call=Cnil;
 	vs_base[0]=x;
+	fname =  clear_compiler_properties(name,vs_base[0]);
 	fname->s.s_gfdef = vs_base[0];
 	fname->s.s_mflag = FALSE;}
 	vs_base[0] = oname;

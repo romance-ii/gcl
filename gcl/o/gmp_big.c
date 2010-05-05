@@ -88,6 +88,10 @@ static object verify_big_or_zero(object big)
 #ifndef GMP_USE_MALLOC
 object big_gcprotect;
 object big_fixnum1;
+object big_fixnum2;
+object big_fixnum3;
+object big_fixnum4;
+object big_fixnum5;
 
 #include "gmp.c"
 void
@@ -118,7 +122,7 @@ new_bignum(void)
    it, and then we can copy it back
 */   
 #define GCPROTECT(u) \
- MP_INT * __u = (u==MP(big_fixnum1) || u==MP(big_fixnum2)) ? u : MP(big_gcprotect); \
+ MP_INT * __u = (u==MP(big_fixnum1) || u==MP(big_fixnum2) || u==MP(big_fixnum3) || u==MP(big_fixnum4) || u==MP(big_fixnum5)) ? u : MP(big_gcprotect);      \
  (__u)->_mp_d =   (u)->_mp_d; \
  (__u)->_mp_alloc = (u)->_mp_alloc 
 #define GC_PROTECTED_SELF (__u)->_mp_d
@@ -333,7 +337,6 @@ set_exponent(double d, int e) {
 
 }
 	
-
 double
 big_to_double(object x) {
 
@@ -565,9 +568,15 @@ gcl_init_big(void)
   MP_ALLOCATED(big_gcprotect)=0;
   big_fixnum1=new_bignum();
   big_fixnum2=new_bignum();
+  big_fixnum3=new_bignum();
+  big_fixnum4=new_bignum();
+  big_fixnum5=new_bignum();
   enter_mark_origin(&big_fixnum1);
-  enter_mark_origin(&big_gcprotect);
   enter_mark_origin(&big_fixnum2);
+  enter_mark_origin(&big_fixnum3);
+  enter_mark_origin(&big_fixnum4);
+  enter_mark_origin(&big_fixnum5);
+  enter_mark_origin(&big_gcprotect);
   gcl_init_big1();
 
 

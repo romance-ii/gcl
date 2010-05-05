@@ -83,7 +83,7 @@ DEFUN_NEW("COMPILE-REGEXP",object,fScompile_regexp,SI,1,1,NONE,OO,OO,OO,OO,(obje
   res=alloc_object(t_vector);
   res->v.v_displaced=Cnil;
   res->v.v_hasfillp=1;
-  res->v.v_elttype=aet_uchar;
+  res->v.tt=res->v.v_elttype=aet_uchar;
   res->v.v_defrank=1;
   res->v.v_adjustable=0;
   res->v.v_self=v;
@@ -94,7 +94,8 @@ DEFUN_NEW("COMPILE-REGEXP",object,fScompile_regexp,SI,1,1,NONE,OO,OO,OO,OO,(obje
 }
 
 
-DEFUN_NEW("STRING-MATCH",object,fSstring_match,SI,2,4,NONE,OO,OO,OO,OO,(object pattern,object string,...),
+DEFUN_NEW("STRING-MATCH",fixnum,fSstring_match,SI,2,4,NONE,IO,OO,OO,OO,
+	  (object pattern,object string,...),
       "Match regexp PATTERN in STRING starting in string starting at START \
 and ending at END.  Return -1 if match not found, otherwise \
 return the start index  of the first matchs.  The variable \
@@ -104,11 +105,13 @@ If it already contains such an array, then the contents of it will \
 be over written.   \
 ") {  
 
-  int i,ans,nargs=VFUN_NARGS,len,start,end;
+  fixnum nargs=INIT_NARGS(2);
+  int i,ans;
+  int len,start,end;
   static char buf[400],case_fold;
   static regexp *saved_compiled_regexp;
   va_list ap;
-  object v = sSAmatch_dataA->s.s_dbind;
+  object v=sSAmatch_dataA->s.s_dbind,l=Cnil,f=OBJNULL;
   char **pp,*str,save_c=0;
   unsigned np;
 
@@ -121,15 +124,10 @@ be over written.   \
   if (type_of(v) != t_vector || v->v.v_elttype != aet_fix || v->v.v_dim < NSUBEXP*2)
     v=sSAmatch_dataA->s.s_dbind=fSmake_vector1_1((NSUBEXP *2),aet_fix,sLnil);
   
-  start=0;
-  end=string->st.st_fillp;
-  if (nargs>2) {
-    va_start(ap,string);
-    start=fix(va_arg(ap,object));
-    if (nargs>3)
-      end=fix(va_arg(ap,object));
-    va_end(ap);
-  }
+  va_start(ap,string);
+  start=(fixnum)NEXT_ARG(nargs,ap,l,f,(object)0);
+  end=(fixnum)NEXT_ARG(nargs,ap,l,f,(object)(fixnum)string->st.st_fillp);
+  va_end(ap);
   if (start < 0 || end > string->st.st_fillp || start > end)
      FEerror("Bad start or end",0);
 
@@ -139,7 +137,7 @@ be over written.   \
      for (i=0;i<NSUBEXP;i++) 
        v->fixa.fixa_self[i]=i ? -1 : 0;
      memcpy(v->fixa.fixa_self+NSUBEXP,v->fixa.fixa_self,NSUBEXP*sizeof(*v->fixa.fixa_self));
-     RETURN1(make_fixnum(0));
+     RETURN1(0);
    }
 
    {
@@ -178,7 +176,7 @@ be over written.   \
 
      if (!ans ) {
        END_NO_INTERRUPT;
-       RETURN1(make_fixnum(-1));
+       RETURN1(-1);
      }
 
      pp=compiled_regexp->startp;
@@ -189,7 +187,7 @@ be over written.   \
        v->fixa.fixa_self[i]=*pp ? *pp-str : -1;
 
      END_NO_INTERRUPT;
-     RETURN1(make_fixnum(v->fixa.fixa_self[0]));
+     RETURN1(v->fixa.fixa_self[0]);
 
    }
 

@@ -6,27 +6,19 @@
 #endif
 
 GMP_EXTERN jmp_buf gmp_jmp;
-GMP_EXTERN int jmp_gmp;
+GMP_EXTERN int jmp_gmp,gmp_relocatable;
 
 #define join(a_,b_) a_ ## b_
 #define Join(a_,b_) join(a_,b_)
-
-#define P1(bt_) bt_ _b
-#define P2(bt_,ct_) P1(bt_),ct_ _c
-#define P3(bt_,ct_,dt_) P2(bt_,ct_),dt_ _d
-#define P4(bt_,ct_,dt_,et_) P3(bt_,ct_,dt_),et_ _e
-
-#define A1 _b
-#define A2 A1,_c
-#define A3 A2,_d
-#define A4 A3,_e
 
 /*FIXME : this is slightly excessively conservative as it includes
   comparisons with possible non mpz_t type arguments*/
 #define E21 _b==(void *)_c
 #define E31 E21||_b==(void *)_d
+#define E32 _b==(void *)_d||_c==(void *)_d
 #define E41 E31||_b==(void *)_e
-#define E42 _b==_d||_b==_e||_c==_d||_c==_e
+#define E42 _b==(void *)_d||_b==(void *)_e||_c==(void *)_d||_c==(void *)_e
+#define E53 _b==(void *)_e||_b==(void *)_f||_c==(void *)_e||_c==(void *)_f||_d==(void *)_e||_d==(void *)_f
 #define E20 0
 #define E11 0
 #define E10 0
@@ -73,6 +65,91 @@ GMP_EXTERN int jmp_gmp;
 #define RA_void
 #define RR_void
 
+#define RF_mpz_t mpz_t
+#define RF_gmp_randstate_t gmp_randstate_t
+#define RF_gmp_char_star_star char **
+
+#define P1(bt_) Join(RF_,bt_) _b
+#define P2(bt_,ct_) P1(bt_),Join(RF_,ct_) _c
+#define P3(bt_,ct_,dt_) P2(bt_,ct_),Join(RF_,dt_) _d
+#define P4(bt_,ct_,dt_,et_) P3(bt_,ct_,dt_),Join(RF_,et_) _e
+#define P5(bt_,ct_,dt_,et_,ft_) P4(bt_,ct_,dt_,et_),Join(RF_,ft_) _f
+
+#define A1 _b
+#define A2 A1,_c
+#define A3 A2,_d
+#define A4 A3,_e
+#define A5 A4,_f
+
+
+#define SS_40 4
+#define SS_30 3
+#define SS_20 2
+#define SS_10 1
+#define SS_00 0
+#define SS_41 3
+#define SS_31 2
+#define SS_21 1
+#define SS_11 0
+#define SS_42 2
+#define SS_32 1
+#define SS_22 0
+#define SS_43 1
+#define SS_33 0
+#define SS_44 0
+#define SS_53 2
+
+#define PP_gmp_ulint  1
+#define PP_gmp_lint   1
+#define PP_int        1
+#define PP_size_t     1
+#define PP_void       0
+#define PP_00 0
+#define PP_10 1
+#define PP_11 2
+#define PP_20 2
+#define PP_21 3
+#define PP0(a_) Join(PP_,a_)
+#define PP1(a_) Join(PP_1,Join(PP_,a_))
+#define PP2(a_) Join(PP_2,Join(PP_,a_))
+
+
+#define QQQ_gmp_ulint  f
+#define QQQ_gmp_lint   f
+#define QQQ_int        f
+#define QQQ_size_t     f
+#define QQQ_mpz_t      b
+
+#define QQ10(a_) Join(QQQ_,a_)
+#define QQ20(a_,b_) QQ10(a_),QQ10(b_)
+#define QQ30(a_,b_,c_) QQ20(a_,b_),QQ10(c_)
+#define QQ40(a_,b_,c_,d_) QQ30(a_,b_,c_),QQ10(d_)
+
+#define QQ11(a_) 
+#define QQ21(a_,b_) QQ10(b_)
+#define QQ31(a_,b_,c_) QQ20(b_,c_)
+#define QQ41(a_,b_,c_,d_) QQ30(b_,c_,d_)
+
+#define QQ22(a_,b_) 
+#define QQ32(a_,b_,c_) QQ10(c_)
+#define QQ42(a_,b_,c_,d_) QQ20(c_,d_)
+
+#define QQ53(a_,b_,c_,d_,e_) QQ20(d_,e_)
+
+#define ZZ_gmp_ulint  f
+#define ZZ_gmp_lint   f
+#define ZZ_int        f
+#define ZZ_size_t     f
+#define ZZ_void       
+#define ZZ3(a_) Join(Join(ZZ_,a_),bbb)
+#define ZZ2(a_) Join(Join(ZZ_,a_),bb)
+#define ZZ1(a_) Join(Join(ZZ_,a_),b)
+#define ZZ0(a_) Join(ZZ_,a_)
+
+#ifndef BF
+#define BF(n_,b_,r_,a_...)
+#endif
+
 #undef mpz_get_strp
 #define mpz_get_strp __gmpz_get_strp
 
@@ -105,101 +182,277 @@ __gmpz_get_strp(char **a,int b,mpz_t c) {return __gmpz_get_str(*a,b,c);} /*FIXME
    GMP_EXTERN_INLINE Join(RF_,rt_) Join(m,a_)(Join(P,n_)(b_)) { \
            int j;\
            Join(RD_,rt_);\
-	   jmp_gmp=0;\
-           if ((j=setjmp(gmp_jmp)))\
-              GBC(j);\
-           if (Join(Join(E,n_),s_)) jmp_gmp=-1 ; else jmp_gmp++;\
+           if (gmp_relocatable) {\
+	     jmp_gmp=0;\
+             if ((j=setjmp(gmp_jmp)))\
+                GBC(j);\
+             if (Join(Join(E,n_),s_)) jmp_gmp=-1 ; else jmp_gmp++;\
+           }\
            Join(RA_,rt_) a_(Join(A,n_));\
-           if (jmp_gmp<-1) GBC(-jmp_gmp);\
-           jmp_gmp=0;\
+           if (gmp_relocatable) {\
+             if (jmp_gmp<-1) GBC(-jmp_gmp);\
+             jmp_gmp=0;\
+           }\
            return Join(RR_,rt_);\
    }
 
+#define EXPORT_GMP_CALL(n_,rt_,a_,s_,b_...) \
+  MEM_GMP_CALL(n_,rt_,Join(mpz_,a_),s_,b_)\
+  BF(Join(SS_,Join(n_,s_)),a_,Join(ZZ,s_)(rt_),Join(QQ,Join(n_,s_))(b_))
+
 MEM_GMP_CALL(3,void,mpz_urandomm,1,mpz_t,gmp_randstate_t,mpz_t)
 MEM_GMP_CALL(2,void,gmp_randseed,1,gmp_randstate_t,mpz_t)
-MEM_GMP_CALL(2,void,gmp_randseed_ui,1,gmp_randstate_t,unsigned long int)
+MEM_GMP_CALL(2,void,gmp_randseed_ui,1,gmp_randstate_t,gmp_ulint)
 MEM_GMP_CALL(1,void,gmp_randinit_default,0,gmp_randstate_t)
 
+ 
+EXPORT_GMP_CALL(2,gmp_ulint,scan0,0,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(2,gmp_ulint,scan1,0,mpz_t,gmp_ulint)
 
-MEM_GMP_CALL(3,void,mpz_add,1,mpz_t,mpz_t,mpz_t)
-MEM_GMP_CALL(3,void,mpz_add_ui,1,mpz_t,mpz_t,unsigned long int)
-MEM_GMP_CALL(3,void,mpz_sub,1,mpz_t,mpz_t,mpz_t)
-MEM_GMP_CALL(3,void,mpz_sub_ui,1,mpz_t,mpz_t,unsigned long int)
-MEM_GMP_CALL(3,void,mpz_mul,1,mpz_t,mpz_t,mpz_t)
-MEM_GMP_CALL(3,void,mpz_mul_si,1,mpz_t,mpz_t,long int)
-MEM_GMP_CALL(3,void,mpz_mul_2exp,1,mpz_t,mpz_t,unsigned long int)
-MEM_GMP_CALL(2,void,mpz_neg,1,mpz_t,mpz_t)
-MEM_GMP_CALL(4,void,mpz_tdiv_qr,2,mpz_t,mpz_t,mpz_t,mpz_t)
-MEM_GMP_CALL(3,void,mpz_fdiv_q_2exp,1,mpz_t,mpz_t,unsigned long int)
-MEM_GMP_CALL(2,int,mpz_cmp,0,mpz_t,mpz_t)
-MEM_GMP_CALL(3,void,mpz_and,1,mpz_t,mpz_t,mpz_t)
-MEM_GMP_CALL(3,void,mpz_xor,1,mpz_t,mpz_t,mpz_t)
-MEM_GMP_CALL(3,void,mpz_ior,1,mpz_t,mpz_t,mpz_t)
-MEM_GMP_CALL(2,void,mpz_com,1,mpz_t,mpz_t)
-MEM_GMP_CALL(2,int,mpz_tstbit,0,mpz_t,unsigned long int)
-MEM_GMP_CALL(1,void,mpz_init,1,mpz_t)
-MEM_GMP_CALL(2,void,mpz_set,1,mpz_t,mpz_t)
-MEM_GMP_CALL(2,void,mpz_set_ui,1,mpz_t,unsigned long int)
-MEM_GMP_CALL(2,void,mpz_set_si,1,mpz_t,long int)
-MEM_GMP_CALL(1,double,mpz_get_d,0,mpz_t)
-MEM_GMP_CALL(1,gmp_lint,mpz_get_si,0,mpz_t)
-MEM_GMP_CALL(3,gmp_char_star,__gmpz_get_strp,0,char **,int,mpz_t)
-MEM_GMP_CALL(1,int,mpz_fits_sint_p,0,mpz_t)
-MEM_GMP_CALL(1,int,mpz_fits_slong_p,0,mpz_t)
-MEM_GMP_CALL(1,gmp_ulint,mpz_popcount,0,mpz_t)
-/*MEM_GMP_CALL(2,void *,mpz_realloc,mpz_t,mp_size_t)*/
-MEM_GMP_CALL(1,size_t,mpz_size,0,mpz_t)
-MEM_GMP_CALL(2,size_t,mpz_sizeinbase,0,mpz_t,int)
-MEM_GMP_CALL(3,void,mpz_gcd,1,mpz_t,mpz_t,mpz_t)
-MEM_GMP_CALL(3,gmp_ulint,mpz_gcd_ui,1,mpz_t,mpz_t,unsigned long int)
-MEM_GMP_CALL(3,void,mpz_divexact,1,mpz_t,mpz_t,mpz_t)
-MEM_GMP_CALL(3,void,mpz_divexact_ui,1,mpz_t,mpz_t,unsigned long int)
-MEM_GMP_CALL(2,void,mpz_fac_ui,1,mpz_t,unsigned long int)
-MEM_GMP_CALL(4,void,mpz_powm,1,mpz_t,mpz_t,mpz_t,mpz_t)
-MEM_GMP_CALL(4,void,mpz_powm_ui,1,mpz_t,mpz_t,unsigned long int,mpz_t)
+EXPORT_GMP_CALL(3,void,add,1,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,void,add_ui,1,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(3,void,sub,1,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,void,sub_ui,1,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(3,void,ui_sub,1,mpz_t,gmp_ulint,mpz_t)
+EXPORT_GMP_CALL(3,void,mul,1,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,void,mul_si,1,mpz_t,mpz_t,gmp_lint)
+EXPORT_GMP_CALL(3,void,mul_ui,1,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(3,void,mul_2exp,1,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(2,void,neg,1,mpz_t,mpz_t)
+EXPORT_GMP_CALL(4,void,tdiv_qr,2,mpz_t,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,void,fdiv_q_2exp,1,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(2,int,cmp,0,mpz_t,mpz_t)
+EXPORT_GMP_CALL(2,int,cmpabs,0,mpz_t,mpz_t)
+EXPORT_GMP_CALL(2,int,cmpabs_ui,0,mpz_t,gmp_ulint)
+/* EXPORT_GMP_CALL(2,int,cmp_si,0,mpz_t,gmp_lint) */ /*macro*/
+/* EXPORT_GMP_CALL(2,int,cmp_ui,0,mpz_t,gmp_ulint) */
+EXPORT_GMP_CALL(3,void,and,1,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,void,xor,1,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,void,ior,1,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(2,void,com,1,mpz_t,mpz_t)
+EXPORT_GMP_CALL(2,int,tstbit,0,mpz_t,gmp_ulint)
+ MEM_GMP_CALL(1,void,mpz_init,1,mpz_t)
+EXPORT_GMP_CALL(2,void,set,1,mpz_t,mpz_t)
+EXPORT_GMP_CALL(2,void,set_ui,1,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(2,void,set_si,1,mpz_t,gmp_lint)
+  MEM_GMP_CALL(1,double,mpz_get_d,0,mpz_t)
+EXPORT_GMP_CALL(1,gmp_lint,get_si,0,mpz_t)
+EXPORT_GMP_CALL(1,gmp_lint,get_ui,0,mpz_t)
+  MEM_GMP_CALL(3,gmp_char_star,__gmpz_get_strp,0,gmp_char_star_star,int,mpz_t)
+EXPORT_GMP_CALL(1,int,fits_sint_p,0,mpz_t)
+EXPORT_GMP_CALL(1,int,fits_slong_p,0,mpz_t)
+EXPORT_GMP_CALL(1,int,fits_sshort_p,0,mpz_t)
+EXPORT_GMP_CALL(1,int,fits_uint_p,0,mpz_t)
+EXPORT_GMP_CALL(1,int,fits_ulong_p,0,mpz_t)
+EXPORT_GMP_CALL(1,int,fits_ushort_p,0,mpz_t)
+EXPORT_GMP_CALL(1,gmp_ulint,popcount,0,mpz_t)
 
+EXPORT_GMP_CALL(1,size_t,size,0,mpz_t)
+EXPORT_GMP_CALL(2,size_t,sizeinbase,0,mpz_t,int)
+EXPORT_GMP_CALL(3,void,gcd,1,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(5,void,gcdext,3,mpz_t,mpz_t,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,gmp_ulint,gcd_ui,1,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(3,void,divexact,1,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,void,divexact_ui,1,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(2,void,fac_ui,1,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(4,void,powm,1,mpz_t,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(4,void,powm_ui,1,mpz_t,mpz_t,gmp_ulint,mpz_t)
+EXPORT_GMP_CALL(3,void,ui_pow_ui,1,mpz_t,gmp_ulint,gmp_ulint)
+EXPORT_GMP_CALL(3,void,pow_ui,1,mpz_t,mpz_t,gmp_ulint)
+
+EXPORT_GMP_CALL(2,int,probab_prime_p,0,mpz_t,int)
+EXPORT_GMP_CALL(2,void,nextprime,1,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,void,lcm,1,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,void,lcm_ui,1,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(3,void,invert,1,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(2,int,jacobi,0,mpz_t,mpz_t)
+EXPORT_GMP_CALL(2,int,kronecker_si,0,mpz_t,gmp_lint)
+EXPORT_GMP_CALL(2,int,kronecker_ui,0,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(2,int,si_kronecker,0,gmp_lint,mpz_t)
+EXPORT_GMP_CALL(2,int,ui_kronecker,0,gmp_ulint,mpz_t)
+EXPORT_GMP_CALL(3,gmp_ulint,remove,1,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,void,bin_ui,1,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(3,void,bin_uiui,1,mpz_t,gmp_ulint,gmp_ulint)
+EXPORT_GMP_CALL(2,void,fib_ui,1,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(3,void,fib2_ui,2,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(2,void,lucnum_ui,1,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(3,void,lucnum2_ui,2,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(3,void,mod,1,mpz_t,mpz_t,mpz_t)
+/* EXPORT_GMP_CALL(3,void,mod_ui,1,mpz_t,mpz_t,gmp_ulint) */ /*alias*/
+EXPORT_GMP_CALL(2,gmp_ulint,millerrabin,0,mpz_t,int)
+EXPORT_GMP_CALL(2,gmp_ulint,hamdist,0,mpz_t,mpz_t)
+/* EXPORT_GMP_CALL(1,int,odd_p,0,mpz_t) */ /*macro*/
+/* EXPORT_GMP_CALL(1,int,even_p,0,mpz_t) */
+
+EXPORT_GMP_CALL(3,int,root,1,mpz_t,mpz_t,gmp_ulint)/* mult val*/
+EXPORT_GMP_CALL(4,void,rootrem,2,mpz_t,mpz_t,mpz_t,gmp_ulint)/* mult val*/
+EXPORT_GMP_CALL(2,void,sqrt,1,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,void,sqrtrem,2,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(1,int,perfect_power_p,0,mpz_t)
+EXPORT_GMP_CALL(1,int,perfect_square_p,0,mpz_t)
+
+EXPORT_GMP_CALL(3,void,cdiv_q,1,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,void,cdiv_r,1,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(4,void,cdiv_qr,2,mpz_t,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,gmp_ulint,cdiv_q_ui,1,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(3,gmp_ulint,cdiv_r_ui,1,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(4,gmp_ulint,cdiv_qr_ui,2,mpz_t,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(2,gmp_ulint,cdiv_ui,0,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(3,void,cdiv_q_2exp,1,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(3,void,cdiv_r_2exp,1,mpz_t,mpz_t,gmp_ulint)
+
+EXPORT_GMP_CALL(3,void,fdiv_q,1,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,void,fdiv_r,1,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(4,void,fdiv_qr,2,mpz_t,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,gmp_ulint,fdiv_q_ui,1,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(3,gmp_ulint,fdiv_r_ui,1,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(4,gmp_ulint,fdiv_qr_ui,2,mpz_t,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(2,gmp_ulint,fdiv_ui,0,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(3,void,fdiv_r_2exp,1,mpz_t,mpz_t,gmp_ulint)
+
+EXPORT_GMP_CALL(3,void,tdiv_q,1,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,void,tdiv_r,1,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,gmp_ulint,tdiv_q_ui,1,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(3,gmp_ulint,tdiv_r_ui,1,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(4,gmp_ulint,tdiv_qr_ui,2,mpz_t,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(2,gmp_ulint,tdiv_ui,0,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(3,void,tdiv_q_2exp,1,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(3,void,tdiv_r_2exp,1,mpz_t,mpz_t,gmp_ulint)
+
+EXPORT_GMP_CALL(2,int,divisible_p,0,mpz_t,mpz_t)
+EXPORT_GMP_CALL(2,int,divisible_ui_p,0,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(2,int,divisible_2exp_p,0,mpz_t,gmp_ulint)
+
+EXPORT_GMP_CALL(3,int,congruent_p,0,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,int,congruent_ui_p,0,mpz_t,gmp_ulint,gmp_ulint)
+EXPORT_GMP_CALL(3,int,congruent_2exp_p,0,mpz_t,mpz_t,gmp_ulint)
+
+EXPORT_GMP_CALL(3,void,addmul,1,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,void,addmul_ui,1,mpz_t,mpz_t,gmp_ulint)
+EXPORT_GMP_CALL(3,void,submul,1,mpz_t,mpz_t,mpz_t)
+EXPORT_GMP_CALL(3,void,submul_ui,1,mpz_t,mpz_t,gmp_ulint)
+
+EXPORT_GMP_CALL(2,void,abs,1,mpz_t,mpz_t)
+
+
+/* MEM_GMP_CALL(2,void *,mpz_realloc,mpz_t,mp_size_t)*/
+/* MEM_GMP_CALL(2,int,mpz_legendre,0,mpz_t,mpz_t) */ /*alias*/
+/* MEM_GMP_CALL(2,int,mpz_kronecker,0,mpz_t,mpz_t) */
 
      /* FIXME: find a way to have this follow the convention in gmp.h*/
 
 #define __gmpz_urandomm m__gmpz_urandomm
-#define __gmp_randseed m__gmp_randseed 
+#define __gmp_randseed m__gmp_randseed
 #define __gmp_randseed_ui m__gmp_randseed_ui
 #define __gmp_randinit_default m__gmp_randinit_default
 
-#define __gmpz_add m__gmpz_add
-#define __gmpz_add_ui m__gmpz_add_ui
-#define __gmpz_sub m__gmpz_sub
-#define __gmpz_sub_ui m__gmpz_sub_ui
-#define __gmpz_mul m__gmpz_mul
-#define __gmpz_mul_si m__gmpz_mul_si
-#define __gmpz_mul_2exp m__gmpz_mul_2exp
-#define __gmpz_neg m__gmpz_neg
-#define __gmpz_tdiv_qr m__gmpz_tdiv_qr
-#define __gmpz_fdiv_q_2exp m__gmpz_fdiv_q_2exp
-#define __gmpz_cmp m__gmpz_cmp
-#define __gmpz_and m__gmpz_and
-#define __gmpz_xor m__gmpz_xor
-#define __gmpz_ior m__gmpz_ior
-#define __gmpz_com m__gmpz_com
-#define __gmpz_tstbit m__gmpz_tstbit
-#define __gmpz_init m__gmpz_init
-#define __gmpz_set m__gmpz_set
-#define __gmpz_set_ui m__gmpz_set_ui
-#define __gmpz_set_si m__gmpz_set_si
-#define __gmpz_get_d m__gmpz_get_d
-#define __gmpz_get_si m__gmpz_get_si
-/* #define __gmpz_get_str m__gmpz_get_str */
-#define __gmpz_get_strp m__gmpz_get_strp
-#define __gmpz_fits_sint_p m__gmpz_fits_sint_p
-#define __gmpz_fits_slong_p m__gmpz_fits_slong_p
-#define __gmpz_popcount m__gmpz_popcount
-/*#define __gmpz_realloc m__gmpz_realloc*/
-#define __gmpz_size m__gmpz_size
-#define __gmpz_sizeinbase m__gmpz_sizeinbase
-#define __gmpz_mpz_gcd m__gmpz_mpz_gcd
-#define __gmpz_mpz_gcd_ui m__gmpz_mpz_gcd_ui
-#define __gmpz_mpz_divexact m__gmpz_mpz_divexact
-#define __gmpz_mpz_divexact_ui m__gmpz_mpz_divexact_ui
-#define __gmpz_mpz_fac_ui m__gmpz_mpz_fac_ui
-#define __gmpz_mpz_powm m__gmpz_mpz_powm
-#define __gmpz_mpz_powm_ui m__gmpz_mpz_powm_ui
+
+#define __mpz_add m__gmpz_add
+#define __mpz_add_ui m__gmpz_add_ui
+#define __mpz_sub m__gmpz_sub
+#define __mpz_sub_ui m__gmpz_sub_ui
+#define __mpz_mul m__gmpz_mul
+#define __mpz_mul_si m__gmpz_mul_si
+#define __mpz_mul_ui m__gmpz_mul_ui
+#define __mpz_mul_2exp m__gmpz_mul_2exp
+#define __mpz_neg m__gmpz_neg
+#define __mpz_tdiv_qr m__gmpz_tdiv_qr
+#define __mpz_fdiv_q_2exp m__gmpz_fdiv_q_2exp
+#define __mpz_cmp m__gmpz_cmp
+#define __mpz_and m__gmpz_and
+#define __mpz_xor m__gmpz_xor
+#define __mpz_ior m__gmpz_ior
+#define __mpz_com m__gmpz_com
+#define __mpz_tstbit m__gmpz_tstbit
+#define __mpz_init m__gmpz_init
+#define __mpz_set m__gmpz_set
+#define __mpz_set_ui m__gmpz_set_ui
+#define __mpz_set_si m__gmpz_set_si
+#define __mpz_get_d m__gmpz_get_d
+#define __mpz_get_si m__gmpz_get_si
+/* #define ____gmpz_get_strp m__g__gmpz_get_strp */
+#define __mpz_fits_sint_p m__gmpz_fits_sint_p
+#define __mpz_fits_slong_p m__gmpz_fits_slong_p
+#define __mpz_popcount m__gmpz_popcount
+#define __mpz_size m__gmpz_size
+#define __mpz_sizeinbase m__gmpz_sizeinbase
+#define __mpz_gcd m__gmpz_gcd
+#define __mpz_gcd_ui m__gmpz_gcd_ui
+#define __mpz_divexact m__gmpz_divexact
+#define __mpz_divexact_ui m__gmpz_divexact_ui
+#define __mpz_fac_ui m__gmpz_fac_ui
+#define __mpz_powm m__gmpz_powm
+#define __mpz_powm_ui m__gmpz_powm_ui
+#define __mpz_ui_pow_ui m__gmpz_ui_pow_ui
+#define __mpz_pow_ui m__gmpz_pow_ui
+
+#define __mpz_probab_prime_p m__gmpz_probab_prime_p
+#define __mpz_nextprime m__gmpz_nextprime
+#define __mpz_lcm m__gmpz_lcm
+#define __mpz_lcm_ui m__gmpz_lcm_ui
+#define __mpz_invert m__gmpz_invert
+#define __mpz_jacobi m__gmpz_jacobi
+#define __mpz_kronecker_si m__gmpz_kronecker_si
+#define __mpz_kronecker_ui m__gmpz_kronecker_ui
+#define __mpz_si_kronecker m__gmpz_si_kronecker
+#define __mpz_ui_kronecker m__gmpz_ui_kronecker
+#define __mpz_remove m__gmpz_remove
+#define __mpz_bin_ui m__gmpz_bin_ui
+#define __mpz_bin_uiui m__gmpz_bin_uiui
+#define __mpz_fib_ui m__gmpz_fib_ui
+#define __mpz_fib2_ui m__gmpz_fib2_ui
+#define __mpz_lucnum_ui m__gmpz_lucnum_ui
+#define __mpz_lucnum2_ui m__gmpz_lucnum2_ui
+#define __mpz_hamdist m__gmpz_hamdist
+#define __mpz_odd_p m__gmpz_odd_p
+#define __mpz_even_p m__gmpz_even_p
+
+#define __mpz_root m__gmpz_root
+#define __mpz_rootrem m__gmpz_rootrem
+#define __mpz_sqrt m__gmpz_sqrt
+#define __mpz_sqrtrem m__gmpz_sqrtrem
+#define __mpz_perfect_power_p m__gmpz_perfect_power_p
+#define __mpz_perfect_square_p m__gmpz_perfect_square_p
+
+#define __mpz_cdiv_q m__gmpz_cdiv_q
+#define __mpz_cdiv_r m__gmpz_cdiv_r
+#define __mpz_cdiv_qr m__gmpz_cdiv_qr
+#define __mpz_cdiv_q_ui m__gmpz_cdiv_q_ui
+#define __mpz_cdiv_r_ui m__gmpz_cdiv_r_ui
+#define __mpz_cdiv_qr_ui m__gmpz_cdiv_qr_ui
+#define __mpz_cdiv_ui m__gmpz_cdiv_ui
+#define __mpz_cdiv_q_2exp m__gmpz_cdiv_q_2exp
+#define __mpz_cdiv_r_2exp m__gmpz_cdiv_r_2exp
+
+#define __mpz_fdiv_q m__gmpz_fdiv_q
+#define __mpz_fdiv_r m__gmpz_fdiv_r
+#define __mpz_fdiv_qr m__gmpz_fdiv_qr
+#define __mpz_fdiv_q_ui m__gmpz_fdiv_q_ui
+#define __mpz_fdiv_r_ui m__gmpz_fdiv_r_ui
+#define __mpz_fdiv_qr_ui m__gmpz_fdiv_qr_ui
+#define __mpz_fdiv_ui m__gmpz_fdiv_ui
+#define __mpz_fdiv_r_2exp m__gmpz_fdiv_r_2exp
+
+#define __mpz_tdiv_q m__gmpz_tdiv_q
+#define __mpz_tdiv_r m__gmpz_tdiv_r
+#define __mpz_tdiv_q_ui m__gmpz_tdiv_q_ui
+#define __mpz_tdiv_r_ui m__gmpz_tdiv_r_ui
+#define __mpz_tdiv_qr_ui m__gmpz_tdiv_qr_ui
+#define __mpz_tdiv_ui m__gmpz_tdiv_ui
+#define __mpz_tdiv_q_2exp m__gmpz_tdiv_q_2exp
+#define __mpz_tdiv_r_2exp m__gmpz_tdiv_r_2exp
+
+#define __mpz_divisible_p m__gmpz_divisible_p
+#define __mpz_divisible_ui_p m__gmpz_divisible_ui_p
+#define __mpz_divisible_2exp_p m__gmpz_divisible_2exp_p
+
+#define __mpz_congruent_p m__gmpz_congruent_p
+#define __mpz_congruent_ui_p m__gmpz_congruent_ui_p
+#define __mpz_congruent_2exp_p m__gmpz_congruent_2exp_p
+
+#define __mpz_addmul m__gmpz_addmul
+#define __mpz_addmul_ui m__gmpz_addmul_ui
+#define __mpz_submul m__gmpz_submul
+#define __mpz_submul_ui m__gmpz_submul_ui
+
+#define __mpz_abs m__gmpz_abs

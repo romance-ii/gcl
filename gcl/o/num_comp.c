@@ -308,6 +308,78 @@ LFD(Lall_different)(void)
 	vs_base[0] = Ct;
 }
 
+DEFUN_NEW("<2",object,fSl2,SI
+	  ,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+  
+  RETURN1(number_compare(x,y)<0 ? Ct : Cnil);
+
+}
+
+
+DEFUN_NEW("<=2",object,fSle2,SI
+	  ,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+  
+  RETURN1(number_compare(x,y)<1 ? Ct : Cnil);
+
+}
+
+
+DEFUN_NEW(">2",object,fSg2,SI
+	  ,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+  
+  RETURN1(number_compare(x,y)>0 ? Ct : Cnil);
+
+}
+
+
+DEFUN_NEW(">=2",object,fSge2,SI
+	  ,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+  
+  RETURN1(number_compare(x,y)>-1 ? Ct : Cnil);
+
+}
+
+
+DEFUN_NEW("=2",object,fSe2,SI
+	  ,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+  
+  RETURN1(number_compare(x,y)==0 ? Ct : Cnil);
+
+}
+
+
+DEFUN_NEW("/=2",object,fSne2,SI
+	  ,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+  
+  RETURN1(number_compare(x,y)!=0 ? Ct : Cnil);
+
+}
+
+
+DEFUN_NEW("MAX2",object,fSx2,SI
+	  ,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+  
+  object z=fixnum_float_contagion(x,y);
+  y=fixnum_float_contagion(y,z);
+
+  RETURN1(number_compare(z,y)<0 ? y : z);
+
+}
+
+
+DEFUN_NEW("MIN2",object,fSm2,SI
+	  ,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+  
+  object z=fixnum_float_contagion(x,y);
+  y=fixnum_float_contagion(y,z);
+
+  RETURN1(number_compare(z,y)>0 ? y : z);
+
+}
+
+
+
+
 static void
 Lnumber_compare(int s, int t)
 {

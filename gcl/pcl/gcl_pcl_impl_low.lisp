@@ -36,9 +36,9 @@
 (defun printing-random-thing-internal (thing stream)
   (format stream "~O" (si:address thing)))
 
-(eval-when (compile load eval)
-(pushnew :turbo-closure *features*)
-(pushnew :turbo-closure-env-size *features*))
+;(eval-when (compile load eval)
+;(pushnew :turbo-closure *features*)
+;(pushnew :turbo-closure-env-size *features*))
 
 (defmacro %svref (vector index)
   `(svref (the simple-vector ,vector) (the fixnum ,index)))
@@ -52,15 +52,15 @@
 (si::freeze-defstruct 'method-call)
 (si::freeze-defstruct 'fast-method-call)
 
-(defvar *pcl-funcall*  `(lambda (loc)
-          (compiler::wt-nl
-           "{object _funobj = " loc ";"
-           "if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
-                   (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
-               else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
-               else super_funcall_no_event(_funobj);}")))
+;; (defvar *pcl-funcall*  `(lambda (loc)
+;;           (compiler::wt-nl
+;;            "{object _funobj = " loc ";"
+;;            "if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+;;                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
+;;                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
+;;                else super_funcall_no_event(_funobj);}")))
 
-(setq compiler::*super-funcall* *pcl-funcall*)
+;; (setq compiler::*super-funcall* *pcl-funcall*)
 
 (defmacro fmc-funcall (fn pv-cell next-method-call &rest args)
   `(funcall ,fn ,pv-cell ,next-method-call ,@args))
@@ -72,80 +72,89 @@
 
 
 ;#+turbo-closure-env-size
-(clines "
-static object cclosure_env_nthcdr (fixnum n,object cc) {
-   object env,*turbo;
-   if(n<0)return Cnil;
-   if(type_of(cc)!=t_cclosure)return Cnil;
-   if((turbo=cc->cc.cc_turbo)==NULL)
-     {env=cc->cc.cc_env;
-      while(n-->0)
-        {if(type_of(env)!=t_cons)return Cnil;
-         env=env->c.c_cdr;}
-      return env;}
-   else
-     {if(n>=fix(*(turbo-1)))return Cnil;
-      return turbo[n];}
-}")
+;; (clines "
+;; static object cclosure_env_nthcdr (fixnum n,object cc) {
+;;    object env,*turbo;
+;;    if(n<0)return Cnil;
+;;    if(type_of(cc)!=t_cclosure)return Cnil;
+;;    if((turbo=cc->cc.cc_turbo)==NULL)
+;;      {env=cc->cc.cc_env;
+;;       while(n-->0)
+;;         {if(type_of(env)!=t_cons)return Cnil;
+;;          env=env->c.c_cdr;}
+;;       return env;}
+;;    else
+;;      {if(n>=fix(*(turbo-1)))return Cnil;
+;;       return turbo[n];}
+;; }")
 
-(defentry cclosure-env-nthcdr (fixnum object) (static object cclosure_env_nthcdr))
+;(defentry cclosure-env-nthcdr (fixnum object) (static object cclosure_env_nthcdr))
 ;; This is the unsafe but fast version.
-(defentry %cclosure-env-nthcdr (fixnum object) (static object cclosure_env_nthcdr))
+;(defentry %cclosure-env-nthcdr (fixnum object) (static object cclosure_env_nthcdr))
+
+
+(defun cclosure-env-nthcdr (n f)
+  (declare (inline c::fn-env))
+  (nthcdr n (c::fn-env f)))
 
 ;; FIXME The non-inlined versions should really check for uncompiled 
 ;; closeres and set the environment properly in them.  In reality,
 ;; trying to build pcl interpreted takes forever!  Also clean the list
 ;; of inlines and make sure there are real function versions for each used case.
-(clines "
-static void
-set_cclosure_env(object cc,object val) {
- if (type_of(cc)==t_cclosure)
-   cc->cc.cc_env=val;
-}
-")
+;; (clines "
+;; static void
+;; set_cclosure_env(object cc,object val) {
+;;  if (type_of(cc)==t_cclosure)
+;;    cc->cc.cc_env=val;
+;; }
+;; ")
 
-(defentry set-cclosure-env (object object) (static void set_cclosure_env))
-(defentry %set-cclosure-env (object object) (static void set_cclosure_env))
+;; (defentry set-cclosure-env (object object) (static void set_cclosure_env))
+;; (defentry %set-cclosure-env (object object) (static void set_cclosure_env))
 
-(clines "
-static object
-cclosurep(object o) {
-  return type_of(o)==t_cclosure ? Ct : Cnil;
-}
-")
 
-(defentry cclosurep (object) (static object cclosurep))
+;; (clines "
+;; static object
+;; cclosurep(object o) {
+;;   return type_of(o)==t_cclosure ? Ct : Cnil;
+;; }
+;; ")
 
-(clines "
-static object
-cclosure_env(object o) {
-  return type_of(o)==t_cclosure ? o->cc.cc_env : Cnil;
-}
-")
+;; (defentry cclosurep (object) (static object cclosurep))
 
-(defentry cclosure-env (object) (static object cclosure_env))
-(defentry %cclosure-env (object) (static object cclosure_env))
+(defun cclosurep (x) (typecase x (compiler::new-compiled-function t)))
+(defun cclosure-env (x) (typecase x (compiler::new-compiled-function (c::function-env x 0))))
 
-(clines "
-static void
-set_compiled_function_name(object o,object n) {
-/* check type here */
-  o->cf.cf_name=n;
-}
-")
+;; (clines "
+;; static object
+;; cclosure_env(object o) {
+;;   return type_of(o)==t_cclosure ? o->cc.cc_env : Cnil;
+;; }
+;; ")
 
-(defentry si::set-compiled-function-name (object object) (static void set_compiled_function_name))
-(defentry si::%set-compiled-function-name (object object) (static void set_compiled_function_name))
+;; (defentry cclosure-env (object) (static object cclosure_env))
+;; (defentry %cclosure-env (object) (static object cclosure_env))
 
-(clines "
-static object
-__fboundp(object o) {
-/* FIXME check type here*/
-return o->s.s_gfdef==OBJNULL ? Cnil : Ct;
-}
-")
+;; (clines "
+;; static void
+;; set_compiled_function_name(object o,object n) {
+;; /* check type here */
+;;   o->cf.cf_name=n;
+;; }
+;; ")
 
-(defentry %fboundp (object) (static object __fboundp))
+;; (defentry si::set-compiled-function-name (object object) (static void set_compiled_function_name))
+;; (defentry si::%set-compiled-function-name (object object) (static void set_compiled_function_name))
+
+;; (clines "
+;; static object
+;; __fboundp(object o) {
+;; /* FIXME check type here*/
+;; return o->s.s_gfdef==OBJNULL ? Cnil : Ct;
+;; }
+;; ")
+
+;; (defentry %fboundp (object) (static object __fboundp))
 
 (eval-when (compile eval load);FIXME do pushn here from compiler
 (defun do-norm (entry)
@@ -158,15 +167,16 @@ return o->s.s_gfdef==OBJNULL ? Cnil : Ct;
 	  '( (%fboundp (t) compiler::boolean nil nil "(#0)->s.s_gfdef!=OBJNULL")
 	     (%symbol-function (t) t nil nil "(#0)->s.s_gfdef")
 	     (si:%structure-name (t) t nil nil "(#0)->str.str_def->str.str_self[0]")
-	     (si:%compiled-function-name (t) t nil nil "(#0)->cf.cf_name")
-	     (si:%set-compiled-function-name (t t) t t nil "((#0)->cf.cf_name)=(#1)")
-	     (cclosurep (t) compiler::boolean nil nil "type_of(#0)==t_cclosure")
-	     (sfun-p (t) compiler::boolean nil nil "type_of(#0)==t_sfun")
-	     (%cclosure-env (t) t nil nil "(#0)->cc.cc_env")
-	     (%set-cclosure-env (t t) t t nil "((#0)->cc.cc_env)=(#1)")
-	     #+turbo-closure
-	     (%cclosure-env-nthcdr (fixnum t) t nil nil "(#1)->cc.cc_turbo[#0]")
-	     (logxor (fixnum fixnum) fixnum nil nil "((#0) ^ (#1))"))))
+;	     (si:%compiled-function-name (t) t nil nil "(#0)->cf.cf_name")
+;	     (si:%set-compiled-function-name (t t) t t nil "((#0)->cf.cf_name)=(#1)")
+;	     (cclosurep (t) compiler::boolean nil nil "type_of(#0)==t_cclosure")
+;	     (sfun-p (t) compiler::boolean nil nil "type_of(#0)==t_sfun")
+;	     (%cclosure-env (t) t nil nil "(#0)->cc.cc_env")
+;	     (%set-cclosure-env (t t) t t nil "((#0)->cc.cc_env)=(#1)")
+;	     #+turbo-closure
+;	     (%cclosure-env-nthcdr (fixnum t) t nil nil "(#1)->cc.cc_turbo[#0]")
+;	     (logxor (fixnum fixnum) fixnum nil nil "((#0) ^ (#1))")
+)))
 
 (defun make-function-inline (inline)
   (setf (get (car inline) 'compiler::inline-always)
@@ -207,15 +217,17 @@ return o->s.s_gfdef==OBJNULL ? Cnil : Ct;
 
 (define-inlines)
 
-(defsetf si:%compiled-function-name si:%set-compiled-function-name)
-(defsetf %cclosure-env %set-cclosure-env)
+;(defsetf si:%compiled-function-name si:%set-compiled-function-name)
+;(defsetf %cclosure-env %set-cclosure-env)
 
 (defun set-function-name-1 (fn new-name ignore)
   (declare (ignore ignore))
   (cond ((compiled-function-p fn)
-	 (si::turbo-closure fn)
+;	 (si::turbo-closure fn)
 	 (when (symbolp new-name) (pcl::proclaim-defmethod new-name nil))
-         (setf (si:%compiled-function-name fn) new-name))
+	 (setf (si::call-name (c::function-plist fn)) new-name)
+;         (setf (si:%compiled-function-name fn) new-name)
+	 )
         ((and (listp fn)
               (eq (car fn) 'lambda-block))
          (setf (cadr fn) new-name))
@@ -226,31 +238,31 @@ return o->s.s_gfdef==OBJNULL ? Cnil : Ct;
   fn)
 
 
-(clines "
-object fSuse_fast_links_2(object,object);
-static object set_cclosure (object result_cc,object value_cc,fixnum available_size) {
-  object result_env_tail,value_env_tail; int i;
+;; (clines "
+;; object fSuse_fast_links_2(object,object);
+;; static object set_cclosure (object result_cc,object value_cc,fixnum available_size) {
+;;   object result_env_tail,value_env_tail; int i;
 
-  /* If we are currently using fast linking,     */
-  /* make sure to remove the link for result_cc. */
-  /* (VFUN_NARGS=2,fSuse_fast_links(sLnil,result_cc));*/
-  fSuse_fast_links_2(sLnil,result_cc);
+;;   /* If we are currently using fast linking,     */
+;;   /* make sure to remove the link for result_cc. */
+;;   /* (VFUN_NARGS=2,fSuse_fast_links(sLnil,result_cc));*/
+;;   fSuse_fast_links_2(sLnil,result_cc);
 
-/*  use_fast_links(3,Cnil,result_cc); */
+;; /*  use_fast_links(3,Cnil,result_cc); */
 
-  result_env_tail=result_cc->cc.cc_env;
-  value_env_tail=value_cc->cc.cc_env;
-  for(i=available_size;
-      result_env_tail!=Cnil && i>0;
-      result_env_tail=CMPcdr(result_env_tail), value_env_tail=CMPcdr(value_env_tail))
-    CMPcar(result_env_tail)=CMPcar(value_env_tail), i--;
-  result_cc->cc.cc_self=value_cc->cc.cc_self;
-  result_cc->cc.cc_data=value_cc->cc.cc_data;
+;;   result_env_tail=result_cc->cc.cc_env;
+;;   value_env_tail=value_cc->cc.cc_env;
+;;   for(i=available_size;
+;;       result_env_tail!=Cnil && i>0;
+;;       result_env_tail=CMPcdr(result_env_tail), value_env_tail=CMPcdr(value_env_tail))
+;;     CMPcar(result_env_tail)=CMPcar(value_env_tail), i--;
+;;   result_cc->cc.cc_self=value_cc->cc.cc_self;
+;;   result_cc->cc.cc_data=value_cc->cc.cc_data;
 
-  return result_cc;
-}")
+;;   return result_cc;
+;; }")
 
-(defentry %set-cclosure (object object fixnum) (static object set_cclosure))
+;(defentry %set-cclosure (object object fixnum) (static object set_cclosure))
 
 
 (defun structure-functions-exist-p ()
@@ -297,8 +309,8 @@ static object set_cclosure (object result_cc,object value_cc,fixnum available_si
                             (writer ;(if read-only-p
 					;(lambda (v x) (si:structure-ref1 x offset))
 				      (lambda (v x) (si:structure-set x type offset v))))
-                        #+turbo-closure (si:turbo-closure reader)
-                        #+turbo-closure (si:turbo-closure writer)
+;                        #+turbo-closure (si:turbo-closure reader)
+;                        #+turbo-closure (si:turbo-closure writer)
                         (let* ((reader-sym 
 				(let ((*package* *the-pcl-package*))
 				  (intern (format nil "~s SLOT~D" type offset))))

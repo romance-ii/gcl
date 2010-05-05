@@ -156,14 +156,17 @@ LFD(Lsleep)(void)
 }
 
 DEFUNM_NEW("GET-INTERNAL-RUN-TIMES",object,fSget_internal_run_times,SI
-	   ,0,0,NONE,OO,OO,OO,OO,(void),"") {
+	   ,0,0,NONE,OO,OO,OO,OO,(),"") {
+
+  object *base=vs_top;
 
 #ifdef USE_INTERNAL_REAL_TIME_FOR_RUNTIME
   RETURN2(fLget_internal_real_time(),small_fixnum(0));
 #else
   struct tms buf;
-  
-/*   check_arg(0); */
+  fixnum vals=(fixnum)fcall.valp;
+
+  /*   check_arg(0); */
   times(&buf);
   RETURN2(make_fixnum(buf.tms_utime),make_fixnum(buf.tms_cutime));
   
@@ -173,7 +176,7 @@ DEFUNM_NEW("GET-INTERNAL-RUN-TIMES",object,fSget_internal_run_times,SI
 
 DEFUN_NEW("GET-INTERNAL-RUN-TIME",object,fLget_internal_run_time,LISP
 	   ,0,0,NONE,OO,OO,OO,OO,(void),"") {
-  object x=FFN(fSget_internal_run_times)();
+  object x=FFN(fSget_internal_run_times)(0);
   RETURN1(x);
 }
 

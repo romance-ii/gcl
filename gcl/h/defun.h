@@ -8,6 +8,7 @@
 EXTER ret fname ();
 
 #define DEFUN_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) EXTER ret fname args;
+#define DEFUNB_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,p,doc) EXTER ret fname args;
 #define DEFUNM_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) EXTER ret fname args;
 
 #define DEFUNO_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,oldret,old,args,doc) \

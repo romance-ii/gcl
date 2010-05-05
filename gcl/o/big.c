@@ -48,15 +48,24 @@ read.d: normalize_big_to_object
 #include <string.h>
 #include "include.h"
 
-void * (*gcl_gmp_allocfun)(size_t) = alloc_relblock;
+#ifdef STATIC_FUNCTION_POINTERS
+static void* alloc_relblock_static (size_t n) {return alloc_relblock (n);}
+static void* alloc_contblock_static(size_t n) {return alloc_contblock(n);}
+#endif
+
+void* (*gcl_gmp_allocfun)(size_t)=FFN(alloc_relblock);
+int gmp_relocatable=1;
+
 
 DEFUN_NEW("SET-GMP-ALLOCATE-RELOCATABLE",object,fSset_gmp_allocate_relocatable,SI,1,1,NONE,OO,OO,OO,OO,
       (object flag),"Set the allocation to be relocatble ")
 {
   if (flag == Ct) {
-    gcl_gmp_allocfun = alloc_relblock;
+    gcl_gmp_allocfun = FFN(alloc_relblock);
+    gmp_relocatable=1;
   } else {
-    gcl_gmp_allocfun = alloc_contblock;
+    gcl_gmp_allocfun = FFN(alloc_contblock);
+    gmp_relocatable=0;
   }
   RETURN1(flag);
 }

@@ -275,7 +275,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	  (unwind-protect
 	      (do ((form (read *compiler-input* nil eof) (read *compiler-input* nil eof))
 		   (load-flag (or (eq :defaults *eval-when-defaults*)
-				  (intersection '(load :load-toplevel) *eval-when-defaults*))))
+				  (list-split '(load :load-toplevel) *eval-when-defaults*))))
 		  (nil)
 		  
 		  (unless (eq form eof)
@@ -286,9 +286,11 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 		  (when (or (eq form eof) (and *split-files* (> (file-position *compiler-input*) (car *split-files*))))
 		    
 		    (when *new-sigs-in-file*
-		      (cmpnote "Caller ~s appears after callee ~s,~%   whose sig changed from ~s to ~s, restart pass1~%"
-			       (car *new-sigs-in-file*) (cadr *new-sigs-in-file*) (caddr *new-sigs-in-file*)
-			       (cadddr *new-sigs-in-file*))
+		      (keyed-cmpnote 
+		       (list 'signatures (car *new-sigs-in-file*))
+		       "Caller ~s appears after callee ~s,~%   whose sig changed from ~s to ~s, restart pass1~%"
+		       (car *new-sigs-in-file*) (cadr *new-sigs-in-file*) (caddr *new-sigs-in-file*)
+		       (cadddr *new-sigs-in-file*))
 		      (return-from compile-file1 'again))
 		    
 		    (when *split-files*
@@ -391,37 +393,68 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
     (wt-data1 form)  ;; this binds all the print stuff
     ))
 
-(defun compile (name &optional def &aux mac tem gaz (*default-pathname-defaults* #"."))
+(defun fun-env (name)
+  (let ((fun (when (fboundp name) (or (macro-function name) (symbol-function name)))))
+    (cond ((si::interpreted-function-p fun) 
+	   (multiple-value-bind
+	    (src clo blk)
+	    (function-lambda-expression fun)
+	    (declare (ignore src blk))
+	    (mapcar 'cadr clo)))
+	  ((compiled-function-p fun) (c::function-env fun 0)))))
+
+
+(defun get-named-form (name)
+  (when (fboundp name) 
+    (let* ((mac (macro-function name))
+	   (na (if (symbol-package name) name 'cmp-anon))
+	   (fun (or mac (symbol-function name))))
+      (multiple-value-bind
+       (lam clo) 
+       (function-lambda-expression fun)
+       (let ((form `(,(if mac 'defmacro 'defun) ,na ,(cadr lam) ,@(cddr lam))))
+	 (values (if clo 
+		     (let ((f (tmpsym))(v (tmpsym))(o (tmpsym))(n (tmpsym))(i (tmpsym)))
+		       `(let* (,@(mapcar (lambda (x) (list (car x) `(tmpsym))) clo)
+			       (,o (fun-env ',name))
+			       (,v ,form)
+			       (,f (c::symbol-gfdef ,v))
+			       (,n (fun-env ',name))
+			       (,i -1))
+			  (mapl (lambda (x y) 
+				  (declare (ignore y))
+				  (c::set-function-env x ,f (incf ,i))) ,o ,n)
+			  ,v)) form) na))))))
+
+(defun compile (name &optional def &aux na tem gaz (*default-pathname-defaults* #"."))
   
   (when (eq name 'cmp-anon)
-    (remhash name si::*call-hash-table*)
+;    (remhash name si::*call-hash-table*)
     (dolist (l '(proclaimed-function proclaimed-arg-types proclaimed-return-type))
       (remprop name l)))
 
-  (cond ((not(symbolp name)) (error "Must be a name"))
+  (cond ((not (symbolp name)) (error "Must be a name"))
 	((or (si::interpreted-function-p def) (and (consp def) (eq (car def) 'lambda)))
 	 (or name (setf name 'cmp-anon))
 	 (setf (symbol-function name) (coerce def 'function))
 	 (compile name))
 	(def (error "def not a lambda expression"))
 	 ;; FIXME -- support warnings-p and failures-p.  CM 20041119
-	((and (fboundp name) (setq tem (function-lambda-expression (or (setq mac (macro-function name)) (symbol-function name)))))
-	 (let ((na (if (symbol-package name) name 'cmp-anon)) warnings failures)
+	((multiple-value-setq (tem na) (get-named-form name))
+	 (let (warnings failures)
 	   (unless (and (fboundp 'si::init-cmp-anon) (or (si::init-cmp-anon) (fmakunbound 'si::init-cmp-anon)))
 	     (with-open-file
 	      (st (setq gaz (gazonk-name)) :direction :output))
 	     (multiple-value-bind 
 	      (fn w f)
-	      (let ((*compiler-compile* `(,(if mac 'defmacro 'defun) ,na 
-					   ,@(ecase (car tem)
-						    (lambda (cdr tem))
-						    (lambda-block (cddr tem)))))) (compile-file gaz))
+	      (let ((*compiler-compile* tem))
+		(compile-file gaz))
 	      (when fn 
 		(load fn)
 		(unless *keep-gaz* (delete-file fn)))
 	      (setq warnings w failures f))
 	     (unless *keep-gaz* (delete-file gaz)))
-	   (or (eq na name) (setf (symbol-function name) (symbol-function na)))
+	   (unless (eq na name) (setf (symbol-function name) (symbol-function na)))
 	   (when *tmp-pack*
 	     (delete-package *tmp-pack*)
 	     (setq *tmp-pack* nil))
@@ -429,22 +462,21 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	(t (error "can't compile ~a" name))))
 
 
-(defun disassemble (name &optional (asm t) &aux tem mac)
+(defun disassemble (name &optional (asm t) &aux tem)
   (check-type name (or function function-identifier))
   (cond ((and (consp name)
 	      (eq (car name) 'lambda))
 	 (dolist (l '(proclaimed-function proclaimed-return-type proclaimed-arg-types))
 	   (remprop 'cmp-anon l))
-	 (remhash 'cmp-anon si::*call-hash-table*)
+;	 (remhash 'cmp-anon si::*call-hash-table*)
 	 (eval `(defun cmp-anon ,@ (cdr name)))
 	 (disassemble 'cmp-anon asm))
 	((not(symbolp name)) (princ "Not a lambda or a name") nil)
-	((and (setq tem (and (fboundp name) (or (setq mac (macro-function name)) (symbol-function name))))
-	      (or (consp tem) (setq tem (function-lambda-expression tem))))
+	((setq tem (get-named-form name))
 	 (let ((gaz (gazonk-name)))
 	   (with-open-file
 	     (st gaz :direction :output)
-	     (prin1-cmp `(,(if mac 'defmacro 'defun) ,name ,@(cdr tem)) st))
+	     (prin1-cmp tem st))
 	   (let (*fasd-data*)
 	     (compile-file gaz 
 			   :h-file t 
@@ -478,11 +510,15 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	((princ name) nil))) ;(error "can't disassemble ~a" name)
 
 
-(defun compiler-pass2 (c-pathname h-pathname system-p )
+(defun compiler-pass2 (c-pathname h-pathname system-p
+				  &aux 
+				  (ci *cmpinclude*)
+				  (ci (when (stringp ci) (subseq ci 1 (1- (length ci)))))
+				  (ci (concatenate 'string si::*system-directory* "../h/" ci))
+				  (system-p (when (or (eq system-p 'disassemble) (probe-file ci)) system-p)))
   (declare (special *init-name*))
   (with-open-file (st c-pathname :direction :output)
-    (let ((*compiler-output1* (if (eq system-p 'disassemble) *standard-output*
-				st)))
+    (let ((*compiler-output1* (if (eq system-p 'disassemble) *standard-output* st)))
       (declare (special *compiler-output1*))
     (with-open-file 
      (*compiler-output2* h-pathname :direction :output)
@@ -763,7 +799,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 		    (format st "int user_match(const char *s,int n) {~%")
 		    (format st "  Fnlst *f;~%")
 		    (format st "  for (f=my_fnlst;f<my_fnlst+NF;f++){~%")
-		    (format st "     if (!strncmp(s,f->s,n)) {~%")
+		    (format st "     if (f->s && !strncmp(s,f->s,n)) {~%")
 		    (format st "        my_load(f->fn,f->s);~%")
 		    (format st "        return 1;~%")
 		    (format st "     }~%")

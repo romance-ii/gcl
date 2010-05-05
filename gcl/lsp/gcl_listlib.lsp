@@ -132,6 +132,7 @@
 	(let* ((key (or key #'identity))(key (if (functionp key) key (funcallable-symbol-function key)))
 	       (key-comp  (comp-key key)))
 	  ,@body))))
+
  (defmacro collect (r rp form)
    `(let ((tmp ,form))
       (setq ,rp (cond (,rp (rplacd ,rp tmp) tmp) ((setq ,r tmp))))))
@@ -397,11 +398,11 @@
 	      ((setq st (cons tr st) cs (cons g cs) tr (car tr)))))))
 
 (defllist intersection (l1 l2 t)
-  (do (r (l1 l1 (cdr l1)))
+  (do (r rp (l1 l1 (cdr l1)))
       ((endp l1) r)
       (let ((oitem (car l1)))
 	(when (member (do-key key key-comp oitem) l2 :test test :test-not test-not :key key)
-	  (push oitem r)))))
+	  (collect r rp (cons oitem nil))))))
 
 (defllist nintersection (l1 l2 t)
   (do (r rp (l1 l1 (cdr l1)))
@@ -410,11 +411,11 @@
 	(collect r rp l1))))
 
 (defllist union (l1 l2 t)
-  (do ((r l2) (l1 l1 (cdr l1)))
-      ((endp l1) r)
+  (do (r rp (l1 l1 (cdr l1)))
+      ((endp l1) (when rp (rplacd rp l2)) (or r l2))
       (let* ((oitem (car l1)))
 	(unless (member (do-key key key-comp oitem) l2 :test test :test-not test-not :key key)
-	  (push oitem r)))))
+	  (collect r rp (cons oitem nil))))))
 
 (defllist nunion (l1 l2 t)
   (do (r rp (l1 l1 (cdr l1)))
@@ -424,11 +425,11 @@
 
 
 (defllist set-difference (l1 l2 t)
-  (do (r (l1 l1 (cdr l1)))
+  (do (r rp (l1 l1 (cdr l1)))
       ((endp l1) r)
       (let* ((oitem (car l1)))
 	(unless (member (do-key key key-comp oitem) l2 :test test :test-not test-not :key key)
-	  (push oitem r)))))
+	  (collect r rp (cons oitem nil))))))
 
 (defllist nset-difference (l1 l2 t)
   (do (r rp (l1 l1 (cdr l1)))
@@ -437,22 +438,20 @@
 	(collect r rp l1))))
 
 (defllist set-exclusive-or (l1 l2 t)
-  (do (r (rr (copy-list l2)) (l1 l1 (cdr l1)))
-      ((endp l1) (nconc r rr))
-      (do (p (oitem (car l1))(c2 l2 (cdr c2)))
-	    ((not (setq c2 (member (do-key key key-comp oitem) c2 :test test :test-not test-not :key key)))
-	     (unless p (push oitem r)))
-	    (do ((xp nil (or xp f)) f (x rr (cdr x))) ((not x) (setq rr f p t));FIXME delete type precedence
-		(if (eq (car x) (car c2)) (when xp (setq xp (rplacd xp (cdr x)))) (setq f (or f x) xp (cdr xp)))))))
+  (do (r rp (rr (copy-list l2)) (l1 l1 (cdr l1)))
+      ((endp l1) (when rp (rplacd rp rr)) (or r rr))
+      (do* (p (oitem (car l1))(k (do-key key key-comp oitem))(c2 l2 (cdr c2)))
+	   ((not (setq c2 (member k c2 :test test :test-not test-not :key key)))
+	    (unless p (collect r rp (cons oitem nil))))
+	   (setq rr (delete (car c2) rr :test 'eq) p t))))
 
 (defllist nset-exclusive-or (l1 l2 t)
   (do (r rp (rr (copy-list l2)) (l1 l1 (cdr l1)))
       ((endp l1) (when rp (rplacd rp rr)) (or r rr))
-      (do (p (c2 l2 (cdr c2)))
-	    ((not (setq c2 (member (do-key key key-comp (car l1)) c2 :test test :test-not test-not :key key)))
-	     (unless p (collect r rp l1)))
-	    (do ((xp nil (or xp f)) f (x rr (cdr x))) ((not x) (setq rr f p t));FIXME delete type precedence
-		(if (eq (car x) (car c2)) (when xp (setq xp (rplacd xp (cdr x)))) (setq f (or f x) xp (cdr xp)))))))
+      (do (p (k (do-key key key-comp (car l1)))(c2 l2 (cdr c2)))
+	  ((not (setq c2 (member k c2 :test test :test-not test-not :key key)))
+	   (unless p (collect r rp l1)))
+	  (setq rr (delete (car c2) rr :test 'eq) p t))))
 
 (defllist subsetp (l1 l2 t)
   (do ((l1 l1 (cdr l1)))
@@ -528,4 +527,38 @@
   (check-type list proper-list)
   (do (cdp (p tail)(pp list)) ((endp pp) p)
       (setq cdp (cdr pp) p (cons (car pp) p) pp cdp)))
+
+(defun not (x)
+  (if x nil t))
+
+(defun null (x)
+  (if x nil t))
+
+(defun get-properties (p i &aux s)
+  (cond ((endp p) (values nil nil nil))
+	((member (setq s (car p)) i :test 'eq) (values s (cadr p) p))
+	((endp (setq s (cdr p))) (error "Bad plist"))
+	(t (get-properties (cdr s) i))))
+
+(defun rplaca (x y)
+  (declare (optimize (safety 1)))
+  (check-type x cons)
+  (c::set-cons-car y x)
+  x)
+
+(defun rplacd (x y)
+  (declare (optimize (safety 1)))
+  (check-type x cons)
+  (c::set-cons-cdr y x)
+  x)
+
+(defun listp (x) (typecase x (list t)))
+(defun consp (x) (when x (listp x)))
+(defun atom (x) (not (consp x)))
+
+(defun getf (l i &optional d &aux s)
+  (cond ((endp l) d) 
+	((eq (car l) i) (cadr l)) 
+	((endp (setq s (cdr l))) (error "Bad plist"))
+	((getf (cdr s) i d))))
 

@@ -28,26 +28,20 @@
 ;;; rebind the special variables,
 ;;; *vs*, *clink*, *ccb-vs*, and *unwind-exit*.
 
+(defvar *new-env* nil)
+
 (defun c2bind (var)
   (case (var-kind var)
         (LEXICAL
          (when (var-ref-ccb var)
-               (wt-nl)
-               (wt-vs (var-ref var))
-               (wt "=MMcons(") (wt-vs (var-ref var))
-               (wt ",") (wt-clink) (wt ");")
-               (clink (var-ref var))
-               (setf (var-ref-ccb var) (ccb-vs-push))))
+	   (wt-nl)
+	   (clink (var-ref var))
+	   (setf (var-ref-ccb var) (ccb-vs-push))))
         (SPECIAL
+	 (setq *bds-used* t)
          (wt-nl "bds_bind(" (vv-str (var-loc var)) ",") (wt-vs (var-ref var))
          (wt ");")
          (push 'bds-bind *unwind-exit*))
-	(DOWN
-	  (cond ((integerp (var-loc var))
-		 (wt-nl "base0[" (var-loc var) "]=")
-		 (wt-vs (var-ref var))
-		 (wt ";"))
-		(t (wfs-error))))
         (t
 	 (cond ((eq (var-kind var) #tinteger)
 		(wt-nl "SETQ_IO(V" (var-loc var)","
@@ -64,18 +58,14 @@
         (LEXICAL
          (cond ((var-ref-ccb var)
                 (wt-nl)
-                (wt-vs (var-ref var))
-                (wt "=MMcons(" loc ",") (wt-clink) (wt ");")
-                (clink (var-ref var))
+                (clink (var-ref var) loc)
                 (setf (var-ref-ccb var) (ccb-vs-push)))
                (t
                 (wt-nl) (wt-vs (var-ref var)) (wt "= " loc ";"))))
         (SPECIAL
+	 (setq *bds-used* t)
          (wt-nl "bds_bind(" (vv-str (var-loc var)) "," loc ");")
          (push 'bds-bind *unwind-exit*))
-
-        (DOWN
-	  (wt-nl "base0[" (var-loc var) "]=" loc ";"))
         (t
 	 (cond ((eq (var-kind var) #tinteger)
 		(let ((*inline-blocks* 0) (*restore-avma* *restore-avma*))
@@ -95,11 +85,9 @@
   (case (var-kind var)
         (LEXICAL
          (cond ((var-ref-ccb var)
-                (let ((loc (list 'vs (var-ref var))))
-                     (let ((*value-to-go* loc))
-                          (c2expr* init))
-                     (wt-nl loc "=MMcons(" loc ",") (wt-clink *clink*)
-                     (wt ");"))
+                (let* ((loc (list 'vs (var-ref var)))
+		       (*value-to-go* loc))
+		  (c2expr* init))
                 (clink (var-ref var))
                 (setf (var-ref-ccb var) (ccb-vs-push)))
                (t
@@ -109,9 +97,6 @@
          (let ((*value-to-go* (list 'bds-bind (var-loc var))))
               (c2expr* init))
          (push 'bds-bind *unwind-exit*))
-	(DOWN
-	  (let ((*value-to-go* (list 'down (var-loc var))))
-	    (c2expr* init)))
 	(t 
 	 (unless (assoc (var-kind var) +wt-loc-alist+)
 	   (baboon))
@@ -126,32 +111,7 @@
 	       ((let ((*value-to-go* (list 'var var nil)))
 		  (c2expr* init)))))))
 
-;; (defun c2bind-init (var init)
-;;   (case (var-kind var)
-;;         (LEXICAL
-;;          (cond ((var-ref-ccb var)
-;;                 (let ((loc (list 'vs (var-ref var))))
-;;                      (let ((*value-to-go* loc))
-;;                           (c2expr* init))
-;;                      (wt-nl loc "=MMcons(" loc ",") (wt-clink *clink*)
-;;                      (wt ");"))
-;;                 (clink (var-ref var))
-;;                 (setf (var-ref-ccb var) (ccb-vs-push)))
-;;                (t
-;;                 (let ((*value-to-go* (list 'vs (var-ref var))))
-;;                      (c2expr* init)))))
-;;         (SPECIAL
-;;          (let ((*value-to-go* (list 'bds-bind (var-loc var))))
-;;               (c2expr* init))
-;;          (push 'bds-bind *unwind-exit*))
-;; 	(DOWN
-;; 	  (let ((*value-to-go* (list 'down (var-loc var))))
-;; 	    (c2expr* init)))
-;; 	(t 
-;; 	 (unless (assoc (var-kind var) +wt-loc-alist+)
-;; 	   (baboon))
-;;          (let ((*value-to-go* (list 'var var nil)))
-;; 	   (c2expr* init)))))
 
 (defun set-bds-bind (loc vv)
-       (wt-nl "bds_bind(" (vv-str vv) "," loc ");"))
+  (setq *bds-used* t)
+  (wt-nl "bds_bind(" (vv-str vv) "," loc ");"))

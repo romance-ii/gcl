@@ -33,19 +33,42 @@
 (in-package 'system)
 
 
-;(proclaim '(optimize (safety 2) (space 3)))
+;; (defmacro coerce-to-package (p)
+;;   (if (eq p '*package*)
+;;       p
+;;       (let ((g (gensym)))
+;;         `(let ((,g ,p))
+;;            (unless (or
+;;                     (packagep ,g)
+;;                     (setq ,g (find-package (string ,g))))
+;;             (error 'package-error :package ,p :format-control "Cannot coerce to package"))
+;;           ,g))))
 
-(defmacro coerce-to-package (p)
-  (if (eq p '*package*)
-      p
-      (let ((g (gensym)))
-        `(let ((,g ,p))
-           (unless (or
-                    (packagep ,g)
-                    (setq ,g (find-package (string ,g))))
-            (error 'package-error :package ,p :format-control "Cannot coerce to package"))
-          ,g))))
+;(defdlfun (:int "strncmp") :void* :void* :int)
 
+;; (defun find-symbol (s &optional (p *package*) &aux r)
+;;   (declare (optimize (safety 1)))
+;;   (check-type s string)
+;;   (check-type p (or package string symbol character))
+;;   (labels ((inb (h p) (c::package-internal p (mod h (c::package-internal_size p))))
+;; 	   (exb (h p) (c::package-external p (mod h (c::package-external_size p))))
+;; 	   (cns (s b &aux (l (length s)))
+;; 		(dolist (v b)
+;; 		  (declare (symbol v)) 
+;; 		  (when (string= s v)
+;; 		      (return v)))))
+;; 	(let* ((p (coerce-to-package p))
+;; 	       (h (pack-hash s)))
+;; 	  (cond ((setq r (cns s (inb h p)))
+;; 		 (values r :internal))
+;; 		((setq r (cns s (exb h p)))
+;; 		 (values r :external))
+;; 		((dolist (p (c::package-uselist p))
+;; 		   (when (setq r (cns s (exb h p)))
+;; 		     (return r)))
+;; 		 (values r :inherited))
+;; 		(t (values nil nil))))))
+	  
 (defun find-all-symbols (string-designator)
   (declare (optimize (safety 2)))
   (setq string-designator (string string-designator))
@@ -236,3 +259,5 @@
 	     ,@declaration
 	     ,@body))))
 
+(defun package-name (p) 
+  (c::package-name (si::coerce-to-package p)))

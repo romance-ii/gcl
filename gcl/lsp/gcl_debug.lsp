@@ -5,9 +5,6 @@
 (In-package "SYSTEM")
 (import 'sloop::sloop)
 
-;(eval-when (compile eval)
-;  (proclaim '(optimize (safety 2) (space 3)))
-
 (defmacro f (op &rest args)
     `(the fixnum (,op ,@ (mapcar #'(lambda (x) `(the fixnum ,x)) args) )))
 
@@ -185,6 +182,15 @@
 (defun dbl ()
   (break-level nil nil))
 
+(eval-when 
+ (eval)
+ (defun stream-name (str) (namestring (pathname str))))
+(clines "static object stream_name(str) object str;{
+     if (str->sm.sm_object1 != 0 && type_of(str->sm.sm_object1)==t_string)
+     return str->sm.sm_object1; else return Cnil; }")
+
+(defentry stream-name (object) (static object "stream_name"))
+
 (defstruct instream stream (line 0 :type fixnum) stream-name)
 
 
@@ -343,16 +349,6 @@
 (defun instream-name (instr)
   (or (instream-stream-name instr)
       (stream-name (instream-stream instr))))
-
-(eval-when (eval)
-
-(defun stream-name (str) (namestring (pathname str)))
-)  
-(clines "static object stream_name(str) object str;{
-     if (str->sm.sm_object1 != 0 && type_of(str->sm.sm_object1)==t_string)
-     return str->sm.sm_object1; else return Cnil; }")
-
-(defentry stream-name (object) (static object "stream_name"))
 
 (clines "static object closedp(str) object str;{return (str->sm.sm_fp==0 ? Ct :Cnil); }")
 
@@ -721,11 +717,10 @@
   (format *display-string* "")
   (do ((i base )
        (v (get (ihs-fname ihs) 'debugger) (cdr v)))
-      ((or (fb >= i end)(fb > (fill-pointer *display-string*) plength)))
+      ((or (fb >= i end)(fb > (fill-pointer *display-string*) plength)(= 0 (address (vs i)))));FIXME
     (format *display-string* "~a~@[~d~]=~s~@[,~]"
 	    (or (car v)  'loc) (if (not (car v)) (f - i base)) (vs i)
-	    (fb < (setq i (f + i 1)) end)))
-  )
+	    (fb < (setq i (f + i 1)) end))))
 
 (defun computing-args-p (ihs)
   ;; When running interpreted we want a line like

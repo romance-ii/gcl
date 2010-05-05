@@ -157,7 +157,7 @@
 ;  (or (setf-function-base-symbol x)
   (when (and *compiler-compile* (symbolp x))
     (unless (symbol-package x)
-      (setq *tmp-pack* (or *tmp-pack* (make-package (symbol-name (gensym)))))
+      (setq *tmp-pack* (or *tmp-pack* (make-package (symbol-name (tmpsym)))))
       (import x *tmp-pack*)
       x)))
 

@@ -1,5 +1,4 @@
-(make-package "C")
-(make-package "COMPILER" :use '("LISP"))
+;(make-package "COMPILER" :use '("LISP"))
 (make-package "SLOOP" :use '("LISP"))
 (make-package "SERROR" :use '("LISP" "SLOOP"))
 (make-package "ANSI-LOOP" :use '("LISP"))
@@ -16,6 +15,8 @@
  ;; must be printed (see License).
 
 ;FIXME this preliminary definition is needed for bootstraping, and is overwritten later
+(defun c::set-symbol-plist (x y) (si::set-symbol-plist y x))
+(fset 'c::package-name (symbol-function 'package-name))
 (defun abs (z)
   (cond ((complexp z)
 	 ;; Compute (sqrt (+ (* x x) (* y y))) carefully to prevent
@@ -32,10 +33,39 @@
 	(z)))
 
 
+(fset 'intersection #'si::intersection-eq)
+(fset 'union #'si::union-eq)
+(fset 'set-difference #'si::set-difference-eq)
+(fset 'nunion #'si::nunion-eq)
+
 (progn 
 
   (system:init-system) 
   (gbc t)
+
+  (in-package 'si)
+;  (dolist (l *gmp-fun-plist*)
+;    (add-hash (car l) (cdr l) nil nil nil))
+   (do-symbols 
+    (s) 
+    (when (search "MPZ" (string s)) 
+      (unintern s :si)))
+;  (unintern (find-symbol "MPZ_GCD") :si);FIXME
+;  (unintern (find-symbol "MPZ_LCM") :si);FIXME
+;;   (do-symbols 
+;;    (s) 
+;;    (when (search "mpz" (string s)) 
+;;      (let ((x (intern (string-upcase s) :gmp)))
+;;        (export x :gmp)
+;;        (setf (symbol-function x) (symbol-function s))
+;;        (unintern s :si))))
+  (use-package :gmp)
+  (do-symbols 
+   (s) 
+   (when (get s 'proclaimed-function)
+     (add-hash s (list (get s 'proclaimed-arg-types) (get s 'proclaimed-return-type)) nil nil nil)
+     (dolist (l '(proclaimed-function proclaimed-arg-types proclaimed-return-type))
+       (remprop s l))))
 
   (in-package "USER")
 

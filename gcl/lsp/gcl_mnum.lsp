@@ -118,7 +118,7 @@
 	  (typecase x
 			 (long-float  (,b x))
 			 (short-float (,f x))
-			 (fixnum      (if (> x most-negative-fixnum) (,i x) (- most-negative-fixnum)))
+			 (fixnum      (if (= x most-negative-fixnum) (- most-negative-fixnum) (,i x)))
 			 (rational    (if (minusp x) (- x) x))
 			 (dcomplex    (,c x))
 			 (fcomplex    (,cf x))

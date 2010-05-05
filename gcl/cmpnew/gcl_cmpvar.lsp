@@ -98,15 +98,15 @@
     (cmpck (not (symbolp name)) "The variable ~s is not a symbol." name)
     (cmpck (constantp name)     "The constant ~s is being bound." name)
     
-    (dolist** 
-     (v types)
-     (when (eq (car v) name)
-       (case (cdr v)
-	     (object (setf (var-loc var) 'object))
-	     (register (setf (var-register var) (+ (var-register var) 100)))
-	     (dynamic-extent #+dynamic-extent (setf (var-dynamic var) 1))
-	     (t (unless *compiler-new-safety* (setf (var-type var) (nil-to-t (type-and (var-type var) (cdr v))))))
-	     )))
+    (dolist (v types)
+      (when (eq (car v) name)
+	(case (cdr v)
+	      (object (setf (var-loc var) 'object))
+	      (register (setf (var-register var) (+ (var-register var) 100)))
+	      (dynamic-extent #+dynamic-extent (setf (var-dynamic var) 1))
+	      (t (unless (and (not (get (var-name var) 'tmp));FIXME
+			      *compiler-new-safety*) 
+		   (setf (var-type var) (nil-to-t (type-and (var-type var) (cdr v)))))))))
     
     (cond ((or (member name specials) (si:specialp name))
 	   (setf (var-kind var) 'SPECIAL)
@@ -133,25 +133,49 @@
     (when (and (eq (var-kind var) 'LEXICAL)
 	       (not (var-ref var)) ;;; This field may be IGNORE.
              (not (var-ref-ccb var)))
-					;	     (every (lambda (x) (or (not (var-p x)) (not (t-to-nil (var-tag x))))) *vars*))
       (cmpwarn "The variable ~s is not used." (var-name var)))))
 
 (defun var-cb (v)
   (or (var-ref-ccb v) (eq 'clb (var-loc v))))
 
-(defun c1var (name)
-  (let ((info (make-info :referred-array (make-array 1 :fill-pointer 0)))
-;			 :changed-array +empty-info-array+))
-        (vref (c1vref name)))
-    (push-referred (car vref) info)
-    (setf (info-type info) (if (var-cb (car vref)) (var-dt (car vref)) (var-type (car vref))))
-    (list 'var info vref)))
+(defun var-cbb (v)
+  (or (var-ref-ccb v) (eq 'clb (var-loc v)) (eq (var-ref v) 'pb)))
+
+;; (defun c1var (name)
+;;   (let ((info (make-info :referred-array (make-array 1 :fill-pointer 0)))
+;; ;			 :changed-array +empty-info-array+))
+;;         (vref (c1vref name)))
+;;     (push-referred (car vref) info)
+;;     (setf (info-type info) (if (var-cb (car vref)) (var-dt (car vref)) (var-type (car vref))))
+;;     (list 'var info vref)))
 
 ;;; A variable reference (vref for short) is a pair
 ;;;	( var-object  ccb-reference )
 
-(defun c1vref (name &aux (ccb nil) (clb nil))
-  (dolist* (var *vars*
+(defun find-v (f)
+  (when f (car (member f *vars* :key (lambda (x) (when (var-p x) (var-name x)))))))
+
+(defun set-vref (v vl)
+  (let ((ol (list (var-ref-ccb v) (var-loc v) (var-ref v))))
+    (setf (var-ref-ccb v) (pop vl) (var-loc v) (pop vl) (var-ref v) (car vl))
+    ol))
+
+(defun c1prov-expr (form)
+  (let* ((v (find-v form))
+	 (vl (when v (list (var-ref-ccb v) (var-loc v) (var-ref v))))
+	 (e (c1expr form))
+	 (nl (when vl (set-vref v vl))))
+    (if nl (append e (list nl)) e)))
+
+(defun c1var (name)
+  (let* ((info (make-info))
+	 (vref (c1vref name)))
+    (setf (info-type info) (if (var-cb (car vref)) (var-dt (car vref)) (var-type (car vref))))
+    (push-referred (car vref) info)
+    (list 'var info vref)))
+
+(defun c1vref (name &aux ccb clb inner)
+  (dolist (var *vars*
                (let ((var (sch-global name)))
                     (unless var
                       (unless (or (si:specialp name) (constantp name)) (undefined-variable name))
@@ -159,23 +183,21 @@
                                           :kind 'GLOBAL
                                           :loc (add-symbol name)
                                           :type (or (get name 'cmp-type) t)
-                                          ))
+					  :ref t));FIXME
                       (push var *undefined-vars*))
                     (list var ccb)))
-      (cond ((eq var 'cb) (setq ccb t))
-            ((eq var 'lb) (setq clb t))
+      (cond ((eq var 'cb) (setq ccb t inner (or inner 'cb)))
+            ((eq var 'lb) (setq clb t inner (or inner 'lb)))
             ((eq (var-name var) name)
              (when (eq (var-ref var) 'IGNORE)
-                   (cmpwarn "The ignored variable ~s is used." name)
-                   (setf (var-ref var) t))
-             (cond (ccb (setf (var-ref-ccb var) t))
+	       (cmpwarn "The ignored variable ~s is used." name)
+	       (setf (var-ref var) t))
+             (cond (ccb (ref-inner inner) 
+			(setf (var-ref-ccb var) t))
                    (clb (when (eq (var-kind var) 'lexical)
-                              (setf (var-loc var) 'clb))
+			  (setf (var-loc var) 'clb))
                         (setf (var-ref var) t))
-                   (t (setf (var-ref var) t)
-		      (setf (var-register var)
-			    (the fixnum (+ 1 (the fixnum (var-register var)))))
-		      ))
+		   (t (setf (var-ref var) t (var-register var) (1+ (var-register var)))))
              (return-from c1vref (list var ccb))))))
 
 (defun c2var-kind (var)
@@ -196,50 +218,6 @@
 (defun c2location (loc) (unwind-exit loc nil 'single-value))
 
 
-(defun check-downward (info &aux no-down )
-  (dolist (v *local-functions*)
-	  (cond ((eq (car v) 'function)
-		 (setq no-down t)
-		 (dolist (w *local-functions*)
-			 (cond ((eq (car w) 'downward-function)
-				(setf (car w) 'function))))
-		 (return nil))))
-  (setq *local-functions* nil)
-  (cond (no-down
-	(do-referred (var info)
-		(if (eq (var-kind var) 'down)
-		    (setf (var-kind var) 'lexical))))))
-
-
-(defun assign-down-vars (info cfun inside &aux (ind 0) )
-  (do-referred (var info)
-	  (cond ((eq (var-kind var) 'down)
-		 ;;don't do twice since this list may have duplicates.
-		 (cond ((integerp (var-loc var) )
-			;(or (integerp (var-ref var)) (print var))
-			(setq ind (max ind (1+ (var-loc var))))
-			(setf (var-ref var) (var-loc var)) ;delete later
-			)
-		       ;((integerp (var-loc var)) (break "bil"))
-		       (t (setf (var-ref var) ind) ;delete later
-			  (setf (var-loc var) ind)
-			  (setf ind (+ ind 1)))))))
-  (cond ((> ind 0)   
-	 ;;(wt-nl "object Dbase[" ind "];")
-	 (cond ((eq inside 't3defun)
-		(wt-nl "object base0[" ind "];")))
-					;DCnames gets defined at end whe
-	 (push 'dcnames *downward-closures*)
-	 (wt-nl "DCnames"cfun  "")))
-  ind)
-
-(si::putprop 'down   'wt-down 'wt-loc)
-
-(defun wt-down (n)
-  (or (si::fixnump n) (wfs-error))
-  (wt "base0[" n "]"))
-
-
 (defun wt-var (var ccb)
   (case (var-kind var)
         (LEXICAL (cond (ccb (wt-ccb-vs (var-ref-ccb var)))
@@ -253,10 +231,16 @@
                        (t (wt-vs (var-ref var)))))
         (SPECIAL (wt "(" (vv-str (var-loc var)) "->s.s_dbind)"))
         (REPLACED (wt (var-loc var)))
+;        (REPLACED (cond ((and (consp (var-loc var)) (info-p (cadr (var-loc var))))FIXME
+;			 (let* ((*inline-blocks* 0)(v (c2expr (var-loc var))))(print v)(break)
+;			   (unwind-exit (get-inline-loc `((t) t #.(flags) "(#0)") (list v))
+;					nil 'single-value)
+;			   (close-inline-blocks)))
+;			((wt (var-loc var)))))
 	(DOWN  (wt-down (var-loc var)))
         (GLOBAL (if *safe-compile*
                     (wt "symbol_value(" (vv-str (var-loc var)) ")")
-                    (wt "(" (vv-str (var-loc var)) "->s.s_dbind)")))
+		  (wt "(" (vv-str (var-loc var)) "->s.s_dbind)")))
         (t (let ((z (cdr (assoc (var-kind var) +wt-c-var-alist+))))
 	     (unless z (baboon))
 	     (when (and (eq #tfixnum (var-kind var)) (zerop *space*)) 
@@ -326,7 +310,7 @@
 
 (defun set-cvar (loc cvar)
   (wt-nl "V" cvar "= ")
-  (let* ((fn (or (cdr (assoc cvar *c-vars*)) t))
+  (let* ((fn (or (car (rassoc cvar *c-vars*)) (cdr (assoc cvar *c-vars*)) t))
 	 (fn (or (car (member fn +c-local-var-types+ :test 'type<=)) 'object))
 	 (fn (cdr (assoc fn +wt-loc-alist+))))
     (unless fn (baboon))
@@ -334,18 +318,16 @@
   (wt ";"))
 
 (defun sch-global (name)
-  (dolist* (var *undefined-vars* nil)
+  (dolist (var *undefined-vars* nil)
     (when (eq (var-name var) name) (return-from sch-global var))))
 
 (defun c1add-globals (globals)
-  (dolist** (name globals)
+  (dolist (name globals)
     (push (make-var :name name
                     :kind 'GLOBAL
                     :loc (add-symbol name)
-                    :type (let ((x (get name 'cmp-type))) (if x x t))
-                    )
-          *vars*))
-  )
+                    :type (or (get name 'cmp-type) t))
+          *vars*)))
 
 (defun c1setq (args)
   (cond ((endp args) (c1nil))
@@ -360,47 +342,100 @@
 
 
 (defun do-setq-tp (v form t1)
-  (when (eq (var-kind v) 'lexical)
-    (setq t1 (coerce-to-one-value t1))
-    (let* ((tp (type-and (var-dt v) t1)))
-      (unless (or tp (not (and (var-dt v) t1)))
-	(cmpwarn "Type mismatches between ~s/~s and ~s/~s." (var-name v) (var-dt v) form t1))
-      (when (boundp '*restore-vars*) 
-	(unless (member v *restore-vars* :key 'car)
-	  (push (list v (var-type v)) *restore-vars*)))
-      (setf (var-type v) tp)
-      (unless (type>= (var-mt v) tp)
-	(setf (var-mt v) (type-or1 (var-mt v) tp))
-	(when (var-tag v)
-	  (let* ((nmt (bump-tp (var-mt v)))
-		 (nmt (type-and nmt (var-dt v))))
-	    (setf (var-mt v) nmt))
-	  (pushnew v *tvc*)
-	  (when (member (var-tag v) *catch-tags*) (throw (var-tag v) v)))))))
+  (unless nil ; *compiler-new-safety* FIXME
+    (when (eq (var-kind v) 'lexical)
+      (setq t1 (coerce-to-one-value t1))
+      (let* ((tp (type-and (var-dt v) t1)))
+	(unless (or tp (not (and (var-dt v) t1)))
+	  (cmpwarn "Type mismatches between ~s/~s and ~s/~s." (var-name v) (var-dt v) form t1))
+	(keyed-cmpnote (list (var-name v) 'type-propagation 'type)
+		       "Setting var-type on ~s from ~s to ~s, form ~s, max ~s" 
+		       (var-name v) (var-type v) tp form (var-mt v))
+	(when (member v *restore-vars-env*)
+	  (pushnew (list v (var-type v)) *restore-vars* :key 'car))
+	(setf (var-type v) tp)
+	(unless (type>= (var-mt v) tp)
+	  (setf (var-mt v) (type-or1 (var-mt v) tp))
+	  (when (var-tag v)
+	    (let* ((nmt (bbump-tp (var-mt v)))
+		   (nmt (type-and nmt (var-dt v))))
+	      (setf (var-mt v) nmt))
+	    (pushnew v *tvc*)
+	    (when (member (var-tag v) *catch-tags*) (throw (var-tag v) v))))))))
 
 (defun set-form-type (form type)
-  (let* ((it (info-type (cadr form)))
-	 (nt (type-and type it)))
-    (unless (or nt (not (and type it)))
-      (cmpwarn "Type mismatch: ~s ~s~%" it type))
-    (setf (info-type (cadr form)) nt)
-    (case (car form)
-	  ((let let*) (set-form-type (car (last form)) type))
-	  (progn (set-form-type (car (last (third form))) type))
-	  (if 
-	    (let ((tt (type-and type (nil-to-t (info-type (cadr (fourth form))))))
-		  (ft (type-and type (nil-to-t (info-type (cadr (fifth form)))))))
-	      (unless tt
-		(set-form-type (fifth form) type)
-		(setf (car form) 'progn (cadr form) (cadr (fifth form)) (caddr form) (list (fifth form)) (cdddr form) nil))
-	      (unless ft
-		(set-form-type (fourth form) type)
-		(setf (car form) 'progn (cadr form) (cadr (fourth form)) (caddr form) (list (fourth form)) (cdddr form) nil)))))))
+  (sft form type))
 
-(defun c1setq1 (name form &aux (info (make-info)) type form1 name1)
+(defun sft-block (form block type)
+  (cond ((atom form))
+	((and (eq (car form) 'return-from) (eq (third form) block))
+	 (sft (car (last form)) type))
+	(t (sft-block (car form) block type) (sft-block (cdr form) block type))))
+
+(defun sft (form type)
+  (let ((it (info-type (cadr form))))
+    (unless (type>= type it)
+      (let ((nt (type-and type it)))
+	(when nt;FIXME
+	  (when (eq form +c1nil+) (break))
+	  (setf (info-type (cadr form)) nt)
+					;)
+	  (case (car form)
+		(block (sft-block (fourth form) (third form) type))
+		((decl-body inline) (sft (car (last form)) type))
+		((let let*)
+		 (sft (car (last form)) type)
+		 (mapc (lambda (x y) (sft y (var-type x)))
+		       (caddr form) (cadddr form)))
+		(var (do-setq-tp (caaddr form) nil nt))
+		(progn (sft (car (last (third form))) type))
+		(if 
+		    (let ((tt (type-and type (nil-to-t (info-type (cadr (fourth form))))))
+			  (ft (type-and type (nil-to-t (info-type (cadr (fifth form)))))))
+		      (unless tt
+			(sft (fifth form) type)
+			(setf (car form) 'progn (cadr form) (cadr (fifth form)) (caddr form) 
+			      (list (fifth form)) (cdddr form) nil))
+		      (unless ft
+			(sft (fourth form) type)
+			(setf (car form) 'progn (cadr form) (cadr (fourth form)) (caddr form) 
+			      (list (fourth form)) (cdddr form) nil))))))))))
+    
+;; (defun sft (form type)
+;;   (let* ((it (info-type (cadr form)))
+;; 	 (nt (type-and type it)))
+;; ;    (when (or nt (not it))
+;;     (unless (and it (or (eq nt it) (not nt)));FIXME type<=
+;;       (when (eq form +c1nil+) (break))
+;;       (setf (info-type (cadr form)) nt)
+;; ;)
+;;       (case (car form)
+;; 	    (block (sft-block (fourth form) (third form) type))
+;; 	    ((decl-body inline) (sft (car (last form)) type))
+;; 	    ((let let*)
+;; 	     (sft (car (last form)) type)
+;; 	     (mapc (lambda (x y) (sft y (var-type x)))
+;; 		   (caddr form) (cadddr form)))
+;; 	    (var (do-setq-tp (caaddr form) nil nt))
+;; 	    (progn (sft (car (last (third form))) type))
+;; 	    (if 
+;; 		(let ((tt (type-and type (nil-to-t (info-type (cadr (fourth form))))))
+;; 		      (ft (type-and type (nil-to-t (info-type (cadr (fifth form)))))))
+;; 		  (unless tt
+;; 		    (sft (fifth form) type)
+;; 		    (setf (car form) 'progn (cadr form) (cadr (fifth form)) (caddr form) 
+;; 			  (list (fifth form)) (cdddr form) nil))
+;; 		  (unless ft
+;; 		    (sft (fourth form) type)
+;; 		    (setf (car form) 'progn (cadr form) (cadr (fourth form)) (caddr form) 
+;; 			  (list (fourth form)) (cdddr form) nil))))))))
+
+(defun c1setq1 (name form &aux (info (make-info)) type form1 name1 *c1exit*)
   (cmpck (not (symbolp name)) "The variable ~s is not a symbol." name)
   (cmpck (constantp name) "The constant ~s is being assigned a value." name)
   (setq name1 (c1vref name))
+  (when (member (var-kind (car name1)) '(special global));FIXME
+    (setf (info-flags info) (logior (iflags side-effects) (info-flags info))))
   (push-changed (car name1) info)
   (setq form1 (c1expr form))
   (add-info info (cadr form1))
@@ -460,16 +495,15 @@
        (wt-nl "else{bds_bind(MMcar(symbols),MMcar(values));")
        (wt-nl "values=MMcdr(values);}")
        (wt-nl "symbols=MMcdr(symbols);}")
-       )
+       (setq *bds-used* t))
   (c2expr body)
   (wt "}")
   )
 
-(defun c1psetq (args &aux (vrefs nil) (forms nil)
+(defun c1psetq (args &aux (vrefs nil) (forms nil) *c1exit*
                           (info (make-info :type #tnull)))
   (do ((l args (cddr l)))
       ((endp l))
-      (declare (object l))
       (cmpck (not (symbolp (car l)))
              "The variable ~s is not a symbol." (car l))
       (cmpck (constantp (car l))
@@ -482,6 +516,9 @@
 
 	(when (eq (car form) 'var)
 	  (pushnew (caaddr form) (var-aliases (car vref))))
+
+	(when (member (var-kind (car vref)) '(special global));FIXME
+	  (setf (info-flags info) (logior (iflags side-effects) (info-flags info))))
 
 	(do-setq-tp (car vref) (cadr l) (info-type (cadr form)))
 	(setq type (var-type (car vref)))
@@ -498,7 +535,7 @@
   (list 'psetq info (reverse vrefs) (reverse forms)))
 
 (defun c2psetq (vrefs forms &aux (*vs* *vs*) (saves nil) (blocks 0))
-  (dolist** (vref vrefs)
+  (dolist (vref vrefs)
     (if (or (args-info-changed-vars (car vref) (cdr forms))
             (args-info-referred-vars (car vref) (cdr forms)))
         (case (caar forms)
@@ -521,12 +558,12 @@
   (dotimes (i blocks) (wt "}"))
   (unwind-exit nil)
   )
+
 (defun wt-var-decl (var)
   (cond ((var-p var)
 	 (let ((n (var-loc var)))
-	   (cond ((eq (var-kind var) #tinteger)(wt "IDECL(")))
-	   (wt *volatile* (register var) (rep-type (var-kind var))
-	       "V" n )
-	   (if (eql (var-kind var) #tinteger) (wt ",V"n"space,V"n"alloc)"))
+	   (when (eq (var-kind var) #tinteger) (wt "IDECL("))
+	   (wt *volatile* (register var) (rep-type (var-kind var)) "V" n )
+	   (when (eq (var-kind var) #tinteger) (wt ",V"n"space,V"n"alloc)"))
 	   (wt ";")))
         (t (wfs-error))))

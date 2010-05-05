@@ -82,6 +82,9 @@ void old(void) \
    pack == LISP ? LISP_makefun(string,fname,argd) : \
    error("Bad pack variable in MAKEFUN\n"))
 
+#define MAKEFUNB(pack,string,fname,argd,p)	\
+  (GMP_makefunb(string,fname,argd,p))
+
 #define MAKEFUNM(pack,string,fname,argd) \
   (pack == SI ? SI_makefunm(string,fname,argd) : \
    pack == LISP ? LISP_makefunm(string,fname,argd) : \
@@ -125,13 +128,19 @@ void old(void) \
 
 #define DEFUN_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) STATD ret FFN(fname) args;\
 void Mjoin(fname,_init) () {\
-   MAKEFUN(pack,string,(ret (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));\
+  MAKEFUN(pack,string,(void *)FFN(fname),F_ARGD(min,max,(flags|ONE_VAL),ARGTYPES(ret0a0,a12,a34,a56))); \
+}\
+STATD ret FFN(fname) args
+
+#define DEFUNB_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,p,doc) STATD ret FFN(fname) args; \
+void Mjoin(fname,_init) () {\
+  MAKEFUNB(pack,string,(void *)FFN(fname),F_ARGD(min,max,(flags|ONE_VAL),ARGTYPES(ret0a0,a12,a34,a56)),p); \
 }\
 STATD ret FFN(fname) args
 
 #define DEFUNM_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) STATD ret FFN(fname) args;\
 void Mjoin(fname,_init) () {\
-   MAKEFUNM(pack,string,(ret (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));\
+  MAKEFUNM(pack,string,(void *)FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
 }\
 STATD ret FFN(fname) args
 
@@ -146,20 +155,20 @@ STATD ret FFN(fname) args
 #define DEFUNO_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,oldret,old,args,doc) \
 STATD  ret FFN(fname) args; \
 void Mjoin(fname,_init) () {\
-   MAKEFUN(pack,string,(ret (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));\
+  MAKEFUN(pack,string,(void *)FFN(fname),F_ARGD(min,max,(flags|ONE_VAL),ARGTYPES(ret0a0,a12,a34,a56))); \
 }\
 LFD(old)(void) \
-{   Iinvoke_c_function_from_value_stack((object (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
+{   Iinvoke_c_function_from_value_stack((void *)FFN(fname),F_ARGD(min,max,(flags|ONE_VAL),ARGTYPES(ret0a0,a12,a34,a56))); \
     return;} \
 STATD  ret FFN(fname) args
 
 #define DEFUNOM_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,oldret,old,args,doc) \
 STATD  ret FFN(fname) args; \
 void Mjoin(fname,_init) () {\
-   MAKEFUNM(pack,string,(ret (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));\
+  MAKEFUNM(pack,string,(void *)FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
 }\
 LFD(old)(void) \
-{   Iinvoke_c_function_from_value_stack((object (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
+{   Iinvoke_c_function_from_value_stack((void *)FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
     return;} \
 STATD  ret FFN(fname) args
 
@@ -312,6 +321,9 @@ gcl_init_cmp_anon(void);
 #define SAFE_FREAD(a_,b_,c_,d_) fread((a_),(b_),(c_),(d_))
 #endif
 
+#ifdef EXPORT_GMP
+#include "bfdef.h"
+#endif
 #include "gmp_wrappers.h"
 
 extern enum type t_vtype;
@@ -344,11 +356,13 @@ PFN(hashtablep)
 PFN(arrayp)
 PFN(vectorp)
 PFN(readtablep)
+PFN(functionp)
 
 /* #define TPE(a_,b_,c_) Check_type(a_,b_,c_) */
 #define TPE(a_,b_,c_) if (!(b_)(*(a_))) FEwrong_type_argument((c_),*(a_))
 
 #define check_type(a_,b_)                               ({t_vtype=(b_);TPE(&a_,vtypep_fn,type_name(t_vtype));})
+#define check_type_function(a_)                         TPE(a_,functionp_fn,sLfunction)
 #define check_type_integer(a_)                          TPE(a_,integerp_fn,sLinteger)
 #define check_type_non_negative_integer(a_)             TPE(a_,non_negative_integerp_fn,TSnon_negative_integer)
 #define check_type_rational(a_)                         TPE(a_,rationalp_fn,sLrational)
@@ -466,7 +480,7 @@ object ihs_top_function_name(ihs_ptr h);
                                                   sLpackage_error,null_string,6,\
                                                   sKpackage,a_,\
                                                   sKformat_control,make_simple_string(c_),sKformat_arguments,list(d_))
-#define NEW_INPUT(a_) (a_)=Ieval(read_object(sLAstandard_inputA->s.s_dbind))
+#define NEW_INPUT(a_) (a_)=Ieval1(read_object(sLAstandard_inputA->s.s_dbind))
 
 
 #define CELL_ERROR(a_,b_) Icall_error_handler(sLcell_error,null_string,6,\

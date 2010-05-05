@@ -300,8 +300,10 @@ mark_object(object x) {
     mark_object(x->s.s_plist);
     mark_object(x->s.s_gfdef);
     mark_object(x->s.s_dbind);
-    if (x->s.s_hpack!=Cnil && x->s.s_hpack->p.p_name==Cnil)
+    if (x->s.s_hpack!=Cnil && x->s.s_hpack->p.p_name==Cnil) {
       x->s.s_hpack=Cnil;
+      x->s.tt=0;
+    }
 /*       mark_object(x->s.s_hpack); */
     if (x->s.s_self == NULL)
       break;
@@ -654,26 +656,33 @@ mark_object(object x) {
     mark_object(x->pn.pn_version);
     break;
     
-  case t_closure:
-    { int i ;
-    if (what_to_collect == t_contiguous)
-      mark_contblock(x->cc.cc_turbo,x->cc.cc_envdim);
-    for (i= 0 ; i < x->cc.cc_envdim ; i++) {
-      mark_object(x->cc.cc_turbo[i]);}}
-    
   case t_cfun:
-  case t_sfun:
-  case t_vfun:
-  case t_afun:
-  case t_gfun:	
     mark_object(x->cf.cf_name);
+    mark_object(x->cf.cf_call);
     mark_object(x->cf.cf_data);
     break;
 
+  case t_function:	
+    mark_object(x->fun.fun_data);
+    mark_object(x->fun.fun_plist);
+    if (x->fun.fun_env != NULL) {
+      mark_object(x->fun.fun_env[0]);
+      if (what_to_collect >= t_contiguous) {
+	object *p=x->fun.fun_env-1;
+	ufixnum n=*(ufixnum *)p;
+	p=copy_relblock((char *)p,n*sizeof(object));
+	x->fun.fun_env=p+1;
+      }
+    }
+    break;
+
+
   case t_ifun:
+    mark_object(x->ifn.ifn_name);
+    mark_object(x->ifn.ifn_call);
     mark_object(x->ifn.ifn_self);
     break;
-    
+
   case t_cfdata:
     
     mark_object(x->cfd.cfd_dlist);
@@ -689,18 +698,6 @@ mark_object(object x) {
 	break;
       mark_contblock(x->cfd.cfd_start, x->cfd.cfd_size);}
     break;
-  case t_cclosure:
-    mark_object(x->cc.cc_name);
-    mark_object(x->cc.cc_env);
-    mark_object(x->cc.cc_data);
-    if (x->cc.cc_turbo!=NULL) mark_object(*(x->cc.cc_turbo-1));
-    if (what_to_collect == t_contiguous) {
-      if (x->cc.cc_turbo != NULL)
-	mark_contblock((char *)(x->cc.cc_turbo-1),
-		       (1+fix(*(x->cc.cc_turbo-1)))*sizeof(object));
-    }
-    break;
-    
   case t_spice:
     break;
   default:

@@ -1,3 +1,5 @@
+#ifndef COMP_BAS_2
+#define COMP_BAS_2
 /* if already mp.h has been included skip */
 #ifdef GMP
 #define save_avma 
@@ -191,4 +193,6 @@ object on_stack_make_list();
 #endif
 #ifndef KEYTYPE
 #define KEYTYPE void *
+#endif
+extern int Rset;
 #endif

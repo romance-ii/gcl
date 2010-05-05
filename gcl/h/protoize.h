@@ -5,7 +5,7 @@
 /* alloc.c:296:OF */ extern object make_cons1 (object a, object d); /* (a, d) object a; object d; */
 /* alloc.c:364:OF */ extern object on_stack_cons (object x, object y); /* (x, y) object x; object y; */
 /* alloc.c:376:OF */ extern object fSallocated (object typ); /* (typ) object typ; */
-/* alloc.c:401:OF */ extern object fSreset_number_used (object typ); /* (typ) object typ; */
+/* alloc.c:401:OF */ extern object fSreset_number_used (object typ,...); /* (typ) object typ; */
 /* alloc.c:480:OF */ extern void insert_contblock (char *p, int s); /* (p, s) char *p; int s; */
 /* alloc.c:480:OF */ extern void insert_maybe_sgc_contblock (char *p, int s); /* (p, s) char *p; int s; */
 /* alloc.c:611:OF */ extern void set_maxpage (void); /* () */
@@ -32,7 +32,7 @@
 /* array.c::OF */ extern object fSmake_vector1_1 (fixnum n,fixnum elt_type,object staticp); 
 /* array.c:738:OF */ extern void adjust_displaced (object x, long diff); /* (x, diff) object x; int diff; */
 /* array.c:790:OF */ extern void gset (void *p1, void *val, int n, int typ); /* (p1, val, n, typ) char *p1; char *val; int n; int typ; */
-/* array.c:831:OF */ extern object fScopy_array_portion (object x, object y,object o1,object o2, object n1); /* (x, y, i1, i2, n1) object x; object y; int i1; int i2; int n1; */
+/* array.c:831:OF */ extern object fScopy_array_portion (object x, object y,object o1,object o2, ...); /* (x, y, i1, i2, n1) object x; object y; int i1; int i2; int n1; */
 /* array.c:879:OF */ extern void array_allocself (object x, int staticp, object dflt); /* (x, staticp, dflt) object x; int staticp; object dflt; */
 /* array.c:920:OF */ extern void siLfill_pointer_set (void); /* () */
 /* array.c:923:OF */ extern object fSfill_pointer_set (object x,fixnum i); /* (x, i) object x; int i; */
@@ -51,7 +51,7 @@
 /* array.c:1023:OF */ extern object fLarray_dimension (object x,fixnum i); /* (x, i) object x; int i; */
 /* array.c:1090:OF */ extern void siLreplace_array (void); /* () */
 /* array.c:1093:OF */ extern object fSreplace_array (object old, object new); /* (old, new) object old; object new; */
-/* array.c:1132:OF */ extern object fLarray_total_size (object x); /* (x) object x; */
+/* array.c:1132:OF */ extern fixnum fLarray_total_size (object x); /* (x) object x; */
 /* array.c:1140:OF */ extern object fSaset_by_cursor (object array, object val, object cursor); /* (array, val, cursor) object array; object val; object cursor; */
 /* array.c:1160:OF */ extern void gcl_init_array_function (void); /* () */
 /* assignment.c:62:OF */ extern void setq (object sym, object val); /* (sym, val) object sym; object val; */
@@ -113,9 +113,10 @@ struct key {short n,allow_other_keys;
 /* catch.c:166:OF */ extern void gcl_init_catch (void); /* () */
 /* cfun.c:37:OF */ extern object make_cfun (void (*self)(), object name, object data, char *start, int size); /* (self, name, data, start, size) int (*self)(); object name; object data; char *start; int size; */
 /* cfun.c:56:OF */ extern object make_sfun (object name, object (*self)(), int argd, object data,fixnum nval); /* (name, self, argd, data) object name; int (*self)(); int argd; object data; */
-/* cfun.c:91:OF */ extern object make_cclosure_new (void (*self)(), object name, object env, object data); /* (self, name, env, data) int (*self)(); object name; object env; object data; */
-/* cfun.c:108:OF */ extern object make_cclosure (void (*self)(), object name, object env, object data, char *start, int size); /* (self, name, env, data, start, size) int (*self)(); object name; object env; object data; char *start; int size; */
-/* cfun.c:124:OF */ extern object fSmc (object name, object address); /* (name, address) object name; object address; */
+/* cfun.c:91:OF */ extern object make_cclosure_new (void *self, object name, object env, object data,object cl,fixnum argd,fixnum sizes); /* (self, name, env, data) int (*self)(); object name; object env; object data; */
+/* cfun.c:91:OF */ extern object make_cclosure(void *self,object data,object call,object key,ufixnum argd,ufixnum sizes,object *envp,ufixnum nargs,...);
+/* cfun.c:91:OF */ extern void  add_to_env(object fun,ufixnum nargs,...);
+/* cfun.c:124:OF */ extern object fSmc (object name, object address,object cl); /* (name, address) object name; object address; */
 /* cfun.c:150:OF */ extern object fSmfsfun (object name, object address, object argd,object nval); /* (name, address, argd) object name; object address; object argd; */
 /* cfun.c:174:OF */ extern object fSmfvfun (object name, object address, object argd,object nval); /* (name, address, argd) object name; object address; object argd; */
 /* cfun.c:193:OF */ extern object fSmfvfun_key (object symbol, object address, object argd, object keys,object nval); /* (symbol, address, argd, keys) object symbol; object address; object argd; object keys; */
@@ -125,7 +126,7 @@ struct key {short n,allow_other_keys;
 /* cfun.c:283:OF */ extern object make_macro_internal (char *s, void(*f)()); /* (s, f) char *s; int (*f)(); */
 /* cfun.c:299:OF */ extern object make_si_sfun_internal (char *s, object (*f)(), int argd); /* (s, f, argd) char *s; int (*f)(); int argd; */
 /* cfun.c:322:OF */ extern object make_si_function_internal (char *s, void (*f) ()); /* (s, f) char *s; int (*f)(); */
-/* cfun.c:341:OF */ extern object make_special_form_internal (char *s, void (*f)()); /* (s, f) char *s; int (*f)(); */
+/* cfun.c:341:OF */ extern object make_special_form_internal (char *s, void * f); /* (s, f) char *s; int (*f)(); */
 /* cfun.c:352:OF */ extern object fScompiled_function_name (object fun); /* (fun) object fun; */
 /* cfun.c:371:OF */ extern void turbo_closure (object fun); /* (fun) object fun; */
 /* cfun.c:392:OF */ extern object fSturbo_closure (object funobj); /* (funobj) object funobj; */
@@ -182,7 +183,7 @@ typedef int (*FUNC)();
 /* error.c:496:OF */ extern object fSvs (object x0); /* (x0) object x0; */
 /* error.c:505:OF */ extern object fSsch_frs_base (object x0, object x1); /* (x0, x1) object x0; object x1; */
 /* error.c:523:OF */ extern object fSinternal_super_go (object tag, object x1, object x2); /* (tag, x1, x2) object tag; object x1; object x2; */
-/* error.c:549:OF */ extern object fSuniversal_error_handler (object x0, object x1, object x2, object x3, object error_fmt_string); /* (x0, x1, x2, x3, error_fmt_string) object x0; object x1; object x2; object x3; object error_fmt_string; */
+/* error.c:549:OF */ extern object fSuniversal_error_handler (object x0, object x1, object x2, object x3, object,object error_fmt_string,...); /* (x0, x1, x2, x3, error_fmt_string) object x0; object x1; object x2; object x3; object error_fmt_string; */
 /* error.c:561:OF */ extern void check_arg_failed (int n); /* (n) int n; */
 /* error.c:568:OF */ extern void too_few_arguments (void); /* () */
 /* error.c:573:OF */ extern void too_many_arguments (void); /* () */
@@ -196,7 +197,7 @@ typedef int (*FUNC)();
 /* error.c:653:OF */ extern void illegal_index (object x, object i); /* (x, i) object x; object i; */
 /* error.c:660:OF */ extern void check_socket (object x); /* (x) object x; */
 /* error.c:670:OF */ extern void check_stream (object strm); /* (strm) object strm; */
-/* error.c:697:OF */ extern void check_arg_range (int n, int m); /* (n, m) int n; int m; */
+/* error.c:697:OF */ extern void check_arg_range (fixnum nn,int n, int m); /* (n, m) int n; int m; */
 /* error.c:727:OF */ extern void gcl_init_error (void); /* () */
 /* eval.c:143:OF */ extern void funcall (object fun); /* (fun) object fun; */
 /* eval.c:375:OF */ extern void lispcall (object *funp, int narg); /* (funp, narg) object *funp; int narg; */
@@ -205,7 +206,8 @@ typedef int (*FUNC)();
 /* eval.c:645:OF */ extern object simple_symlispcall (object sym, object *base, int narg); /* (sym, base, narg) object sym; object *base; int narg; */
 /* eval.c:739:OF */ extern void super_funcall (object fun); /* (fun) object fun; */
 /* eval.c:752:OF */ extern void super_funcall_no_event (object fun); /* (fun) object fun; */
-/* eval.c:936:OF */ extern object Ieval (object form); /* (form) object form; */
+/* eval.c:936:OF */ extern object Ievaln (object form,object *vals); /* (form) object form; */
+#define Ieval1(a_) Ievaln(a_,0)
 /* eval.c:944:OF */ extern void eval (object form); /* (form) object form; */
 /* eval.c:1189:OF */ extern void Leval (void); /* () */
 /* eval.c:1191:OF */ extern object fLeval (object x0); /* (x0) object x0; */
@@ -314,6 +316,7 @@ typedef void (*funcvoid)(void);
 /* makefun.c:113:OF */ extern object fSset_key_struct (object key_struct_ind); /* (key_struct_ind) object key_struct_ind; */
 /* makefun.c:122:OF */ extern void SI_makefun (char *strg, object (*fn) (/* ??? */), unsigned int argd); /* (strg, fn, argd) char *strg; object (*fn)(); unsigned int argd; */
 /* makefun.c:131:OF */ extern void LISP_makefun (char *strg, object (*fn) (/* ??? */), unsigned int argd); /* (strg, fn, argd) char *strg; object (*fn)(); unsigned int argd; */
+/* makefun.c:122:OF */ extern void GMP_makefunb (char *strg, object (*fn) (/* ??? */), unsigned int argd,object p); /* (strg, fn, argd) char *strg; object (*fn)(); unsigned int argd; */
 /* makefun.c:122:OF */ extern void SI_makefunm (char *strg, object (*fn) (/* ??? */), unsigned int argd); /* (strg, fn, argd) char *strg; object (*fn)(); unsigned int argd; */
 /* makefun.c:131:OF */ extern void LISP_makefunm (char *strg, object (*fn) (/* ??? */), unsigned int argd); /* (strg, fn, argd) char *strg; object (*fn)(); unsigned int argd; */
 /* makefun.c:167:OF */ extern object fSinvoke (object x); /* (x) object x; */
@@ -321,8 +324,9 @@ typedef void (*funcvoid)(void);
 /* multival.c:32:OF */ extern void Lvalues (void); /* () */
 /* multival.c:37:OF */ extern void Lvalues_list (void); /* () */
 /* multival.c:134:OF */ extern void gcl_init_multival (void); /* () */
+object funcall_vec(object,ufixnum,object *);
 /* nfunlink.c:190:OF */ extern object IapplyVector (object fun, int nargs, object *base); /* (fun, nargs, base) object fun; int nargs; object *base; */
-/* nfunlink.c:269:OF */ extern void Iinvoke_c_function_from_value_stack (object (*f)(), int fargd); /* (f, fargd) object (*f)(); int fargd; */
+/* nfunlink.c:269:OF */ extern void Iinvoke_c_function_from_value_stack (object (*f)(), ufixnum fargd); /* (f, fargd) object (*f)(); int fargd; */
 /* nsocket.c:190:OF */ extern int CreateSocket (int port, char *host, int server, char *myaddr, int myport, int async); /* (port, host, server, myaddr, myport, async) int port; char *host; int server; char *myaddr; int myport; int async; */
 /* nsocket.c:329:OF */ extern object fSgetpeername (object sock); /* (sock) object sock; */
 /* nsocket.c:353:OF */ extern object fSgetsockname (object sock); /* (sock) object sock; */
@@ -544,7 +548,7 @@ typedef void (*funcvoid)(void);
 /* utils.c:20:OF */ extern object IisFboundp (object f); /* (f) object f; */
 /* utils.c:30:OF */ extern object IisArray (object f); /* (f) object f; */
 /* utils.c:44:OF */ extern object Iis_fixnum (object f); /* (f) object f; */
-/* utils.c:61:OF */ extern object Iapply_ap_new (object (*f) (/* ??? */), object first, va_list ap); /* (f, ap) object (*f)(); va_list ap; */
+/* utils.c:61:OF */ extern object Iapply_ap_new (fixnum n,object (*f) (/* ??? */), object first, va_list ap); /* (f, ap) object (*f)(); va_list ap; */
 /* utils.c:178:OF */ extern object Icheck_one_type (object x, enum type t); /* (x, t) object x; enum type t; */
 /* utils.c:189:OF */ extern object fSincorrect_type (object val, object type); /* (val, type) object val; object type; */
 /* utils.c:202:OF */ extern object Ivs_values (void); /* () */
@@ -1302,7 +1306,7 @@ int
 system_time_zone_helper(void);
 
 object
-call_proc_new(object,int setf,int pop_one_arg,void **,int,object,va_list);
+call_proc_new(object sym,ufixnum clp,ufixnum vald,void **link,ufixnum argd,object first,va_list ll);
 
 object 
 call_vproc_new(object,int setf,int pop_one_arg,void *,object,va_list);
@@ -1750,10 +1754,17 @@ object
 cplus(object,object);
 
 object
-Icall_error_handler(object,object,int,...);
+Icall_gen_error_handler(object,object,object,object,ufixnum,...);
 
-object
-Icall_continue_error_handler(object,object,object,int,...);
+#define Icall_error_handler(a_,b_,c_,d_...) \
+  Icall_gen_error_handler(Cnil,null_string,a_,b_,c_,##d_)
+#define Icall_continue_error_handler(a_,b_,c_,d_,e_...) \
+  Icall_gen_error_handler(Ct,a_,b_,c_,d_,##e_)
+/* object */
+/* Icall_error_handler(object,object,int,...); */
+
+/* object */
+/* Icall_continue_error_handler(object,object,object,int,...); */
 
 void *
 gcl_gmp_alloc(size_t);
@@ -1870,5 +1881,20 @@ make_fcomplex(fcomplex);
 dcomplex
 object_to_dcomplex(object);
 
+void *
+object_to_pointer(object);
+
 object
 make_dcomplex(dcomplex);
+
+object
+quick_call_function_cs(object,...);
+
+object
+call_proc_cs(object,...);
+
+object
+call_proc_cs1(object,...);
+
+object
+call_proc_cs2(object,...);

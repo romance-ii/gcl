@@ -92,24 +92,23 @@ DEFCONST("C-TYPE-MAX", sSc_type_max,LISP, make_fixnum(t_end-1),"");
 DEF_ORDINARY("DEBUGGER",sSdebugger,SI,"");
 
 DEFUN_NEW("DEFVAR1",object,fSdefvar1,SI
-       ,2,3,NONE,OO,OO,OO,OO,(object sym,object val,...),"")
-{	int n=VFUN_NARGS;
-	object doc;
-	va_list ap;
-	{ va_start(ap,val);
-	  if (n>=3) doc=va_arg(ap,object);else goto LDEFAULT3;
-	  goto LEND_VARARG;
-	LDEFAULT3: doc = Cnil;
-	LEND_VARARG: va_end(ap);}
+	  ,2,3,NONE,OO,OO,OO,OO,(object sym,object val,...),"") {
 
-	CHECK_ARG_RANGE(2,3);
-	if(sym->s.s_dbind==0 && n > 1)
-	  sym->s.s_dbind= val;
-	sym->s.s_stype=(short)stp_special;
-	if(n > 2)
-	  putprop(sym,doc,sSvariable_documentation);
-	RETURN1(sym);
-      }
+  object doc,l=Cnil,f=OBJNULL;
+  va_list ap;
+  fixnum n=INIT_NARGS(2);
+  
+  va_start(ap,val);
+  doc=NEXT_ARG(n,ap,l,f,Cnil);
+  va_end(ap);
+  
+  if (sym->s.s_dbind==0 && n>1)
+    sym->s.s_dbind= val;
+  sym->s.s_stype=(short)stp_special;
+  if (n>2)
+    putprop(sym,doc,sSvariable_documentation);
+  RETURN1(sym);
+}
 
 
 DEFUN_NEW("DEBUGGER",object,fSdebugger,SI
@@ -129,8 +128,8 @@ DEFUN_NEW("SETVV",object,fSsetvv,SI
   RETURN1(index);
 }
 
-DEF_ORDINARY("%MEMORY",sSPmemory,SI,"");
-DEF_ORDINARY("%INIT",sSPinit,SI,"");
+DEFVAR("%MEMORY",sSPmemory,SI,OBJNULL,"");
+DEFVAR("%INIT",sSPinit,SI,OBJNULL,"");
 
 /* void Lidentity(void); */
 void
@@ -198,6 +197,68 @@ gcl_init_cmpaux(void)
 	Conversions to C
 */
 
+
+dcomplex
+object_to_dcomplex(object x) {
+  
+  dcomplex d=0;
+  
+  switch(type_of(x)) {
+  case t_fixnum:
+    d=fix(x);
+    break;
+  case t_bignum:
+    d=mpz_get_si(MP(x));
+    break;
+  case t_character:
+    d=char_code(x);
+    break;
+  case t_ratio:
+    d=number_to_double(x);
+    break;
+  case t_shortfloat:
+    d=sf(x);
+    break;
+  case t_longfloat:
+    d=lf(x);
+    break;
+  case t_complex:
+    d=(double)object_to_dcomplex(x->cmp.cmp_real)+I*(double)object_to_dcomplex(x->cmp.cmp_imag);
+    break;
+  default:
+    FEcannot_coerce(sLfloat,x);
+    break;
+  }
+  
+  return d;
+  
+}
+
+
+void *
+object_to_pointer(object x) {
+  
+  void *d=0;
+  
+  switch(type_of(x)) {
+  case t_vector:
+  case t_bitvector:
+  case t_symbol:
+  case t_string:
+  case t_array:
+  case t_character:
+    d=x->v.v_self;
+    break;
+  default:
+    FEcannot_coerce(sLfloat,x);
+    break;
+  }
+  
+  return d;
+  
+}
+
+
 char
 object_to_char(object x)
 {
@@ -259,7 +320,7 @@ object_to_fixnum(object x)
 	case t_fixnum:
 	  i = fix(x);  break;
 	case t_bignum:
-	  i = number_to_double(x);
+	  i = FFN(fSmpz_get_si(x)); break;
 	  break;
 	case t_ratio:
 	  i = number_to_double(x);  break;
@@ -272,6 +333,10 @@ object_to_fixnum(object x)
 	}
 	return(i);
 }
+
+fixnum object_to_long(object x) {return object_to_fixnum(x);}
+fixnum object_to_short(object x) {return object_to_fixnum(x);}
+
 
 float 
 object_to_float(object x) 
@@ -346,7 +411,7 @@ make_dcomplex(dcomplex x) {
 }
 
 dcomplex 
-object_to_dcomplex(object x) 
+object_to_dcomplex1(object x) 
 { 
 	dcomplex f=0.0; 
 
@@ -423,24 +488,6 @@ object_to_string(object x) {
   return res;
 
 }
-
-/*  typedef int (*FUNC)(); */
-
-/* perform the actual invocation of the init function durint a fasload
-   init_address is the offset from the place in memory where the code is loaded
-   in.  In most systems this will be 0.
-   The new style fasl vector MUST end with an entry (si::%init f1 f2 .....)
-   where f1 f2 are forms to be evaled.
-*/
-
-/* #ifdef CLEAR_CACHE */
-/* static int */
-/* sigh(int sig,long code,void *scp, char *addr) { */
-
-/*     fprintf(stderr,"Received SIGILL at %p\n",((siginfo_t *)code)->si_addr); */
-/*     exit(1); */
-/* } */
-/* #endif */
 
 void
 call_init(int init_address, object memory, object fasl_vec, FUNC fptr)

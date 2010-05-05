@@ -196,16 +196,6 @@ object x;
 	return(Cnil);
 }
 
-object
-kar(x)
-object x;
-{
-	if (consp(x))
-		return(x->c.c_car);
-	FEwrong_type_argument(sLcons, x);
-	return(Cnil);
-}
-
 /* static object
 kdr(x)
 object x;
@@ -283,17 +273,6 @@ object list_vector_new(fixnum n,object first,va_list ap)
    }
  return ans;}
 
-   
-/* clean this up */
-/* static object on_stack_list(int n, ...)
-{va_list ap;
- object res;
- va_start(ap,n);
- res=on_stack_list_vector(n,ap);
- va_end(ap);
- return res;
-}*/
-  
 
 object list(fixnum n,...) { 
 
@@ -640,29 +619,6 @@ LFD(Lcddadr)(){check_arg(1); vs_base[0] = cdr(cdr(car(cdr(vs_base[0]))));}
 LFD(Lcdddar)(){check_arg(1); vs_base[0] = cdr(cdr(cdr(car(vs_base[0]))));}
 LFD(Lcddddr)(){check_arg(1); vs_base[0] = cdr(cdr(cdr(cdr(vs_base[0]))));}
 
-DEFUN_NEW("SET-DIFFERENCE",object,fLset_difference,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") { 
-  object z=Cnil,yy;
-  for (;!endp(x);x=x->c.c_cdr) {
-    for (yy=y;!endp(yy) && !eql(x->c.c_car,yy->c.c_car);yy=yy->c.c_cdr);
-    if (yy==Cnil)
-      z=MMcons(x->c.c_car,z);
-  }
-  RETURN1(z);
-
-}
-
-DEFUN_NEW("UNION",object,fLunion,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") { 
-  object z=y,yy;
-  for (;!endp(x);x=x->c.c_cdr) {
-    for (yy=z;!endp(yy) && !eql(x->c.c_car,yy->c.c_car);yy=yy->c.c_cdr);
-    if (yy==Cnil)
-      z=MMcons(x->c.c_car,z);
-  }
-  RETURN1(z);
-
-}
-
-
 DEFUN_NEW("SET-DIFFERENCE-EQ",object,fSset_difference_eq,SI,2,8,NONE,OO,OO,OO,OO,
 	  (object x,object y,...),"") { 
   object z=Cnil,yy;
@@ -713,6 +669,7 @@ DEFUN_NEW("INTERSECTION-EQ",object,fSintersection_eq,SI,2,8,NONE,OO,OO,OO,OO,
   RETURN1(z);
 
 }
+
 
 DEFUN_NEW("NTH",object,fLnth,LISP,2,2,NONE,OO,OO,OO,OO,(object i,object lst),"") { 
   object x = lst;

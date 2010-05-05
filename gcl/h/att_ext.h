@@ -66,8 +66,8 @@ object big_plus();
 object big_times();
 object normalize_big_to_object();
 double big_to_double();
-EXTER  struct bignum big_fixnum1_body,big_fixnum2_body;
-EXTER object big_fixnum1,big_fixnum2;
+/* EXTER  struct bignum big_fixnum1_body,big_fixnum2_body; */
+EXTER object big_fixnum1,big_fixnum2,big_fixnum3,big_fixnum4,big_fixnum5;
 object maybe_replace_big();
 
 
@@ -228,7 +228,6 @@ EXTER object sKkey;
 EXTER object sKrev;
 object car();
 object cdr();
-object kar();
 object kdr();
 object caar();
 object cadr();
@@ -368,6 +367,7 @@ EXTER object japi_package;
 #endif
 EXTER object keyword_package;
 EXTER object system_package;
+EXTER object gmp_package;
 EXTER object sLApackageA;
 EXTER object sKinternal;
 EXTER object sKexternal;
@@ -568,6 +568,7 @@ object make_symbol();
 object make_ordinary();
 object make_special();
 object make_constant();
+object make_gmp_ordinary();
 object make_si_ordinary();
 object make_si_special();
 object make_si_constant();

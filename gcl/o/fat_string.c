@@ -62,10 +62,7 @@ DEFUN_NEW("FUNCTION-START",object,fSfunction_start,SI
        ,1,1,NONE,OO,OO,OO,OO,(object funobj),"")
 {/* 1 args */
  if(type_of(funobj)!=t_cfun
-    && type_of(funobj)!=t_sfun
-    && type_of(funobj)!=t_vfun
-    && type_of(funobj)!=t_afun
-    && type_of(funobj)!=t_gfun)
+    && type_of(funobj)!=t_function)
     FEerror("not compiled function",0);
  funobj=make_fixnum((long) (funobj->cf.cf_self));
  RETURN1(funobj);
@@ -183,20 +180,15 @@ cfuns_to_combined_table(unsigned int n) /* non zero n will ensure new table leng
 
  for (i = 0;  i < maxpage;  i++) {
    if ((enum type)type_map[i]!=tm_table[(short)t_cfun].tm_type &&
-       (enum type)type_map[i]!=tm_table[(short)t_gfun].tm_type &&
-       (enum type)type_map[i]!=tm_table[(short)t_sfun].tm_type &&
-       (enum type)type_map[i]!=tm_table[(short)t_vfun].tm_type
-       )
+       (enum type)type_map[i]!=tm_table[(short)t_function].tm_type)
      continue;
    tm = tm_of((enum type)type_map[i]);
    p = pagetochar(i);
    for (j = tm->tm_nppage; j > 0; --j, p += tm->tm_size) {
      x = (object)p;
      if (type_of(x)!=t_cfun &&
-	 type_of(x)!=t_sfun &&
-	 type_of(x)!=t_vfun &&
-	 type_of(x)!=t_gfun
-	 ) continue;
+	 type_of(x)!=t_function) 
+       continue;
      if (is_free(x) || x->cf.cf_self == NULL)
        continue;
 	/* the cdefn things are the proclaimed call types. */
@@ -259,18 +251,15 @@ bfd_combined_table_update(struct bfd_link_hash_entry *h,PTR ct) {
 
 
 DEFUN_NEW("SET-UP-COMBINED",object,fSset_up_combined,SI
-       ,0,1,NONE,OO,OO,OO,OO,(object first,...),"")
-{
-  int nargs=VFUN_NARGS;
+	  ,0,1,NONE,OO,OO,OO,OO,(object first,...),"") {
+
   unsigned int n;
-  object siz;
+  object siz,l=Cnil,f=OBJNULL;
+  fixnum nargs=INIT_NARGS(0);
+  va_list ap;
 
-  if (nargs>=1) 
-    siz=first;
-  else 
-    siz = small_fixnum(0);
-
-  CHECK_ARG_RANGE(0,1);
+  va_start(ap,first);
+  siz=NEXT_ARG(nargs,ap,l,f,make_fixnum(0));
   n = (unsigned int) fix(siz);
   cfuns_to_combined_table(n);
 

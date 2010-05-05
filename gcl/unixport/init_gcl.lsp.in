@@ -1,6 +1,5 @@
 (setq si::*optimize-maximum-pages* nil)
-(make-package "C")
-(make-package "COMPILER" :use '("LISP"))
+;(make-package "COMPILER" :use '("LISP"))
 (make-package "SLOOP" :use '("LISP"))
 (make-package "SERROR" :use '("LISP" "SLOOP"))
 (make-package "ANSI-LOOP" :use '("LISP"))
@@ -17,10 +16,29 @@
  ;; if ANY header or license information is printed by the
  ;; program, then the following License and Enhancement notice
  ;; must be printed (see License).
+
 (progn 
 
  (system:init-system) 
  (gbc t)
+
+  (in-package 'si)
+  (use-package :gmp)
+  (do-symbols 
+   (s) 
+   (when (get s 'proclaimed-function)
+     (unless (sig s)
+       (add-hash s (list (get s 'proclaimed-arg-types) (get s 'proclaimed-return-type)) nil nil nil))
+     (dolist (l '(proclaimed-function proclaimed-arg-types proclaimed-return-type))
+       (remprop s l))))
+
+  (declaim (notinline error cerror warn break coerce));FIXME
+
+  (dolist (l (append (let (r) (do-symbols (s 'c r) (unless (search "SET-" (string s)) (push s r))))
+		   (list 'list 'list* 'si::cons-car 'si::cons-cdr 'compiler::unbox 'si::clzl 
+			 'system::check-type-symbol 'si::number-plus 'si::number-minus
+			 'si::number-times 'si::number-divide 'compiler::tt3 'compiler::tt30)))
+  (setf (get l 'c1no-side-effects) t));FIXME
 
  (in-package "USER")
 

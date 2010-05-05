@@ -688,7 +688,7 @@ find_special(object body, struct bind_temp *start, struct bind_temp *end,object 
 		}
 	}
 
-	if (body != Cnil && body->c.c_car != form)
+	if (body != Cnil && body->c.c_car != form && isdeclare(form->c.c_car))/*FIXME*/
 		body = make_cons(form, body->c.c_cdr);
 	vs_reset;
 	return(body);

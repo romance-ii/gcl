@@ -199,7 +199,7 @@
   result)
 	  
 (defun trace-call (temp-name args cond entrycond entry exitcond exit
-			 &aux (*trace-level* *trace-level*) vals indent)
+			 &aux (*trace-level* *trace-level*) (*print-circle* t) vals indent)
   (when (= *trace-level* 0)
 	(reset-trace-declarations (all-trace-declarations)))
   (cond

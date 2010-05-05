@@ -265,10 +265,16 @@
 #undef LM24BITS
 
 /* fill bits needed in certain lisp structures */
+#undef LM27BITS
+
+/* fill bits needed in certain lisp structures */
 #undef LM3BITS
 
 /* fill bits needed in certain lisp structures */
 #undef LM4BITS
+
+/* fill bits needed in certain lisp structures */
+#undef LM9BITS
 
 /* maximum number of pages to be allocated */
 #undef MAXPAGE

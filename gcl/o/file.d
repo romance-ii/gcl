@@ -559,7 +559,7 @@ object if_exists, if_does_not_exist;
 
 	vs_push(make_simple_string(fname));
 	x = alloc_object(t_stream);
-	x->sm.sm_mode = (short)smm;
+	x->sm.tt=x->sm.sm_mode = (short)smm;
 	x->sm.sm_fp = fp;
 	x->sm.sm_buffer = 0;
 	x->sm.sm_object0 = sLcharacter;
@@ -776,7 +776,7 @@ object istrm, ostrm;
 	object strm;
 
 	strm = alloc_object(t_stream);
-	strm->sm.sm_mode = (short)smm_two_way;
+	strm->sm.tt=strm->sm.sm_mode = (short)smm_two_way;
 	strm->sm.sm_fp = NULL;
 	STREAM_INPUT_STREAM(strm) = istrm;
 	STREAM_OUTPUT_STREAM(strm) = ostrm;
@@ -803,7 +803,7 @@ int istart, iend;
 	object strm;
 
 	strm = alloc_object(t_stream);
-	strm->sm.sm_mode = (short)smm_string_input;
+	strm->sm.tt=strm->sm.sm_mode = (short)smm_string_input;
 	strm->sm.sm_fp = NULL;
 	STRING_STREAM_STRING(strm) = strng;
 	strm->sm.sm_object1 = OBJNULL;
@@ -833,7 +833,7 @@ int line_length;
 		/*  Saving for GBC.  */
 	strng->st.st_self = alloc_relblock(line_length);
 	strm = alloc_object(t_stream);
-	strm->sm.sm_mode = (short)smm_string_output;
+	strm->sm.tt=strm->sm.sm_mode = (short)smm_string_output;
 	strm->sm.sm_fp = NULL;
 	STRING_STREAM_STRING(strm) = strng;
 	strm->sm.sm_object1 = OBJNULL;
@@ -1939,7 +1939,7 @@ LFD(Lmake_synonym_stream)()
 	check_arg(1);
 	check_type_symbol(&vs_base[0]);
 	x = alloc_object(t_stream);
-	x->sm.sm_mode = (short)smm_synonym;
+	x->sm.tt=x->sm.sm_mode = (short)smm_synonym;
 	x->sm.sm_fp = NULL;
 	x->sm.sm_object0 = vs_base[0];
 	x->sm.sm_object1 = OBJNULL;
@@ -1961,7 +1961,7 @@ LFD(Lmake_broadcast_stream)()
 	for (i = narg;  i > 0;  --i)
 		stack_cons();
 	x = alloc_object(t_stream);
-	x->sm.sm_mode = (short)smm_broadcast;
+	x->sm.tt=x->sm.sm_mode = (short)smm_broadcast;
 	x->sm.sm_fp = NULL;
 	x->sm.sm_object0 = vs_base[0];
 	x->sm.sm_object1 = OBJNULL;
@@ -1983,7 +1983,7 @@ LFD(Lmake_concatenated_stream)()
 	for (i = narg;  i > 0;  --i)
 		stack_cons();
 	x = alloc_object(t_stream);
-	x->sm.sm_mode = (short)smm_concatenated;
+	x->sm.tt=x->sm.sm_mode = (short)smm_concatenated;
 	x->sm.sm_fp = NULL;
 	x->sm.sm_object0 = vs_base[0];
 	x->sm.sm_object1 = OBJNULL;
@@ -2060,7 +2060,7 @@ object make_stream_from_fd ( object command, int fd, enum smmode smm )
 		FEerror("make_stream_from_fd : wrong mode",0);
 	}
         
-	stream->sm.sm_mode    = (short) smm;
+	stream->sm.tt=stream->sm.sm_mode    = (short) smm;
 	stream->sm.sm_fp      = fdopen ( fd, mode );
 
 	stream->sm.sm_object0 = sLcharacter;
@@ -2095,10 +2095,7 @@ object make_stream_from_fd ( object command, int fd, enum smmode smm )
             MMcar ( x ) = coerce_to_string ( MMcar(x) );
         }
         x = make_simple_string ( "~S~{ ~S~}" );
-        vargcount  = VFUN_NARGS;
-        VFUN_NARGS = 4;
-        command    = FFN(fLformat) ( Cnil, x, command, argv );
-        VFUN_NARGS = vargcount;
+        command=(VFUN_NARGS=4,FFN(fLformat)(Cnil,x,command,argv));
 
         c_command  = lisp_to_string ( command );
         
@@ -2351,14 +2348,16 @@ for the string ~S.",
 		3, istart, iend, strng);
 @)
 
-@(static defun make_string_output_stream (&k element_type)
-@
-  element_type=element_type;/*FIXME lintian*/
-  @(return `make_string_output_stream(64)`)
-@)
+DEFUN_NEW("MAKE-STRING-OUTPUT-STREAM",object,fLmake_string_output_stream,LISP,
+	  0,1,NONE,OO,OO,OO,OO,(object tp,...),"") {
 
-DEFUNO_NEW("GET-OUTPUT-STREAM-STRING",object,fLget_output_stream_string,LISP,
-	   1,1,NONE,OO,OO,OO,OO,void,Lget_output_stream_string,(object stream),"") {
+ tp=tp;/*FIXME lintian*/
+ RETURN1(make_string_output_stream(64));
+
+}
+
+DEFUN_NEW("GET-OUTPUT-STREAM-STRING",object,fLget_output_stream_string,LISP,
+	   1,1,NONE,OO,OO,OO,OO,(object stream),"") {
 
   if (type_of(stream) != t_stream ||
       (enum smmode)stream->sm.sm_mode != smm_string_output)
@@ -2464,64 +2463,64 @@ LFD(Lstream_element_type)()
 	@(return Ct)
 @)
 
-@(static defun open1 (filename
-	      &key (direction sKinput)
-		   (element_type sLcharacter)
-		   (if_exists Cnil iesp)
-		   (if_does_not_exist Cnil idnesp)
-                   (external_format sKdefault iefp)  
-	      &aux strm)
-	enum smmode smm=0;
-	vs_mark;
-@
-	if ((type_of(filename) != t_string) ||
-	    (filename->st.st_self[0] != '|')) {
-		check_type_or_pathname_string_symbol_stream(&filename);
-		if (wild_pathname_p(filename,Cnil) == Ct) {
-		    WILD_PATH(filename);
-		    @(return Cnil)
-		}
-		filename = coerce_to_local_namestring(filename);
-	}
-	if (direction == sKinput) {
-		smm = smm_input;
-		if (!idnesp)
-			if_does_not_exist = sKerror;
-	} else if (direction == sKoutput) {
-		smm = smm_output;
-		if (!iesp)
-			if_exists = sKnew_version;
-		if (!idnesp) {
-			if (if_exists == sKoverwrite ||
-			    if_exists == sKappend)
-				if_does_not_exist = sKerror;
-			else
-				if_does_not_exist = sKcreate;
-		}
-	} else if (direction == sKio) {
-		smm = smm_io;
-		if (!iesp)
-			if_exists = sKnew_version;
-		if (!idnesp) {
-			if (if_exists == sKoverwrite ||
-			    if_exists == sKappend)
-				if_does_not_exist = sKerror;
-			else
-				if_does_not_exist = sKcreate;
-		}
-	} else if (direction == sKprobe) {
-		smm = smm_probe;
-		if (!idnesp)
-			if_does_not_exist = Cnil;
-	} else
-		FEerror("~S is an illegal DIRECTION for OPEN.",
-			1, direction);
-	strm = open_stream(filename, smm, if_exists, if_does_not_exist);
-	if (type_of(strm) == t_stream)
-	    strm->sm.sm_object0 = element_type;
-	vs_reset;
-	@(return strm)
-@)
+DEFUN_NEW("OPEN-INT",object,fSopen_int,SI,8,8,NONE,OO,OO,OO,OO,
+	  (object filename,object direction,object element_type,object if_exists,
+	   object iesp,object if_does_not_exist,object idnesp,
+	   object external_format),"") {
+
+  enum smmode smm=0;
+  vs_mark;
+  object strm;
+  
+  if ((type_of(filename) != t_string) ||
+      (filename->st.st_self[0] != '|')) {
+    check_type_or_pathname_string_symbol_stream(&filename);
+    if (wild_pathname_p(filename,Cnil) == Ct) {
+      WILD_PATH(filename);
+      RETURN1(Cnil);
+    }
+    filename = coerce_to_local_namestring(filename);
+  }
+  if (direction == sKinput) {
+    smm = smm_input;
+    if (idnesp==Cnil)
+      if_does_not_exist = sKerror;
+  } else if (direction == sKoutput) {
+    smm = smm_output;
+    if (iesp==Cnil)
+      if_exists = sKnew_version;
+    if (idnesp==Cnil) {
+      if (if_exists == sKoverwrite ||
+	  if_exists == sKappend)
+	if_does_not_exist = sKerror;
+      else
+	if_does_not_exist = sKcreate;
+    }
+  } else if (direction == sKio) {
+    smm = smm_io;
+    if (iesp==Cnil)
+      if_exists = sKnew_version;
+    if (idnesp==Cnil) {
+      if (if_exists == sKoverwrite ||
+	  if_exists == sKappend)
+	if_does_not_exist = sKerror;
+      else
+	if_does_not_exist = sKcreate;
+    }
+  } else if (direction == sKprobe) {
+    smm = smm_probe;
+    if (idnesp==Cnil)
+      if_does_not_exist = Cnil;
+  } else
+    FEerror("~S is an illegal DIRECTION for OPEN.",
+	    1, direction);
+  strm = open_stream(filename, smm, if_exists, if_does_not_exist);
+  if (type_of(strm) == t_stream)
+    strm->sm.sm_object0 = element_type;
+  vs_reset;
+  RETURN1(strm);
+}
+
 
 static fixnum /*FIXME, this duplicates code in gcl_iolib.lsp somwhat */
 chars_per_write(object s) {/*s already a file-stream*/
@@ -2810,7 +2809,7 @@ LFD(siLmake_string_output_stream_from_string)()
 	if (type_of(strng) != t_string || !strng->st.st_hasfillp)
 		FEerror("~S is not a string with a fill-pointer.", 1, strng);
 	strm = alloc_object(t_stream);
-	strm->sm.sm_mode = (short)smm_string_output;
+	strm->sm.tt=strm->sm.sm_mode = (short)smm_string_output;
 	strm->sm.sm_fp = NULL;
 	STRING_STREAM_STRING(strm) = strng;
 	strm->sm.sm_object1 = OBJNULL;
@@ -2970,32 +2969,35 @@ FFN(siLfp_input_stream)()
 }
  
 
-@(static defun fwrite (vector start count stream)
+DEFUN_NEW("FWRITE",object,fSfwrite,SI,4,4,NONE,OO,OO,OO,OO,
+	  (object vector,object start,object count,object stream),"") {
+
   unsigned char *p;
   int n,beg;
-@  
+  
   stream=coerce_stream(stream,1);
-  if (stream==Cnil) @(return Cnil);
+  if (stream==Cnil) RETURN1(Cnil);
   p = vector->ust.ust_self;
   beg = ((type_of(start)==t_fixnum) ? fix(start) : 0);
   n = ((type_of(count)==t_fixnum) ? fix(count) : (vector->st.st_fillp - beg));
-  if (fwrite(p+beg,1,n,stream->sm.sm_fp)) @(return Ct);
-  @(return Cnil);
-@)
+  if (fwrite(p+beg,1,n,stream->sm.sm_fp)) RETURN1(Ct);
+  RETURN1(Cnil);
+}
 
-@(static defun fread (vector start count stream)
+DEFUN_NEW("FREAD",object,fSfread,SI,4,4,NONE,OO,OO,OO,OO,
+	  (object vector,object start,object count,object stream),"") {
   char *p;
   int n,beg;
-@  
+
   stream=coerce_stream(stream,0);
-  if (stream==Cnil) @(return Cnil);
+  if (stream==Cnil) RETURN1(Cnil);
   p = vector->st.st_self;
   beg = ((type_of(start)==t_fixnum) ? fix(start) : 0);
   n = ((type_of(count)==t_fixnum) ? fix(count) : (vector->st.st_fillp - beg));
   if ((n=SAFE_FREAD(p+beg,1,n,stream->sm.sm_fp)))
-      @(return `make_fixnum(n)`);
-  @(return Cnil);
-@)
+    RETURN1(make_fixnum(n));
+  RETURN1(Cnil);
+}
 
 #ifdef HAVE_NSOCKET
 
@@ -3086,7 +3088,7 @@ object async;
      FEerror("Could not connect",0);
    }
   x = alloc_object(t_stream);
-  x->sm.sm_mode = smm_socket;
+  x->sm.tt=x->sm.sm_mode = smm_socket;
   x->sm.sm_buffer = 0;
   x->sm.sm_object0 = list(3,server,host,port);
   x->sm.sm_object1 = 0;
@@ -3352,7 +3354,7 @@ gcl_init_file(void)
 	object standard;
 	object x;
 	standard_input = alloc_object(t_stream);
-	standard_input->sm.sm_mode = (short)smm_input;
+	standard_input->sm.tt=standard_input->sm.sm_mode = (short)smm_input;
 	standard_input->sm.sm_fp = stdin;
 	standard_input->sm.sm_object0 = sLcharacter;
 	standard_input->sm.sm_object1 = make_simple_string("stdin");
@@ -3360,7 +3362,7 @@ gcl_init_file(void)
 	standard_input->sm.sm_int1 = 0; /* unused */
 
 	standard_output = alloc_object(t_stream);
-	standard_output->sm.sm_mode = (short)smm_output;
+	standard_output->sm.tt=standard_output->sm.sm_mode = (short)smm_output;
 	standard_output->sm.sm_fp = stdout;
 	standard_output->sm.sm_object0 = sLcharacter;
 	standard_output->sm.sm_object1 = make_simple_string("stdout");
@@ -3372,7 +3374,7 @@ gcl_init_file(void)
 	enter_mark_origin(&terminal_io);
 
 	x = alloc_object(t_stream);
-	x->sm.sm_mode = (short)smm_synonym;
+	x->sm.tt=x->sm.sm_mode = (short)smm_synonym;
 	x->sm.sm_fp = NULL;
 	x->sm.sm_object0 = sLAterminal_ioA;
 	x->sm.sm_object1 = OBJNULL;
@@ -3461,14 +3463,14 @@ gcl_init_file_function()
 	make_function("MAKE-ECHO-STREAM", Lmake_echo_stream);
 	make_function("MAKE-STRING-INPUT-STREAM",
 		      Lmake_string_input_stream);
-	make_function("MAKE-STRING-OUTPUT-STREAM",
-		      Lmake_string_output_stream);
+/* 	make_function("MAKE-STRING-OUTPUT-STREAM", */
+/* 		      Lmake_string_output_stream); */
 /* 	make_function("GET-OUTPUT-STREAM-STRING", */
 /* 		      Lget_output_stream_string); */
 
 	make_si_function("OUTPUT-STREAM-STRING", siLoutput_stream_string);
-	make_si_function("FWRITE",Lfwrite);
-	make_si_function("FREAD",Lfread);
+/* 	make_si_function("FWRITE",Lfwrite); */
+/* 	make_si_function("FREAD",Lfread); */
 #ifdef HAVE_NSOCKET
 	make_si_function("SOCKET",Lsocket);
 	make_si_function("ACCEPT",Laccept);
@@ -3482,7 +3484,7 @@ gcl_init_file_function()
 	make_function("STREAM-ELEMENT-TYPE", Lstream_element_type);
 	make_function("CLOSE", Lclose);
 
-	make_si_function("OPEN1", Lopen1);
+/* 	make_si_function("OPEN1", Lopen1); */
 
 	make_function("FILE-POSITION", Lfile_position);
 	make_function("FILE-LENGTH", Lfile_length);

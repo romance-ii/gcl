@@ -134,10 +134,12 @@ FFN(Fdefmacro)(object form)
 	in VS_BASE[0].
 */
 object
-Imacro_expand1(object exp_fun, object form)
-{
-	return Ifuncall_n(sLAmacroexpand_hookA->s.s_dbind,
-		   3,exp_fun,form,MACRO_EXPAND_ENV);
+Imacro_expand1(object exp_fun, object form) {
+/*   pp(form->c.c_car);printf("\n"); */
+  object b[3]={exp_fun,form,MACRO_EXPAND_ENV};
+  fcall.valp=0;
+  return funcall_vec(sLAmacroexpand_hookA->s.s_dbind,3,b);
+
 }
 
 /*
@@ -175,51 +177,44 @@ macro_def(object form) {
 }
 
 DEFUNOM_NEW("MACROEXPAND",object,fLmacroexpand,LISP
-       ,1,2,NONE,OO,OO,OO,OO,void,Lmacroexpand,(object form,...),"")
-{	int n=VFUN_NARGS;
-	object envir;
-	object exp_fun;
-	object *lex=lex_env;
-	object buf[3];
-	
-	va_list ap;
-	{ va_start(ap,form);
-	  if (n>=2) envir=va_arg(ap,object);else goto LDEFAULT2;
-	  goto LEND_VARARG;
-	LDEFAULT2: envir = Cnil;
-	LEND_VARARG: va_end(ap);}
+	    ,1,2,NONE,OO,OO,OO,OO,void,Lmacroexpand,
+	    (object form,...),"") {
 
-	lex_env = buf;
-	if (n== 1) {buf[0]=sLnil;
-		    buf[1]=sLnil;
-		    buf[2]=sLnil;
-		  }
-	else if (n==2)
-	  { buf[0]=car(envir);
-	    envir=Mcdr(envir);
-	    buf[1]=car(envir);
-	    envir=Mcdr(envir);
-	    buf[2]=car(envir);
-	  }
-	else check_arg_range(1,2);
+  object envir;
+  object exp_fun,l=Cnil,f=OBJNULL;
+  object *lex=lex_env;
+  object buf[3];
+  va_list ap;
+  fixnum n=INIT_NARGS(1);
+  fixnum vals=(fixnum)fcall.valp;
+  object *base=vs_top;
 
-	exp_fun = macro_def(form);
-
-	if (MMnull(exp_fun)) {
-	  lex_env = lex;
-	  RETURN(2,object,form,(RV(sLnil)));
-	}
-	else
-	  {
-	    object *top = vs_top;
-	    do {
-	      form= Imacro_expand1(exp_fun, form);
-	      vs_top = top;
-	      exp_fun = macro_def(form);
-	    } while (!MMnull(exp_fun));
-	    lex_env = lex;
-	    RETURN(2,object,form,(RV(sLt)));
-	  }
+  va_start(ap,form);
+  envir=NEXT_ARG(n,ap,l,f,Cnil);
+  va_end(ap);
+  
+  lex_env = buf;
+  buf[0]=car(envir);
+  envir=Mcdr(envir);
+  buf[1]=car(envir);
+  envir=Mcdr(envir);
+  buf[2]=car(envir);
+  
+  exp_fun = macro_def(form);
+  
+  if (MMnull(exp_fun)) {
+    lex_env = lex;
+    RETURN(2,object,form,(RV(sLnil)));
+  } else {
+    object *top = vs_top;
+    do {
+      form= Imacro_expand1(exp_fun, form);
+      vs_top = top;
+      exp_fun = macro_def(form);
+    } while (!MMnull(exp_fun));
+    lex_env = lex;
+    RETURN(2,object,form,(RV(sLt)));
+  }
 }
 
 LFD(Lmacroexpand_1)(void)

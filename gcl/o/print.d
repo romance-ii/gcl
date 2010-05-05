@@ -820,21 +820,16 @@ int level;
 		vs_mark;
 		if (ppfun != Ct)
 		switch (type_of(ppfun)) {
-		    case t_cfun:
-		    case t_gfun:
-		    case t_ifun:
-		    case t_sfun:
-		    case t_vfun:
-		    case t_afun:
-		    case t_closure:
-		    case t_cclosure:
-		    case t_symbol:
-		    case t_cons:
-			call_print_function(ppfun, x, 0, 2);
-			vs_reset;
-			return;
-		    default:
-			FEwrong_type_argument(sLfunction,ppfun);
+		case t_cfun:
+		case t_function:/*FIXME*/
+		case t_ifun:
+		case t_symbol:
+		case t_cons:
+		  call_print_function(ppfun, x, 0, 2);
+		  vs_reset;
+		  return;
+		default:
+		  FEwrong_type_argument(sLfunction,ppfun);
 		}
 	}
 	switch (type_of(x)) {
@@ -1531,16 +1526,18 @@ int level;
 			vs_popp;
 		}
 		break;
-	case t_sfun:
-	case t_gfun:
-	case t_vfun:
-        case t_afun:	
 	case t_cfun:
 		write_str("#<compiled-function ");
 		if (x->cf.cf_name != Cnil)
 			write_object(x->cf.cf_name, level);
 		else
 			write_addr(x);
+		write_str(">");
+		break;
+
+	case t_function:
+		write_str("#<compiled-function ");
+		write_addr(x);
 		write_str(">");
 		break;
 
@@ -1570,16 +1567,6 @@ int level;
 	  write_str(">");
 	  break;
 
-	case t_closure:
-	case t_cclosure:
-		write_str("#<compiled-closure ");
-		if (x->cc.cc_name != Cnil)
-			write_object(x->cc.cc_name, level);
-		else
-			write_addr(x);
-		write_str(">");
-		break;
-
 	case t_spice:
 		write_str("#<\100");
 		for (i = CHAR_SIZE*sizeof(long)-4;  i >= 0;  i -= 4) {
@@ -1597,49 +1584,6 @@ int level;
 	}
 }
 
-/* char travel_push_type[(int)t_other];  */
-
-/* static void */
-/* travel_push_object(x) */
-/* object x; */
-/* { */
-/* 	enum type t; */
-/* 	int i; */
-/* 	object *vp; */
-
-/* 	cs_check(x); */
-
-/* BEGIN: */
-/* 	t = type_of(x); */
-/* 	if(travel_push_type[(int)t]==0) return; */
-/* 	if(t==t_symbol && x->s.s_hpack != Cnil) return; */
-
-/* 	for (vp = PRINTvs_top;  vp < vs_top;  vp += 2) */
-/* 		if (x == *vp) { */
-/* 			if (vp[1] != Cnil) */
-/* 				return; */
-/* 			vp[1] = Ct; */
-/* 			return; */
-/* 		} */
-/* 	vs_check_push(x); */
-/* 	vs_check_push(Cnil); */
-/* 	if (t == t_array && (enum aelttype)x->a.a_elttype == aet_object) */
-/* 		for (i = 0;  i < x->a.a_dim;  i++) */
-/* 			travel_push_object(x->a.a_self[i]); */
-/* 	else if (t == t_vector && (enum aelttype)x->v.v_elttype == aet_object) */
-/* 		for (i = 0;  i < x->v.v_fillp;  i++) */
-/* 			travel_push_object(x->v.v_self[i]); */
-/* 	else if (t == t_ifun) */
-/* 		travel_push_object(x->ifn.ifn_self); */
-/* 	else if (t == t_cons) { */
-/* 		travel_push_object(x->c.c_car); */
-/* 		x = x->c.c_cdr; */
-/* 		goto BEGIN; */
-/* 	} else if (t == t_structure) { */
-/* 		for (i = 0;  i < S_DATA(x->str.str_def)->length;  i++) */
-/* 		  travel_push_object(structure_ref(x,x->str.str_def,i)); */
-/* 	} */
-/* } */
 
 static int dgs;
 
@@ -1897,97 +1841,119 @@ int base;
 		return(FALSE);
 	return(TRUE);
 }
-@(defun write (x
+
+
+DEFUN_NEW("WRITE-INT",object,fSwrite_int,SI,17,17,NONE,OO,OO,OO,OO,
+	  (object x,object strm,object array,object base,object cas,
+	   object circle,object escape,object gensym,object length,
+	   object level,object lines,object miser_width,object pprint_dispatch,
+	   object pretty,object radix,object readably,object right_margin),"") {
+
+  struct printStruct printStructBuf; 
+  struct printStruct *old_printStructBufp = printStructBufp;  
+  object changer;
+  
+  changer = sLApprint_dispatchA->s.s_dbind;
+  sLApprint_dispatchA->s.s_dbind = pprint_dispatch;
+  pprint_dispatch = changer;
+  changer = sLAprint_linesA->s.s_dbind;
+  sLAprint_linesA->s.s_dbind = lines;
+  lines = changer;
+  changer = sLAprint_right_marginA->s.s_dbind;
+  sLAprint_right_marginA->s.s_dbind = right_margin;
+  right_margin = changer;
+  changer = sLAprint_miser_widthA->s.s_dbind;
+  sLAprint_miser_widthA->s.s_dbind = miser_width;
+  miser_width = changer;
+  
+  printStructBufp = &printStructBuf; 
+  if (strm == Cnil)
+    strm = symbol_value(sLAstandard_outputA);
+  else if (strm == Ct)
+    strm = symbol_value(sLAterminal_ioA);
+  if (type_of(strm) != t_stream)
+    FEerror("~S is not a stream.", 1, strm);
+  PRINTvs_top = vs_top;
+  PRINTstream = strm;
+  PRINTreadably = readably != Cnil;
+  PRINTescape = PRINTreadably || escape != Cnil;
+  PRINTpretty = pretty != Cnil;
+  PRINTcircle = circle != Cnil;
+  if (type_of(base)!=t_fixnum || fix((base))<2 || fix((base))>36)
+    FEerror("~S is an illegal PRINT-BASE.", 1, base);
+  else
+    PRINTbase = fix((base));
+  PRINTradix = radix != Cnil;
+  PRINTcase = cas;
+  if (PRINTcase != sKupcase && PRINTcase != sKdowncase &&
+      PRINTcase != sKcapitalize)
+    FEerror("~S is an illegal PRINT-CASE.", 1, cas);
+  PRINTgensym = PRINTreadably || gensym != Cnil;
+  if (PRINTreadably || level == Cnil)
+    PRINTlevel = -1;
+  else if (type_of(level) != t_fixnum || fix((level)) < 0)
+    FEerror("~S is an illegal PRINT-LEVEL.", 1, level);
+  else
+    PRINTlevel = fix((level));
+  if (PRINTreadably || length == Cnil)
+    PRINTlength = -1;
+  else if (type_of(length) != t_fixnum || fix((length)) < 0)
+    FEerror("~S is an illegal PRINT-LENGTH.", 1, length);
+  else
+    PRINTlength = fix((length));
+  PRINTarray = PRINTreadably || array != Cnil;
+  if (PRINTcircle) setupPRINTcircle(x,1);
+  if (PRINTpretty) {
+    qh = qt = qc = 0;
+    isp = iisp = 0;
+    indent_stack[0] = 0;
+    write_ch_fun = writec_queue;
+  } else
+    write_ch_fun = writec_PRINTstream;
+  PRINTpackage = symbol_value(sSAprint_packageA) != Cnil;
+  PRINTstructure = symbol_value(sSAprint_structureA) != Cnil;
+  write_object(x, 0);
+  CLEANUP_PRINT_DEFAULT;
+  flush_stream(PRINTstream);
+  
+  sLApprint_dispatchA->s.s_dbind = pprint_dispatch;
+  sLAprint_linesA->s.s_dbind = lines;
+  sLAprint_right_marginA->s.s_dbind = right_margin;
+  sLAprint_miser_widthA->s.s_dbind = miser_width;
+  
+  RETURN1(x);
+  
+}
+
+@(defun write (x
 	       &key ((:stream strm) Cnil)
-		    (escape `symbol_value(sLAprint_escapeA)`)
-		    (readably `symbol_value(sLAprint_readablyA)`)
-		    (radix `symbol_value(sLAprint_radixA)`)
-		    (base `symbol_value(sLAprint_baseA)`)
-		    (circle `symbol_value(sLAprint_circleA)`)
-		    (pretty `symbol_value(sLAprint_prettyA)`)
-		    (level `symbol_value(sLAprint_levelA)`)
-		    (length `symbol_value(sLAprint_lengthA)`)
-		    ((:case cas) `symbol_value(sLAprint_caseA)`)
-		    (gensym `symbol_value(sLAprint_gensymA)`)
-		    (array `symbol_value(sLAprint_arrayA)`)
-		    (pprint_dispatch `symbol_value(sLApprint_dispatchA)`)
-		    (lines `symbol_value(sLAprint_linesA)`)
-		    (right_margin `symbol_value(sLAprint_right_marginA)`)
-		    (miser_width `symbol_value(sLAprint_miser_widthA)`))
-        struct printStruct printStructBuf; 
-        struct printStruct *old_printStructBufp = printStructBufp;  
-	object changer;
-@
-	changer = sLApprint_dispatchA->s.s_dbind;
-	sLApprint_dispatchA->s.s_dbind = pprint_dispatch;
-	pprint_dispatch = changer;
-	changer = sLAprint_linesA->s.s_dbind;
-	sLAprint_linesA->s.s_dbind = lines;
-	lines = changer;
-	changer = sLAprint_right_marginA->s.s_dbind;
-	sLAprint_right_marginA->s.s_dbind = right_margin;
-	right_margin = changer;
-	changer = sLAprint_miser_widthA->s.s_dbind;
-	sLAprint_miser_widthA->s.s_dbind = miser_width;
-	miser_width = changer;
+	       (escape `symbol_value(sLAprint_escapeA)`)
+	       (readably `symbol_value(sLAprint_readablyA)`)
+	       (radix `symbol_value(sLAprint_radixA)`)
+	       (base `symbol_value(sLAprint_baseA)`)
+	       (circle `symbol_value(sLAprint_circleA)`)
+	       (pretty `symbol_value(sLAprint_prettyA)`)
+	       (level `symbol_value(sLAprint_levelA)`)
+	       (length `symbol_value(sLAprint_lengthA)`)
+	       ((:case cas) `symbol_value(sLAprint_caseA)`)
+	       (gensym `symbol_value(sLAprint_gensymA)`)
+	       (array `symbol_value(sLAprint_arrayA)`)
+	       (pprint_dispatch `symbol_value(sLApprint_dispatchA)`)
+	       (lines `symbol_value(sLAprint_linesA)`)
+	       (right_margin `symbol_value(sLAprint_right_marginA)`)
+	       (miser_width `symbol_value(sLAprint_miser_widthA)`))
 
-	printStructBufp = &printStructBuf; 
-	if (strm == Cnil)
-		strm = symbol_value(sLAstandard_outputA);
-	else if (strm == Ct)
-		strm = symbol_value(sLAterminal_ioA);
-	if (type_of(strm) != t_stream)
-		FEerror("~S is not a stream.", 1, strm);
-	PRINTvs_top = vs_top;
-	PRINTstream = strm;
-	PRINTreadably = readably != Cnil;
-	PRINTescape = PRINTreadably || escape != Cnil;
-	PRINTpretty = pretty != Cnil;
-	PRINTcircle = circle != Cnil;
-	if (type_of(base)!=t_fixnum || fix((base))<2 || fix((base))>36)
-		FEerror("~S is an illegal PRINT-BASE.", 1, base);
-	else
-		PRINTbase = fix((base));
-	PRINTradix = radix != Cnil;
-	PRINTcase = cas;
-	if (PRINTcase != sKupcase && PRINTcase != sKdowncase &&
-	    PRINTcase != sKcapitalize)
-		FEerror("~S is an illegal PRINT-CASE.", 1, cas);
-	PRINTgensym = PRINTreadably || gensym != Cnil;
-	if (PRINTreadably || level == Cnil)
-		PRINTlevel = -1;
-	else if (type_of(level) != t_fixnum || fix((level)) < 0)
-		FEerror("~S is an illegal PRINT-LEVEL.", 1, level);
-	else
-		PRINTlevel = fix((level));
-	if (PRINTreadably || length == Cnil)
-		PRINTlength = -1;
-	else if (type_of(length) != t_fixnum || fix((length)) < 0)
-		FEerror("~S is an illegal PRINT-LENGTH.", 1, length);
-	else
-		PRINTlength = fix((length));
-	PRINTarray = PRINTreadably || array != Cnil;
-	if (PRINTcircle) setupPRINTcircle(x,1);
-	if (PRINTpretty) {
-		qh = qt = qc = 0;
-		isp = iisp = 0;
-		indent_stack[0] = 0;
-		write_ch_fun = writec_queue;
-	} else
-		write_ch_fun = writec_PRINTstream;
-	PRINTpackage = symbol_value(sSAprint_packageA) != Cnil;
-	PRINTstructure = symbol_value(sSAprint_structureA) != Cnil;
-	write_object(x, 0);
-	CLEANUP_PRINT_DEFAULT;
-	flush_stream(PRINTstream);
-
-	sLApprint_dispatchA->s.s_dbind = pprint_dispatch;
-	sLAprint_linesA->s.s_dbind = lines;
-	sLAprint_right_marginA->s.s_dbind = right_margin;
-	sLAprint_miser_widthA->s.s_dbind = miser_width;
-
-	@(return x)
+  @
+  x=FFN(fSwrite_int)(x,strm,array,base,cas,
+		     circle,escape,gensym,length,
+		     level,lines,miser_width,pprint_dispatch,
+		     pretty,radix,readably,right_margin);
+  
+  @(return x)
+  
 @)
+
+
 
 @(defun prin1 (obj &optional strm)
 @

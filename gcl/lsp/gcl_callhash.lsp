@@ -1,85 +1,78 @@
 ;; -*-Lisp-*-
 
-(in-package 'lisp)
-
-(export '(function-lambda-expression))
-
 (in-package 'si)
 
-(*make-special '*pahl*)
+;(*make-special '*pahl*)
 (*make-special '*boot*)
 (*make-special '*tmp-dir*)
 (eval-when (load eval)
-	   (setq *pahl* nil)
+;   (setq *pahl* nil)
 	   (setq *boot* nil))
 
-(defun add-hash (fn sig callees src file)
+(defun add-hash (fn sig callees src file &optional props &aux ar cm)
   (cond ((not (eq *boot* t))
 	 (setq *pahl* (cons `(add-hash ',fn ',sig ',callees ,src ,file) *pahl*))
-	 (unless (or (not (fboundp 'make-s-data))
-		     (not (let ((s (find-symbol "UNIQUE-SIGS" (find-package "COMPILER")))) 
-			    (and s (fboundp s))))
+	 (unless (or (not (and 
+			   (setq *us* (find-symbol "UNIQUE-SIGS" (find-package "COMPILER")))
+			   (fboundp *us*)))
 		     *boot*)
-	   (setq *boot* 'add-hash) 
+;	   (setq *boot* 'add-hash) 
 	   (let ((*package* (find-package "SI")))
-	     (defstruct (call (:copier copy-call)
-			      (:predicate call-p)
+	     (defstruct (call (:type list)
 			      (:constructor make-call))
-			      sig callees callers src file)
-	     (defvar *call-hash-table* (make-hash-table :test 'eq))
+			      sig callees src file props name)
 	     (defvar *needs-recompile* (make-array 10 :fill-pointer 0 :adjustable t))
-	     (defvar %memory)
-	     (defvar %init)
+	     (defvar *us* nil)
 	     (defvar *cmr* nil)
 	     (defvar *rfns* nil)
 	     (defvar *sfns* nil)
 	     (defvar *split-files* nil)
 	     (defvar *sig-discovery* nil)
-;	     (defvar *unique-sigs* (make-hash-table :test 'equal))
-	     (defvar *us* (find-symbol "UNIQUE-SIGS" (find-package "COMPILER")))
-;	     (assert (and *us* (fboundp *us*)))
-	     (setq *tmp-dir* (get-temp-dir))
+	     (setq *tmp-dir* (get-temp-dir)))
 	     (setq *boot* t)
 	     (mapc 'eval (nreverse *pahl*))
-	     (setq *pahl* nil))))
+	     (setq *pahl* nil)))
 	((let* ((sig (when sig (funcall *us* sig)))
-		(h (or (gethash fn *call-hash-table*)
-		       (setf (gethash fn *call-hash-table*) (make-call :sig sig)))))
-	   (let ((x (get fn 'state-function)))
-	     (when (and x (some (lambda (y) (not (eq (car y) x))) callees))
-	       (break-state fn x)))
-	   (procl fn sig)
+		(h (call fn t :sig sig)))
+	   (when (symbolp fn)
+	     (let ((x (get fn 'state-function)))
+	       (when (and x (member-if (lambda (y) (not (eq (car y) x))) callees))
+		 (break-state fn x))))
 	   (when sig
 	     (unless (eq sig (call-sig h))
-		 (dolist (l (call-callers h))
-		   (unless (eq l fn)
-		     (add-recompile l fn (call-sig h) sig)))
-		 (setf (call-sig h) sig)))
+	       (when (symbolp fn)
+		 (procl fn sig)
+		 (when (call-sig h)
+		   (dolist (l (get fn 'callers))
+		     (unless (eq l fn)
+		       (add-recompile l fn (call-sig h) sig)))))
+	       (setf (call-sig h) sig)))
+	   (when (symbolp fn) (setf (call-name h) fn))
 	   (when src (setf (call-src h) src))
 	   (when file (unless (call-file h) (setf (call-file h) file)))
-	   (let (ar cm)
-	     (dolist (l callees (progn (when cm (pushnew fn *cmr* :test 'eq))
-				       (unless ar (when (and sig callees) (remove-recompile fn)))));fixme
-	       (unless (member (car l) (call-callees h) :test 'eq)
-		 (push (car l) (call-callees h))
-		 (setq cm t))
-	       (let* ((ns (cdr l))
-		      (ns (when ns (funcall *us* ns)))
-		      (h (or (gethash (car l) *call-hash-table*)
-			     (setf (gethash (car l) *call-hash-table*) (make-call :sig ns :callers (list fn)))))
-		      (os (call-sig h)))
-		 (pushnew fn (call-callers h) :test 'eq)
-		 (unless (or (eq fn (car l)) (not os) (eq ns os))
-		   (add-recompile fn (car l) ns os)
-		   (setq ar t)))))))))
+	   (when props (setf (call-props h) props))
+	   (dolist (l callees (progn (when cm (pushnew fn *cmr* :test 'eq))
+				     (unless ar (when (and sig callees) (remove-recompile fn)));fixme
+				     h))
+	     (let ((fe (car l)))
+	       (unless (member fe (call-callees h) :test 'eq)
+		 (push fe (call-callees h))
+		 (setq cm (symbolp fn)))
+	       (when (symbolp fn)
+		 (let* ((ns (cdr l))
+			(ns (when ns (funcall *us* ns)))
+			(h (call fe))
+			(os (when h (call-sig h))))
+		   (pushnew fn (get fe 'callers) :test 'eq)
+		   (unless (or (eq fn fe) (not os) (eq ns os))
+		     (add-recompile fn fe os ns)
+		     (setq ar t))))))))))
 
 (defun procl (fn sig)
   (when sig 
-;    (unless (eq (cadr sig) '*) 
-      (putprop fn t 'proclaimed-function)
-      ;)
-    (putprop fn (car sig) 'proclaimed-arg-types)
-    (putprop fn (cadr sig) 'proclaimed-return-type)))
+    (remprop fn 'lfun)
+    (remprop fn 'arg-types)
+    (remprop fn 'return-type)))
 
 (defun break-state (sym x)
   (format t "Breaking state function ~s due to definition of ~s~%" x sym)
@@ -88,54 +81,34 @@
     (mapc (lambda (x y) (unless (eq sym x) (eval `(defun ,x ,@(cdr y))))) (car o) (cadr o))
     (mapc (lambda (y) (push y *cmr*) (add-recompile y 'state-function (sig x) nil)) (car o)) 
     (fmakunbound x)
-    (remhash x *call-hash-table*)
     (unintern x)))
 
 (defun clear-compiler-properties (sym code)
-  (cond ((not (eq *boot* t))
-	 (push `(clear-compiler-properties ',sym nil) *pahl*))
-	((let ((h (or (gethash sym *call-hash-table*) 
-		      (setf (gethash sym *call-hash-table*) (make-call)))))
+  (cond ((not (eq *boot* t)) (push `(clear-compiler-properties ',sym nil) *pahl*))
+	((not code))
+	((eq (symbol-to-function sym) code))
+	((let ((h (call sym)))
+	   
+	   (when h
+	     (dolist (l (call-callees h))
+	       (setf (get l 'callers) (delete sym (get l 'callers)))))
 
-	   (dolist (l (call-callees h))
-	     (let ((l (gethash l *call-hash-table*)))
-	       (setf (call-callers l) (delete sym (call-callers l)))))
+	   (let ((x (when (compiled-function-p (symbol-to-function sym)) (get sym 'state-function))))
+	     (when x
+	       (break-state sym x)))
 
-	   (unless (and (compiled-function-p code) (eq (function-name code) sym))
-	     (let ((x (get sym 'state-function)))
-	       (when x
-		 (break-state sym x))))
-
-	   (let (new)
-	     (maphash (lambda (x y) 
-			(when (and (fboundp x) (eq (symbol-function x) code) (call-src y))
-			  (setq new x))) *call-hash-table*)
-	     (cond (new
-		    (let ((nr (find new *needs-recompile* :key 'car)))
-		      (when nr (add-recompile sym (cadr nr) (caddr nr) (cadddr nr))))
-		    (setq new (gethash new *call-hash-table*))
-		    (let ((ns (call-sig new)))
-		      (unless (eq ns (call-sig h))
-			(dolist (l (call-callers h))
-			  (add-recompile l sym (call-sig h) ns)))
-		      (setf (call-sig h) ns)
-		      (procl sym ns))
-		    (dolist (l (call-callees new)) 
-		      (pushnew sym (call-callers (gethash l *call-hash-table*))))
-		    (setf (call-callees h) (call-callees new) (call-src h) (call-src new) (call-file h) (call-file new)))
-		   ((progn
-		      (remove-recompile sym)
-		      (let ((ns (if (and (compiled-function-p code) (not (eq (function-name code) sym))
-					 (fboundp sym) (compiled-function-p (symbol-function sym)) 
-					 (not (eq (symbol-function sym) code)))
-				    (let ((s '((*) *))) (pushnew sym *sfns*)(funcall *us* s))
-				  (call-sig h))))
-			(unless (eq ns (call-sig h))
-			  (dolist (l (call-callers h))
-			    (add-recompile l sym (call-sig h) ns)))
-			(setf (call-sig h) ns)
-			(procl sym ns))
-		      (setf (call-callees h) nil (call-src h) nil (call-file h) nil)))))))))
+	   (let ((new (call code t :sig (when h (call-sig h)))))
+	     
+	     (let ((nr (find code *needs-recompile* :key (lambda (x) (symbol-to-function x)))))
+	       (when nr (add-recompile sym (cadr nr) (caddr nr) (cadddr nr))))
+	     (when h
+	       (let ((ns (call-sig new)))
+		 (unless (eq ns (call-sig h))
+		   (dolist (l (get sym 'callers))
+		     (add-recompile l sym (call-sig h) ns)))
+		 (procl sym ns)))
+	     (dolist (l (call-callees new)) 
+	       (pushnew sym (get l 'callers) :test 'eq)))))))
 
 (defun add-recompile (fn why assumed-sig actual-sig)
   (unless (find fn *needs-recompile* :key 'car)
@@ -150,7 +123,6 @@
 	(setf (aref *needs-recompile* i) (aref *needs-recompile* (1+ i)))))))
 
 (defun clr-call nil 
-  (clrhash *call-hash-table*)
   (setf (fill-pointer *needs-recompile*) 0))
 
 
@@ -171,7 +143,7 @@
       (when (equal fn (file l));FIXME eq
 	(push l z)))
     (do ((l (set-difference z y) (cdr l))
-	 (r (union z y) (same-file-all-callees (car l) r fn)))
+	 (r (union z y) (same-file-all-callers (car l) r fn)))
 	((endp l) r))))
 
 ;; (defun all-callees (x y)
@@ -193,51 +165,6 @@
 ;; 	    ((endp l) 
 ;; 	     (unless (intersection z y) (setf (gethash x *acr*) (set-difference r y)))
 ;; 	     r))))))
-
-(defun block-lambda (ll block body)
-  (let* ((z body)
-	 (decls (do (d doc) 
-		    ((or (not z) (if (stringp (car z)) 
-				     (or (endp (cdr z)) doc)
-				   (or (not (consp (car z))) (not (eq (caar z) 'declare))))) (nconc doc (nreverse d)))
-		    (let ((x (pop z))) (if (stringp x) (unless doc (push x doc)) (push x d)))))
-	 (ctps (let (d) (do nil ((or (not z) (not (consp (car z))) (not (eq (caar z) 'check-type))) (nreverse d))
-			     (push (pop z) d))))
-	 (rest z))
-  `(lambda ,ll ,@decls ,@ctps (block ,block ,@rest))))
-       
-
-(defun function-lambda-expression (y) 
-  (let ((x (typecase y
-	    (interpreted-function (interpreted-function-lambda y))
-	    (compiled-function (function-src (function-name y)))
-	    (otherwise nil))))
-    (case (car x)
-	  (lambda (values x nil (function-name y)))
-	  (lambda-block (values (block-lambda (caddr x) (cadr x) (cdddr x)) nil (cadr x)))
-	  (lambda-closure (values (cons 'lambda (cddr (cddr x)))  (not (not (cadr x)))  (function-name y)))
-	  (lambda-block-closure (values (block-lambda (caddr (cdddr x)) (cadr (cdddr x)) (cddr (cddr (cddr x)))) 
-					(not (not (cadr x))) (fifth x)))
-	  (otherwise (values nil t nil)))))
-
-(defun compress-src (src)
-  (let* ((w (make-string-output-stream))
-	 (ss (si::open-fasd w :output nil nil)))
-    (si::find-sharing-top src (aref ss 1))
-    (si::write-fasd-top src ss)
-    (si::close-fasd ss)
-    (get-output-stream-string w)))
-
-(defun function-src (sym)
-  (or
-   (let* ((h (gethash sym *call-hash-table*))
-	  (fas (when h (call-src h))))
-     (when fas
-       (let* ((ss (open-fasd (make-string-input-stream fas) :input 'eof nil))
-	      (out (read-fasd-top ss)))
-	 (close-fasd ss)
-	 out)))
-   (and (fboundp sym) (typep (symbol-function sym) 'interpreted-function) (function-lambda-expression (symbol-function sym)))))
 
 (defun nsyms (n &optional syms)
   (declare (seqind n))
@@ -261,7 +188,7 @@
 (defun old-src (stfn &optional src syms sts srcs)
   (cond (stfn (old-src nil (function-src stfn) syms sts srcs))
 	((atom src) nil)
-	((eq (car src) 'macrolet)
+	((eq (car src) 'labels)
 	 (list (mapcar 'car (cadr src)) 
 	       (mapcar (lambda (x) (if (eq (caadr x) 'funcall) (cadadr x) (caadr x))) (cddr (caddr src)))))
 	((or (old-src stfn (car src) syms sts srcs) (old-src stfn (cdr src) syms sts srcs)))))
@@ -270,13 +197,13 @@
   (remove '&optional (mapcar (lambda (x) (if (consp x) (car x) x)) ll)))
 
 (defun inlinef (n syms sts fns)
-    (unless (some (lambda (x) (intersection '(&rest &key &aux &allow-other-keys) (cadr x))) fns)
+    (unless (member-if (lambda (x) (intersection '(&rest &key &aux &allow-other-keys) (cadr x))) fns)
       (let* ((lsst (1- (length sts)))
 	     (tps (max-types (mapcar 'sig syms)))
-	     (min (reduce 'min (mapcar (lambda (x) 
-					 (let* ((ll (cadr x))) 
-					   (- (length ll) (length (member '&optional ll))))) fns)
-			  :initial-value 64));FIXME
+	     (min (reduce 
+		   'min 
+		   (mapcar (lambda (x) (length (ldiff (cadr x) (member '&optional (cadr x))))) fns)
+		   :initial-value 64));FIXME
 	     (max (reduce 'max (mapcar (lambda (x) (length (lambda-vars (cadr x)))) fns) :initial-value 0))
 	     (reqs (nsyms min))
 	     (opts (nsyms (- max min)))
@@ -290,27 +217,32 @@
 		   (let ((q (pop z)))
 		     (when (and (consp (cadr q)) (eq 'optimize (caadr q))) 
 		       (push q d)))))
-	   (macrolet ,(mapcan (lambda (x y z) `((,x ,(cadr y) `(,',n ,,z ,,@(lambda-vars (cadr y)))))) syms fns sts)
-		     (case state
-			   ,@(mapcar (lambda (x y)
-				       `(,(if (= x lsst) 'otherwise x) 
-					 (funcall ,y ,@(reverse 
-							(early-nthcdr 
-							 (- max (length (lambda-vars (cadr y))))
-							 all))))) sts fns)))))))
 
-(defun sig (x) (let ((h (gethash x *call-hash-table*))) (when h (call-sig h))))
-(defun src (x) (let ((h (gethash x *call-hash-table*))) (when h (call-src h))))
-(defun file (x) (let ((h (gethash x *call-hash-table*))) (when h (call-file h))))
-(defun callees (x) (let ((h (gethash x *call-hash-table*))) (when h (call-callees h))))
-(defun callers (x) (let ((h (gethash x *call-hash-table*))) (when h (call-callers h))))
-(defun *s (x) 
-  (let ((p (find-package x)))
-    (remove-if-not
-     (lambda (y) (eq (symbol-package y) p)) 
-     (let (r) 
-       (maphash (lambda (x y) (when (eq '* (cadr (call-sig y))) (push x r))) *call-hash-table*)
-       r))))
+	   (labels
+	    ,(mapcan (lambda (x y z)
+		       `((,x ,(cadr y) (,n ,z ,@(lambda-vars (cadr y)))))) syms fns sts)
+	    (case state
+		  ,@(mapcar
+		     (lambda (x y)
+		       `(,(if (= x lsst) 'otherwise x) 
+			 (funcall ,y ,@(reverse (early-nthcdr (- max (length (lambda-vars (cadr y)))) all)))))
+		     sts fns)))))))
+
+(defun sig (x) (let ((h (call x))) (when h (call-sig h))))
+(defun props (x) (let ((h (call x))) (when h (call-props h))))
+(defun src (x) (let ((h (call x))) (when h (call-src h))))
+(defun file (x) (let ((h (call x))) (when h (call-file h))))
+(defun name (x) (let ((h (call x))) (when h (call-name h))))
+(defun callees (x) (let ((h (call x))) (when h (call-callees h))))
+(defun callers (x) (get x 'callers))
+
+;; (defun *s (x) 
+;;   (let ((p (find-package x)))
+;;     (remove-if-not
+;;      (lambda (y) (eq (symbol-package y) p)) 
+;;      (let (r) 
+;;        (maphash (lambda (x y) (when (eq '* (cadr (call-sig y))) (push x r))) *call-hash-table*)
+;;        r))))
 
 (defun mutual-recursion-peers (sym)
   (unless (or (get sym 'state-function) (get sym 'mutual-recursion-group))
@@ -318,10 +250,12 @@
       (when (eq '* (cadr y))
 	(let ((e (same-file-all-callees sym nil (file sym)))
 	      (r (same-file-all-callers sym nil (file sym))))
-	  (remove-if-not (lambda (x) (and (eq (symbol-package x) (symbol-package sym))
-					  (let ((h (gethash x *call-hash-table*)))
-					    (and h (call-src h) (eq '* (cadr (call-sig h)))))))
-			 (intersection e r)))))))
+	  (remove-if-not
+	   (lambda (x) 
+	     (and (eq (symbol-package x) (symbol-package sym))
+		  (let ((h (call x)))
+		    (when h (eq '* (cadr (call-sig h)))))))
+	   (intersection e r)))))))
 
 ;(defun mutual-recursion-peers (sym)
 ;  (unless (or (get sym 'state-function) (get sym 'mutual-recursion-group))
@@ -347,55 +281,46 @@
 	     (sts (let (sts) (dotimes (i (length syms) (nreverse sts)) (push i sts))))
 	     (ns (inlinef n syms sts fns)))
 	(when ns
+	  (eval ns)
 	  (mapc (lambda (x y z) (let ((z (cadr z))) (eval `(defun ,x ,z (,n ,y ,@(lambda-vars z)))))) syms sts fns)
 	  (mapc (lambda (x) (putprop x n 'state-function)) syms)
-	  (eval ns)
 	  (dolist (l syms) (add-hash l nil (list (list n)) nil nil))
 	  (putprop n syms 'mutual-recursion-group)
 	  (add-recompile n 'mutual-recursion nil nil)
 	  n)))))
     
 (defun temp-prefix nil
-  (si::string-concatenate *tmp-dir* "gazonk_" (write-to-string (abs (getpid))) "_"));FIXME
+  (concatenate 'string
+	       *tmp-dir*
+	       "gazonk_"
+	       (write-to-string (let ((p (getpid))) (if (>= p 0) p (- p))))
+	       "_"));FIXME
 
-(defun recompile (fn)
-  (with-temp-file 
-      (s tpn) ((temp-prefix) "lsp")
-      (let ((*print-radix* nil)
-	    (*print-base* 10)
-	    (*print-circle* t)
-	    (*print-pretty* nil)
-	    (*print-level* nil)
-	    (*print-length* nil)
-	    (*print-case* :downcase)
-	    (*print-gensym* t)
-	    (*print-array* t)
-	    (si::*print-package* t)
-	    (si::*print-structure* t))
-	(let* ((src (function-src fn)))
-	  (if src (prin1 `(defun ,fn ,@(cdr src)) s)
-	    (remove-recompile fn))
-	  (let ((o (compile-file tpn)))
-	    (load o)
-	    (delete-file o))))))
+(defun compiler-state-fns nil
+  (let ((p (find-package "COMPILER")))
+    (when p
+      (do-symbols 
+       (s p)
+       (when (member s *cmr*)
+	 (let ((x (convert-to-state s)))
+	   (when x
+	     (compile x)
+	     (mapc 'compile (get x 'mutual-recursion-group)))))))))
 
-(defun get-temp-dir ()
-  (dolist (x `(,@(mapcar 'si::getenv '("TMPDIR" "TMP" "TEMP")) "/tmp" ""))
-    (when x
-      (let* ((x (pathname x))
-	     (x (if (pathname-name x) x 
-		  (merge-pathnames
-		   (make-pathname :directory (butlast (pathname-directory x)) 
-				  :name (car (last (pathname-directory x))))
-		   x))))
-	(when (stat x) 
-	  (return-from 
-	   get-temp-dir 
-	   (namestring 
-	    (make-pathname 
-	     :device (pathname-device x)
-	     :directory (when (or (pathname-directory x) (pathname-name x))
-			  (append (pathname-directory x) (list (pathname-name x))))))))))))
+(defun dead-code (ps &aux r)
+  (let ((p (find-package ps)))
+    (when p
+      (do-symbols
+       (s p r)
+       (when (fboundp s)
+	 (unless (macro-function s)
+	   (multiple-value-bind
+	    (s k)
+	    (find-symbol (symbol-name s) p)
+	    (when (eq k :internal)
+	      (unless (get s 'callers)
+		(push s r))))))))))
+
 
 (defun do-recompile (&optional (pn nil pnp))
 
@@ -427,13 +352,7 @@
 
 	      (let ((*sig-discovery* t)(*compile-verbose* nil)) 
 		(dolist (fn (nreverse fns))
-;		  (compile fn)
-		  (if (eq (function-name (symbol-function fn)) fn)
-		      (compile fn)
-		    (progn
-		      (format t "skipping ~s~%" fn)
-		      (remove-recompile fn)))
-		  )))))
+		  (compile fn))))))
 
       (if (and pnp (not pn))
 
@@ -465,142 +384,9 @@
 		     (o (compile-file pn :system-p t :c-file t :h-file t :data-file t)))
 		(unless pnp (load o)))))))))
 
-;; (defun do-recompile (&optional pn)
-;;   (unless *disable-recompile*
-;;     (let ((*disable-recompile* t))
-;;       (when (= 0 (length *needs-recompile*)) (do nil ((not *cmr*)) (convert-to-state (pop *cmr*))))
-;;       (unless (= 0 (length *needs-recompile*))
-;; 	(sort *needs-recompile*
-;; 	      (lambda (x y) (member (car x) (callees (car y)))))
-;; 	(map nil (lambda (fn)
-;; 		   (cond ((eq (cadr fn) 'mutual-recursion)
-;; 			  (format t "Mutual recursion detected: ~s, recompiling ~s~%" 
-;; 				  (get (car fn) 'mutual-recursion-group) (car fn)))
-;; 			 ((format t "Callee ~s sigchange ~s to ~s, recompiling ~s~%" 
-;; 			   (cadr fn) (caddr fn) (cadddr fn) (car fn))))) *needs-recompile*)
-;; 	(with-temp-file 
-;; 	    (s tpn) ((temp-prefix) "lsp")
-;; 	    (let ((*print-radix* nil)
-;; 		  (*print-base* 10)
-;; 		  (*print-circle* t)
-;; 		  (*print-pretty* nil)
-;; 		  (*print-level* nil)
-;; 		  (*print-length* nil)
-;; 		  (*print-case* :downcase)
-;; 		  (*print-gensym* t)
-;; 		  (*print-array* t)
-;; 		  (si::*print-package* t)
-;; 		  (si::*print-structure* t))
-;; 	      (dotimes (i (length *needs-recompile*))
-;; 		(let* ((fn (car (aref *needs-recompile* i)))
-;; 		       (src (function-src fn)))
-;; 		  (when pn (push fn *rfns*))
-;; 		  (cond (src 
-;; 			   (prin1 `(defun ,fn ,@(cdr src)) s)
-;; 			   (dolist (l '(state-function mutual-recursion-group))
-;; 			     (let ((x (get fn l)))
-;; 			       (when x 
-;; 				 (prin1 `(putprop ',fn ',x ',l) s)))))
-;; 			((remove-recompile fn))))))
-;; 	    (let* ((*split-files* 100000)(*sig-discovery* t));(o (compile-file tpn)))
-;; 	      (compile-file tpn)
-;; 	      ;(load o)
-;; ;	      (mapcar 'delete-file (directory (merge-pathnames (pathname (string-concatenate (pathname-name o) "*")) o)))
-;; ))))
-;;     (cond ((or *cmr* (> (length *needs-recompile*) 0)) (do-recompile pn))
-;; 	  (pn 
-;; 	   (with-open-file 
-;; 	    (f pn :direction :output :if-exists :append :if-does-not-exist :create)
-;; 	    (let ((*print-radix* nil)
-;; 		  (*print-base* 10)
-;; 		  (*print-circle* t)
-;; 		  (*print-pretty* nil)
-;; 		  (*print-level* nil)
-;; 		  (*print-length* nil)
-;; 		  (*print-case* :downcase)
-;; 		  (*print-gensym* t)
-;; 		  (*print-array* t)
-;; 		  (si::*print-package* t)
-;; 		  (si::*print-structure* t))
-;; 	      (setq *rfns* (delete-duplicates (nreverse *rfns*)))
-;; 	      (do (l) ((not (setq l (pop *rfns*))))
-;; 		(prin1 `(defun ,l ,@(cdr (function-src l))) f)
-;; 		(dolist (p '(state-function mutual-recursion-group))
-;; 		  (let ((x (get l p)))
-;; 		    (when x 
-;; 		      (prin1 `(putprop ',l ',x ',p) f)))))
-;; 	      (prin1 `(setq *cmr* nil) f)))
-;; 	   (let ((*split-files* 100000)) (compile-file pn :system-p t :c-file t :h-file t :data-file t))))))
-
-
-;FIXME!!!
-;(defun is-eq-test-item-list (x y z w)
-;  (format t "Should never be called ~s ~s ~s ~s~%" x y z w))
 
 (defun cmp-vec-length (x)
   (declare (vector x))
   (if (array-has-fill-pointer-p x) (fill-pointer x) (array-dimension x 0)))
 
-
-(defun mdlsym (str &optional (n "" np))
-  (let* ((pk (or (find-package "LIB") (make-package "LIB")))
-	 (k  (if np (dlopen n) 0))
-	 (ad (dlsym k str))
-	 (p (or (pathname-name (dladdr ad)) ""))
-	 (psym (intern p pk))
-	 (npk (or (find-package psym) (make-package psym :use '(lisp))))
-	 (sym (and (shadow str npk) (intern str npk))))
-    (export (list psym) pk)
-    (export sym npk)
-    (setf (symbol-value psym) k (symbol-value sym) ad)
-    sym))
-
-(defun eval-feature (x)
-  (cond ((atom x)
-         (member x *features*))
-        ((eq (car x) :and)
-         (dolist (x (cdr x) t) (unless (eval-feature x) (return nil))))
-        ((eq (car x) :or)
-         (dolist (x (cdr x) nil) (when (eval-feature x) (return t))))
-        ((eq (car x) :not)
-	 (not (eval-feature (cadr x))))
-	(t (error "~S is not a feature expression." x))))
-
-(defun sharp-+-reader (stream subchar arg)
-  (declare (ignore subchar arg))
-  (if (eval-feature (let ((*read-suppress* nil) 
-			  (*read-base* 10.)
-			  (*package* (load-time-value (find-package 'keyword))))
-		      (read stream t nil t)))
-      (values (read stream t nil t))
-      (let ((*read-suppress* t)) (read stream t nil t) (values))))
-
-(set-dispatch-macro-character #\# #\+ 'sharp-+-reader)
-(set-dispatch-macro-character #\# #\+ 'sharp-+-reader
-                              (si::standard-readtable))
-
-(defun sharp---reader (stream subchar arg)
-  (declare (ignore subchar arg))
-  (if (eval-feature (let ((*read-suppress* nil)
-			  (*read-base* 10.)
-			  (*package* (load-time-value (find-package 'keyword))))
-                         (read stream t nil t)))
-      (let ((*read-suppress* t)) (read stream t nil t) (values))
-      (values (read stream t nil t))))
-
-(set-dispatch-macro-character #\# #\- 'sharp---reader)
-(set-dispatch-macro-character #\# #\- 'sharp---reader
-                              (si::standard-readtable))
-
-
-(defun lib-name (p)
-  (if (or (string= p "") (string= p "libc") (string= p "libm")) "" 
-    (string-concatenate p ".so")))
-				  
-(defun mdl (n p vad)
-  (let* ((sym (mdlsym n (lib-name p)))
-	 (ad (symbol-value sym))
-	 (adp (aref %init vad)))
-    (dladdr-set adp ad)
-    (dllist-push %memory sym adp)))
 

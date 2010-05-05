@@ -33,9 +33,6 @@
 ;;primarily be wrappers around computationally intensive internal
 ;;functions compiled with more aggressive settings. 20050718 CM
 
-;(eval-when (compile)
-;	   (proclaim '(optimize (safety 0) (space 3) (speed 3))))
-
 (defun type-of (object)
   (cond ((not object) 'null)
 	((eq object t) 'boolean)
@@ -53,27 +50,21 @@
 		  (class-of object))
 		 (tp))))))
 
-(defmacro dt-apply (x y) 
-  (let ((l (gensym))) 
-    `(let ((,l (length ,y))) 
-       (case ,l 
-	     (0 (funcall ,x)) 
-	     (1 (funcall ,x (car ,y))) 
-	     (2 (funcall ,x (car ,y) (cadr ,y))) 
-	     (otherwise (apply ,x ,y))))))
-
 (defun typep-int (object type &aux tp i tem)
   (if (atom type)
       (setq tp type i nil)
     (setq tp (car type) i (cdr type)))
-  (when (or (eq tp 'values) (and (eq tp 'function) i))
+  (when (and (eq tp 'function) i)
     (error "Bad type to typep: ~S" type))
   (if (eq tp 'structure-object) (setq tp 'structure))
-  (when (and (or (eq tp 'structure) (eq tp 'compiled-function)) (typep-int object 'standard-object))
+  (when (and (or (eq tp 'structure) (eq tp 'compiled-function)
+		 (eq tp 'old-compiled-function) (eq tp 'new-compiled-function)) 
+	     (typep-int object 'standard-object))
     (return-from typep-int nil))
   (let ((f (and (not i) (symbolp tp) (get tp 'type-predicate))))
     (when f (return-from typep-int (let ((z (funcall f object))) (when z t)))))
   (case tp
+	((values returns-exactly) (typep-int object (car i)))
 	(cons (and (consp object)
 		   (or (not i)
 		       (and (typep-int (car object) (car i))
@@ -124,12 +115,12 @@
 	      (or (endp i) (match-dimensions (array-dimensions object) i))))
 	((vector simple-vector)
 	 (and (vectorp object)
-	      (let ((at (upgraded-array-element-type (or (eq tp 'simple-vector) (car i) (if (eq tp 'vector) '* t)))))
+	      (let ((at (upgraded-array-element-type (cond ((eq tp 'simple-vector)) (i (car i)) ('*)))))
 		(or (eq at '*) (eq at (upgraded-array-element-type (array-element-type object)))))
 	      (or (not (cdr i)) (match-dimensions (array-dimensions object) (cdr i)))))
 	((array simple-array)
 	 (and (arrayp object)
-	      (let ((at (upgraded-array-element-type (or (car i) '*))))
+	      (let ((at (upgraded-array-element-type (if i (car i) '*))))
 		(or (eq at '*) (eq at (upgraded-array-element-type (array-element-type object)))))
 	      (or (not (cdr i)) (eq (cadr i) '*)
 		  (if (listp (cadr i))
@@ -141,7 +132,7 @@
 	    ((if (symbolp tp) (get tp 's-data) (typep-int tp 's-data))
 	     (let ((z (structure-subtype-p object tp))) (when z t)))
 	    ((setq tem (when (symbolp tp) (get tp 'deftype-definition)))
-	     (typep-int object (dt-apply tem i)))
+	     (typep-int object (apply tem i)))
 	    ((classp tp)
 	     (subtypep1 (class-of object) tp))))))
 
@@ -195,7 +186,7 @@
 
 
 (defun upgraded-complex-part-type (type &optional environment) 
-  (declare (ignore environment) (optimize (safety 2)) )
+  (declare (ignore environment) (optimize (safety 2)))
   type)
 
 (defun upgraded-array-element-type (type &optional environment)
@@ -215,6 +206,10 @@
 	   (not (cddr tp)))))
 
 ;;; COERCE function.
+(defconstant +coerce-list+ '(list vector string array character short-float
+				  long-float float complex function null cons))
+
+(declaim (notinline coerce));FIXME
 (defun coerce (object type)
   (declare (optimize (safety 2)))
   (check-type type (and (not null) type-spec))
@@ -263,8 +258,15 @@
   (let* ((p (find-package "COMPILER")) (s (and p (find-symbol "*NORM-TP-HASH*" p))))
     (when (and s (boundp s)) (remhash sym (symbol-value s)))))
 
+(defun satisfies-predicate (form)
+  (cond ((atom form) nil)
+	((consp (car form)) (when (null (cdr form)) (satisfies-predicate (car form))))
+	((eq (car form) 'quote) (satisfies-predicate (cadr form)))
+	((eq (car form) 'satisfies) (cadr form))))
+	
+
 ;;; DEFTYPE macro.
-(defmacro deftype (name lambda-list &rest body &aux decls prot)
+(defmacro deftype (name lambda-list &rest body &aux decls)
   ;; Replace undefaultized optional parameter X by (X '*).
   (declare (optimize (safety 2)))
   (do ((b body body)) ((or (not b) (not (consp (car b))) (not (eq 'declare (caar b)))) (nreverse decls))
@@ -274,35 +276,40 @@
   (do ((l lambda-list (cdr l))
        (m nil (cons (car l) m)))
       ((null l))
-      (cond ((member (car l) lambda-list-keywords)
-	     (unless (eq (car prot) '*) (push '* prot))
-	     (unless (member (car l) '(&optional &key)) (return nil))
-	     (setq m (cons (car l) m))
-	     (setq l (cdr l))
-	     (do ()
-		 ((or (null l) (member (car l) lambda-list-keywords)))
-		 (if (symbolp (car l))
-		     (setq m (cons (list (car l) ''*) m))
-		   (setq m (cons (car l) m)))
-		 (setq l (cdr l)))
-	     (setq lambda-list (nreconc m l))
-	     (return nil))
-	    ((push t prot))))
-  (let ((fun-name (gensym (string name))) (prot (nreverse prot)))
+      (when (member (car l) lambda-list-keywords)
+	(unless (member (car l) '(&optional &key)) (return nil))
+	(setq m (cons (car l) m))
+	(setq l (cdr l))
+	(do ()
+	    ((or (null l) (member (car l) lambda-list-keywords)))
+	    (if (symbolp (car l))
+		(setq m (cons (list (car l) ''*) m))
+	      (setq m (cons (car l) m)))
+	    (setq l (cdr l)))
+	(setq lambda-list (nreconc m l))
+	(return nil)))
+  (let ((fun-name (gensym (string name))))
     `(eval-when (compile eval load)
 		(putprop ',name
 			 '(deftype ,name ,lambda-list ,@body)
 			 'deftype-form)
-		(proclaim '(ftype (function ,prot t) ,fun-name))
 		(defun ,fun-name ,lambda-list ,@decls (block ,name ,@body))
 		(putprop ',name ',fun-name 'deftype-definition)
 		(maybe-clear-tp ',name)
 		(putprop ',name
 			 ,(find-documentation body)
 			 'type-documentation)
+		,@(let* ((r (unless lambda-list (eval (cons 'progn body))))
+			 (p (satisfies-predicate r)))
+		    (when p
+		      `((putprop ',name ',p 'type-predicate)
+			(putprop ',p ',name 'predicate-type))))
 		',name)))
 
 ;;; Some DEFTYPE definitions.
+
+(deftype hash-table nil `(or hash-table-eq hash-table-eql hash-table-equal hash-table-equalp))
+(deftype funcallable-symbol nil `(satisfies funcallable-symbol-p))
 
 (defconstant +ifb+ (- (car (last (multiple-value-list (si::heap-report))))))
 (defconstant +ifr+ (ash (- +ifb+)  -1))
@@ -416,7 +423,9 @@
   (and (characterp x) (not (standard-char-p x))))
 
 (defun improper-consp (s &optional (f nil fp))
-  (cond ((not fp) (cond ((atom s) nil) ((atom (cdr s)) (when (cdr s) t)) ((improper-consp (cdr s) (cddr s)))))
+  (cond ((not fp) (cond ((atom s) nil)
+			((atom (cdr s)) (when (cdr s) t))
+			((improper-consp (cdr s) (cddr s)))))
 	((atom f) f)
 	((atom (cdr f)) (when (cdr f) t))
 	((eq s f))
@@ -448,6 +457,9 @@
 (deftype function (&optional as vs) 
   (declare (ignore as vs)) 
   `(or interpreted-function compiled-function generic-function))
+(deftype compiled-function (&optional as vs) 
+  (declare (ignore as vs)) 
+  `(or new-compiled-function old-compiled-function))
 (deftype generic-function nil nil);Overwritten by pcl check
 
 (deftype integer (&optional (low '*) (high '*)) `(integer ,low ,high))
@@ -461,8 +473,6 @@
   `(array ,et ,(if (not dims) 0 dims)))
 
 (deftype eql (&optional (x nil xp)) (when xp `(member ,x)))
-
-(deftype cons-member () `(cons))
 
 (deftype boolean () `(member t nil))
 (deftype null () `(member nil))
@@ -593,48 +603,54 @@
           (pathname . pathnamep)
           (readtable . readtablep)
           (hash-table . hash-table-p)
+          (hash-table-eq . hash-table-eq-p)
+          (hash-table-eql . hash-table-eql-p)
+          (hash-table-equal . hash-table-equal-p)
+          (hash-table-equalp . hash-table-equalp-p)
           (random-state . random-state-p)
           (structure . structurep)
           (function . functionp)
-          (compiled-function . compiled-function-p)
+          (old-compiled-function . old-compiled-function-p)
+          (new-compiled-function . new-compiled-function-p)
           (common . commonp)))
 
 (dolist (l +type-alist+)
   (putprop (car l) (cdr l) 'type-predicate)
   (when (symbolp (cdr l)) 
-    (putprop (cdr l) (car l) 'predicate-type)
-;    (proclaim `(ftype (function (t) boolean) ,(cdr l)))
-))
+    (putprop (cdr l) (car l) 'predicate-type)))
 
 
 (defconstant +singleton-types+ '(non-keyword-symbol keyword standard-char
 				      non-standard-base-char 
-				      package cons-member proper-cons
+				      package cons
 				      broadcast-stream concatenated-stream echo-stream file-stream string-stream
 				      synonym-stream two-way-stream 
 				      non-logical-pathname logical-pathname
-				      readtable hash-table random-state standard-object structure 
+				      readtable 
+				      hash-table-eq hash-table-eql hash-table-equal hash-table-equalp
+				      random-state standard-object structure 
 				      interpreted-function
-				      compiled-function))
+				      new-compiled-function
+				      old-compiled-function))
 
 
 (defconstant +range-types+ `(integer ratio short-float long-float))
 
 (defconstant +array-types+ (si::aelttype-list))
-(defconstant +array-types-with-nil-for-ansi+ (append '(nil) +array-types+))
+;(defconstant +array-types+ (append '(nil) +array-types+))
 
 (deftype vector (&optional (element-type '* ep) size)
   (if ep 
       `(array ,element-type (,size))
-    `(or ,@(mapcar (lambda (x) `(array ,x (,size))) +array-types-with-nil-for-ansi+))))
+    `(or ,@(mapcar (lambda (x) `(array ,x (,size))) +array-types+))))
 
 (defconstant +known-types+ (append +range-types+ 
 				   (mapcar (lambda (x) `(complex ,x)) +range-types+)
 				   +singleton-types+
-				   (mapcar (lambda (x) `(array ,x)) +array-types-with-nil-for-ansi+)))
+				   (mapcar (lambda (x) `(array ,x)) +array-types+)))
 
 (defconstant +array-type-alist+ (mapcar (lambda (x) (cons x (intern (string-concatenate "ARRAY-" (string x)))))
-					+array-types-with-nil-for-ansi+))
+					+array-types+))
 (defconstant +complex-type-alist+ (mapcar (lambda (x) (cons x (intern (string-concatenate "COMPLEX-" (string x)))))
 					+range-types+))
 
@@ -721,10 +737,10 @@
 	     (setf (car (setq ,l (let ((,tmp (cons nil nil))) (if ,l (cdr (rplacd ,l ,tmp)) (setq ,r ,tmp))))) (car ,ind)))))))
 
 (defvar *tp-mod* 0)
-(eval-when (compile) (proclaim '(type (integer -1 1) *tp-mod*)))
+(eval-when (compile) (proclaim '(type (integer -1 1) *tp-mod*)));FIXME
 
 (defun tp-mod (x d)
-  (unless (or (not (ntp-ukn x)) (/= (abs *tp-mod*) 1))
+  (unless (or (not (ntp-ukn x)) (/= (let ((x *tp-mod*)) (if (>= x 0) x (- x))) 1))
     (if d (setf (ntp-tps x) nil (ntp-def x) (= *tp-mod* 1) (ntp-ukn x) nil)
       (setq x (if (= *tp-mod* 1) +tp-t+ +tp-nil+))))
   x)
@@ -923,7 +939,6 @@
 		     op atm
 		     (do ((y (cdr y) (cdr y)) (q q (cdr q))) 
 			 ((or (not y) (not q) (equal (car y) (car q))) (if (and y q) (eq op 'and) x)))
-			;		   (if (some 'equal (cdr y) q) (eq op 'and) x)
 		     (mapcar (lambda (x y) (if (funcall atm y) y x))
 			     (cdr y) q))))
 	       (if (funcall atm z) z 
@@ -948,12 +963,8 @@
 (defun elgt (x y)
   (cond ((or (eq (car x) '*) (eq (cdr y) '*)) nil)
 	((and (integerp (car x)) (integerp (cdr y))) (> (car x) (1+ (cdr y))))
-;	((and (integerp (range-num (car x))) 
-;	      (integerp (range-num (cdr y)))) (>= (range-num (car x)) (1+ (range-num (cdr y)))))
 	((and (listp (car x)) (listp (cdr y))) (>= (range-num (car x)) (range-num (cdr y))))
 	((> (range-num (car x)) (range-num (cdr y))))))
-;	((and (numberp (car x)) (numberp (cdr y))) (> (car x) (cdr y)))
-;	((>= (range-num (car x)) (range-num (cdr y))))))
 
 (defun elin (x y op)
   (cond ((eq x '*) y)
@@ -969,14 +980,22 @@
 	((funcall op (range-num x) (range-num y)) x)
 	(y)))
 
+(defun goodel (x y)
+  (cond ((eq x '*))
+	((eq y '*))
+	((let ((ax (range-num x))
+	       (ay (range-num y)))
+	   (or (< ax ay) (and (= ax ay) (atom x) (atom y)))))))
 
 (defun range-and (x y &optional res)
   (cond ((or (not x) (not y)) (nreverse res))
 	((elgt (car y) (car x)) (range-and (cdr x) y res))
 	((elgt (car x) (car y)) (range-and x (cdr y) res))
-	((let ((z (elin (cdar y) (cdar x) '<)))
-	   (range-and (if (equal z (cdar x)) (cdr x) x) (if (equal z (cdar y)) (cdr y) y) 
-		    (cons (cons (elin (caar x) (caar y) '>) z) res))))))
+	((let* ((w (elin (caar x) (caar y) '>))
+		(z (elin (cdar y) (cdar x) '<))
+		(zy (eq (cdar y) z))
+		(nr (if (goodel w z) (cons (cons w z) res) res)))
+	   (range-and (if zy x (cdr x)) (if zy (cdr y) y) nr)))))
 
 (defun maybe-or-push (x res)
   (cond ((not res) (list x))
@@ -1075,16 +1094,16 @@
 
 (defun array-load (ntp type)
   (let* ((z (cadr type))
-	 (z (if (eq z '*) z (car (member z +array-types-with-nil-for-ansi+)))))
+	 (z (if (eq z '*) z (car (member z +array-types+)))))
     (unless (or z (not (cadr type))) (error "Bad array type ~a~%" (cadr type)))
     (let* ((dim (caddr type))
 	   (dim (cond ((eq dim '*) t)
 		      ((integerp dim) (if (= 0 dim) dim (make-list dim :initial-element t)))
-		      ((listp dim) (let (r) (dolist (d dim (nreverse r)) (push (if (eq d '*) t d) r)))))))
-      (if (eq z '*)
-	  (dolist (l +array-type-alist+)
-	    (ntp-ld ntp `(,(cdr l) ,(when z dim))))
-	(ntp-ld ntp `(,(cdr (assoc z +array-type-alist+)) ,dim))))))
+		      ((listp dim) (substitute t '* dim)))))
+      (cond ((eq z '*) 
+	     (dolist (l +array-type-alist+)
+	       (ntp-ld ntp `(,(cdr l) ,(when z dim)))))
+	    (z (ntp-ld ntp `(,(cdr (assoc z +array-type-alist+)) ,dim)))))))
   
 (defun array-atm (x)
   (cond ((atom x))
@@ -1100,13 +1119,13 @@
 	((and (integerp x) (integerp y)) (when (= x y) x))
 	((integerp x) (when (and (consp y) (= x (length y))) y))
 	((integerp y) (array^ y x))
-	((and (consp x) (eq (car x) 'member))
-	 (let ((y (cond ((and (consp y) (eq (car y) 'member)) y)
-			((eq y t) `(array * *))
-			((and (consp y) (member t y)) `(array * ,(substitute '* t y)))
-			(`(array * ,y)))))
-	   (let ((q (lremove-if-not (lambda (z) (typep-int z y)) (cdr x))))
-	   (when q `(member ,@q)))))
+	((and (eq (car x) 'member) (eq (car y) 'member))
+	 (let ((q (ordered-intersection-eq (cdr x) (cdr y))))
+	   (when q `(member ,@q))))
+	((eq (car x) 'member)
+	 (let* ((y (substitute '* t y))
+		(q (lremove-if-not (lambda (x) (match-dimensions (array-dimensions x) y)) (cdr x))))
+	   (when q `(member ,@q))))
 	((and (consp y) (eq (car y) 'member)) (array^ y x))
 	((/= (length x) (length y)) nil)
 	((mapcar 'array^ x y))))
@@ -1117,10 +1136,14 @@
 	      ((and or) (sigalg-op op (cadr x) (cadr y) 'array^ 'array-atm))
 	      (not (negate (cadr x))))))
 
-(defun array-recon (x) 
-  `(array ,(car (rassoc (car x) +array-type-alist+)) 
-	  ,(cond ((eq (cadr x) t) '*) ((atom (cadr x)) (cadr x)) 
-		 ((mapcar (lambda (x) (if (eq x t) '* x)) (cadr x))))))
+(defun array-recon (x &aux (tp (pop x))(x (car x))) 
+  (cond ((not (array-atm x))
+	 (cons 'or (mapcar (lambda (z) (array-recon `(,tp ,z))) (cdr x))))
+	((and (consp x) (eq (car x) 'member) x))
+	(`(array ,(car (rassoc tp +array-type-alist+)) 
+		 ,(cond ((eq x t) '*)
+			((atom x) x) 
+			((substitute '* t x)))))))
 
 ;; STRUCTURES
 
@@ -1196,9 +1219,6 @@
 	((member x (class-precedence-list y)) y)
 	((reduce (lambda (&rest xy) (when xy (standard^ (car xy) (cadr xy))))
 		 (ordered-intersection-eq (class-direct-subclasses x) (class-direct-subclasses y))))))
-;	((reduce (lambda (&rest xy) (when xy (standard^ (car xy) (cadr xy))))
-;		 (intersection (class-direct-subclasses x) (class-direct-subclasses y)
-;				 :test 'standard^)))))
 
 (defun standard-op (op x y)
   (setf (cadr x)
@@ -1206,7 +1226,6 @@
 	      ((and or) (sigalg-op op (cadr x) (cadr y) 'standard^ 'standard-atm))
 	      (not (negate (cadr x))))))
 
-;(defun standard-recon (x) (let ((z (cadr x))) (if (eq z t) (or (find-class 'standard-object) 'standard-object) z)))
 (defun standard-recon (x)
   (let ((z (or (find-class (car x)) (car x))))
     (cond ((eq (cadr x) t) z)
@@ -1216,6 +1235,7 @@
 (defun ntp-load (type &aux tem)
   (let ((ntp (make-ntp)))
     (cond ((eq (car type) t) (ntp-not ntp))
+	  ((eq (car type) 'proper-cons) (ntp-ld ntp (list 'cons 'proper-cons)))
 	  ((setq tem (cdr (assoc (car type) +kindom-load-ops-alist+)))
 	   (funcall tem ntp type))
 	  ((setq tem (coerce-to-standard-class (car type)))
@@ -1229,32 +1249,25 @@
 		 (when z
 		   (setq els (set-difference els z))
 		   (let* ((z (cond ((member l +range-types+)
-				    (reduce 'range-or (mapcar (lambda (x) (number-range-fixup `((,x . ,x)) l)) z)))
+				    (reduce 'range-or
+					    (mapcar
+					     (lambda (x) 
+					       (number-range-fixup `((,x . ,x)) l)) z)))
 				   ((and (consp l) (eq (car l) 'complex))
-				    (let ((q (reduce 'range-or (mapcar (lambda (x) (let ((q (realpart x))(r (imagpart x)))
-									    (number-range-fixup `((,(min q r) . ,(max q r))) (cadr l)))) z))))
+				    (let ((q (reduce 'range-or
+						     (mapcar 
+						      (lambda (x) 
+							(let ((q (realpart x))(r (imagpart x)))
+							  (number-range-fixup
+							   `((,(min q r) . ,(max q r)))
+							   (cadr l)))) z))))
 				      (cons q q)))
-;				    (cons
-;				     (reduce 'range-or (mapcar (lambda (x) (let ((q (realpart x))) 
-;									     (number-range-fixup `((,q . ,q)) (cadr l)))) z))
-;				     (reduce 'range-or (mapcar (lambda (x) (let ((q (imagpart x))) 
-;									     (number-range-fixup `((,q . ,q)) (cadr l)))) z))))
 				   (`(member ,@z))))
 			  (lst (and (consp l) (if (eq (car l) 'array) +array-type-alist+ +complex-type-alist+)))
 			  (z (and z `(,(if lst (cdr (assoc (cadr l) lst)) l) ,z))))
 		     (ntp-ld ntp z)))))
-	     (let ((z (lremove-if-not (lambda (x) (typep-int x 'complex)) els)))
-	       (when z
-		 (setq els (set-difference els z))
-		 (dolist (el z)
-		   (let* ((rt (car (member (realpart el) +range-types+ :test 'typep-int)))
-			  (it (car (member (imagpart el) +range-types+ :test 'typep-int)))
-			  (zr (let ((q (realpart el)))  (number-range-fixup `((,q . ,q)) rt)))
-			  (zi (let ((q (imagpart el)))  (number-range-fixup `((,q . ,q)) it))))
-		     (ntp-ld ntp `(,(cdr (assoc rt +complex-type-alist+)) (,zr . nil)))
-		     (ntp-ld ntp `(,(cdr (assoc it +complex-type-alist+)) (nil . ,zi)))))))
 	     (when els (let ((ntp (ntp-not ntp))) (setf (ntp-ukn ntp) t)))))
-	  ((car type) (let ((ntp (ntp-not ntp))) (setf (ntp-ukn ntp) t)))) ;(format t  "not processing type ~a~%" type)
+	  ((car type) (let ((ntp (ntp-not ntp))) (setf (ntp-ukn ntp) t))))
     ntp))
 
 (defun nprocess-type (type)
@@ -1266,142 +1279,6 @@
    ((eq (car type) 'not)  (ntp-not (nprocess-type (cadr type))))
    ((ntp-load type))))
 
-;; CONS
-
-(defun cons-load (ntp type)
-  (ntp-ld ntp `(cons (,(nprocess-type (cadr type)) . ,(nprocess-type (caddr type))))))
-
-(defun cons-atm (x)
-  (cond ((not x))
-	((eq x t))
-	((and (consp x) 
-	      (consp (car x)) (listp (caar x)) (= (length (car x)) 3)
-	      (consp (cdr x)) (listp (cadr x)) (= (length (cdr x)) 3)))))
-
-(defun ntp-to-nil (ntp)
-  (when (or (ntp-tps ntp) (ntp-def ntp))
-    ntp))
-
-(defun cons-to-nil (cntp)
-  (let* ((at (or (atom cntp) (not (cons-atm cntp))))
-	 (car (or at (atom (car cntp)) (ntp-to-nil (car cntp))))
-	 (cdr (or at (atom (cdr cntp)) (ntp-to-nil (cdr cntp)))))
-    (and car cdr cntp)))
-
-(defun cons^ (x y)
-  (cond ((eq x t) y)
-	((eq y t) x)
-	((and x y)
-	 (let ((ax (copy-tree (car x)))
-	       (dx (copy-tree (cdr x))))
-	   (cons-to-nil
-	    (cons (ntp-and ax (car y))
-		  (ntp-and dx (cdr y))))))))
-
-(defun cons-op (op x y)
-  (setf (cadr x)
-	(case op
-	      ((and or) (cons-to-nil (sigalg-op op (cadr x) (cadr y) 'cons^ 'cons-atm)))
-	      (not
-	       (cond ((not (cadr x)))
-		     ((eq (cadr x) t) nil)
-		     ((cons-atm (cadr x))
-		      (let ((car (ntp-to-nil (ntp-not (copy-tree (caadr x)))));FIXME
-			    (cdr (ntp-to-nil (ntp-not (copy-tree (cdadr x))))))
-			(cond ((and car cdr) 
-			       (cons-to-nil 
-				(sigalg-op 'or `(,car . ,(nprocess-type '(t))) 
-					   `(,(nprocess-type '(t)) . ,cdr) 'cons^ 'cons-atm)))
-			      (car (cons car (nprocess-type '(t))))
-			      (cdr (cons (nprocess-type '(t)) cdr)))))
-		     (t (reduce (lambda (&rest xy) 
-				 (when xy 
-				   (cons-to-nil
-				    (sigalg-op 
-				     (if (eq (caadr x) 'or) 'and 'or) (car xy) (cadr xy) 'cons^ 'cons-atm))))
-				(mapcar (lambda (x) (cons-op 'not `(cons ,x) nil)) (cdadr x)))))))));  nil)))))
-
-(defun prune-type (z q i w) ;FIXME optional tail recursion
-  (declare (seqind i))
-  (cond ((= i (length +array-type-alist+))
-	 (setf (cadar q) '*)
-	 (ldelete-if (lambda (y) (unless (eq y (car q)) (and (consp y) (eq (car y) 'array)))) z))
-	((not w) z)
-	((or (atom (car w)) (not (eq (caar w) 'array))) (prune-type z q i (cdr w)))
-	((not q) (prune-type z w (1+ i) (cdr w)))
-	((equal (caddar w) (caddar q)) (prune-type z q (1+ i) (cdr w)))
-	(z)))
-
-(defun nreconstruct-type-int (x)
-  (if (ntp-ukn x) t
-    (if (ntp-def x)
-	(let ((z (nreconstruct-type-int (ntp-not x))))
-	  (or (not z) `(not ,z)))
-      (let* ((z (lremove-if 
-		 'not 
-		 (mapcar (lambda (x)
-			   (let ((op (cdr (assoc (car x) +kindom-recon-ops-alist+))))
-			     (funcall op x))) (ntp-tps x))))
-	     (z (prune-type z nil 0 z)))
-	(if (cdr z) `(or ,@z) (car z))))))
-
-(defun last-cdr-null-p (x)
-  (cond ((atom x) nil)
-	((and (eq (car x) 'cons) (equal (caddr x) '(member nil))) t)
-	((eq (car x) 'cons) (last-cdr-null-p (caddr x)))))
-
-(defun cons-recon (x)
-  (cond ((eq t (cadr x)) `(cons t t))
-	((atom (cadr x)) nil)
-	((cons-atm (cadr x))
-	 (let ((car (nreconstruct-type-int (copy-tree (caadr x))));FIXME
-	       (cdr (nreconstruct-type-int (copy-tree (cdadr x)))))
-	   (and car cdr (if (and (eq car t) (eq cdr 'proper-cons)) cdr `(cons ,car ,cdr)))))
-	((eq (caadr x) 'or)
-	 (let* ((z (remove-duplicates (lremove-if 'not (mapcar (lambda (x) (cons-recon `(cons ,x))) (cdadr x)))))
-		(z (if (member 'proper-cons z) (lremove-if 'last-cdr-null-p z) z)))
-	   (if (cdr z) `(or ,@z) (car z))))
-	((error "Bad cons recon~%"))))
-
-
-(defun nreconstruct-type (x)
-  (list (nreconstruct-type-int x) (ntp-ukn x)))
-
-
-(defun copy-type (type res)
-  (cond ((atom type) (nreverse res))
-	((consp (car type)) (copy-type (cdr type) (cons (copy-type (car type) nil) res)))
-	((member (car type) '(member eql)) type)
-	((copy-type (cdr type) (cons (car type) res)))))
-
-(defun expand-proper-cons (tp lt)
-  (cond ((atom tp))
-	((equal (car tp) '(proper-cons)) (setf (car tp) `(or (cons (t) (member nil)) (cons (t) (proper-cons)) ,@lt)))
-	((eq (car tp) 'cons))
-	((and (expand-proper-cons (car tp) lt) (expand-proper-cons (cdr tp) lt)))))
-
-(defun distribute-complex (type)
-  (cond ((atom type) type)
-	((consp (car type)) (cons (distribute-complex (car type)) (distribute-complex (cdr type))))
-	((member (car type) '(and or not)) (cons (car type) (distribute-complex (cdr type))))
-	(`(complex ,type))))
-
-(defmacro maybe-eval (x) `(if (and (consp ,x) (eq (car ,x) 'load-time-value)) (eval (cadr ,x)) ,x))
-
-(defun proper-cons-tp (tp end)
-  (cond ((eq (car tp) 'cons) (cons 'cons (list '(t) (proper-cons-tp (caddr tp) end))))
-	(end)))
-
-(defun list-types (tp &optional r)
-  (cond ((atom tp) r)
-	((consp (car tp)) (let ((r (list-types (car tp) r))) (list-types (cdr tp) r)))
-	((eq (car tp) 'cons) 
-	 (pushnew (proper-cons-tp tp '(proper-cons)) r :test 'equal)
-	 (pushnew (proper-cons-tp tp '(member nil)) r :test 'equal)
-	 (list-types (cdr tp) r))
-	((list-types (cdr tp) r))))
-
-;;FIXME loose the ar and default to t
 (defun normalize-type-int (type ar &aux tem)
   (cond ((atom type) (normalize-type-int (list type) ar))
 	;;These are deftype accelerators  FIXME may no longer be necessary with faster deftype
@@ -1442,8 +1319,9 @@
 	((setq tem (coerce-to-standard-class (car type))) (if (eq (car type) tem) type `(,tem ,@(cdr type))))
 	((classp (car type)) (normalize-type-int `(,(class-name (car type)) ,@(cdr type)) ar))
 	((and (not (cdr type)) (member (car type) +singleton-types+)) type)
-        ((and (eq (car type) 'satisfies) 
-	      (setq tem (get (cadr type) 'predicate-type)))
+	((and (eq (car type) 'satisfies) 
+	      (setq tem (get (cadr type) 'predicate-type))
+	      (or (not (symbolp tem)) (not (eq (get tem 'type-predicate) (cadr type)))))
 	 (normalize-type-int tem ar))
 	((let* ((dt (and (symbolp (car type)) 
 			 (get (car type) 'deftype-definition)))
@@ -1451,7 +1329,7 @@
 			(mapcar (lambda (x) (if (and (consp x) (eq (car x) 'load-time-value)) (eval (cadr x)) x))
 				(cdr type))
 		      (cdr type)))
-		(nt (and dt (or (dt-apply dt rr) '(nil)))))
+		(nt (and dt (or (apply dt rr) '(nil)))))
 	   (when (and nt (not (equal type nt)))
 	     (normalize-type-int nt ar))))
 	((member (car type) '(and or not))
@@ -1463,11 +1341,190 @@
 	(type)))
 
 (defun normalize-type (tp &optional ar);FIXME
-  (let* ((tp (normalize-type-int tp ar))
-	 (lt (list-types tp)))
-    (when lt (expand-proper-cons tp lt))
-    tp))
+  (normalize-type-int tp ar))
 
+;; CONS
+
+(defun cons-load (ntp type)
+  (ntp-ld ntp `(cons (,(nprocess-type (cadr type)) . ,(nprocess-type (caddr type))))))
+
+(defun cons-atm (x)
+  (cond ((not x))
+	((eq x t))
+	((eq x 'proper-cons))
+	((eq (car x) 'not) (cons-atm (cadr x)))
+	((and (consp x) (eq (car x) 'member)))
+	((and (consp x) 
+	      (consp (car x)) (listp (caar x)) (= (length (car x)) 3)
+	      (consp (cdr x)) (listp (cadr x)) (= (length (cdr x)) 3)))))
+
+(defun ntp-to-nil (ntp)
+  (when (or (ntp-tps ntp) (ntp-def ntp))
+    ntp))
+
+(defun cons-to-nil (cntp)
+  (let* ((at (or (atom cntp) (not (cons-atm cntp)) (eq (car cntp) 'member)))
+	 (car (or at (atom (car cntp)) (ntp-to-nil (car cntp))))
+	 (cdr (or at (atom (cdr cntp)) (ntp-to-nil (cdr cntp)))))
+    (and car cdr cntp)))
+
+(defun cons^ (x y)
+  (cond ((eq x t) y)
+	((eq y t) x)
+	((not (and x y)) nil)
+	((and (eq x 'proper-cons) (eq y 'proper-cons)) x)
+	((and (eq x 'proper-cons) (eq (car y) 'member))
+	 (let ((q (lremove-if-not 'proper-consp (cdr y))))
+	   (when q `(member ,@q))))
+	((eq x 'proper-cons)
+	 (cons-to-nil
+	  (cons
+	   (copy-tree (car y))
+	   (ntp-and (copy-tree (cdr y)) '(((non-keyword-symbol (member nil)) (cons proper-cons)) nil nil)))));FIXME
+	((eq y 'proper-cons)
+	 (cons^ y x))
+	((and (eq (car x) 'member) (eq (car y) 'member))
+	 (let ((q (ordered-intersection-eq (cdr x) (cdr y))))
+	   (when q `(member ,@q))))
+	((eq (car x) 'member)
+	 (let ((q (lremove-if-not
+		   (lambda (x) 
+		     (cons^ (cons (ntp-load `(member ,(car x))) 
+				  (ntp-load `(member ,(cdr x)))) y)) (cdr x))))
+	   (when q `(member ,@q))))
+	((eq (car y) 'member) (cons^ y x))
+	((and x y)
+	 (let ((ax (copy-tree (car x)))
+	       (dx (copy-tree (cdr x))))
+	   (cons-to-nil
+	    (cons (ntp-and ax (car y))
+		  (ntp-and dx (cdr y))))))))
+
+(defun cons-op (op x y &aux (w (cadr x)))
+  (setf (cadr x)
+	(case op
+	      ((and or) (cons-to-nil (sigalg-op op w (cadr y) 'cons^ 'cons-atm)))
+	      (not
+	       (cond ((not w))
+		     ((eq w t) nil)
+		     ((eq w 'proper-cons) (negate w))
+		     ((eq (car w) 'member) (negate w))
+		     ((eq (car w) 'not) (cadr w))
+		     ((cons-atm w)
+		      (let ((car (ntp-to-nil (ntp-not (copy-tree (car w)))));FIXME
+			    (cdr (ntp-to-nil (ntp-not (copy-tree (cdr w))))))
+			(cond ((and car cdr) 
+			       (cons-to-nil 
+				(sigalg-op 'or `(,car . ,(nprocess-type '(t))) 
+					   `(,(nprocess-type '(t)) . ,cdr) 'cons^ 'cons-atm)))
+			      (car (cons car (nprocess-type '(t))))
+			      (cdr (cons (nprocess-type '(t)) cdr)))))
+		     (t (reduce (lambda (zx zy) 
+				  (cons-to-nil
+				   (sigalg-op 
+				    (if (eq (car w) 'or) 'and 'or) zx zy 'cons^ 'cons-atm)))
+				(mapcar (lambda (x) (cons-op 'not `(cons ,x) nil)) (cdr w))
+				:initial-value (eq (car w) 'or))))))))
+
+(defun prune-type (z q i w) ;FIXME optional tail recursion
+  (declare (seqind i))
+  (cond ((= i (length +array-type-alist+))
+	 (setf (cadar q) '*)
+	 (ldelete-if (lambda (y) (unless (eq y (car q)) (and (consp y) (eq (car y) 'array)))) z))
+	((not w) z)
+	((or (atom (car w)) (not (eq (caar w) 'array))) (prune-type z q i (cdr w)))
+	((not q) (prune-type z w (1+ i) (cdr w)))
+	((equal (caddar w) (caddar q)) (prune-type z q (1+ i) (cdr w)))
+	(z)))
+
+(defun nreconstruct-type-int (x)
+  (if (ntp-ukn x) t
+    (if (ntp-def x)
+	(let ((z (nreconstruct-type-int (ntp-not x))))
+	  (or (not z) `(not ,z)))
+      (let* ((z (lremove-if 
+		 'not 
+		 (mapcar (lambda (x)
+			   (let ((op (cdr (assoc (car x) +kindom-recon-ops-alist+))))
+			     (funcall op x))) (ntp-tps x))))
+	     (z (prune-type z nil 0 z)))
+	(if (cdr z) `(or ,@z) (car z))))))
+
+;; (defun last-cdr-null-p (x)
+;;   (cond ((atom x) nil)
+;; 	((and (eq (car x) 'cons) (equal (caddr x) '(member nil))) t)
+;; 	((eq (car x) 'cons) (last-cdr-null-p (caddr x)))))
+
+(defun cons-recon (x &aux (w (cadr x)))
+  (cond ((eq t w) `(cons t t))
+	((eq w 'proper-cons) w)
+	((atom w) nil)
+	((eq (car w) 'member) w)
+	((eq (car w) 'not) `(not ,(cons-recon `(cons ,(cadr w)))))
+	((cons-atm w)
+	 (let ((car (nreconstruct-type-int (copy-tree (car w))));FIXME
+	       (cdr (nreconstruct-type-int (copy-tree (cdr w)))))
+	   (and car cdr (if (and (eq car t) 
+				 (or (eq cdr 'proper-cons)
+				     (equal cdr '(or (member nil) proper-cons))
+				     (equal cdr '(or proper-cons (member nil)))));FIXME
+			    'proper-cons `(cons ,car ,cdr)))))
+	((let* ((z (lremove-if 'not (mapcar (lambda (x) (cons-recon `(cons ,x))) (cdr w)))))
+	   (if (cdr z) `(,(car w) ,@z) (car z))))))
+
+
+(defun nreconstruct-type (x)
+  (list (nreconstruct-type-int x) (ntp-ukn x)))
+
+
+;; (defun copy-type (type res)
+;;   (cond ((atom type) (nreverse res))
+;; 	((consp (car type)) (copy-type (cdr type) (cons (copy-type (car type) nil) res)))
+;; 	((member (car type) '(member eql)) type)
+;; 	((copy-type (cdr type) (cons (car type) res)))))
+
+;; (defun expand-proper-cons (tp lt)
+;;   (cond ((atom tp))
+;; 	((equal (car tp) '(proper-cons)) (setf (car tp) `(or (cons (t) (member nil)) (cons (t) (proper-cons)) ,@lt)))
+;; ;	((eq (car tp) 'cons))
+;; 	((eq (car tp) 'cons) (expand-proper-cons (cddr tp) lt))
+;; 	((and (expand-proper-cons (car tp) lt) (expand-proper-cons (cdr tp) lt)))))
+
+(defun distribute-complex (type)
+  (cond ((atom type) type)
+	((consp (car type)) (cons (distribute-complex (car type)) (distribute-complex (cdr type))))
+	((member (car type) '(and or not)) (cons (car type) (distribute-complex (cdr type))))
+	(`(complex ,type))))
+
+(defmacro maybe-eval (x) `(if (and (consp ,x) (eq (car ,x) 'load-time-value)) (eval (cadr ,x)) ,x))
+
+;; (defun proper-cons-tp (tp end)
+;;   (cond ((eq (car tp) 'cons) (cons 'cons (list '(t) (proper-cons-tp (caddr tp) end))))
+;; 	(end)))
+
+;; (defun cons-to-tp (c)
+;;   (cond ((consp c) (cons 'cons (list '(t) (cons-to-tp (cdr c)))))
+;; 	(c '(t))
+;; 	(`(member nil))))
+
+;; (defun list-types (tp &optional r)
+;;   (cond ((atom tp) r)
+;; 	((consp (car tp)) (let ((r (list-types (car tp) r))) (list-types (cdr tp) r)))
+;; 	((or (eq (car tp) 'member) (eq (car tp) 'eql))
+;; 	 (mapc (lambda (x) (when (consp x) (pushnew (cons-to-tp x) r :test 'equal))) (cdr tp))
+;; 	 r)
+;; 	((eq (car tp) 'cons) 
+;; 	 (pushnew (proper-cons-tp tp '(proper-cons)) r :test 'equal)
+;; 	 (pushnew (proper-cons-tp tp '(member nil)) r :test 'equal)
+;; 	 (list-types (cdr tp) r))
+;; 	((list-types (cdr tp) r))))
+
+;;FIXME loose the ar and default to t
+
+;; (let* ((tp )
+;; 	 (lt (list-types tp)))
+;;     (when lt (expand-proper-cons tp lt))
+;;     tp))
 
 (defun resolve-type (type)
   (nreconstruct-type (nprocess-type (normalize-type type t))))

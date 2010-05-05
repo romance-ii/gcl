@@ -41,8 +41,6 @@
 (in-package 'system)
 
 
-;(proclaim '(optimize (safety 2) (space 3)))
-
 (defun best-array-element-type (type)
   (cond ((not type) nil)
 	((eq type '*) '*)
@@ -75,7 +73,7 @@
 		      (i 0 (1+ i)))
 		     ((>= i n))
 		   (declare (fixnum n i))
-		   (si:aset x i (elt initial-contents i))))
+		   (si:aset (elt initial-contents i) x i)))
 	   x))
         (t
 	 (let ((x
@@ -219,7 +217,7 @@
   (check-type vector fpvec)
   (let ((fp (fill-pointer vector)))
     (cond ((< fp (array-dimension vector 0))
-           (si:aset vector fp new-element)
+           (si:aset new-element vector fp)
            (si:fill-pointer-set vector (1+ fp))
 	   fp))))
 
@@ -233,7 +231,7 @@
       (adjust-array vector (the seqind (+ dim (or extension (max 5 dim))))
 		    :element-type (array-element-type vector)
 		    :fill-pointer fp))
-    (si:aset vector fp new-element)
+    (si:aset new-element vector fp)
     (si:fill-pointer-set vector (1+ fp))
     fp))
 

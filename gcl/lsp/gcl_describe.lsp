@@ -31,9 +31,6 @@
 (in-package 'system)
 
 
-;(proclaim '(optimize (safety 2) (space 3)))
-
-
 (defvar *inspect-level* 0)
 (defvar *inspect-history* nil)
 (defvar *inspect-mode* nil)

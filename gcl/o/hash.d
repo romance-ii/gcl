@@ -657,16 +657,12 @@ print_hash_table (object ht,char *procedure_name) {
 }
 */
 
-@(defun make_hash_table (&key (test sLeql)
-			 (size `make_fixnum(1024)`)
-			 (rehash_size
-			  `make_shortfloat((shortfloat)1.5)`)
-			 (rehash_threshold
-			  `make_shortfloat((shortfloat)0.7)`)
-			 &aux h)
+DEFUN_NEW("MAKE-HASH-TABLE-INT",object,fSmake_hash_table_int,SI,4,4,NONE,OO,OO,OO,OO,
+	  (object test,object size,object rehash_size,object rehash_threshold),"") {
+
   enum httest htt=0;
   fixnum i,max_ent,err;
-@
+  object h;
 
   if (test == sLeq || test == sLeq->s.s_gfdef)
      htt = htt_eq;
@@ -732,7 +728,7 @@ print_hash_table (object ht,char *procedure_name) {
   {
     BEGIN_NO_INTERRUPT;
     h = alloc_object(t_hashtable);
-    h->ht.ht_test = (short)htt;
+    h->ht.tt=h->ht.ht_test = (short)htt;
     h->ht.ht_size = fix(size);
     h->ht.ht_rhsize = rehash_size;
     h->ht.ht_rhthresh = rehash_threshold;
@@ -747,129 +743,166 @@ print_hash_table (object ht,char *procedure_name) {
     }
     END_NO_INTERRUPT;
   }
+  RETURN1(h);
+}
+
+@(defun make_hash_table (&key (test sLeql)
+			 (size `make_fixnum(1024)`)
+			 (rehash_size
+			  `make_shortfloat((shortfloat)1.5)`)
+			 (rehash_threshold
+			  `make_shortfloat((shortfloat)0.7)`)
+			 &aux h)
+@
+  h=FFN(fSmake_hash_table_int)(test,size,rehash_size,rehash_threshold);
   @(return h)
 @)
 
-LFD(Lhash_table_p)(void)
-{
-	check_arg(1);
-
-	if(type_of(vs_base[0]) == t_hashtable)
-		vs_base[0] = Ct;
-	else   
-		vs_base[0] = Cnil;
+DEFUN_NEW("HASH-TABLE-P",object,fLhash_table_p,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x)==t_hashtable ? Ct : Cnil);
 }
 
-LFD(Lgethash)()
-{
-	int narg;
-	struct htent *e;
+DEFUN_NEW("HASH-TABLE-EQ-P",object,fShash_table_eq_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x)==t_hashtable && x->ht.ht_test==htt_eq ? Ct : Cnil);
+}
+
+DEFUN_NEW("HASH-TABLE-EQL-P",object,fShash_table_eql_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x)==t_hashtable && x->ht.ht_test==htt_eql  ? Ct : Cnil);
+}
+
+DEFUN_NEW("HASH-TABLE-EQUAL-P",object,fShash_table_equal_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x)==t_hashtable && x->ht.ht_test==htt_equal  ? Ct : Cnil);
+}
+
+DEFUN_NEW("HASH-TABLE-EQUALP-P",object,fShash_table_equalp_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x)==t_hashtable && x->ht.ht_test==htt_equalp  ? Ct : Cnil);
+}
+
+DEFUNM_NEW("GETHASH",object,fLgethash,LISP,2,3,NONE,OO,OO,OO,OO,(object x,object y,...),"") {
+
+  fixnum nargs=INIT_NARGS(2),vals=(fixnum)fcall.valp;
+  object *base=vs_top,l=Cnil,f=OBJNULL,z;
+  va_list ap;
+  struct htent *e;
+
+  check_type_hash_table(&y);
+  e=gethash(x,y);
+  if (e->hte_key != OBJNULL)
+    RETURN2(e->hte_value,Ct);
+  else {
+    va_start(ap,y);
+    z=NEXT_ARG(nargs,ap,l,f,Cnil);
+    va_end(ap);
+    RETURN2(z,Cnil);
+  }
+
+}
+  
+/* /\* LFD(Lgethash)() *\/ */
+/* /\* { *\/ */
+/* 	int narg; */
+/* 	struct htent *e; */
 	
-	narg = vs_top - vs_base;
-	if (narg < 2)
-		too_few_arguments();
-	else if (narg == 2)
-		vs_push(Cnil);
-	else if (narg > 3)
-		too_many_arguments();
-	check_type_hash_table(&vs_base[1]);
-	e = gethash(vs_base[0], vs_base[1]);
-	if (e->hte_key != OBJNULL) {
-		vs_base[0] = e->hte_value;
-		vs_base[1] = Ct;
-	} else {
-		vs_base[0] = vs_base[2];
-		vs_base[1] = Cnil;
-	}
-	vs_popp;
-}
+/* 	narg = vs_top - vs_base; */
+/* 	if (narg < 2) */
+/* 		too_few_arguments(); */
+/* 	else if (narg == 2) */
+/* 		vs_push(Cnil); */
+/* 	else if (narg > 3) */
+/* 		too_many_arguments(); */
+/* 	check_type_hash_table(&vs_base[1]); */
+/* 	e = gethash(vs_base[0], vs_base[1]); */
+/* 	if (e->hte_key != OBJNULL) { */
+/* 		vs_base[0] = e->hte_value; */
+/* 		vs_base[1] = Ct; */
+/* 	} else { */
+/* 		vs_base[0] = vs_base[2]; */
+/* 		vs_base[1] = Cnil; */
+/* 	} */
+/* 	vs_popp; */
+/* } */
 
-LFD(siLhash_set)()
-{
-	check_arg(3);
+DEFUN_NEW("HASH-SET",object,fShash_set,SI,3,3,NONE,OO,OO,OO,OO,(object x,object y,object z),"") {
+/* LFD(siLhash_set)() */
+/* { */
+/* 	check_arg(3); */
 
-	check_type_hash_table(&vs_base[1]);
-	sethash(vs_base[0], vs_base[1], vs_base[2]);
-	vs_base += 2;
+  check_type_hash_table(&y);
+  sethash(x,y,z);
+  RETURN1(z);
+/* 	vs_base += 2; */
 }
  	
-LFD(Lremhash)()
-{
-	struct htent *e;
+DEFUN_NEW("REMHASH",object,fLremhash,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
 
-	check_arg(2);
-	check_type_hash_table(&vs_base[1]);
-	e = gethash(vs_base[0], vs_base[1]);
-	if (e->hte_key != OBJNULL) {
-		e->hte_key = OBJNULL;
-		e->hte_value = Cnil;
-		vs_base[1]->ht.ht_nent--;
-		vs_base[0] = Ct;
-	} else
-		vs_base[0] = Cnil;
-	vs_top = vs_base + 1;
+  struct htent *e;
+  
+  check_type_hash_table(&y);
+  e = gethash(x,y);
+  if (e->hte_key != OBJNULL) {
+    e->hte_key = OBJNULL;
+    e->hte_value = Cnil;
+    y->ht.ht_nent--;
+    RETURN1(Ct);
+  } else
+    RETURN1(Cnil);
+
 }
 
-LFD(Lclrhash)()
-{
-	int i;
+DEFUN_NEW("CLRHASH",object,fLclrhash,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
-	check_arg(1);
-	check_type_hash_table(&vs_base[0]);
-	for(i = 0; i < vs_base[0]->ht.ht_size; i++) {
-		vs_base[0]->ht.ht_self[i].hte_key = OBJNULL;
-		vs_base[0]->ht.ht_self[i].hte_value = OBJNULL;
-	}
-	vs_base[0]->ht.ht_nent = 0;
+  int i;
+  
+  check_type_hash_table(&x);
+  for(i = 0; i < x->ht.ht_size; i++) {
+    x->ht.ht_self[i].hte_key = OBJNULL;
+    x->ht.ht_self[i].hte_value = OBJNULL;
+  }
+  x->ht.ht_nent = 0;
+  RETURN1(x);
 }
 
-LFD(Lhash_table_count)()
-{
-
-	check_arg(1);
-	check_type_hash_table(&vs_base[0]);
-	vs_base[0] = make_fixnum(vs_base[0]->ht.ht_nent);
+DEFUN_NEW("HASH-TABLE-COUNT",fixnum,fLhash_table_count,LISP,1,1,NONE,IO,OO,OO,OO,(object x),"") {
+  
+  check_type_hash_table(&x);
+  RETURN1(x->ht.ht_nent);
 }
 
 
-LFD(Lsxhash)()
-{
-	check_arg(1);
-
-	/*FIXME 64*/
-	vs_base[0] = make_fixnum(ihash_equal(vs_base[0],0)/*  & 0x7fffffff */);
+DEFUN_NEW("SXHASH",fixnum,fLsxhash,LISP,1,1,NONE,IO,OO,OO,OO,(object x),"") {
+  /*FIXME 64*/
+  RETURN1(ihash_equal(x,0));/*  & 0x7fffffff */
 }
 
-LFD(Lmaphash)()
-{
-	object *base = vs_base;
-        object hashtable;
-	int i;
+DEFUN_NEW("MAPHASH",object,fLmaphash,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
 
-	check_arg(2);
-	check_type_hash_table(&vs_base[1]);
-	hashtable = vs_base[1];
-	for (i = 0;  i < hashtable->ht.ht_size;  i++) {
-		if(hashtable->ht.ht_self[i].hte_key != OBJNULL)
-			ifuncall2(base[0],
-				  hashtable->ht.ht_self[i].hte_key,
-				  hashtable->ht.ht_self[i].hte_value);
-	}
-	vs_base[0] = Cnil;
-	vs_popp;
+  int i;
+  
+  check_type_hash_table(&y);
+  for (i = 0;  i < y->ht.ht_size;  i++) {
+    if(y->ht.ht_self[i].hte_key != OBJNULL)
+      ifuncall2(x,y->ht.ht_self[i].hte_key,y->ht.ht_self[i].hte_value);
+  }
+  RETURN1(Cnil);
 }
 
-DEFUNM_NEW("NEXT-HASH-TABLE-ENTRY",object,fSnext_hash_table_entry,SI,2,2,NONE,OO,OO,OO,OO,(object table,object ind),"For HASH-TABLE and for index I return three values: NEXT-START, the next KEY and its  VALUE.   NEXT-START will be -1 if there are no more entries, otherwise it will be a value suitable for passing as an index")
-{ int i = fix(ind);
+DEFUNM_NEW("NEXT-HASH-TABLE-ENTRY",object,fSnext_hash_table_entry,SI,2,2,NONE,OO,OO,OO,OO,
+	   (object table,object ind),"For HASH-TABLE and for index I return three values: NEXT-START, the next KEY and its  VALUE.   NEXT-START will be -1 if there are no more entries, otherwise it will be a value suitable for passing as an index")
+{ 
+  int i = fix(ind);
+  fixnum vals=(fixnum)fcall.valp;
+  object *base=vs_top;
+
   check_type_hash_table(&table);
   if ( i < 0) { FEerror("needs non negative index",0);}
   while ( i <  table->ht.ht_size) {
-     if (table->ht.ht_self[i].hte_key != OBJNULL) {
-         RETURN(3,object,make_fixnum(i+1),
-                        (RV(table->ht.ht_self[i].hte_key),
-		         RV(table->ht.ht_self[i].hte_value)));}
-        i++;}
-   RETURN(3,object,small_fixnum(-1),(RV(sLnil),RV(sLnil)));
+    if (table->ht.ht_self[i].hte_key != OBJNULL) {
+      RETURN(3,object,make_fixnum(i+1),
+	     (RV(table->ht.ht_self[i].hte_key),
+	      RV(table->ht.ht_self[i].hte_value)));}
+    i++;}
+  RETURN(3,object,small_fixnum(-1),(RV(sLnil),RV(sLnil)));
+
 }
 
 DEFUN_NEW("NEXT-HASH-TABLE-INDEX",object,fSnext_hash_table_index,SI,2,2,NONE,OO,OO,OO,OO,(object table,object ind),"For HASH-TABLE and for index I return the index of the next valid entry, or -1.") { 
@@ -948,28 +981,29 @@ DEFUN_NEW("HASH-TABLE-REHASH-THRESHOLD",object,fLhash_table_rehash_threshold,LIS
 }
 
 void
-gcl_init_hash()
-{
-	sLeq = make_ordinary("EQ");
-	sLeql = make_ordinary("EQL");
-	sLequal = make_ordinary("EQUAL");
-	sLequalp = make_ordinary("EQUALP");
-	sKsize = make_keyword("SIZE");
-	sKtest = make_keyword("TEST");
-	sKrehash_size = make_keyword("REHASH-SIZE");
-	sKrehash_threshold = make_keyword("REHASH-THRESHOLD");
-	
-	make_function("MAKE-HASH-TABLE", Lmake_hash_table);
-	make_function("HASH-TABLE-P", Lhash_table_p);
-	make_function("GETHASH", Lgethash);
-	make_function("REMHASH", Lremhash);
-   	make_function("MAPHASH", Lmaphash);
-	make_function("CLRHASH", Lclrhash);
-	make_function("HASH-TABLE-COUNT", Lhash_table_count);
-   	make_function("SXHASH", Lsxhash);
-/* 	make_si_sfun("HASH-EQUAL",hash_equal,ARGTYPE2(f_object,f_fixnum) */
-/* 						| RESTYPE(f_object)); */
-/* 	make_si_sfun("HASH-EQUALP",hash_equalp,ARGTYPE2(f_object,f_fixnum) */
-/* 						| RESTYPE(f_object)); */
-	make_si_function("HASH-SET", siLhash_set);
+gcl_init_hash() {
+
+  sLeq = make_ordinary("EQ");
+  sLeql = make_ordinary("EQL");
+  sLequal = make_ordinary("EQUAL");
+  sLequalp = make_ordinary("EQUALP");
+  sKsize = make_keyword("SIZE");
+  sKtest = make_keyword("TEST");
+  sKrehash_size = make_keyword("REHASH-SIZE");
+  sKrehash_threshold = make_keyword("REHASH-THRESHOLD");
+  
+  make_function("MAKE-HASH-TABLE", Lmake_hash_table);
+/*   make_function("HASH-TABLE-P", Lhash_table_p); */
+/*   /\* 	make_function("GETHASH", Lgethash); *\/ */
+/*   make_function("REMHASH", Lremhash); */
+/*   make_function("MAPHASH", Lmaphash); */
+/*   make_function("CLRHASH", Lclrhash); */
+/*   make_function("HASH-TABLE-COUNT", Lhash_table_count); */
+/*   make_function("SXHASH", Lsxhash); */
+  /* 	make_si_sfun("HASH-EQUAL",hash_equal,ARGTYPE2(f_object,f_fixnum) */
+  /* 						| RESTYPE(f_object)); */
+  /* 	make_si_sfun("HASH-EQUALP",hash_equalp,ARGTYPE2(f_object,f_fixnum) */
+  /* 						| RESTYPE(f_object)); */
+  /* 	make_si_function("HASH-SET", siLhash_set); */
 }
+

@@ -1375,45 +1375,51 @@ dbg:
                          `(- funcallable-instance-closure-size
                              (funcallable-instance-data-position ,data)
                              2))))
-    `(car (%cclosure-env-nthcdr ,index-form ,fin))))
+    `(car (cclosure-env-nthcdr ,index-form ,fin))))
 
 
-#+turbo-closure (clines "#define TURBO_CLOSURE")
+(defun make-trampoline (function)
+  (declare (optimize (speed 3) (safety 0)))
+  (lambda (&rest args)
+    (declare (:dynamic-extent args))
+    (apply function args)))
 
-(clines "
-static void make_trampoline_internal();
-static void make_turbo_trampoline_internal();
+;; #+turbo-closure (clines "#define TURBO_CLOSURE")
 
-static object
-make_trampoline(function)
-     object function;
-{
-  vs_push(MMcons(function,Cnil));
-#ifdef TURBO_CLOSURE
-  if(type_of(function)==t_cclosure)
-    {if(function->cc.cc_turbo==NULL)turbo_closure(function);
-     vs_head=make_cclosure_new(make_turbo_trampoline_internal,Cnil,vs_head,Cnil);
-     return vs_pop;}
-#endif
-  vs_head=make_cclosure_new(make_trampoline_internal,Cnil,vs_head,Cnil);
-  return vs_pop;
-}
+;; (clines "
+;; static void make_trampoline_internal();
+;; static void make_turbo_trampoline_internal();
 
-static void
-make_trampoline_internal(base0)
-     object *base0;
-{super_funcall_no_event(base0[0]->c.c_car);}
+;; static object
+;; make_trampoline(function)
+;;      object function;
+;; {
+;;   vs_push(MMcons(function,Cnil));
+;; #ifdef TURBO_CLOSURE
+;;   if(type_of(function)==t_cclosure)
+;;     {if(function->cc.cc_turbo==NULL)turbo_closure(function);
+;;      vs_head=make_cclosure_new(make_turbo_trampoline_internal,Cnil,vs_head,Cnil);
+;;      return vs_pop;}
+;; #endif
+;;   vs_head=make_cclosure_new(make_trampoline_internal,Cnil,vs_head,Cnil);
+;;   return vs_pop;
+;; }
 
-static void
-make_turbo_trampoline_internal(base0)
-     object *base0;
-{ object function=base0[0]->c.c_car;
-  (*function->cc.cc_self)(function->cc.cc_turbo);
-}
+;; static void
+;; make_trampoline_internal(base0)
+;;      object *base0;
+;; {super_funcall_no_event(base0[0]->c.c_car);}
 
-")
+;; static void
+;; make_turbo_trampoline_internal(base0)
+;;      object *base0;
+;; { object function=base0[0]->c.c_car;
+;;   (*function->cc.cc_self)(function->cc.cc_turbo);
+;; }
 
-(defentry make-trampoline (object) (static object make_trampoline))
+;; ")
+
+;; (defentry make-trampoline (object) (static object make_trampoline))
 )
 
 #+IBCL
@@ -1427,8 +1433,8 @@ make_turbo_trampoline_internal(base0)
   (let ((fin (allocate-funcallable-instance-2))
 	(env
 	  (make-list funcallable-instance-closure-size :initial-element nil)))
-    (set-cclosure-env fin env)
-    #+:turbo-closure (si:turbo-closure fin)
+    (si::set-function-environment fin env)
+;    #+:turbo-closure (si:turbo-closure fin)
     (dotimes (i (1- funcallable-instance-closure-size)) (pop env))
     (setf (car env) *funcallable-instance-marker*)
     fin))

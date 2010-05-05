@@ -1214,9 +1214,12 @@ LFD(Lfloat_precision)(void)
 #endif
 }
 
-DEFUN_NEW("INTEGER-DECODE-FLOAT",object,fLinteger_decode_float,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUNM_NEW("INTEGER-DECODE-FLOAT",object,fLinteger_decode_float,LISP,1,1,NONE,OO,OO,OO,OO,
+	   (object x),"") {
 
   int h,l,e,s;
+  fixnum vals=(fixnum)fcall.valp;
+  object *base=vs_top;
   
   check_type_float(&x);
   h=0;

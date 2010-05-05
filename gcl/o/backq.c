@@ -360,7 +360,8 @@ static object fLbackquote_reader(object x0, object x1)
 }
 
 #define	make_cf(f)	make_cfun((f), Cnil, Cnil, NULL, 0);
-#define MAKE_AFUN(addr,n) MakeAfun(addr,F_ARGD(n,n,NONE,ARGTYPES(OO,OO,OO,OO)),0);
+/* #define MAKE_AFUN(addr,n) MakeAfun(addr,F_ARGD(n,n,ONE_VAL,ARGTYPES(OO,OO,OO,OO)),0); */
+#define MAKE_AFUN(addr,n) fSinit_function(Cnil,(object)addr,Cnil,Cnil,-1,0,2|(2<<6))
 
 
 DEF_ORDINARY("Y",sSY,SI,"");

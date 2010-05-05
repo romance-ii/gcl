@@ -39,10 +39,6 @@
 (in-package 'system)
 
 
-;(eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))
-;(eval-when (compile) (proclaim '(optimize (safety 2))))
-
-
 (defconstant imag-one #C(0 1))
 
 
@@ -61,7 +57,20 @@
                     (setq x (floor (+ x y) 2))))))
 
 
-(defun logandc2 (x y) (boole boole-andc2 x y))
+;(defun logandc2 (x y) (boole boole-andc2 x y))
+
+;; (defstruct byte
+;;   (position 0 :type (integer 0))
+;;   (size     0 :type (integer 0)))
+
+;; (defun byte (size position)
+;;   (declare (optimize (safety 1)))
+;;   (check-type size (integer 0))
+;;   (check-type position (integer 0))
+;;   (make-byte :size size :position position))
+
+(defun byte (size position)
+  (cons size position))
 (defun byte-position (bytespec)
   (check-type bytespec cons)
   (cdr bytespec))
@@ -236,18 +245,14 @@
     (values (float i (if (floatp x) x 1.0)) r)))
 
 
-(defun lognand (x y) (boole boole-nand x y))
-(defun lognor (x y) (boole boole-nor x y))
-(defun logandc1 (x y) (boole boole-andc1 x y))
-(defun logorc1 (x y) (boole boole-orc1 x y))
-(defun logorc2 (x y) (boole boole-orc2 x y))
+;(defun lognand (x y) (boole boole-nand x y))
+;(defun lognor (x y) (boole boole-nor x y))
+;(defun logandc1 (x y) (boole boole-andc1 x y))
+;(defun logorc1 (x y) (boole boole-orc1 x y))
+;(defun logorc2 (x y) (boole boole-orc2 x y))
 
-(defun lognot (x) (logxor -1 x))
+;(defun lognot (x) (logxor -1 x))
 (defun logtest (x y) (not (zerop (logand x y))))
-
-
-(defun byte (size position)
-  (cons size position))
 
 
 

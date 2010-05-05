@@ -1,7 +1,4 @@
 ;; -*-Lisp-*-
-(in-package 'lisp)
-(export '(error break cerror))
-
 (in-package 'si)
 
 (defvar *error-stack* nil)
@@ -77,6 +74,15 @@
 
 
 (defun processed-error-p (x) (stringp x))
+
+(defun process-args (args &optional fc fa others);FIXME do this without consing, could be oom
+  (cond ((not args) (nconc (nreverse others) (when (and fc fa) (list (apply 'format nil fc fa)))))
+	((eq (car args) :format-control)
+	 (process-args (cddr args) (cadr args) fa others))
+	((eq (car args) :format-arguments)
+	 (process-args (cddr args) fc (cadr args) others))
+	((process-args (cdr args) fc fa (cons (car args) others)))))
+
 (defun coerce-to-string (datum args) 
   (cond ((stringp datum)
 	 (if args 
@@ -87,11 +93,7 @@
 	       (apply 'format nil datum args))
 	   datum))
 	((symbolp datum)
-	 (let* ((fc (cadr (member :format-control args)))
-		(fa (cadr (member :format-arguments args)))
-		(tl (list :format-control :format-arguments fc fa))
-		(args (nconc (remove-if (lambda (x) (not (not (member x tl)))) args)
-			     (list (when fc (apply 'format nil fc fa))))))
+	 (let ((args (process-args args)))
 	   (substitute 
 	    #\^ #\~ 
 	    (coerce-to-string
@@ -123,6 +125,7 @@
 (defun skip-error (datum)
   (and *ignore-floating-point-errors* 
 	   (member datum '(floating-point-overflow floating-point-underflow))))
+
 (defun error (datum &rest arguments)
   (if (skip-error datum)
       (no-value)

@@ -177,7 +177,7 @@
           ;allocate-contiguous-pages
           ;allocated-contiguous-pages maximum-contiguous-pages
           ;allocate-relocatable-pages allocated-relocatable-pages 
-          sfun gfun cfun cclosure spice structure))
+          spice structure))
 
 ;(defvar type-character-alist
 ;             '((cons . #\.)

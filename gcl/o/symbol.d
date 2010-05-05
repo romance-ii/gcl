@@ -24,6 +24,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include <string.h>
+#include <ctype.h>
 #include "include.h"
 
 static void
@@ -170,6 +171,38 @@ char *s;
 	return(x);
 }
 
+object
+make_gmp_ordinary(s)
+char *s;
+{
+        int i,j;
+	object x, l, *ep;
+	vs_mark;
+	char *ss=alloca(strlen(s)+1);
+
+	for (i=0;s[i];i++)
+	  ss[i]=toupper(s[i]);
+	ss[i]=0;
+	set_up_string_register(ss);
+	j = pack_hash(string_register);
+	ep = & P_EXTERNAL(gmp_package,j);
+	for (l = *ep;  consp(l);  l = l->c.c_cdr)
+		if (string_eq(l->c.c_car, string_register))
+			return(l->c.c_car);
+	for (l =  P_EXTERNAL(lisp_package,j);
+	     consp(l);
+	     l = l->c.c_cdr)
+		if (string_eq(l->c.c_car, string_register))
+		    error("name conflict --- can't make_si_ordinary");
+	x = make_symbol(string_register);
+	vs_push(x);
+	x->s.s_hpack = gmp_package;
+	gmp_package->p.p_external_fp ++;
+	*ep = make_cons(x, *ep);
+	vs_reset;
+	return(x);
+}
+
 /*
 	Make_si_special(s, v) makes a special variable from C string s
 	with initial value v in system package.
@@ -224,6 +257,7 @@ char *s;
 	x = make_symbol(string_register);
 	vs_push(x);
 	x->s.s_hpack = keyword_package;
+	x->s.tt=2;
 	x->s.s_stype = (short)stp_constant;
 	x->s.s_dbind = x;
 	*ep = make_cons(x, *ep);
@@ -425,6 +459,12 @@ DEFUN_NEW("SYMBOL-PLIST",object,fLsymbol_plist,LISP,1,1,NONE,OO,OO,OO,OO,(object
 	}
 	@(return Cnil Cnil Cnil)
 @)
+
+DEFUN_NEW("SYMBOL-STRING",object,fSsymbol_string,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+  object y=alloc_simple_string(sym->st.st_fillp);
+  y->st.st_self=sym->st.st_self;
+  RETURN1(y);
+}
 
 
 object

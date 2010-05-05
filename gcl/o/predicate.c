@@ -340,37 +340,11 @@ DEFUNO_NEW("PACKAGEP",object,fLpackagep ,LISP
 RETURN1(x0);}
 
 DEFUNO_NEW("FUNCTIONP",object,fLfunctionp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Lfunctionp,(object x0),"")
+	   ,1,1,NONE,OO,OO,OO,OO,void,Lfunctionp,(object x0),"") {
+  
+  RETURN1(functionp(x0) ? Ct : Cnil);
 
-{
-	enum type t;
-
-	/* 1 args */
-	t = type_of(x0);
-	if (t == t_cfun || t == t_cclosure || t == t_sfun || t == t_gfun
-	    || t == t_closure|| t == t_afun
-	    || t == t_vfun || t == t_ifun) {
-		x0 = Ct;
-/* #ifndef ANSI_COMMON_LISP */
-#if 0
-	} else if (t == t_symbol) {
-	  if (x0->s.s_gfdef != OBJNULL &&
-	      x0->s.s_mflag == FALSE)
-	    x0 = Ct;
-	  else
-	    x0 = Cnil;
-	} else if (t == t_cons) {
-	  object x = x0->c.c_car;
-	  if (x == sLlambda || x == sLlambda_block ||
-	      x == sSlambda_block_expanded ||
-	      x == sLlambda_closure || x == sLlambda_block_closure)
-	    x0 = Ct;
-	  else
-	    x0 = Cnil;
-#endif
-	} else
-	  x0 = Cnil;
-RETURN1(x0);}
+}
 
 #ifdef STATIC_FUNCTION_POINTERS
 object
@@ -394,19 +368,25 @@ DEFUNO_NEW("COMPILED-FUNCTION-P",object,fLcompiled_function_p,LISP
 	/* 1 args */;
 
 	if (type_of(x0) == t_cfun ||
-	    type_of(x0) == t_cclosure  ||
-	    type_of(x0) == t_sfun   ||
-	    type_of(x0) == t_gfun ||
-	    type_of(x0) == t_afun ||
-	    type_of(x0) == t_closure ||
-	    type_of(x0) == t_vfun
-	    
-	    
-	    )
+	    type_of(x0) == t_function)
 		x0 = Ct;
 	else
 		x0 = Cnil;
 RETURN1(x0);}
+
+DEFUN_NEW("NEW-COMPILED-FUNCTION-P",object,fSnew_compiled_function_p,SI
+   ,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+
+  RETURN1(type_of(x0) == t_function ? Ct : Cnil);
+
+}
+
+DEFUN_NEW("OLD-COMPILED-FUNCTION-P",object,fSold_compiled_function_p,SI
+   ,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+
+  RETURN1(type_of(x0) == t_cfun ? Ct : Cnil);
+
+}
 
 DEFUNO_NEW("INTERPRETED-FUNCTION-P",object,fSinterpreted_function_p,SI
    ,1,1,NONE,OO,OO,OO,OO,void,siLinterpreted_function_p,(object x0),"")

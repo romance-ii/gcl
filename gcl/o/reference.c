@@ -28,6 +28,19 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 
+DEFUN_NEW("CFUN-CALL",object,fScfun_call,SI,1,1,NONE,OO,OO,OO,OO,(object fun),"") {
+  if (!functionp(fun))
+    TYPE_ERROR(fun,sLfunction);
+  RETURN1(fun->cf.cf_call);
+}
+
+DEFUN_NEW("SET-CFUN-CALL",object,fSset_cfun_call,SI,2,2,NONE,OO,OO,OO,OO,(object call,object fun),"") {
+  if (!functionp(fun))
+    TYPE_ERROR(fun,sLfunction);
+  RETURN1(fun->cf.cf_call=call);
+}
+
+
 DEFUN_NEW("FBOUNDP-SYM",object,fSfboundp_sym,SI,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
 
   if (type_of(sym) != t_symbol) {
@@ -168,6 +181,7 @@ FFN(Ffunction)(object form)
 		{
 		  object x=alloc_object(t_ifun);
 		  x->ifn.ifn_self=vs_base[0];
+		  x->ifn.ifn_name=x->ifn.ifn_call=Cnil;
 		  vs_base[0]=x;
 		}
 	} else {
@@ -197,6 +211,10 @@ DEFUN_NEW("BOUNDP",object,fLboundp,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
 
 }
 
+/* DEFUN_NEW("MACRO-FUNCTION",object,fLmacro_function,SI,1,2,NONE,OO,OO,OO,OO,(object x,...),"") { */
+
+/*   object  */
+
 LFD(Lmacro_function)(void) {
 
   object envir;
@@ -218,10 +236,8 @@ LFD(Lmacro_function)(void) {
     envir=Mcdr(envir);
     buf[2]=car(envir);
   }
-  else {
-    VFUN_NARGS=n;
-    check_arg_range(1,2);
-  }
+  else
+    check_arg_range(n,1,2);
 
   lex_env = buf;
   
@@ -249,6 +265,12 @@ DEFUNO_NEW("LEXICAL-BINDING-ENVIRONMENT",object,fSlexical_binding_environment,SI
 	   ,0,0,NONE,OO,OO,OO,OO,void,siLlexical_binding_environment,(void),"") {
 
   RETURN1(list(3,lex_env[0],lex_env[1],lex_env[2]));
+
+}
+
+DEFUN_NEW("LEX-ENV",object,fSlex_env,SI,0,0,NONE,OI,OO,OO,OO,(fixnum i),"") {
+
+  RETURN1(i>=0 && i<=3 ? lex_env[i] : Cnil);
 
 }
 
