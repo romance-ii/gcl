@@ -305,7 +305,7 @@
   (if vv (wt (vv-str vv))
     (wt "make_fixnum(" char ")")))
 
-(defun wt-long-float-loc (loc)
+(defun wt-long-float-loc (loc &aux x)
   (cond ((and (consp loc)
               (eq (car loc) 'var)
               (eq (var-kind (cadr loc)) #tlong-float))
@@ -332,7 +332,7 @@
        (declare (ignore long-float-value))
        (wt (vv-str vv)))
 
-(defun ft-wrapper (key tt)
+(defun ft-wrapper (key tt pp)
   (if *compiler-new-safety*
       (wt (strcat "((" key ")object_to_" (if pp "pointer" "dcomplex") "("))
     (wt (or (cdr (assoc tt +to-c-var-alist+)) "") "(")))
@@ -340,16 +340,17 @@
 (defun tt-wrapper (ft)
   (wt (or (cdr (assoc ft +wt-c-var-alist+)) "") "("))
 
-(defun cast-wrapper (key))
+(defun cast-wrapper (key) key)
 
-(defvar +value-types+ (mapcar (lambda (x) (cons (cmp-norm-tp x) (get-sym `(,x "-VALUE")))) +c-local-var-types-syms+))
+(defvar +value-types+ (mapcar (lambda (x) (cons (cmp-norm-tp x) (get-sym `(,x "-VALUE"))))
+			      (cons 'character +c-local-var-types-syms+)))
 
 (defun loc-kind (loc &aux (cl (car loc)))
   (cond ((eq cl 'var) 
 	 (let* ((var (cadr loc))
 		(kind (var-kind var)))
 	   (case kind
-		 (replaced (loc-type (var-loc var)))
+		 (replaced (loc-kind (var-loc var)))
 		 (object #tt)
 		 (otherwise kind))))
 	((eq cl 'cvar)
@@ -362,18 +363,25 @@
 	(#tt)))
 
 (defun loc-type (loc &aux (cl (car loc)))
-  (cond ((eq cl 'var)  (coerce-to-one-value (var-kind (cadr loc))));?
+  (cond ((eq cl 'var)  	 
+	 (let* ((var (cadr loc))
+		(kind (var-kind var)))
+	   (case kind
+		 (replaced (loc-type (var-loc var)))
+		 (object #tt)
+		 (otherwise kind))))
 	((eq cl 'cvar) (or (car (rassoc (cadr loc) *c-vars*)) 
 			   (cdr (assoc (cadr loc) *c-vars*)) #tt))
 	((car (rassoc cl +inline-types-alist+)))
 	((car (rassoc cl +value-types+)))
+;	((eq cl 'character-value) #tchar);FIXME
 	(#tt)))
 
-(defun wt-gen-loc (key loc &aux p)
+(defun wt-gen-loc (key loc)
   (let* ((cl   (when (consp loc) (car loc)))
 	 (fit  (car (rassoc cl +inline-types-alist+)))
 	 (fvt  (car (rassoc cl +value-types+)))
-	 (ft   (loc-type loc))
+	 (ft   (loc-kind loc))
 	 (tt   (cmp-norm-tp (get key 'lisp-type)))
 	 (cast (strcat "(" key ")"))
 	 (pp   (search "*" cast)))
@@ -386,9 +394,12 @@
 	  ((and (type>= #tcnum tt) (type>= #tcnum ft)) (wt "(" cast))
 	  ((baboon)))
 		 
-    (cond ((eq cl 'var) (wt (if (integerp (var-loc (cadr loc))) "V" "") (var-loc (cadr loc))))
+    (cond ((not loc) (wt "Cnil"))
+	  ((eq loc t) (wt "Ct"))
+	  ((eq cl 'var) (wt (if (integerp (var-loc (cadr loc))) "V" "") (var-loc (cadr loc))))
 	  ((eq cl 'cvar) (wt "V" (cadr loc)))
 	  ((eq cl 'vv) (wt loc))
+;	  ((eq cl 'character-value) (wt "code_char(" (caddr loc) ")"));FIXME
 	  (fit (wt-inline-loc (caddr loc) (cadddr loc)))
 	  (fvt (cond ((= (caddr loc) most-negative-fixnum) (wt "(" (1+ most-negative-fixnum) "- 1)"))
 		     ((wt (caddr loc)))))

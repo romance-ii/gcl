@@ -14,14 +14,14 @@
   (setq *rep-lst1* (mapcar (lambda (x) (list (car x) (tt3 (eval (cdr x))))) *rep-lst*)))
 (in-package 'user)
 
-(dolist (l '(cp2))
+(dolist (l '(cp))
   (time (load (compile-file
 	       (concatenate 'string "../lsp/gcl_" (string-downcase (string l)) ".lsp")
 	       :c-file t :h-file t :data-file t :system-p t))))
 
 #+pre-gcl(declaim (optimize (safety 3)))
 
-(dolist (l '(c listlib predlib arraylib seq seqlib bnum fle dl rm nr lr2 sym hash))
+(dolist (l '(c listlib predlib arraylib seq seqlib bnum fle dl rm nr lr sym hash))
   (time (load (compile-file
 	       (concatenate 'string "../lsp/gcl_" (string-downcase (string l)) ".lsp")
 	       :c-file t :h-file t :data-file t :system-p t))))

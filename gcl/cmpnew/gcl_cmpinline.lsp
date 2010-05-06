@@ -229,97 +229,97 @@
 	(t (incf *inline-blocks*))))
 
 
-(defun loc-from-c2form (form type)
-  (case (car form)
-	(LOCATION (coerce-loc (caddr form) type))
-	(VAR
-	 (cond ((args-info-changed-vars (caaddr form) (cdr forms))
-		(cond ((and (member (var-kind (caaddr form)) +c-local-var-types+)
-			    (eq type (var-kind (caaddr form))))
-		       (let* ((cvar (cs-push type t))(*value-to-go* `(cvar ,cvar)))
-			 (wt-nl "{" (rep-type type) "V" cvar "= V"
-				(var-loc (caaddr form)) ";")
-			 (inc-inline-blocks)
-			 (list 'cvar cvar 'inline-args)))
-		      ((let* ((temp (wt-c-push type))(*value-to-go* temp))
-			 (wt-nl temp "= ")
-			 (wt-var (caaddr form) (cadr (caddr form)))
-			 (wt ";")
-			 (coerce-loc temp type)))))
-	       ((and (member (var-kind (caaddr form)) +c-local-var-types+)
-		     (not (eq type (var-kind (caaddr form)))))
-		(let* ((temp (cs-push type))(*value-to-go* `(cvar ,temp)))
-		  (wt-nl "V" temp " = "
-			 (coerce-loc (cons 'var (caddr form)) type) ";")
-		  (list 'cvar temp)))
-	       ((coerce-loc (cons 'VAR (caddr form)) type))))
-	(CALL-GLOBAL
-	 (if (let ((fname (caddr form)))
-	       (and (inline-possible fname)
-		    (setq ii (get-inline-info fname (cadddr form) (info-type (cadr form)) (sixth form)))
-		    (progn  (save-avma ii) t)))
-	     (let ((loc (get-inline-loc ii (cadddr form))))
-	       (cond
-		((or (and (flag-p (caddr ii) ans)(not *c-gc*)); returns new object
-		     (and (member (cadr ii) +c-local-var-types+)
-			  (not (eq type (cadr ii)))))
-		 (let* ((temp (cs-push type))(*value-to-go* `(cvar ,temp)))
-		   (wt-nl "V" temp " = " (coerce-loc loc type) ";")
-		   (list 'cvar temp)))
-		((or (need-to-protect (cdr forms) (cdr types))
-		     ;;if either new form or side effect,
-		     ;;we don't want double evaluation
-		     (and (flag-p (caddr ii) allocates-new-storage)
-			  (or (null fun)
-			      ;; Any fun such as list,list* which
-			      ;; does not cause side effects or
-			      ;; do double eval (ie not "@..")
-			      ;; could go here.
-			      (not (si::memq fun '(list-inline list*-inline)))))
-		     (flag-p (caddr ii) is)
-		     (and (flag-p (caddr ii) set) ; side-effectp
-			  (not (null (cdr forms)))))
-		 (let (cvar)
-		   (cond
-		    ((eq type t)
-		     (setq cvar (cs-push))
-		     (wt-nl "V" cvar "= ")
-		     (let ((*value-to-go* `(cvar ,cvar))) (wt-loc loc)))
-		    (t (setq cvar (cs-push type t))
-		       (wt-nl "{" (rep-type type) "V" cvar "= ")
-		       (let ((*value-to-go* `(cvar ,cvar)))
-			 (funcall (or (cdr (assoc (promoted-c-type type) +wt-loc-alist+)) 'wt-loc) loc))
-		       (inc-inline-blocks)))
-		   (wt ";")
-		   (list 'cvar cvar 'inline-args)))
-		(t (coerce-loc loc type))))
-	   (let* ((temp (if *c-gc* (list 'cvar (cs-push)) (list 'vs (vs-push))))
-		  (*value-to-go* temp))
-	     (c2expr* form)
-	     (coerce-loc temp type))))
-	(ub (list 'gen-loc (caddr form) (loc-from-c2form (fourth form) type)))
-	(structure-ref(coerce-loc-structure-ref (cdr form) type))
-	(SETQ
-	 (let ((vref (caddr form))
-	       (form1 (cadddr form)))
-	   (let ((*value-to-go* (cons 'var vref))) (c2expr* form1))
-	   (cond ((eq (car form1) 'LOCATION)
-		  (coerce-loc (caddr form1) type))
-		 (t (loc-from-c2form (list 'VAR (cadr form) vref))
-		  (setq forms (list* form (list 'VAR (cadr form) vref) (cdr forms)))
-		  ;; want (setq types (list* type type (cdr  types)))
-		  ;; but type is first of types
-		  (setq types (list* type  types))))))
-	((let ((temp
-		(cond ((not *c-gc*) (list 'vs (vs-push)))
-		      ((eq type t) (list 'cvar (cs-push)))
-		      ((list 'var
-			     (make-var :type type :loc (cs-push type)
-				       :kind (or (car (member (promoted-c-type type) +c-local-var-types+)) 'object))
-			     nil)))))
-	   (let ((*value-to-go* temp))
-	     (c2expr* form)
-	     (coerce-loc temp type))))))
+;; (defun loc-from-c2form (form type)
+;;   (case (car form)
+;; 	(LOCATION (coerce-loc (caddr form) type))
+;; 	(VAR
+;; 	 (cond ((args-info-changed-vars (caaddr form) (cdr forms))
+;; 		(cond ((and (member (var-kind (caaddr form)) +c-local-var-types+)
+;; 			    (eq type (var-kind (caaddr form))))
+;; 		       (let* ((cvar (cs-push type t))(*value-to-go* `(cvar ,cvar)))
+;; 			 (wt-nl "{" (rep-type type) "V" cvar "= V"
+;; 				(var-loc (caaddr form)) ";")
+;; 			 (inc-inline-blocks)
+;; 			 (list 'cvar cvar 'inline-args)))
+;; 		      ((let* ((temp (wt-c-push type))(*value-to-go* temp))
+;; 			 (wt-nl temp "= ")
+;; 			 (wt-var (caaddr form) (cadr (caddr form)))
+;; 			 (wt ";")
+;; 			 (coerce-loc temp type)))))
+;; 	       ((and (member (var-kind (caaddr form)) +c-local-var-types+)
+;; 		     (not (eq type (var-kind (caaddr form)))))
+;; 		(let* ((temp (cs-push type))(*value-to-go* `(cvar ,temp)))
+;; 		  (wt-nl "V" temp " = "
+;; 			 (coerce-loc (cons 'var (caddr form)) type) ";")
+;; 		  (list 'cvar temp)))
+;; 	       ((coerce-loc (cons 'VAR (caddr form)) type))))
+;; 	(CALL-GLOBAL
+;; 	 (if (let ((fname (caddr form)))
+;; 	       (and (inline-possible fname)
+;; 		    (setq ii (get-inline-info fname (cadddr form) (info-type (cadr form)) (sixth form)))
+;; 		    (progn  (save-avma ii) t)))
+;; 	     (let ((loc (get-inline-loc ii (cadddr form))))
+;; 	       (cond
+;; 		((or (and (flag-p (caddr ii) ans)(not *c-gc*)); returns new object
+;; 		     (and (member (cadr ii) +c-local-var-types+)
+;; 			  (not (eq type (cadr ii)))))
+;; 		 (let* ((temp (cs-push type))(*value-to-go* `(cvar ,temp)))
+;; 		   (wt-nl "V" temp " = " (coerce-loc loc type) ";")
+;; 		   (list 'cvar temp)))
+;; 		((or (need-to-protect (cdr forms) (cdr types))
+;; 		     ;;if either new form or side effect,
+;; 		     ;;we don't want double evaluation
+;; 		     (and (flag-p (caddr ii) allocates-new-storage)
+;; 			  (or (null fun)
+;; 			      ;; Any fun such as list,list* which
+;; 			      ;; does not cause side effects or
+;; 			      ;; do double eval (ie not "@..")
+;; 			      ;; could go here.
+;; 			      (not (si::memq fun '(list-inline list*-inline)))))
+;; 		     (flag-p (caddr ii) is)
+;; 		     (and (flag-p (caddr ii) set) ; side-effectp
+;; 			  (not (null (cdr forms)))))
+;; 		 (let (cvar)
+;; 		   (cond
+;; 		    ((eq type t)
+;; 		     (setq cvar (cs-push))
+;; 		     (wt-nl "V" cvar "= ")
+;; 		     (let ((*value-to-go* `(cvar ,cvar))) (wt-loc loc)))
+;; 		    (t (setq cvar (cs-push type t))
+;; 		       (wt-nl "{" (rep-type type) "V" cvar "= ")
+;; 		       (let ((*value-to-go* `(cvar ,cvar)))
+;; 			 (funcall (or (cdr (assoc (promoted-c-type type) +wt-loc-alist+)) 'wt-loc) loc))
+;; 		       (inc-inline-blocks)))
+;; 		   (wt ";")
+;; 		   (list 'cvar cvar 'inline-args)))
+;; 		(t (coerce-loc loc type))))
+;; 	   (let* ((temp (if *c-gc* (list 'cvar (cs-push)) (list 'vs (vs-push))))
+;; 		  (*value-to-go* temp))
+;; 	     (c2expr* form)
+;; 	     (coerce-loc temp type))))
+;; 	(ub (list 'gen-loc (caddr form) (loc-from-c2form (fourth form) type)))
+;; 	(structure-ref(coerce-loc-structure-ref (cdr form) type))
+;; 	(SETQ
+;; 	 (let ((vref (caddr form))
+;; 	       (form1 (cadddr form)))
+;; 	   (let ((*value-to-go* (cons 'var vref))) (c2expr* form1))
+;; 	   (cond ((eq (car form1) 'LOCATION)
+;; 		  (coerce-loc (caddr form1) type))
+;; 		 (t (loc-from-c2form (list 'VAR (cadr form) vref))
+;; 		  (setq forms (list* form (list 'VAR (cadr form) vref) (cdr forms)))
+;; 		  ;; want (setq types (list* type type (cdr  types)))
+;; 		  ;; but type is first of types
+;; 		  (setq types (list* type  types))))))
+;; 	((let ((temp
+;; 		(cond ((not *c-gc*) (list 'vs (vs-push)))
+;; 		      ((eq type t) (list 'cvar (cs-push)))
+;; 		      ((list 'var
+;; 			     (make-var :type type :loc (cs-push type)
+;; 				       :kind (or (car (member (promoted-c-type type) +c-local-var-types+)) 'object))
+;; 			     nil)))))
+;; 	   (let ((*value-to-go* temp))
+;; 	     (c2expr* form)
+;; 	     (coerce-loc temp type))))))
 
 (defun wt-push-loc (loc type &optional expr)
   (let* ((cv (cs-push type))

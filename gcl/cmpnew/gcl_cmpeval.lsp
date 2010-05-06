@@ -540,12 +540,12 @@
 (si::putprop 'tt30 'tt30-type-propagator 'type-propagator)    
 
 
-(defun c1infer-tp (args)
-  (let* ((x (car (member (pop args) *vars* :key (lambda (x) (when (var-p x) (var-name x))))))
-	 (tp (cmp-norm-tp (pop args))))
-    (with-restore-vars
-     (do-setq-tp x nil (type-and tp (var-type x)))
-     (c1expr (car args)))))
+;; (defun c1infer-tp (args)
+;;   (let* ((x (car (member (pop args) *vars* :key (lambda (x) (when (var-p x) (var-name x))))))
+;; 	 (tp (cmp-norm-tp (pop args))))
+;;     (with-restore-vars
+;;      (do-setq-tp x nil (type-and tp (var-type x)))
+;;      (c1expr (car args)))))
 
 (defun c1infer-tp (args)
   (let* ((x (car (member (pop args) *vars* :key (lambda (x) (when (var-p x) (var-name x))))))
@@ -559,6 +559,7 @@
     (setf (info-type info) (info-type ri))
     res))
 (defun c2infer-tp (x tp fm)
+  (declare (ignore x tp))
   (c2expr fm))
 (si::putprop 'infer-tp 'c1infer-tp 'c1)
 (si::putprop 'infer-tp 'c2infer-tp 'c2)

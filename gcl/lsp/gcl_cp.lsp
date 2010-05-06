@@ -92,8 +92,7 @@
 		(ns (intern (string-upcase (compiler::strcat "set-" n)) 'c))
 		(zz (if (member z '(:integer :real :plist :pack :string :structure :keyword :direl :symbol)) :object z))
 		(ss (concatenate 'string "->"  (string sn) "." (string e) (if s "[" "")))
-		(f `(compiler::lit ,zz (compiler::unbox :object x) (compiler::cstr ,ss) 
-				   ,@(when s `((compiler::unbox :fixnum i)(compiler::cstr "]")))));FIXME
+		(f `(compiler::litt ,zz (:object x) ,ss ,@(when s `((:fixnum i) "]"))));FIXME
 		(fp f)
 		(i (third x))
 		(tt1 (when i (if y `(integer 0 (,(ash 1 i)))
@@ -101,9 +100,7 @@
 		(tt1 (or tt1 (get z 'compiler::lisp-type)))
 		(f (if tt1 `(the ,tt1 ,f) f))
 		(fs (sublis
-		     (list (cons fp (append `(compiler::lit ,zz (compiler::cstr "("))
-					    (cddr fp)
-					    `((compiler::cstr "=")(compiler::unbox ,zz y)(compiler::cstr ")"))))) f))
+		     (list (cons fp (append `(compiler::litt ,zz "(") (cddr fp) `("=" (,zz y) ")")))) f))
 		(v (member e '("FIXVAL" "LFVAL" "SFVAL" "CODE") :test 'equal))
 		(fs (unless v fs));could be an immediate fixnum, unsettable
 		(f (if v `x f)));use default coersion
@@ -145,58 +142,51 @@
   (declare (optimize (safety 1)))
   (declare (seqind i))
   (check-type x hash-table)
-  (the fixnum;FIXME
-       (lit :fixnum (cstr "(fixnum)(") (unbox :object x) 
-	    (cstr "->ht.ht_self+") (unbox :fixnum i) (cstr ")"))))
+  (litt :fixnum "(fixnum)(" (:object x)  "->ht.ht_self+" (:fixnum i) ")"))
 
 (defun c::gethash-int (x y)
   (declare (optimize (safety 1)))
   (check-type y hash-table)
-  (the fixnum;FIXME
-       (lit :fixnum (cstr "(fixnum)gethash(") (unbox :object x) (cstr ",") (unbox :object y) (cstr ")"))))
+  (litt :fixnum "(fixnum)gethash(" (:object x) "," (:object y) ")"))
 
 (defun c::sxhash-int (x)
   (declare (optimize (safety 1)))
-  (the fixnum;FIXME
-       (lit :fixnum (cstr "ihash_equal1(") (unbox :object x) (cstr ",0)"))))
+  (litt :fixnum "ihash_equal1(" (:object x) ",0)"))
 
 (defun c::close-int (x)
   (declare (optimize (safety 1)))
   (check-type x stream)
-  (the fixnum;FIXME
-       (lit :fixnum (cstr "(close_stream(") (unbox :object x) (cstr "),1)"))))
+  (litt :fixnum "(close_stream(" (:object x) "),1)"))
 
 (defun c::read-object-non-recursive (x)
   (declare (optimize (safety 1)))
   (check-type x stream)
-  (lit :object (cstr "read_object_non_recursive(") (unbox :object x) (cstr ")")))
+  (litt :object "read_object_non_recursive(" (:object x) ")"))
 
 (defun c::read-object-recursive (x)
   (declare (optimize (safety 1)))
   (check-type x stream)
-  (lit :object (cstr "read_object_non_recursive(") (unbox :object x) (cstr ")")))
+  (litt :object "read_object_non_recursive(" (:object x) ")"))
 
 (defun c::htent-value (x)
   (declare (optimize (safety 1)))
   (check-type x fixnum)
-  (lit :object (cstr "((struct htent *)" ) (unbox :fixnum x) (cstr ")->hte_value")))
+  (litt :object "((struct htent *)" (:fixnum x) ")->hte_value"))
 
 (defun c::htent-key (x)
   (declare (optimize (safety 1)))
   (check-type x fixnum)
-  (lit :object (cstr "((struct htent *)" ) (unbox :fixnum x) (cstr ")->hte_key")))
+  (litt :object "((struct htent *)" (:fixnum x) ")->hte_key"))
 
 (defun c::set-htent-value (y x)
   (declare (optimize (safety 1)))
   (check-type x fixnum)
-  (lit :object (cstr "((struct htent *)" ) (unbox :fixnum x) (cstr ")->hte_value=")
-       (unbox :object y)))
+  (litt :object "((struct htent *)" (:fixnum x) ")->hte_value=" (:object y)))
 
 (defun c::set-htent-key (y x)
   (declare (optimize (safety 1)))
   (check-type x fixnum)
-  (lit :object (cstr "((struct htent *)" ) (unbox :fixnum x) (cstr ")->hte_key=")
-       (unbox :object y)))
+  (litt :object "((struct htent *)" (:fixnum x) ")->hte_key=" (:object y)))
 
 
 (defun sf (s)
@@ -222,18 +212,56 @@
   (the function (c::symbol-gfdef s)));FIXME
 (setf (get 'fsf 'cmp-inline) t)
 
-(defun tt3 (x) (lit :fixnum (cstr "fto(") (unbox :object x) (cstr ")")))
+(defun tt3 (x) (litt :fixnum "fto(" (:object x) ")"))
 (si::putprop 'tt3 t 'cmp-inline)
-(defun tt30 (x) (lit :boolean (cstr "!fto0(") (unbox :object x) (cstr ")")))
+(defun tt30 (x) (litt :boolean "!fto0(" (:object x) ")"))
 (si::putprop 'tt30 t 'cmp-inline)
 
 (defun fn-env (x) ;FIXME expose pointers above, rename function type to type-spec
   (declare (optimize (safety 1)))
   (typecase x
    (new-compiled-function
-    (let ((a (lit :fixnum (cstr "(fixnum)") (unbox :object x) (cstr "->fun.fun_env"))))
+    (let ((a (litt :fixnum "(fixnum)" (:object x) "->fun.fun_env")))
       (unless (= 0 a)
 	(c::function-env x 0))))))
+
+(defun c::& (x y)
+  (declare (optimize (safety 1)))
+  (check-type x fixnum)
+  (check-type y fixnum)
+  (litt :fixnum "(" (:fixnum x) "&" (:fixnum y) ")"))
+
+(defun c::\| (x y)
+  (declare (optimize (safety 1)))
+  (check-type x fixnum)
+  (check-type y fixnum)
+  (litt :fixnum "(" (:fixnum x) "\|" (:fixnum y) ")"))
+
+(defun c::^ (x y)
+  (declare (optimize (safety 1)))
+  (check-type x fixnum)
+  (check-type y fixnum)
+  (litt :fixnum "(" (:fixnum x) "^" (:fixnum y) ")"))
+
+(defun c::~ (x)
+  (declare (optimize (safety 1)))
+  (check-type x fixnum)
+  (litt :fixnum "(~" (:fixnum x) ")"))
+
+(defun c::<< (x y)
+  (declare (optimize (safety 1)))
+  (check-type x fixnum)
+  (check-type y fixnum)
+  (litt :fixnum "(" (:fixnum x) "<<" (:fixnum y) ")"))
+
+(defun c::>> (x y)
+  (declare (optimize (safety 1)))
+  (check-type x fixnum)
+  (check-type y fixnum)
+  (litt :fixnum "(" (:fixnum x) ">>" (:fixnum y) ")"))
+
+(dolist (l '(& \| ^ ~ << >>))
+  (export (find-symbol (string l) "C") 'c))
 
 ;; (defun fboundp (funid)
 ;;   (declare (optimize (safety 1)))

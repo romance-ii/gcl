@@ -57,6 +57,7 @@
 (import 'si::hash-table-equalp 'compiler)
 (import 'si::str-ref 'compiler)
 (import 'compiler::lit 'si)
+(import 'compiler::litt 'si)
 (import 'compiler::unbox 'si)
 (import 'compiler::cstr 'si)
 (import 'si::fsf 'compiler)
@@ -1072,7 +1073,7 @@
 
 (defconstant +wt-c-var-alist+ `((,#tchar ."make_fixnum")
 				(,#tfixnum ."make_fixnum")
-				(,#tinteger ."make_integer") 
+;				(,#tinteger ."make_integer") 
 				(,#tcharacter  ."code_char")
 				(,#tlong-float  ."make_longfloat")
 				(,#tshort-float ."make_shortfloat")
