@@ -154,7 +154,7 @@ gclcvs (2.7.0-89) unstable; urgency=low
 
   * fix endian checks
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 21 Aug 2008 10:56:19 -0400
+ -- Camm Maguire <camm@debian.org>  Thu, 21 Aug 2008 10:56:19 -0400
 
 gclcvs (2.7.0-88) unstable; urgency=low
 
@@ -169,7 +169,7 @@ gclcvs (2.7.0-87) unstable; urgency=low
   * more div/remq sybols for alpha
   * -O2 -g on sparc to workaround longjmp bug.
 
- -- Camm Maguire <camm@intech21.enhanced.com>  Wed,  6 Aug 2008 15:59:30 -0400
+ -- Camm Maguire <camm@debian.org>  Wed,  6 Aug 2008 15:59:30 -0400
 
 gclcvs (2.7.0-86) unstable; urgency=low
 
@@ -177,7 +177,7 @@ gclcvs (2.7.0-86) unstable; urgency=low
     by default, which eliminates _gp_disp from the code.
   * more div/rem symbols for arm and hppa
   
- -- Camm Maguire <camm@sacrifice.m.enhanced.com>  Sat, 02 Aug 2008 00:23:30 +0000
+ -- Camm Maguire <camm@debian.org>  Sat, 02 Aug 2008 00:23:30 +0000
 
 gclcvs (2.7.0-85) unstable; urgency=low
 
@@ -200,7 +200,7 @@ gclcvs (2.7.0-85) unstable; urgency=low
   * compiler warning cleanups
   * __divdi3 et.al symbols for ia64 and arm
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 01 Aug 2008 17:43:45 -0400
+ -- Camm Maguire <camm@debian.org>  Fri, 01 Aug 2008 17:43:45 -0400
 
 gclcvs (2.7.0-84.1) unstable; urgency=low
 
@@ -227,13 +227,13 @@ gclcvs (2.7.0-84) unstable; urgency=low
 
   * #-dynamic-extent arm build fix
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  2 Jan 2008 20:38:27 -0500
+ -- Camm Maguire <camm@debian.org>  Wed,  2 Jan 2008 20:38:27 -0500
 
 gclcvs (2.7.0-83) unstable; urgency=low
 
   * arm and ia64 gcc bug workarounds
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  1 Jan 2008 15:24:55 -0500
+ -- Camm Maguire <camm@debian.org>  Tue,  1 Jan 2008 15:24:55 -0500
 
 gclcvs (2.7.0-82) unstable; urgency=low
 
@@ -241,13 +241,13 @@ gclcvs (2.7.0-82) unstable; urgency=low
   * vertical bar reader fix
   * rt patch applied
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 18 Dec 2007 11:17:13 -0500
+ -- Camm Maguire <camm@debian.org>  Tue, 18 Dec 2007 11:17:13 -0500
 
 gclcvs (2.7.0-81) unstable; urgency=low
 
   * build fixes
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 17 Dec 2007 13:07:12 -0500
+ -- Camm Maguire <camm@debian.org>  Mon, 17 Dec 2007 13:07:12 -0500
 
 gclcvs (2.7.0-80) unstable; urgency=low
 
@@ -256,7 +256,7 @@ gclcvs (2.7.0-80) unstable; urgency=low
   * debian bug sync with 2.6.8pre
   * ansi-fixes;tail-recursion expansion;support build w/o immfix
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 15 Dec 2007 23:53:38 -0500
+ -- Camm Maguire <camm@debian.org>  Sat, 15 Dec 2007 23:53:38 -0500
 
 gclcvs (2.7.0-79) unstable; urgency=low
 
@@ -276,7 +276,7 @@ gclcvs (2.7.0-79) unstable; urgency=low
     template", thanks to Rudy Godoy (Closes: #423708). Thanks
   * build-dep texlive-latex-base
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 07 Nov 2007 17:22:11 -0500
+ -- Camm Maguire <camm@debian.org>  Wed, 07 Nov 2007 17:22:11 -0500
 
 gclcvs (2.7.0-78) unstable; urgency=low
 
@@ -289,7 +289,7 @@ gclcvs (2.7.0-78) unstable; urgency=low
   * compile top level closures
   * all cclosures turbo, fix top-level-form compile
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 17 Jul 2007 23:43:57 -0400
+ -- Camm Maguire <camm@debian.org>  Tue, 17 Jul 2007 23:43:57 -0400
 
 gclcvs (2.7.0-77) unstable; urgency=low
 
@@ -315,7 +315,7 @@ gclcvs (2.7.0-77) unstable; urgency=low
   * copt for ia64;gcc 4.x for arm
   * _mcount for ppc
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 13 Jul 2007 23:41:54 -0400
+ -- Camm Maguire <camm@debian.org>  Fri, 13 Jul 2007 23:41:54 -0400
 
 gclcvs (2.7.0-76) unstable; urgency=low
 
@@ -326,7 +326,7 @@ gclcvs (2.7.0-76) unstable; urgency=low
   * fix alloca detection for bsd
   * fix cmpinclude.h for bsd
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 06 Jul 2007 10:03:19 -0400
+ -- Camm Maguire <camm@debian.org>  Fri, 06 Jul 2007 10:03:19 -0400
 
 gclcvs (2.7.0-75) unstable; urgency=low
 
@@ -338,7 +338,7 @@ gclcvs (2.7.0-75) unstable; urgency=low
   * rb_end<core_end protection
   * remove my_plt references on rsym systems
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 03 Jul 2007 19:47:06 -0400
+ -- Camm Maguire <camm@debian.org>  Tue, 03 Jul 2007 19:47:06 -0400
 
 gclcvs (2.7.0-74) unstable; urgency=low
 
@@ -346,14 +346,14 @@ gclcvs (2.7.0-74) unstable; urgency=low
   * fix fmla-c1expr
   * fix alpha build;fix flet/labels function type inference
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 02 Jul 2007 17:36:32 -0400
+ -- Camm Maguire <camm@debian.org>  Mon, 02 Jul 2007 17:36:32 -0400
 
 gclcvs (2.7.0-73) unstable; urgency=low
 
   * fix intermingled doc-string/declaration handling
   * mcount_wrapper
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 28 Jun 2007 22:50:01 -0400
+ -- Camm Maguire <camm@debian.org>  Thu, 28 Jun 2007 22:50:01 -0400
 
 gclcvs (2.7.0-72) unstable; urgency=low
 
@@ -362,7 +362,7 @@ gclcvs (2.7.0-72) unstable; urgency=low
   * sgc fix;allow mized doc-string/declare form order
   * optional second arg to complex-propagator
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 25 Jun 2007 21:38:21 -0400
+ -- Camm Maguire <camm@debian.org>  Mon, 25 Jun 2007 21:38:21 -0400
 
 gclcvs (2.7.0-71) unstable; urgency=low
 
@@ -371,7 +371,7 @@ gclcvs (2.7.0-71) unstable; urgency=low
   * fix struct tests
   * mips switch workaround
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 23 Jun 2007 18:31:28 -0400
+ -- Camm Maguire <camm@debian.org>  Sat, 23 Jun 2007 18:31:28 -0400
 
 gclcvs (2.7.0-70) unstable; urgency=low
 
@@ -381,7 +381,7 @@ gclcvs (2.7.0-70) unstable; urgency=low
   * earlier lib-sym reset
   * restore fork
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 22 Jun 2007 13:27:46 -0400
+ -- Camm Maguire <camm@debian.org>  Fri, 22 Jun 2007 13:27:46 -0400
 
 gclcvs (2.7.0-69) unstable; urgency=low
 
@@ -424,7 +424,7 @@ gclcvs (2.7.0-69) unstable; urgency=low
   * faster eql,equal, and equalp
   * type fixes, optimize-maximum-pages on after compiler::link
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 20 Jun 2007 21:01:16 -0400
+ -- Camm Maguire <camm@debian.org>  Wed, 20 Jun 2007 21:01:16 -0400
 
 gclcvs (2.7.0-68) unstable; urgency=low
 
@@ -434,7 +434,7 @@ gclcvs (2.7.0-68) unstable; urgency=low
     makes compile into compile-file;c1var propagates declared type
     within closures;fix ensure--directories-exist
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 04 May 2007 21:37:34 -0400
+ -- Camm Maguire <camm@debian.org>  Fri, 04 May 2007 21:37:34 -0400
 
 gclcvs (2.7.0-67) unstable; urgency=low
 
@@ -442,7 +442,7 @@ gclcvs (2.7.0-67) unstable; urgency=low
   * Fix 64bit gcl-tk bug, Closes: #417848
   * headers for plt.c
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 07 Apr 2007 01:54:08 -0400
+ -- Camm Maguire <camm@debian.org>  Sat, 07 Apr 2007 01:54:08 -0400
 
 gclcvs (2.7.0-66) unstable; urgency=low
 
@@ -453,7 +453,7 @@ gclcvs (2.7.0-66) unstable; urgency=low
   * fix reading and printing of floats
   * fix equalp on random-states
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 04 Apr 2007 14:01:28 -0400
+ -- Camm Maguire <camm@debian.org>  Wed, 04 Apr 2007 14:01:28 -0400
 
 gclcvs (2.7.0-65) unstable; urgency=low
 
@@ -486,7 +486,7 @@ gclcvs (2.7.0-65) unstable; urgency=low
   * Depend on common-lisp-controller, Closes: #416514.
   * Fix bad symlink in pargcl source.
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 29 Mar 2007 12:56:28 -0400
+ -- Camm Maguire <camm@debian.org>  Thu, 29 Mar 2007 12:56:28 -0400
 
 gclcvs (2.7.0-64.2) unstable; urgency=low
 
@@ -514,7 +514,7 @@ gclcvs (2.7.0-64) unstable; urgency=low
   * s_hpack to Cnil in gbc whens et to nil package;FFN(fSihs_top) for
     ia64
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 30 Nov 2006 12:08:31 -0500
+ -- Camm Maguire <camm@debian.org>  Thu, 30 Nov 2006 12:08:31 -0500
 
 gclcvs (2.7.0-63) unstable; urgency=low
 
@@ -562,7 +562,7 @@ gclcvs (2.7.0-63) unstable; urgency=low
   * work around for hppa gmp support
   * new hppa compiler options
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 29 Nov 2006 22:02:47 -0500
+ -- Camm Maguire <camm@debian.org>  Wed, 29 Nov 2006 22:02:47 -0500
 
 gclcvs (2.7.0-62) unstable; urgency=low
 
@@ -637,7 +637,7 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * s_hpack to Cnil in gbc whens et to nil package;FFN(fSihs_top) for
     ia64
   
- -- Camm Maguire <camm@enhanced.com>  Sat, 21 Oct 2006 15:27:22 -0400
+ -- Camm Maguire <camm@debian.org>  Sat, 21 Oct 2006 15:27:22 -0400
 
 gclcvs (2.7.0-61) unstable; urgency=low
 
@@ -648,7 +648,7 @@ gclcvs (2.7.0-61) unstable; urgency=low
     fixes;xgcl updates
   * fastlink gensym
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 16 Sep 2006 00:50:35 -0400
+ -- Camm Maguire <camm@debian.org>  Sat, 16 Sep 2006 00:50:35 -0400
 
 gclcvs (2.7.0-60) unstable; urgency=low
 
@@ -657,7 +657,7 @@ gclcvs (2.7.0-60) unstable; urgency=low
   * block name in setf functions
   * preliminary si::stat function
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 14 Sep 2006 15:07:38 -0400
+ -- Camm Maguire <camm@debian.org>  Thu, 14 Sep 2006 15:07:38 -0400
 
 gclcvs (2.7.0-59) unstable; urgency=low
 
@@ -665,7 +665,7 @@ gclcvs (2.7.0-59) unstable; urgency=low
   * restore alpha build with static defentry support
   * Try stepping around hppa/gmp oddity
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 13 Sep 2006 17:43:15 -0400
+ -- Camm Maguire <camm@debian.org>  Wed, 13 Sep 2006 17:43:15 -0400
 
 gclcvs (2.7.0-58) unstable; urgency=low
 
@@ -675,13 +675,13 @@ gclcvs (2.7.0-58) unstable; urgency=low
   * mips support
   * Fix mv-setq and symbol-macrolet tests
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 12 Sep 2006 09:50:30 -0400
+ -- Camm Maguire <camm@debian.org>  Tue, 12 Sep 2006 09:50:30 -0400
 
 gclcvs (2.7.0-57) unstable; urgency=low
 
   * remove emacs build-depends;64bit hash and gmp fixes
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  8 Sep 2006 13:31:02 -0400
+ -- Camm Maguire <camm@debian.org>  Fri,  8 Sep 2006 13:31:02 -0400
 
 gclcvs (2.7.0-56) unstable; urgency=low
 
@@ -719,7 +719,7 @@ gclcvs (2.7.0-56) unstable; urgency=low
     propagation, Closes: #385745
   * check for overflow in bds_bind
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  7 Sep 2006 21:25:26 -0400
+ -- Camm Maguire <camm@debian.org>  Thu,  7 Sep 2006 21:25:26 -0400
 
 gclcvs (2.7.0-55) unstable; urgency=low
 
@@ -879,7 +879,7 @@ gclcvs (2.7.0-55) unstable; urgency=low
     functions;preserve relocatable block across image saves for
     performance;fix random-seed error with newest dynamic gmp
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 29 Aug 2006 13:30:41 -0400
+ -- Camm Maguire <camm@debian.org>  Tue, 29 Aug 2006 13:30:41 -0400
 
 gclcvs (2.7.0-54) unstable; urgency=low
 
@@ -991,20 +991,20 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * ~ in compile-file paths
   * Fix gemtemp package arg
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  7 Sep 2006 13:18:42 -0400
+ -- Camm Maguire <camm@debian.org>  Thu,  7 Sep 2006 13:18:42 -0400
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
   * No logl on non-i386 ?? (a c99 requirement),wrap fSkill call in
     run_process.c for ia64
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 18 Dec 2005 18:38:36 +0000
+ -- Camm Maguire <camm@debian.org>  Sun, 18 Dec 2005 18:38:36 +0000
 
 gclcvs (2.7.0-52) unstable; urgency=low
 
   * fix configure
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 17 Dec 2005 15:04:56 +0000
+ -- Camm Maguire <camm@debian.org>  Sat, 17 Dec 2005 15:04:56 +0000
 
 gclcvs (2.7.0-51) unstable; urgency=low
 
@@ -1190,14 +1190,14 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * pass devices if present in compiler::get-temp-dir
   * Fix install target
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 16 Dec 2005 22:13:42 +0000
+ -- Camm Maguire <camm@debian.org>  Fri, 16 Dec 2005 22:13:42 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
   * debian binutils 2-16.1
   * ia64 support for latest changes
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 10 Sep 2005 01:28:14 +0000
+ -- Camm Maguire <camm@debian.org>  Sat, 10 Sep 2005 01:28:14 +0000
 
 gclcvs (2.7.0-49) unstable; urgency=low
 
@@ -1363,7 +1363,7 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * fix clc script to avoid hanging on stdin -- TODO FIX, this should
     happen with -batch in any case
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 17:43:55 +0000
+ -- Camm Maguire <camm@debian.org>  Wed,  7 Sep 2005 17:43:55 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
@@ -1372,7 +1372,7 @@ gclcvs (2.7.0-48) unstable; urgency=low
   * mips optimizes bzero to memset
   * Have to build 2.0 binary on hppa until debian gets >= gcc 3.4
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 18 Jun 2005 22:08:17 +0000
+ -- Camm Maguire <camm@debian.org>  Sat, 18 Jun 2005 22:08:17 +0000
 
 gclcvs (2.7.0-47) unstable; urgency=low
 
@@ -1384,7 +1384,7 @@ gclcvs (2.7.0-47) unstable; urgency=low
   * FIXME _GNU_SOURCE -> __USE_ISOC99 macro for isnormal et. al.
   * powerpc-macosx.h includes
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 17 Jun 2005 01:13:32 +0000
+ -- Camm Maguire <camm@debian.org>  Fri, 17 Jun 2005 01:13:32 +0000
 
 gclcvs (2.7.0-46) unstable; urgency=low
 
@@ -1397,7 +1397,7 @@ gclcvs (2.7.0-46) unstable; urgency=low
   * Handle CSTACK_ADDRESS of MOST_NEGATIVE_FIX
   * Preserve SGC bit i set_type_of
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 15 Jun 2005 22:23:28 +0000
+ -- Camm Maguire <camm@debian.org>  Wed, 15 Jun 2005 22:23:28 +0000
 
 gclcvs (2.7.0-45) unstable; urgency=low
 
@@ -1421,7 +1421,7 @@ gclcvs (2.7.0-45) unstable; urgency=low
   * Cap rising C stacks for fixnum table, lower mips heap start
   * Better mark/free semantics
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 14 Jun 2005 22:37:17 +0000
+ -- Camm Maguire <camm@debian.org>  Tue, 14 Jun 2005 22:37:17 +0000
 
 gclcvs (2.7.0-44) unstable; urgency=low
 
@@ -1445,7 +1445,7 @@ gclcvs (2.7.0-44) unstable; urgency=low
   * Fast (expt 2 x)
   * builtin class for random-state
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 10 Jun 2005 16:10:09 +0000
+ -- Camm Maguire <camm@debian.org>  Fri, 10 Jun 2005 16:10:09 +0000
 
 gclcvs (2.7.0-43) unstable; urgency=low
 
@@ -1455,7 +1455,7 @@ gclcvs (2.7.0-43) unstable; urgency=low
   * Fix remaining misc test failure by bridging the old string-char into
     character -- FIXME, this needs to be done throughout
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  9 May 2005 19:59:26 +0000
+ -- Camm Maguire <camm@debian.org>  Mon,  9 May 2005 19:59:26 +0000
 
 gclcvs (2.7.0-42) unstable; urgency=low
 
@@ -1478,7 +1478,7 @@ gclcvs (2.7.0-42) unstable; urgency=low
   * remove _o from init-names
   * Update ensure-directories-exist to new probe-file behavior
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  7 May 2005 16:09:43 +0000
+ -- Camm Maguire <camm@debian.org>  Sat,  7 May 2005 16:09:43 +0000
 
 gclcvs (2.7.0-41) unstable; urgency=low
 
@@ -1488,27 +1488,27 @@ gclcvs (2.7.0-41) unstable; urgency=low
     unique gprof init name patch
   * fix symbol name hashing in new alpha relocation code
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 17 Apr 2005 19:43:37 +0000
+ -- Camm Maguire <camm@debian.org>  Sun, 17 Apr 2005 19:43:37 +0000
 
 gclcvs (2.7.0-40) unstable; urgency=low
 
   * Fix ia64 function stubs in run_process.c
   * Make sure local bfd has writable howto types
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 15 Apr 2005 14:37:18 +0000
+ -- Camm Maguire <camm@debian.org>  Fri, 15 Apr 2005 14:37:18 +0000
 
 gclcvs (2.7.0-39) unstable; urgency=low
 
   * Alpha native relocs
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 14 Apr 2005 21:29:42 +0000
+ -- Camm Maguire <camm@debian.org>  Thu, 14 Apr 2005 21:29:42 +0000
 
 gclcvs (2.7.0-38) unstable; urgency=low
 
   * Add _mcount symbol to plt table for mips native relocs on ansi gprof
   * Make static stubs in run_process.c for ia64
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 11 Apr 2005 19:56:30 +0000
+ -- Camm Maguire <camm@debian.org>  Mon, 11 Apr 2005 19:56:30 +0000
 
 gclcvs (2.7.0-37) unstable; urgency=low
 
@@ -1574,7 +1574,7 @@ gclcvs (2.7.0-37) unstable; urgency=low
   * cacheflush for mips; FIXME -- perhaps not necessary
   * prototype for un_perm_writable
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 10 Apr 2005 03:18:16 +0000
+ -- Camm Maguire <camm@debian.org>  Sun, 10 Apr 2005 03:18:16 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 
@@ -1595,7 +1595,7 @@ gclcvs (2.7.0-36) unstable; urgency=high
   * reduce print.cons.random.2 iterations for slow autobuilders to migrate
     latest into sarge, Closes: #282809.
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 11 Dec 2004 01:22:13 +0000
+ -- Camm Maguire <camm@debian.org>  Sat, 11 Dec 2004 01:22:13 +0000
 
 gclcvs (2.7.0-35) unstable; urgency=high
 
@@ -1606,7 +1606,7 @@ gclcvs (2.7.0-35) unstable; urgency=high
   * Preliminary support for 64bit address/nani/load-time-value, and
     64bit most-positive-fixnum
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 27 Nov 2004 22:03:22 +0000
+ -- Camm Maguire <camm@debian.org>  Sat, 27 Nov 2004 22:03:22 +0000
 
 gclcvs (2.7.0-34) unstable; urgency=low
 
@@ -1619,7 +1619,7 @@ gclcvs (2.7.0-34) unstable; urgency=low
   * Reduce iterations for print.cons.1 test, as slower machines are
     timing out
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 25 Nov 2004 14:47:53 -0500
+ -- Camm Maguire <camm@debian.org>  Thu, 25 Nov 2004 14:47:53 -0500
 
 gclcvs (2.7.0-33) unstable; urgency=high
 
@@ -1654,7 +1654,7 @@ gclcvs (2.7.0-33) unstable; urgency=high
   * versionless debhelper build-depend
   * Fix Debian clc cleanup
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 25 Nov 2004 00:02:07 +0000
+ -- Camm Maguire <camm@debian.org>  Thu, 25 Nov 2004 00:02:07 +0000
 
 gclcvs (2.7.0-32) unstable; urgency=high
 
@@ -1694,7 +1694,7 @@ gclcvs (2.7.0-32) unstable; urgency=high
     denominator of former is very large and the latter is modest will
     still probably fail -- need a test here (Paul?)
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 16 Sep 2004 21:24:12 +0000
+ -- Camm Maguire <camm@debian.org>  Thu, 16 Sep 2004 21:24:12 +0000
 
 gclcvs (2.7.0-31) unstable; urgency=high
 
@@ -1729,7 +1729,7 @@ gclcvs (2.7.0-31) unstable; urgency=high
     parse_number
   * Further fixes to parse_number
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 17 Aug 2004 18:03:19 +0000
+ -- Camm Maguire <camm@debian.org>  Tue, 17 Aug 2004 18:03:19 +0000
 
 gclcvs (2.7.0-30) unstable; urgency=high
 
@@ -1752,7 +1752,7 @@ gclcvs (2.7.0-30) unstable; urgency=high
   * Fix typo in sys docs
   * Better common-lisp-controller support
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  6 Aug 2004 18:21:08 +0000
+ -- Camm Maguire <camm@debian.org>  Fri,  6 Aug 2004 18:21:08 +0000
 
 gclcvs (2.7.0-29) unstable; urgency=low
 
@@ -1762,7 +1762,7 @@ gclcvs (2.7.0-29) unstable; urgency=low
     not being compiled correctly.
   * Cleanup after clc on purge, Closes: #261796.
 
- -- Camm Maguire <camm@enhanced.com>  Sun,  1 Aug 2004 23:06:21 +0000
+ -- Camm Maguire <camm@debian.org>  Sun,  1 Aug 2004 23:06:21 +0000
 
 gclcvs (2.7.0-28) unstable; urgency=high
 
@@ -1780,7 +1780,7 @@ gclcvs (2.7.0-28) unstable; urgency=high
   * remove old with-standard-io-syntax frm gcl_ansi_io.lsp
   * preliminary support for common-lisp-controller, Closes: #130569.
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 24 Jul 2004 13:11:10 +0000
+ -- Camm Maguire <camm@debian.org>  Sat, 24 Jul 2004 13:11:10 +0000
 
 gclcvs (2.7.0-27) unstable; urgency=low
 
@@ -1807,13 +1807,13 @@ gclcvs (2.7.0-27) unstable; urgency=low
     available at runtime
   * Support for optimized and inlined calls to setf fuctions
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 15 Jul 2004 23:00:49 +0000
+ -- Camm Maguire <camm@debian.org>  Thu, 15 Jul 2004 23:00:49 +0000
 
 gclcvs (2.7.0-26) unstable; urgency=low
 
   * C_GC_OFFSET is 2 on m68k-linux
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 24 Jun 2004 15:13:46 +0000
+ -- Camm Maguire <camm@debian.org>  Thu, 24 Jun 2004 15:13:46 +0000
 
 gclcvs (2.7.0-25) unstable; urgency=low
 
@@ -1863,7 +1863,7 @@ gclcvs (2.7.0-25) unstable; urgency=low
   * Close possibility of malloc failure due to intervening gbc arising
     from the misordering of allocation calls
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 23 Jun 2004 19:22:08 +0000
+ -- Camm Maguire <camm@debian.org>  Wed, 23 Jun 2004 19:22:08 +0000
 
 gclcvs (2.7.0-24) unstable; urgency=low
 
@@ -1874,7 +1874,7 @@ gclcvs (2.7.0-24) unstable; urgency=low
   * Ensure set TLDFLAGS are used in finding DBEGIN in copnfigure.in, for
     OpenBSD
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  7 May 2004 21:51:43 +0000
+ -- Camm Maguire <camm@debian.org>  Fri,  7 May 2004 21:51:43 +0000
 
 gclcvs (2.7.0-23) unstable; urgency=low
 
@@ -1895,19 +1895,19 @@ gclcvs (2.7.0-23) unstable; urgency=low
   * Revert debugging forms in o/prog.c
   * OpenBSD support, gcc warning cleanups for long page integers
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  3 May 2004 21:36:09 +0000
+ -- Camm Maguire <camm@debian.org>  Mon,  3 May 2004 21:36:09 +0000
 
 gclcvs (2.7.0-22) unstable; urgency=low
 
   * New snapshot for Debian package
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 20 Apr 2004 12:05:26 -0400
+ -- Camm Maguire <camm@debian.org>  Tue, 20 Apr 2004 12:05:26 -0400
 
 gclcvs (2.7.0-21) unstable; urgency=low
 
   * Remove junk files from source, which blocked build on ia64
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 15 Apr 2004 15:13:10 +0000
+ -- Camm Maguire <camm@debian.org>  Thu, 15 Apr 2004 15:13:10 +0000
 
 gclcvs (2.7.0-20) unstable; urgency=low
 
@@ -2042,7 +2042,7 @@ gclcvs (2.7.0-20) unstable; urgency=low
     other platforms for now
   * Make sure pages are mprotected PROT_EXEC for amd64 support
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 13 Apr 2004 21:02:02 +0000
+ -- Camm Maguire <camm@debian.org>  Tue, 13 Apr 2004 21:02:02 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
@@ -2061,7 +2061,7 @@ gclcvs (2.7.0-19) unstable; urgency=low
   * Store banner in si::*system-banner* for possible modificationin
     compatibly licensed programs
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 14 Feb 2004 17:42:42 +0000
+ -- Camm Maguire <camm@debian.org>  Sat, 14 Feb 2004 17:42:42 +0000
 
 gclcvs (2.7.0-18) unstable; urgency=low
 
@@ -2089,13 +2089,13 @@ gclcvs (2.7.0-18) unstable; urgency=low
   * Avoid ~P escape with no arguments in ansi-tests/rt.lsp -- FIXME --
     this should be made to work
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 30 Jan 2004 04:48:44 +0000
+ -- Camm Maguire <camm@debian.org>  Fri, 30 Jan 2004 04:48:44 +0000
 
 gclcvs (2.7.0-17) unstable; urgency=low
 
   * Fix gcl-doc doc-base files
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 30 Dec 2003 22:35:58 +0000
+ -- Camm Maguire <camm@debian.org>  Tue, 30 Dec 2003 22:35:58 +0000
 
 gclcvs (2.7.0-16) unstable; urgency=low
 
@@ -2175,14 +2175,14 @@ gclcvs (2.7.0-16) unstable; urgency=low
   * Rework html documentation generation and installation
   * Remove parentheses from setf class-name info node in chap-7.texi
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 30 Dec 2003 16:50:01 +0000
+ -- Camm Maguire <camm@debian.org>  Tue, 30 Dec 2003 16:50:01 +0000
 
 gclcvs (2.7.0-15) unstable; urgency=low
 
   * Insert some forgotten STATIC_FUNCTION_POINTERS fixes into comm.c and
     sheader.h in the gcl-tk directory
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  6 Nov 2003 20:48:35 +0000
+ -- Camm Maguire <camm@debian.org>  Thu,  6 Nov 2003 20:48:35 +0000
 
 gclcvs (2.7.0-14) unstable; urgency=low
 
@@ -2198,7 +2198,7 @@ gclcvs (2.7.0-14) unstable; urgency=low
     #217484, Closes: #204789, (STATIC_FUNCTION_POINTERS define in
     config.h)
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  6 Nov 2003 15:43:07 +0000
+ -- Camm Maguire <camm@debian.org>  Thu,  6 Nov 2003 15:43:07 +0000
 
 gclcvs (2.7.0-13) unstable; urgency=low
 
@@ -2210,7 +2210,7 @@ gclcvs (2.7.0-13) unstable; urgency=low
     study rational for *info* special variable in certain places as
     opposed to more common copy-info
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 30 Oct 2003 20:23:17 -0500
+ -- Camm Maguire <camm@debian.org>  Thu, 30 Oct 2003 20:23:17 -0500
 
 gclcvs (2.7.0-12) unstable; urgency=low
 
@@ -2250,7 +2250,7 @@ gclcvs (2.7.0-12) unstable; urgency=low
     bfd_build_symbol_table, for the purposes of the static build
     possibility
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 23 Oct 2003 16:46:22 +0000
+ -- Camm Maguire <camm@debian.org>  Thu, 23 Oct 2003 16:46:22 +0000
 
 gclcvs (2.7.0-11) unstable; urgency=low
 
@@ -2262,14 +2262,14 @@ gclcvs (2.7.0-11) unstable; urgency=low
     verify and test this
   * Program error when bad place is passed to getf
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 13 Oct 2003 21:50:55 +0000
+ -- Camm Maguire <camm@debian.org>  Mon, 13 Oct 2003 21:50:55 +0000
 
 gclcvs (2.7.0-10) unstable; urgency=low
 
   * generate less garbage in add-info (gcl_cmpinline.lsp), enabling
     maxima compile to complete in a finite time :-)
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 10 Oct 2003 22:15:28 +0000
+ -- Camm Maguire <camm@debian.org>  Fri, 10 Oct 2003 22:15:28 +0000
 
 gclcvs (2.7.0-9) unstable; urgency=low
 
@@ -2288,7 +2288,7 @@ gclcvs (2.7.0-9) unstable; urgency=low
   * begin sync of our pcl tree with cmucl's, and fix a few bugs not in
     cmucl's tree.  Brings ansi test failures down by about one hundred
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 10 Oct 2003 03:37:09 +0000
+ -- Camm Maguire <camm@debian.org>  Fri, 10 Oct 2003 03:37:09 +0000
 
 gclcvs (2.7.0-8) unstable; urgency=low
 
@@ -2298,7 +2298,7 @@ gclcvs (2.7.0-8) unstable; urgency=low
     failures
   * Rebuild depdndent files
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  7 Oct 2003 21:08:29 +0000
+ -- Camm Maguire <camm@debian.org>  Tue,  7 Oct 2003 21:08:29 +0000
 
 gclcvs (2.7.0-7) unstable; urgency=low
 
@@ -2317,7 +2317,7 @@ gclcvs (2.7.0-7) unstable; urgency=low
   * Add mod directory to *load-path*
   * Fix BOA defstruct ansi tests
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  2 Oct 2003 17:57:21 +0000
+ -- Camm Maguire <camm@debian.org>  Thu,  2 Oct 2003 17:57:21 +0000
 
 gclcvs (2.7.0-6) unstable; urgency=low
 
@@ -2326,7 +2326,7 @@ gclcvs (2.7.0-6) unstable; urgency=low
   * Merge in compilation from lsp step in lsp and cmpnew directories via
     saved_pre_gcl from 2.6.1
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 24 Sep 2003 16:28:59 +0000
+ -- Camm Maguire <camm@debian.org>  Wed, 24 Sep 2003 16:28:59 +0000
 
 gclcvs (2.7.0-5) unstable; urgency=low
 
@@ -2340,7 +2340,7 @@ gclcvs (2.7.0-5) unstable; urgency=low
     fasdmacros name changes, collectfn name changes, and sys-proclaim
     updates and rebuilds from 2.6.1
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 23 Sep 2003 21:49:24 +0000
+ -- Camm Maguire <camm@debian.org>  Tue, 23 Sep 2003 21:49:24 +0000
 
 gclcvs (2.7.0-4) unstable; urgency=low
 
@@ -2357,13 +2357,13 @@ gclcvs (2.7.0-4) unstable; urgency=low
   * Fix typo in fasldlsym.c, Closes: #212239
   * Package rebuild and rerelease
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 22 Sep 2003 22:04:42 +0000
+ -- Camm Maguire <camm@debian.org>  Mon, 22 Sep 2003 22:04:42 +0000
 
 gclcvs (2.7.0-3) unstable; urgency=low
 
   * Close streams in fasldlsym.c
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 16 Sep 2003 15:04:45 +0000
+ -- Camm Maguire <camm@debian.org>  Tue, 16 Sep 2003 15:04:45 +0000
 
 gclcvs (2.7.0-2) unstable; urgency=low
 
@@ -2381,7 +2381,7 @@ gclcvs (2.7.0-2) unstable; urgency=low
   * Use NIFlAGS to compile new_init with lower opts on ppc to work
     around gcc bug, restore full opts to other files
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 14 Sep 2003 02:43:36 +0000
+ -- Camm Maguire <camm@debian.org>  Sun, 14 Sep 2003 02:43:36 +0000
 
 gclcvs (2.7.0-1) unstable; urgency=low
 
@@ -2416,7 +2416,7 @@ gclcvs (2.7.0-1) unstable; urgency=low
   * Newer standards
   * Add windows/isntall.lsp to clean target
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  9 Sep 2003 17:10:20 +0000
+ -- Camm Maguire <camm@debian.org>  Tue,  9 Sep 2003 17:10:20 +0000
 
 gcl (2.6.1-1) unstable; urgency=low
 
@@ -2469,7 +2469,7 @@ gcl (2.6.1-1) unstable; urgency=low
     minimum granularity introduced via CPTR_ALIGN
   * Remove exit function in main.c
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  4 Sep 2003 02:20:52 +0000
+ -- Camm Maguire <camm@debian.org>  Thu,  4 Sep 2003 02:20:52 +0000
 
 gcl (2.6.0cvs-1) experimental; urgency=low
 
@@ -2477,13 +2477,13 @@ gcl (2.6.0cvs-1) experimental; urgency=low
   * reader enhancement to handle foo:(a b c)
   * preliminary defgeneric method support
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 15 Jul 2003 13:41:33 -0400
+ -- Camm Maguire <camm@debian.org>  Tue, 15 Jul 2003 13:41:33 -0400
 
 gcl (2.5.3-2) unstable; urgency=low
 
   * gcc-3.3 all platforms
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  7 Jul 2003 16:10:25 +0000
+ -- Camm Maguire <camm@debian.org>  Mon,  7 Jul 2003 16:10:25 +0000
 
 gcl (2.5.3-1) unstable; urgency=low
 
@@ -2493,7 +2493,7 @@ gcl (2.5.3-1) unstable; urgency=low
     si-defs.texi
   * Unstatic object_to_float, object_to_double
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 15 Jul 2003 13:37:08 -0400
+ -- Camm Maguire <camm@debian.org>  Tue, 15 Jul 2003 13:37:08 -0400
 
 gcl (2.5.2-1) unstable; urgency=low
 
@@ -2501,7 +2501,7 @@ gcl (2.5.2-1) unstable; urgency=low
   * Cleanup xdrfuns.c for Axiom
   * Reenable xgcl build
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 20 Mar 2003 09:15:54 -0500
+ -- Camm Maguire <camm@debian.org>  Thu, 20 Mar 2003 09:15:54 -0500
 
 gcl (2.5.1-1) unstable; urgency=high
 
@@ -2509,7 +2509,7 @@ gcl (2.5.1-1) unstable; urgency=high
   * Add RELEASE-2.5.1 file
   * Add dedication notice to the memory of W. Schelter
 
- -- Camm Maguire <camm@enhanced.com>  Sun,  2 Mar 2003 10:20:26 -0500
+ -- Camm Maguire <camm@debian.org>  Sun,  2 Mar 2003 10:20:26 -0500
 
 gcl (2.5.0.cvs20020625-80) unstable; urgency=low
 
@@ -2527,13 +2527,13 @@ gcl (2.5.0.cvs20020625-80) unstable; urgency=low
   * num_log.c miscompilation on ia64 apparently fixed, Closes: #156291
   * Ensure cmpinclude.h up to date in main makefile
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  1 Mar 2003 17:33:29 -0500
+ -- Camm Maguire <camm@debian.org>  Sat,  1 Mar 2003 17:33:29 -0500
 
 gcl (2.5.0.cvs20020625-79) unstable; urgency=low
 
   * Fix Debian package install bug
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 27 Feb 2003 23:17:55 -0500
+ -- Camm Maguire <camm@debian.org>  Thu, 27 Feb 2003 23:17:55 -0500
 
 gcl (2.5.0.cvs20020625-78) unstable; urgency=low
 
@@ -2541,7 +2541,7 @@ gcl (2.5.0.cvs20020625-78) unstable; urgency=low
   * Remove xgcl-2/debian directory
   * Update clcs/sys-proclaim.lisp
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 27 Feb 2003 18:48:38 -0500
+ -- Camm Maguire <camm@debian.org>  Thu, 27 Feb 2003 18:48:38 -0500
 
 gcl (2.5.0.cvs20020625-77) unstable; urgency=low
 
@@ -2557,7 +2557,7 @@ gcl (2.5.0.cvs20020625-77) unstable; urgency=low
   * Typo in debian/rules
   * Remove debian/gcl.conffiles
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 27 Feb 2003 15:56:11 -0500
+ -- Camm Maguire <camm@debian.org>  Thu, 27 Feb 2003 15:56:11 -0500
 
 gcl (2.5.0.cvs20020625-76) unstable; urgency=low
 
@@ -2603,13 +2603,13 @@ gcl (2.5.0.cvs20020625-76) unstable; urgency=low
   * Toggle ansi image with GCL_ANSI environment variable
   * Version 2.5.1
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 26 Feb 2003 21:31:04 -0500
+ -- Camm Maguire <camm@debian.org>  Wed, 26 Feb 2003 21:31:04 -0500
 
 gcl (2.5.0.cvs20020625-75) unstable; urgency=low
 
   * Export truename for dlopen systems
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 14 Feb 2003 23:31:15 -0500
+ -- Camm Maguire <camm@debian.org>  Fri, 14 Feb 2003 23:31:15 -0500
 
 gcl (2.5.0.cvs20020625-74) unstable; urgency=low
 
@@ -2621,7 +2621,7 @@ gcl (2.5.0.cvs20020625-74) unstable; urgency=low
   * Prototypes for all possible compiler generated function calls
   * relative symlink for cmpinclude.h in Debian package
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 14 Feb 2003 20:17:31 -0500
+ -- Camm Maguire <camm@debian.org>  Fri, 14 Feb 2003 20:17:31 -0500
 
 gcl (2.5.0.cvs20020625-73) unstable; urgency=low
 
@@ -2633,7 +2633,7 @@ gcl (2.5.0.cvs20020625-73) unstable; urgency=low
   * gcc-3.2 on powerpc can't yet handle -O2 and higher
   * Reenable gcc-3.2 for m68k and do some guesswork in configure
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 10 Feb 2003 13:47:00 -0500
+ -- Camm Maguire <camm@debian.org>  Mon, 10 Feb 2003 13:47:00 -0500
 
 gcl (2.5.0.cvs20020625-72) unstable; urgency=high
 
@@ -2644,7 +2644,7 @@ gcl (2.5.0.cvs20020625-72) unstable; urgency=high
   * Repair nconc and tailp fixes
   * varargs->stdarg for gcc 3.3 and higher
 
- -- Camm Maguire <camm@enhanced.com>  Sun,  9 Feb 2003 16:57:33 -0500
+ -- Camm Maguire <camm@debian.org>  Sun,  9 Feb 2003 16:57:33 -0500
 
 gcl (2.5.0.cvs20020625-71) unstable; urgency=high
 
@@ -2675,7 +2675,7 @@ gcl (2.5.0.cvs20020625-71) unstable; urgency=high
   * recompiled core lsp and compiler files
   * restore dvi and html doc build for non-mingw
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 24 Jan 2003 13:55:11 -0500
+ -- Camm Maguire <camm@debian.org>  Fri, 24 Jan 2003 13:55:11 -0500
 
 gcl (2.5.0.cvs20020625-70) unstable; urgency=high
 
@@ -2687,14 +2687,14 @@ gcl (2.5.0.cvs20020625-70) unstable; urgency=high
     acl2 build
   * SGC for s390
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  5 Dec 2002 08:02:17 -0500
+ -- Camm Maguire <camm@debian.org>  Thu,  5 Dec 2002 08:02:17 -0500
 
 gcl (2.5.0.cvs20020625-69) unstable; urgency=high
 
   * eval fix
   * \-mlong-calls for arm
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 25 Nov 2002 08:35:27 -0500
+ -- Camm Maguire <camm@debian.org>  Mon, 25 Nov 2002 08:35:27 -0500
 
 gcl (2.5.0.cvs20020625-68) unstable; urgency=high
 
@@ -2705,7 +2705,7 @@ gcl (2.5.0.cvs20020625-68) unstable; urgency=high
   * Loop error fixes
   * cache flush with page granularity on m68k
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 21 Nov 2002 17:44:30 -0500
+ -- Camm Maguire <camm@debian.org>  Thu, 21 Nov 2002 17:44:30 -0500
 
 gcl (2.5.0.cvs20020625-67) unstable; urgency=high
 
@@ -2713,13 +2713,13 @@ gcl (2.5.0.cvs20020625-67) unstable; urgency=high
     should fix acl2 build
   * Removed diagnostic SIGILL trapping in cmpaux.c
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 12 Nov 2002 23:25:49 -0500
+ -- Camm Maguire <camm@debian.org>  Tue, 12 Nov 2002 23:25:49 -0500
 
 gcl (2.5.0.cvs20020625-66) unstable; urgency=high
 
   * Fix SIGILL trap in cmpaux.c
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 11 Nov 2002 11:14:07 -0500
+ -- Camm Maguire <camm@debian.org>  Mon, 11 Nov 2002 11:14:07 -0500
 
 gcl (2.5.0.cvs20020625-65) unstable; urgency=high
 
@@ -2728,19 +2728,19 @@ gcl (2.5.0.cvs20020625-65) unstable; urgency=high
   * map-into fill-pointer fixes
   * changes to the user-init mechanism for portable acl2 build
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 10 Nov 2002 12:33:59 -0500
+ -- Camm Maguire <camm@debian.org>  Sun, 10 Nov 2002 12:33:59 -0500
 
 gcl (2.5.0.cvs20020625-64) unstable; urgency=low
 
   * Fix epsilon calculations again to reenable arm build
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  1 Nov 2002 07:08:33 -0500
+ -- Camm Maguire <camm@debian.org>  Fri,  1 Nov 2002 07:08:33 -0500
 
 gcl (2.5.0.cvs20020625-63) unstable; urgency=low
 
   * Add versioned dependency on the gcc used to build gcl
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 29 Oct 2002 16:20:22 -0500
+ -- Camm Maguire <camm@debian.org>  Tue, 29 Oct 2002 16:20:22 -0500
 
 gcl (2.5.0.cvs20020625-62) unstable; urgency=low
 
@@ -2750,7 +2750,7 @@ gcl (2.5.0.cvs20020625-62) unstable; urgency=low
   * Fix info dir setting in configure
   * Priority extra
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 28 Oct 2002 23:45:07 -0500
+ -- Camm Maguire <camm@debian.org>  Mon, 28 Oct 2002 23:45:07 -0500
 
 gcl (2.5.0.cvs20020625-61) unstable; urgency=low
 
@@ -2769,7 +2769,7 @@ gcl (2.5.0.cvs20020625-61) unstable; urgency=low
   * make -> $(MAKE) in makefiles
   * Incorporated main GCL (ANSI) Lisp Documentation in distribution
 
- -- Camm Maguire <camm@m.enhanced.com>  Mon, 28 Oct 2002 04:31:33 -0500
+ -- Camm Maguire <camm@debian.org>  Mon, 28 Oct 2002 04:31:33 -0500
 
 gcl (2.5.0.cvs20020625-60) unstable; urgency=low
 
@@ -2788,7 +2788,7 @@ gcl (2.5.0.cvs20020625-60) unstable; urgency=low
   * fix handler.lisp
   * Fix to bfd/GBC interaction
 
- -- Camm Maguire <camm@m.enhanced.com>  Wed, 23 Oct 2002 08:38:08 -0400
+ -- Camm Maguire <camm@debian.org>  Wed, 23 Oct 2002 08:38:08 -0400
 
 gcl (2.5.0.cvs20020625-59) unstable; urgency=low
 
@@ -2798,7 +2798,7 @@ gcl (2.5.0.cvs20020625-59) unstable; urgency=low
   * New config.sub and config.guess files and automatic updates in
     binutils, gmp, and gmp3 subdirs
 
- -- Camm Maguire <camm@m.enhanced.com>  Wed, 16 Oct 2002 11:38:56 -0400
+ -- Camm Maguire <camm@debian.org>  Wed, 16 Oct 2002 11:38:56 -0400
 
 gcl (2.5.0.cvs20020625-58) unstable; urgency=low
 
@@ -2828,7 +2828,7 @@ gcl (2.5.0.cvs20020625-58) unstable; urgency=low
   * elt errors of type type error
   * bad-sequence limit returns type error
 
- -- Camm Maguire <camm@m.enhanced.com>  Tue, 15 Oct 2002 15:39:19 -0400
+ -- Camm Maguire <camm@debian.org>  Tue, 15 Oct 2002 15:39:19 -0400
 
 gcl (2.5.0.cvs20020625-57) unstable; urgency=low
 
@@ -2857,7 +2857,7 @@ gcl (2.5.0.cvs20020625-57) unstable; urgency=low
   * Fix bug in main makefile
   * Newlines at end of test files
 
- -- Camm Maguire <camm@m.enhanced.com>  Wed,  9 Oct 2002 15:04:41 -0400
+ -- Camm Maguire <camm@debian.org>  Wed,  9 Oct 2002 15:04:41 -0400
 
 gcl (2.5.0.cvs20020625-56) unstable; urgency=high
 
@@ -2872,7 +2872,7 @@ gcl (2.5.0.cvs20020625-56) unstable; urgency=high
     string.d;fix bug in string.d:member_char for vector types;redefine
     slot reader and writer functions in pcl/impl/gcl/gcl-low.lisp
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  5 Oct 2002 14:33:46 -0400
+ -- Camm Maguire <camm@debian.org>  Sat,  5 Oct 2002 14:33:46 -0400
 
 gcl (2.5.0.cvs20020625-55) unstable; urgency=high
 
@@ -2909,7 +2909,7 @@ gcl (2.5.0.cvs20020625-55) unstable; urgency=high
   * (char ignores fill-pointer
   * remove -O4 from debian/rules
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  3 Oct 2002 01:52:45 -0400
+ -- Camm Maguire <camm@debian.org>  Thu,  3 Oct 2002 01:52:45 -0400
 
 gcl (2.5.0.cvs20020625-54) unstable; urgency=high
 
@@ -2920,7 +2920,7 @@ gcl (2.5.0.cvs20020625-54) unstable; urgency=high
   * make-sequence checks size against result type
   * install endp macro for dotted list support
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 24 Sep 2002 14:57:44 -0400
+ -- Camm Maguire <camm@debian.org>  Tue, 24 Sep 2002 14:57:44 -0400
 
 gcl (2.5.0.cvs20020625-53) unstable; urgency=high
 
@@ -2930,19 +2930,19 @@ gcl (2.5.0.cvs20020625-53) unstable; urgency=high
   * Compile hppa with debugging, will get a build but a broken one, ok
     for now, Closes: #159591
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 20 Sep 2002 09:48:35 -0400
+ -- Camm Maguire <camm@debian.org>  Fri, 20 Sep 2002 09:48:35 -0400
 
 gcl (2.5.0.cvs20020625-52) unstable; urgency=high
 
   * Fixed gcc version bug in debian/rules
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 12 Sep 2002 18:00:50 -0400
+ -- Camm Maguire <camm@debian.org>  Thu, 12 Sep 2002 18:00:50 -0400
 
 gcl (2.5.0.cvs20020625-51) unstable; urgency=high
 
   * static gmp for m68k
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 12 Sep 2002 09:33:03 -0400
+ -- Camm Maguire <camm@debian.org>  Thu, 12 Sep 2002 09:33:03 -0400
 
 gcl (2.5.0.cvs20020625-50) unstable; urgency=high
 
@@ -2950,26 +2950,26 @@ gcl (2.5.0.cvs20020625-50) unstable; urgency=high
     hppa,ia64,and arm;libgmp2-dev for m68k;no rsym with
     dynsysbfd;build_symbol_table earlier to shrink table size;
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 12 Sep 2002 00:39:17 -0400
+ -- Camm Maguire <camm@debian.org>  Thu, 12 Sep 2002 00:39:17 -0400
 
 gcl (2.5.0.cvs20020625-49) unstable; urgency=high
 
   * Use old gmp for m68k until can pin down test failure with gmp3
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 10 Sep 2002 00:36:10 -0400
+ -- Camm Maguire <camm@debian.org>  Tue, 10 Sep 2002 00:36:10 -0400
 
 gcl (2.5.0.cvs20020625-48) unstable; urgency=high
 
   * Rework build and install so that custom images can be made without
     the source tree, even when using dlopen
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  9 Sep 2002 23:26:47 -0400
+ -- Camm Maguire <camm@debian.org>  Mon,  9 Sep 2002 23:26:47 -0400
 
 gcl (2.5.0.cvs20020625-47) unstable; urgency=high
 
   * Install cmpinclude.h in system include directory
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 29 Aug 2002 23:31:55 -0400
+ -- Camm Maguire <camm@debian.org>  Thu, 29 Aug 2002 23:31:55 -0400
 
 gcl (2.5.0.cvs20020625-46) unstable; urgency=high
 
@@ -2984,13 +2984,13 @@ gcl (2.5.0.cvs20020625-46) unstable; urgency=high
   * Correctly add directory paths to extra gmp file targets in
     unixport/makefile for m68k
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 29 Aug 2002 21:56:28 -0400
+ -- Camm Maguire <camm@debian.org>  Thu, 29 Aug 2002 21:56:28 -0400
 
 gcl (2.5.0.cvs20020625-45) unstable; urgency=high
 
   * Fix typo in rshift target for m68k
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 28 Aug 2002 18:02:00 -0400
+ -- Camm Maguire <camm@debian.org>  Wed, 28 Aug 2002 18:02:00 -0400
 
 gcl (2.5.0.cvs20020625-44) unstable; urgency=high
 
@@ -3000,7 +3000,7 @@ gcl (2.5.0.cvs20020625-44) unstable; urgency=high
   * Fix infinite loop in assoc-if et.al.
   * X_LIBS and X_CFLAGS determination in configure script
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 21 Aug 2002 18:22:37 -0400
+ -- Camm Maguire <camm@debian.org>  Wed, 21 Aug 2002 18:22:37 -0400
 
 gcl (2.5.0.cvs20020625-43) unstable; urgency=high
 
@@ -3012,7 +3012,7 @@ gcl (2.5.0.cvs20020625-43) unstable; urgency=high
   * Dynamic libgmp support, overriding with patched functions from local
     source where necessary
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 18 Aug 2002 12:10:55 -0400
+ -- Camm Maguire <camm@debian.org>  Sun, 18 Aug 2002 12:10:55 -0400
 
 gcl (2.5.0.cvs20020625-42) unstable; urgency=high
 
@@ -3023,19 +3023,19 @@ gcl (2.5.0.cvs20020625-42) unstable; urgency=high
   * oldgmp configure option, and made default for m68k as temporary
     workaround
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 12 Aug 2002 23:49:09 -0400
+ -- Camm Maguire <camm@debian.org>  Mon, 12 Aug 2002 23:49:09 -0400
 
 gcl (2.5.0.cvs20020625-41) unstable; urgency=high
 
   * Minor rules revision for i164
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 11 Aug 2002 13:49:03 -0400
+ -- Camm Maguire <camm@debian.org>  Sun, 11 Aug 2002 13:49:03 -0400
 
 gcl (2.5.0.cvs20020625-40) unstable; urgency=high
 
   * revamp CONST configure test for certain bfd versions
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 11 Aug 2002 12:31:35 -0400
+ -- Camm Maguire <camm@debian.org>  Sun, 11 Aug 2002 12:31:35 -0400
 
 gcl (2.5.0.cvs20020625-39) unstable; urgency=high
 
@@ -3043,7 +3043,7 @@ gcl (2.5.0.cvs20020625-39) unstable; urgency=high
     higher -- code takes address of a variable kept in a register
   * compile num_log.c with -O only on ia64 to work around compiler bug
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 11 Aug 2002 08:53:03 -0400
+ -- Camm Maguire <camm@debian.org>  Sun, 11 Aug 2002 08:53:03 -0400
 
 gcl (2.5.0.cvs20020625-38) unstable; urgency=high
 
@@ -3051,33 +3051,33 @@ gcl (2.5.0.cvs20020625-38) unstable; urgency=high
     for ia64
   * Remove error in clean target
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 10 Aug 2002 13:20:08 -0400
+ -- Camm Maguire <camm@debian.org>  Sat, 10 Aug 2002 13:20:08 -0400
 
 gcl (2.5.0.cvs20020625-37) unstable; urgency=high
 
   * Replace tmpnam and mktemp with less dangerous mkstemp
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  9 Aug 2002 19:45:52 -0400
+ -- Camm Maguire <camm@debian.org>  Fri,  9 Aug 2002 19:45:52 -0400
 
 gcl (2.5.0.cvs20020625-36) unstable; urgency=high
 
   * Fix rsym compilation when not using bfd
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  9 Aug 2002 19:10:16 -0400
+ -- Camm Maguire <camm@debian.org>  Fri,  9 Aug 2002 19:10:16 -0400
 
 gcl (2.5.0.cvs20020625-35) unstable; urgency=high
 
   * Don't build bfd/po subdir
   * Build-depend on automake and gettext
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  9 Aug 2002 14:36:58 -0400
+ -- Camm Maguire <camm@debian.org>  Fri,  9 Aug 2002 14:36:58 -0400
 
 gcl (2.5.0.cvs20020625-34) unstable; urgency=high
 
   * fix zero length array support
   * reverse configure order for bfd and libiberty
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  9 Aug 2002 11:52:38 -0400
+ -- Camm Maguire <camm@debian.org>  Fri,  9 Aug 2002 11:52:38 -0400
 
 gcl (2.5.0.cvs20020625-33) unstable; urgency=high
 
@@ -3085,7 +3085,7 @@ gcl (2.5.0.cvs20020625-33) unstable; urgency=high
   * dlopen for appropriate arches in debian/rules
   * add custreloc configure option
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  9 Aug 2002 10:16:55 -0400
+ -- Camm Maguire <camm@debian.org>  Fri,  9 Aug 2002 10:16:55 -0400
 
 gcl (2.5.0.cvs20020625-32) unstable; urgency=high
 
@@ -3093,7 +3093,7 @@ gcl (2.5.0.cvs20020625-32) unstable; urgency=high
   * Try default gmp3 build on m68k
   * Fix merge-pathnames
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  9 Aug 2002 00:13:16 -0400
+ -- Camm Maguire <camm@debian.org>  Fri,  9 Aug 2002 00:13:16 -0400
 
 gcl (2.5.0.cvs20020625-31) unstable; urgency=high
 
@@ -3101,7 +3101,7 @@ gcl (2.5.0.cvs20020625-31) unstable; urgency=high
   * New number_tan implementation using real tan, so optimized compiled
     code will find symbol in -lm
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  6 Aug 2002 18:37:52 -0400
+ -- Camm Maguire <camm@debian.org>  Tue,  6 Aug 2002 18:37:52 -0400
 
 gcl (2.5.0.cvs20020625-30) unstable; urgency=high
 
@@ -3109,7 +3109,7 @@ gcl (2.5.0.cvs20020625-30) unstable; urgency=high
   * \-O6 \-fomit\-frame\-pointer for Linux, speed gain of ~ 10%
   * clean saved_gcl_pcl
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  5 Aug 2002 16:34:33 -0400
+ -- Camm Maguire <camm@debian.org>  Mon,  5 Aug 2002 16:34:33 -0400
 
 gcl (2.5.0.cvs20020625-29) unstable; urgency=high
 
@@ -3119,7 +3119,7 @@ gcl (2.5.0.cvs20020625-29) unstable; urgency=high
   * hppa still has gc leak, possibly due to faulty setjmp.  Try Lamont
     Jones' latest assembler to flush regs
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  2 Aug 2002 20:50:21 -0400
+ -- Camm Maguire <camm@debian.org>  Fri,  2 Aug 2002 20:50:21 -0400
 
 gcl (2.5.0.cvs20020625-28) unstable; urgency=high
 
@@ -3129,7 +3129,7 @@ gcl (2.5.0.cvs20020625-28) unstable; urgency=high
     functions that actually return long being cast appropriately
   * back out of m68k hack in eval.c and funlink.c
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  2 Aug 2002 18:22:04 -0400
+ -- Camm Maguire <camm@debian.org>  Fri,  2 Aug 2002 18:22:04 -0400
 
 gcl (2.5.0.cvs20020625-27) unstable; urgency=high
 
@@ -3140,7 +3140,7 @@ gcl (2.5.0.cvs20020625-27) unstable; urgency=high
   * GBC register spiil asm for hppa
   * fix hash_equal declaration error in hash.d
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  1 Aug 2002 18:12:49 -0400
+ -- Camm Maguire <camm@debian.org>  Thu,  1 Aug 2002 18:12:49 -0400
 
 gcl (2.5.0.cvs20020625-26) unstable; urgency=high
 
@@ -3152,7 +3152,7 @@ gcl (2.5.0.cvs20020625-26) unstable; urgency=high
   * cc instead of ld for -shared linking in fasldlsym.c (needed for
     hppa)
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 31 Jul 2002 18:46:54 -0400
+ -- Camm Maguire <camm@debian.org>  Wed, 31 Jul 2002 18:46:54 -0400
 
 gcl (2.5.0.cvs20020625-25) unstable; urgency=high
 
@@ -3160,13 +3160,13 @@ gcl (2.5.0.cvs20020625-25) unstable; urgency=high
   * Remove gclm.bat from Debian package
   * Build-Depend on autoconf, Closes: #154909
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 31 Jul 2002 09:44:20 -0400
+ -- Camm Maguire <camm@debian.org>  Wed, 31 Jul 2002 09:44:20 -0400
 
 gcl (2.5.0.cvs20020625-24) unstable; urgency=high
 
   * chmod +x gmp3/configure
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 31 Jul 2002 07:55:17 -0400
+ -- Camm Maguire <camm@debian.org>  Wed, 31 Jul 2002 07:55:17 -0400
 
 gcl (2.5.0.cvs20020625-23) unstable; urgency=high
 
@@ -3178,168 +3178,168 @@ gcl (2.5.0.cvs20020625-23) unstable; urgency=high
   * gmp3 import for ia64
   * system bzero, bcmp, and bcopy function prototypes
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 30 Jul 2002 23:11:58 -0400
+ -- Camm Maguire <camm@debian.org>  Tue, 30 Jul 2002 23:11:58 -0400
 
 gcl (2.5.0.cvs20020625-22) unstable; urgency=high
 
   * ElfW macros in rsym*.c for 64bit
   * Allow for 8 byte gmp mp_limbs
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 25 Jul 2002 18:52:37 -0400
+ -- Camm Maguire <camm@debian.org>  Thu, 25 Jul 2002 18:52:37 -0400
 
 gcl (2.5.0.cvs20020625-21) unstable; urgency=high
 
   * Support for dlopen object loading where bfd is not yet working --
     ./configure --enable-dlopen
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 25 Jul 2002 15:08:05 -0400
+ -- Camm Maguire <camm@debian.org>  Thu, 25 Jul 2002 15:08:05 -0400
 
 gcl (2.5.0.cvs20020625-20) unstable; urgency=high
 
   * Cleanups for --disable-bfd option
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 24 Jul 2002 15:05:28 -0400
+ -- Camm Maguire <camm@debian.org>  Wed, 24 Jul 2002 15:05:28 -0400
 
 gcl (2.5.0.cvs20020625-19) unstable; urgency=high
 
   * 64bit fixes
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 24 Jul 2002 12:16:42 -0400
+ -- Camm Maguire <camm@debian.org>  Wed, 24 Jul 2002 12:16:42 -0400
 
 gcl (2.5.0.cvs20020625-18) unstable; urgency=high
 
   * misc. lintian cleanups, mostly for 64 bit
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 23 Jul 2002 23:35:03 -0400
+ -- Camm Maguire <camm@debian.org>  Tue, 23 Jul 2002 23:35:03 -0400
 
 gcl (2.5.0.cvs20020625-17) unstable; urgency=high
 
   * Fixed typeo in error.c preventing arm compilation
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 22 Jul 2002 17:18:18 -0400
+ -- Camm Maguire <camm@debian.org>  Mon, 22 Jul 2002 17:18:18 -0400
 
 gcl (2.5.0.cvs20020625-16) unstable; urgency=high
 
   * Fix bad on_stack_list_vector args
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 22 Jul 2002 16:10:16 -0400
+ -- Camm Maguire <camm@debian.org>  Mon, 22 Jul 2002 16:10:16 -0400
 
 gcl (2.5.0.cvs20020625-15) unstable; urgency=high
 
   * More lint changes for sundry arches
   * Fixed bug in Iapply_ap
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 20 Jul 2002 23:40:33 -0400
+ -- Camm Maguire <camm@debian.org>  Sat, 20 Jul 2002 23:40:33 -0400
 
 gcl (2.5.0.cvs20020625-14) unstable; urgency=high
 
   * include stdarg.h when defining _GNU_SOURCE
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 20 Jul 2002 18:47:43 -0400
+ -- Camm Maguire <camm@debian.org>  Sat, 20 Jul 2002 18:47:43 -0400
 
 gcl (2.5.0.cvs20020625-13) unstable; urgency=high
 
   * Proper va_dcl declarations
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 20 Jul 2002 10:40:02 -0400
+ -- Camm Maguire <camm@debian.org>  Sat, 20 Jul 2002 10:40:02 -0400
 
 gcl (2.5.0.cvs20020625-12) unstable; urgency=high
 
   * cvs updates for missing ptrdiff_t
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 20 Jul 2002 08:41:37 -0400
+ -- Camm Maguire <camm@debian.org>  Sat, 20 Jul 2002 08:41:37 -0400
 
 gcl (2.5.0.cvs20020625-11) unstable; urgency=high
 
   * cvs changes to compile cleanly with -Wall
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 20 Jul 2002 02:59:33 -0400
+ -- Camm Maguire <camm@debian.org>  Sat, 20 Jul 2002 02:59:33 -0400
 
 gcl (2.5.0.cvs20020625-10) unstable; urgency=high
 
   * Architecture any, though still have some issues
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 12 Jul 2002 19:02:09 -0400
+ -- Camm Maguire <camm@debian.org>  Fri, 12 Jul 2002 19:02:09 -0400
 
 gcl (2.5.0.cvs20020625-9) unstable; urgency=high
 
   * cvs commits for 64bit support
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 12 Jul 2002 18:01:21 -0400
+ -- Camm Maguire <camm@debian.org>  Fri, 12 Jul 2002 18:01:21 -0400
 
 gcl (2.5.0.cvs20020625-8) unstable; urgency=high
 
   * NULL_OR_ON_C_STACK macro correction for m68k
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 12 Jul 2002 14:37:48 -0400
+ -- Camm Maguire <camm@debian.org>  Fri, 12 Jul 2002 14:37:48 -0400
 
 gcl (2.5.0.cvs20020625-7) unstable; urgency=high
 
   * arm is bigendian
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 10 Jul 2002 18:04:22 -0400
+ -- Camm Maguire <camm@debian.org>  Wed, 10 Jul 2002 18:04:22 -0400
 
 gcl (2.5.0.cvs20020625-6) unstable; urgency=high
 
   * cvs updates for arm build
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  9 Jul 2002 16:09:26 -0400
+ -- Camm Maguire <camm@debian.org>  Tue,  9 Jul 2002 16:09:26 -0400
 
 gcl (2.5.0.cvs20020625-5) unstable; urgency=high
 
   * CC environment variable setting in debian/rules to aid in porting
   * gcc 2.95 for m68k
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  6 Jul 2002 23:00:23 -0400
+ -- Camm Maguire <camm@debian.org>  Sat,  6 Jul 2002 23:00:23 -0400
 
 gcl (2.5.0.cvs20020625-4) unstable; urgency=high
 
   * gcc 3.0 for arm
   * cachectl header for m68k
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  1 Jul 2002 15:47:53 -0400
+ -- Camm Maguire <camm@debian.org>  Mon,  1 Jul 2002 15:47:53 -0400
 
 gcl (2.5.0.cvs20020625-3) unstable; urgency=high
 
   * Better libbfd detection for arm/alpha
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 26 Jun 2002 17:27:21 -0400
+ -- Camm Maguire <camm@debian.org>  Wed, 26 Jun 2002 17:27:21 -0400
 
 gcl (2.5.0.cvs20020625-2) unstable; urgency=high
 
   * s390 support
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 25 Jun 2002 21:25:35 -0400
+ -- Camm Maguire <camm@debian.org>  Tue, 25 Jun 2002 21:25:35 -0400
 
 gcl (2.5.0.cvs20020625-1) unstable; urgency=high
 
   * CVS updates, new s390 arch
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 25 Jun 2002 19:26:36 -0400
+ -- Camm Maguire <camm@debian.org>  Tue, 25 Jun 2002 19:26:36 -0400
 
 gcl (2.5.0.cvs20020610-2) unstable; urgency=high
 
   * cvs updates
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 13 Jun 2002 08:42:32 -0400
+ -- Camm Maguire <camm@debian.org>  Thu, 13 Jun 2002 08:42:32 -0400
 
 gcl (2.5.0.cvs20020610-1) unstable; urgency=high
 
   * cvs updates
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 12 Jun 2002 23:04:57 -0400
+ -- Camm Maguire <camm@debian.org>  Wed, 12 Jun 2002 23:04:57 -0400
 
 gcl (2.5.0.cvs20020523-2) unstable; urgency=high
 
   * configure updates for better tk detection
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 24 May 2002 18:50:22 -0400
+ -- Camm Maguire <camm@debian.org>  Fri, 24 May 2002 18:50:22 -0400
 
 gcl (2.5.0.cvs20020523-1) unstable; urgency=high
 
   * New upstream release
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 24 May 2002 18:50:22 -0400
+ -- Camm Maguire <camm@debian.org>  Fri, 24 May 2002 18:50:22 -0400
 
 gcl (2.5.0.cvs20020429-1) unstable; urgency=high
 
@@ -3347,13 +3347,13 @@ gcl (2.5.0.cvs20020429-1) unstable; urgency=high
   * New cvs updates
   * Added sparc to arch list, Closes: #143465
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 29 Apr 2002 23:07:36 -0400
+ -- Camm Maguire <camm@debian.org>  Mon, 29 Apr 2002 23:07:36 -0400
 
 gcl (2.5.0.cvs20020219-2) unstable; urgency=medium
 
   * flavor ->debian-emacs-flavor in emacsen-startup
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  4 Mar 2002 14:29:59 -0500
+ -- Camm Maguire <camm@debian.org>  Mon,  4 Mar 2002 14:29:59 -0500
 
 gcl (2.5.0.cvs20020219-1) unstable; urgency=medium
 
@@ -3362,20 +3362,20 @@ gcl (2.5.0.cvs20020219-1) unstable; urgency=medium
   * Gcl currently only available on i386, arm and m68k as specified in
     the Architecture control field, Closes: #133912
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 19 Feb 2002 12:04:29 -0500
+ -- Camm Maguire <camm@debian.org>  Tue, 19 Feb 2002 12:04:29 -0500
 
 gcl (2.5.0.cvs-3) unstable; urgency=medium
 
   * Build-depend on texi2html, Closes: #133699
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 13 Feb 2002 16:22:35 -0500
+ -- Camm Maguire <camm@debian.org>  Wed, 13 Feb 2002 16:22:35 -0500
 
 gcl (2.5.0.cvs-2) unstable; urgency=medium
 
   * Put in versioned dependency on binutils for libbfd support, rebuilt
     with latest binutils, Closes: #133004
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 12 Feb 2002 13:19:12 -0500
+ -- Camm Maguire <camm@debian.org>  Tue, 12 Feb 2002 13:19:12 -0500
 
 gcl (2.5.0.cvs-1) unstable; urgency=medium
 
@@ -3384,7 +3384,7 @@ gcl (2.5.0.cvs-1) unstable; urgency=medium
   * /etc/emacs/site-start.d/50gcl.el as conffile, Closes: #132137
   * limited arm and m68k support
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  4 Feb 2002 09:32:29 -0500
+ -- Camm Maguire <camm@debian.org>  Mon,  4 Feb 2002 09:32:29 -0500
 
 gcl (2.5.0-1) unstable; urgency=medium
 
@@ -3399,7 +3399,7 @@ gcl (2.5.0-1) unstable; urgency=medium
     suggested to upstream gmp developers. Closes: #108910
   * Tcl/Tk support now in. Closes: #113197
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 21 Dec 2001 00:03:43 -0500
+ -- Camm Maguire <camm@debian.org>  Fri, 21 Dec 2001 00:03:43 -0500
 
 gcl (2.4.0-3) unstable; urgency=medium
 
