@@ -294,7 +294,7 @@ void
 gcl_init_number(void) {
 
 #if !defined(IM_FIX_BASE) || !defined(IM_FIX_LIM)
-  fSallocate_bigger_fixnum_range(-1024,1023);
+  FFN(fSallocate_bigger_fixnum_range)(-1024,1023);
 #endif
 
   shortfloat_zero = alloc_object(t_shortfloat);

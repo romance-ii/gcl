@@ -65,7 +65,7 @@ for PROF in n y; do
 		(setq *compile-verbose* t)
 		(setq *load-verbose* t)
 		(setq *require-verbose* t)
-		(ignore-errors (c-l-c:compile-library (quote '"$1"'))
+		(ignore-errors (clc:compile-library (quote '"$1"'))
 		    (lisp:quit 0))
 		(lisp:quit 1)
 		' | $gcl_bin || build_error $1
@@ -107,30 +107,8 @@ for PROF in n y; do
 (in-package :common-lisp-controller)
 (init-common-lisp-controller-v4 "$(basename $gcl_clc)")
 
-(defun send-clc-command (command package)
-  "Overrides global definition."
-  (multiple-value-bind (exit-code signal-code)
-	(si::system (c-l-c:make-clc-send-command-string
-		     command package "gcl@EXT@"))
-    (if (and (zerop exit-code) (zerop signal-code))
-	  (values)
-	(error "Error during ~A of ~A for ~A~%Please see /usr/share/doc/common-lisp-controller/REPORTING-BUGS.gz"
-	       (ecase command
-		 (:recompile "recompilation")
-		 (:remove "removal"))
-	       package
-	       "gcl@EXT@"))))
-
-(in-package :asdf)
-
-(defun run-shell-command (control-string &rest args)
-"Interpolate ARGS into CONTROL-STRING as if by FORMAT, and
-synchronously execute the result using a Bourne-compatible shell,
-with output to *verbose-out*.  Returns the shell's exit code."
-  (let ((command (apply #'format nil control-string args)))
-    (format *verbose-out* "; $ ~A~%" command)
-    (si::system command) ; even less *verbose-out*
-    ))
+(when (probe-file "/etc/lisp-config.lisp")
+  (load "/etc/lisp-config.lisp"))
 
 (si:save-system "$image"))
 !INSTALL_CLC!

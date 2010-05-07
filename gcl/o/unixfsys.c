@@ -703,8 +703,10 @@ LFD(Ldirectory)(void)
 
 	ch=(vs_base[0]->pn.pn_name==Cnil && vs_base[0]->pn.pn_type==Cnil) ? '!' : ' ';
 	coerce_to_local_filename(vs_base[0], filename);
-	sprintf(command, "shopt -s dotglob; "
-		         "IFS='' j=\"%s\"; for i in $j ; do ! [ -e \"$i\" ] || %c [ -d \"$i\" ] || echo \"$i\" ; done", filename, ch);
+	sprintf(command, 
+		"bash -c 'shopt -s dotglob;"
+		"IFS=\"\" j=\"%s\"; for i in $j; do "
+		"! [ -e \"$i\" ] || %c [ -d \"$i\" ] || echo \"$i\" ; done'", filename, ch);
 	fp = popen(command, "r");
 	setbuf(fp, iobuffer);
 	for (;;) {

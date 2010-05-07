@@ -8198,13 +8198,18 @@ else
 if test "$enable_static" = "yes" ; then
   heap_ceiling=0x0
 else
-if ! test -x `which ldd` ; then
-  heap_ceiling=0x0
+if ! test -x `which ldd` && ! test -d /proc/self ; then
+   heap_ceiling=0x0
+else
+if test -d /proc/self ; then
+   heap_ceiling=0x`/bin/cat /proc/self/maps | grep "/lib/ld" | cut -f1 -d- | head -1`
 else
 #echo -e "#include <stdio.h>\n int main() {printf(\"foo\");return 0;}" >foo.c
 #$CC foo.c -o foo
-AAWK=`which awk`
-heap_ceiling=`ldd $AAWK | tail -n 1 | $AWK '{print $NF}' | tr -d '()'`
+   AAWK=`which awk`
+# | grep -v ld-kfreebsd needed on some strange bsd amd64 boxes
+   heap_ceiling=`ldd $AAWK | tail -n 1 | $AWK '{print $NF}' | tr -d '()'`
+fi
 if test "$cross_compiling" = yes; then :
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
