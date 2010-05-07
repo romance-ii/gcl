@@ -8,8 +8,9 @@ gclcvs (2.7.0-101) unstable; urgency=high
   * FFN() call in number.c for hppa
   * mips forgot boolean
   * Only link with bfd when configuring with dynsysbfd
+  * recompile system files for mips -- FIXME isolate SIGILL arising when omitted
 
- -- Camm Maguire <camm@debian.org>  Fri, 07 May 2010 18:43:30 +0000
+ --
 
 gclcvs (2.7.0-100) unstable; urgency=high
 
