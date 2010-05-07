@@ -7,8 +7,9 @@ gclcvs (2.7.0-101) unstable; urgency=high
   * static function poitners for hppa
   * FFN() call in number.c for hppa
   * mips forgot boolean
+  * Only link with bfd when configuring with dynsysbfd
 
- -- Camm Maguire <camm@debian.org>  Fri, 07 May 2010 18:21:32 +0000
+ -- Camm Maguire <camm@debian.org>  Fri, 07 May 2010 18:43:30 +0000
 
 gclcvs (2.7.0-100) unstable; urgency=high
 
