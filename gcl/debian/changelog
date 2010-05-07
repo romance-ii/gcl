@@ -4,8 +4,10 @@ gclcvs (2.7.0-101) unstable; urgency=high
     thanks to Francois-Rene Rideau (Closes: #580310). 
   * Bug fix: "problems on kfreebsd-amd64", thanks to Petr Salinger
     (Closes: #580350).
+  * static function poitners for hppa
+  * FFN() call in number.c for hppa
 
- -- Camm Maguire <camm@debian.org>  Wed, 05 May 2010 14:23:55 +0000
+ -- Camm Maguire <camm@debian.org>  Fri, 07 May 2010 17:20:29 +0000
 
 gclcvs (2.7.0-100) unstable; urgency=high
 
