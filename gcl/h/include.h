@@ -41,9 +41,9 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define MY_BFD_FALSE FALSE
 #define MY_BFD_TRUE TRUE
 #else
-#define MY_BFD_BOOLEAN boolean
-#define MY_BFD_FALSE false
-#define MY_BFD_TRUE true
+#define MY_BFD_BOOLEAN int
+#define MY_BFD_FALSE 0
+#define MY_BFD_TRUE 1
 #endif
 
 #ifdef IN_NUM_CO

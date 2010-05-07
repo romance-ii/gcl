@@ -6,8 +6,9 @@ gclcvs (2.7.0-101) unstable; urgency=high
     (Closes: #580350).
   * static function poitners for hppa
   * FFN() call in number.c for hppa
+  * mips forgot boolean
 
- -- Camm Maguire <camm@debian.org>  Fri, 07 May 2010 17:20:29 +0000
+ -- Camm Maguire <camm@debian.org>  Fri, 07 May 2010 18:21:32 +0000
 
 gclcvs (2.7.0-100) unstable; urgency=high
 
