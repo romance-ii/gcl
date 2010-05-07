@@ -6643,7 +6643,7 @@ fi
 
 
 
-	else if test "$enable_dynsysbfd" = "yes"
+	else if test "$enable_dynsysbfd" = "yes" ; then
 		TLIBS="$TLIBS -lbfd -liberty -ldl"
 	fi
 	fi

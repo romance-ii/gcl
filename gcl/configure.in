@@ -1081,7 +1081,7 @@ flib() {
 		AC_SUBST(BUILD_BFD)
 		AC_SUBST(LIBBFD)
 		AC_SUBST(LIBIBERTY)
-	else if test "$enable_dynsysbfd" = "yes"
+	else if test "$enable_dynsysbfd" = "yes" ; then
 		TLIBS="$TLIBS -lbfd -liberty -ldl"
 	fi
 	fi
