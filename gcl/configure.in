@@ -1084,6 +1084,7 @@ flib() {
 	else if test "$enable_dynsysbfd" = "yes"
 		TLIBS="$TLIBS -lbfd -liberty -ldl"
 	fi
+	fi
 fi
 
 #AC_CONFIG_SUBDIRS($MY_SUBDIRS)
