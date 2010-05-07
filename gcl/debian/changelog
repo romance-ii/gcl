@@ -10,7 +10,7 @@ gclcvs (2.7.0-101) unstable; urgency=high
   * Only link with bfd when configuring with dynsysbfd
   * recompile system files for mips -- FIXME isolate SIGILL arising when omitted
 
- --
+ -- Camm Maguire <camm@debian.org>  Fri, 07 May 2010 19:35:36 +0000
 
 gclcvs (2.7.0-100) unstable; urgency=high
 
