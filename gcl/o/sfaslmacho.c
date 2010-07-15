@@ -381,6 +381,7 @@ fasload(object faslfile) {
   init_address=n->n_value-(ul)d1;
   
   munmap(v1,ve-v1);
+  close_stream(faslfile);
   
   call_init(init_address,memory,data,0);
   
