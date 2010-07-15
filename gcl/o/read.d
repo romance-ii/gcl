@@ -749,7 +749,7 @@ double pow();
 static double
 new_fraction(char *s,int end,int exp_pos) {
 
-  char ch,ch1;
+  char ch,ch1=0;
   double fraction;
 
   ch=s[end];

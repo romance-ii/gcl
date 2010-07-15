@@ -5,12 +5,16 @@
 #include <math.h>
 #include <complex.h>
 
+#include "config.h"
+
 /*  We try here to compile in function addresses to which it is known
     that the compiler will make *direct* reference.  20040308 CM */
 
+#ifndef DARWIN
 extern int _mcount();
 #define mmcount _mcount
 extern void sincos(double,double *,double *);
+#endif
 
 int
 main(int argc,char * argv[],char *envp[]) {
@@ -48,13 +52,17 @@ main(int argc,char * argv[],char *envp[]) {
   l=read(l,&l,sizeof(l));
   l=write(l,&l,sizeof(l));
 
+#ifndef DARWIN
   ch&=mmcount();
+#endif
 
   setjmp(env);
 
   d=cos(d);
   d=sin(d);
+#ifndef DARWIN
   sincos(d,&d,&d);
+#endif
   d=tan(d);
   dc=d+d*I;
   dc*=dc;

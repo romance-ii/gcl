@@ -2842,6 +2842,9 @@ case $canonical in
      powerpc-*-darwin*)
      	use=powerpc-macosx;;
 
+     *86*darwin*)
+     	use=386-macosx;;
+
      alpha-dec-osf)
      use=alpha-osf1;;
 
@@ -3008,8 +3011,8 @@ case $use in
 	esac;;
     *mingw*)
 	def_statsysbfd="no" ; def_custreloc="yes" ;;
-    powerpc-macosx)
-	def_statsysbfd="no" ; def_locbfd="yes" ;;
+    *-macosx)
+	def_statsysbfd="no" ; def_custreloc="yes" ;;
     *solaris*)
 	def_statsysbfd="no" ; def_locbfd="yes" ;;
 esac
@@ -5199,6 +5202,8 @@ fi
 # gcc on ppc cannot compile our new_init.c with full opts --CM
 TONIFLAGS=""
 case $use in
+     powerpc*macosx)
+	   TCFLAGS="$TCFLAGS -mlongcall";;
      *linux)
 	case $use in
 #		amd64*) # stack-boundary option does not work
@@ -5595,7 +5600,7 @@ rm -f makedefsafter
 
 MP_INCLUDE=""
 
-GMPDIR=gmp3
+GMPDIR=gmp4
 PATCHED_SYMBOLS=""
 if test "$enable_dynsysgmp" = "yes" ; then
 	ac_fn_c_check_header_mongrel "$LINENO" "gmp.h" "ac_cv_header_gmp_h" "$ac_includes_default"
@@ -6825,6 +6830,46 @@ if ac_fn_c_try_run "$LINENO"; then :
 
 cat >>confdefs.h <<_ACEOF
 #define LM9BITS $size
+_ACEOF
+
+else
+  as_fn_error "Cannot find fill bits" "$LINENO" 5
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+
+if test "$cross_compiling" = yes; then :
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error "cannot run test program while cross compiling
+See \`config.log' for more details." "$LINENO" 5; }
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+	#include <stdio.h>
+
+int
+main ()
+{
+
+	    FILE *fp=fopen("conftest1","w");
+	    unsigned long c;
+	    int i;
+	    for (i=0,c=1;c;c<<=1,i++);
+	    fprintf(fp,"%d",i-5);
+	    return 0;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  size=`cat conftest1`
+
+cat >>confdefs.h <<_ACEOF
+#define LM5BITS $size
 _ACEOF
 
 else

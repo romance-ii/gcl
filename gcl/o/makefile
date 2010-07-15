@@ -177,7 +177,7 @@ plt.h: plttest.o pltd.h
 			sort | \
 			grep -v 'restFP' | grep -v 'saveFP'  | \
 			grep -v _gp_disp | \
-			$(AWK) '{A[++k]=$$0} END {for (i=1;i<=k;i++) \
+			$(AWK) '{gsub("\\$$.*","");A[++k]=$$0} END {for (i=1;i<=k;i++) \
 				printf("MY_PLT(%s)%s\n",A[i],i==k ? "" : ",");}' >$@
 #	rm $@
 #	touch $@

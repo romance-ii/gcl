@@ -1,8 +1,0 @@
-#!/bin/sh
-set -e
-install-info --section Development Development --quiet /usr/share/info/gmp.info.gz
-if [ "$1" = "configure" ]; then
- if [ -d /usr/doc -a ! -e /usr/doc/libgmp3-doc -a -d /usr/share/doc/libgmp3-doc ]; then
-  ln -sf ../share/doc/libgmp3-doc /usr/doc/libgmp3-doc
- fi
-fi

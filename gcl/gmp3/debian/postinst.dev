@@ -1,6 +1,0 @@
-#!/bin/sh
-if [ "$1" = "configure" ]; then
- if [ -d /usr/doc -a ! -e /usr/doc/libgmp3-dev -a -d /usr/share/doc/libgmp3-dev ]; then
-  ln -sf ../share/doc/libgmp3-dev /usr/doc/libgmp3-dev
- fi
-fi
