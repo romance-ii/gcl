@@ -70,21 +70,21 @@ typedef unsigned char   uqfixnum;
 
 #ifndef WORDS_BIGENDIAN
 
-#define FIRSTWORD ufixnum e:1,m:1,f:1,s:1,t:5,tt:4,st:3,w:LM16BITS
+#define FIRSTWORD ufixnum e:1,m:1,f:1,s:1,tt:4,t:5,st:3,w:LM16BITS
 #define FSTPWORD  ufixnum emfs:4,         tp:9,    st:3,w:LM16BITS
-#define MARKWORD  ufixnum e:1,mf:2,   s:1,t:5,w:LM9BITS
-#define SGCMWORD  ufixnum e:1,mfs:3,      t:5,w:LM9BITS
-#define TYPEWORD  ufixnum emf:3,      s:1,t:5,w:LM9BITS
-#define FUNWORD   ufixnum e:1,m:1,f:1,s:1,t:5,tt:4,fun_minarg:6,fun_maxarg:6,fun_neval:5,fun_vv:1,w:LM31BITS
+#define MARKWORD  ufixnum e:1,mf:2,   s:1,tt:4,t:5,w:LM5BITS
+#define SGCMWORD  ufixnum e:1,mfs:3,      tt:4,t:5,w:LM5BITS
+#define TYPEWORD  ufixnum emf:3,      s:1,tt:4,t:5,w:LM5BITS
+#define FUNWORD   ufixnum e:1,m:1,f:1,s:1,tt:4,t:5,fun_minarg:6,fun_maxarg:6,fun_neval:5,fun_vv:1,w:LM31BITS
 
 #else
 
-#define FIRSTWORD ufixnum w:LM16BITS,st:3,tt:4,t:5,s:1,f:1,m:1,e:1
+#define FIRSTWORD ufixnum w:LM16BITS,st:3,t:5,tt:4,s:1,f:1,m:1,e:1
 #define FSTPWORD  ufixnum w:LM16BITS,st:3,tp:9,    emfs:4
-#define MARKWORD  ufixnum w:LM9BITS,           t:5,s:1,mf:2,   e:1
-#define SGCMWORD  ufixnum w:LM9BITS,           t:5,mfs:3,      e:1
-#define TYPEWORD  ufixnum w:LM9BITS,           t:5,s:1,emf:3
-#define FUNWORD   ufixnum w:LM31BITS,fun_vv:1,fun_neval:5,fun_maxarg:6,fun_minarg:6,tt:4,t:5,s:1,f:1,m:1,e:1
+#define MARKWORD  ufixnum w:LM5BITS,      t:5,tt:4,s:1,mf:2,   e:1
+#define SGCMWORD  ufixnum w:LM5BITS,      t:5,tt:4,mfs:3,      e:1
+#define TYPEWORD  ufixnum w:LM5BITS,      t:5,tt:4,s:1,emf:3
+#define FUNWORD   ufixnum w:LM31BITS,fun_vv:1,fun_neval:5,fun_maxarg:6,fun_minarg:6,t:5,tt:4,s:1,f:1,m:1,e:1
 
 #endif
 

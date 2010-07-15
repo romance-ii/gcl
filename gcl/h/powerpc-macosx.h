@@ -72,7 +72,7 @@ extern void *my_sbrk(int incr);
 #define SEPARATE_SFASL_FILE "sfaslbfd.c"
 #else
 #define SPECIAL_RSYM "rsym_macosx.c"
-#define SEPARATE_SFASL_FILE "sfaslmacosx.c"
+#define SEPARATE_SFASL_FILE "sfaslmacho.c"
 #endif
 
 /* The file has non Mach-O stuff appended.  We need to know where the Mach-O stuff ends.  */

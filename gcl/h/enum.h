@@ -5,6 +5,7 @@
 enum type {
   t_cons,
   t_start = 0,
+  /* t_immfix, */
   t_fixnum,
   t_bignum,
   t_ratio,

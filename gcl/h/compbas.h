@@ -36,11 +36,77 @@ typedef double complex dcomplex;
 #define fimb    0
 #endif
 
-#define fto(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? t_end : \
+/*FIXME*/
+#define fto(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? t_end<<4 : \
       ({union fstp _c=_x->fstp;(_c.f<IM_FIX_BASE)*(_c.f&1)*_c.t.tp;});})
 
-#define fto0(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? t_end : \
+#define fto2(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? t_end : \
+      ({union fstp _c=_x->fstp;(_c.f<IM_FIX_BASE)*(_c.f&1)*_x->d.t;});})
+
+#define fto1(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? t_end : \
+      ({union fstp _c=_x->fstp;((_c.f<IM_FIX_BASE)*(_c.f&1)*_c.t.tp)+(_x==Cnil)*(t_symbol<<4+3);});})
+
+#define fto3(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? t_end : \
+      ({union fstp _c=_x->fstp;((_c.f<IM_FIX_BASE)*(_c.f&1)*_c.t.tp)+(_x==Cnil)*t_symbol;});})
+
+#define fto0(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? 1 : \
       ({union fstp _c=_x->fstp;(_c.f<IM_FIX_BASE)*(_c.f&1);});})
+
+
+
+
+/*FIXME <<4*/
+#define tpo0(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE);})
+
+#define tpo1(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? 2 : \
+      ({union fstp _c=_x->fstp;(_c.f<IM_FIX_BASE)*(_c.f&1);});})
+
+#define tpo2(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? 3 : \
+      ({union fstp _c=_x->fstp;(_c.f<IM_FIX_BASE)*(_c.f&1)*2+(_x==Cnil);});})
+
+#define tpo3(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? t_fixnum : \
+      ({union fstp _c=_x->fstp;(_c.f<IM_FIX_BASE)*(_c.f&1)*_x->d.t;});})
+
+#define tpo4(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? t_fixnum : \
+      ({union fstp _c=_x->fstp;((_c.f<IM_FIX_BASE)*(_c.f&1)*_x->d.t)+(_x==Cnil)*t_symbol;});})
+
+#define tpo5(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? (t_fixnum<<4)+1 : \
+      ({union fstp _c=_x->fstp;(_c.f<IM_FIX_BASE)*(_c.f&1)*_c.t.tp;});})
+
+#define tpo6(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? (t_fixnum<<4)+1 : \
+      ({union fstp _c=_x->fstp;((_c.f<IM_FIX_BASE)*(_c.f&1)*_c.t.tp)+(_x==Cnil)*((t_symbol<<4)+3);});})
+
+
+
+
+
+#define tp0(x) (((ufixnum)x)>=IM_FIX_BASE)
+
+#define tp1(x) (x==Cnil)
+
+#define tp2(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? 2 : \
+      ({union fstp _c=_x->fstp;_x->d.e && _c.f<IM_FIX_BASE;});})
+
+#define tp3(x) ({object _x=x;_x==Cnil ? 2 :\
+    ((((ufixnum)_x)>=IM_FIX_BASE) ? 3 :\
+     ({union fstp _c=_x->fstp;_x->d.e && _c.f<IM_FIX_BASE;}));})
+
+#define tp4(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? t_fixnum :\
+      ({union fstp _c=_x->fstp;_x->d.e && _c.f<IM_FIX_BASE ? _x->d.t : 0;});})
+
+#define tp5(x) ({object _x=x;_x==Cnil ? t_symbol :\
+    ((((ufixnum)_x)>=IM_FIX_BASE) ? t_fixnum :\
+     ({union fstp _c=_x->fstp;_x->d.e && _c.f<IM_FIX_BASE ? _x->d.t : 0;}));})
+
+
+#define tp6(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? (t_fixnum<<4)+1 :\
+      ({union fstp _c=_x->fstp;_x->d.e && _c.f<IM_FIX_BASE ? _c.t.tp : 0;});})
+
+#define tp7(x) ({object _x=x;_x==Cnil ? (t_symbol<<4)+3 :\
+      ((((ufixnum)_x)>=IM_FIX_BASE) ? (t_fixnum<<4)+1 :\
+       ({union fstp _c=_x->fstp;_x->d.e && _c.f<IM_FIX_BASE ? _c.t.tp : 0;}));})
+
+
 
 /* #define immnum_comp(x,y,c) (fimf(((ufixnum)x)&((ufixnum)y)) ? (x c y) : (number_compare(x,y) c 0)) */
 #define immnum_comp(x,y,c) ({register object _x=x,_y=y;\
