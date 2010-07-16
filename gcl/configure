@@ -8384,7 +8384,7 @@ else
 	    fprintf ( fp,"0x%lx", 0x1a000000 );  /* Windows custom allocation from this point up */
 	    #else
 	    #if defined (__APPLE__) && defined (__MACH__)
-	    fprintf(fp,"((unsigned long)get_dbegin())");
+	    fprintf(fp,"mach_mapstart");
 	    #else
 	    b = sbrk(0);
 	    fprintf(fp,"0x%lx",((unsigned long) b) & ~(unsigned long)0xffffff);
