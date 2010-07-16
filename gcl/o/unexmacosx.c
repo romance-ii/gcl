@@ -212,7 +212,8 @@ vm_range_t marked_regions [MAX_MARKED_REGIONS];
 unsigned num_marked_regions;
 
 /* Size of the heap.  */
-#define BIG_HEAP_SIZE 0x50000000
+/* #define BIG_HEAP_SIZE 0x50000000 */
+#define BIG_HEAP_SIZE MAXPAGE*PAGESIZE
 int big_heap = BIG_HEAP_SIZE;
 
 /* Start of the heap.  */
