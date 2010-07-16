@@ -174,7 +174,7 @@ maybe_redirect_trampoline(struct relocation_info *ri,
 			  struct section *sec1,ul *io1) {
 
   struct section *js=sec1+ri->r_symbolnum-1;
-  ul o;
+  ul o=0;
 
   if (ri->r_extern)
     return 0;
@@ -337,10 +337,10 @@ fasload(object faslfile) {
   void *v1,*v,*ve,*d1,*p;
   struct stat ss;
   int l;
-  struct section *sec1,*sece;
-  struct nlist *n1,*n,*ne;
-  char *st1;
-  ul s=0,ma=0,*io1,rls;
+  struct section *sec1,*sece=NULL;
+  struct nlist *n1=NULL,*n,*ne=NULL;
+  char *st1=NULL;
+  ul s=0,ma=0,*io1=NULL,rls;
 
   coerce_to_filename(faslfile, filename);
   faslfile = open_stream(faslfile, smm_input, Cnil, sKerror);
