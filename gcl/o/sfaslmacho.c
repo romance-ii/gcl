@@ -231,7 +231,7 @@ relocate(struct relocation_info **rip,ul *q,
       
       if (!(a & b)) 
 	val=(val&b)|a|0x3;
-      else if (!((a-=rel) & b)) 
+      else if (!((a-=(ul)q) & b)) 
 	val=(val&b)|a|0x1;
       
       *q=val;
