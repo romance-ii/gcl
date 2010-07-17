@@ -3,12 +3,13 @@
 #include <setjmp.h>
 #include <stdio.h>
 #include <math.h>
-#include <complex.h>
-
-#include "config.h"
 
 /*  We try here to compile in function addresses to which it is known
     that the compiler will make *direct* reference.  20040308 CM */
+
+#if defined (__APPLE__) && defined (__MACH__)
+#define DARWIN
+#endif
 
 #ifndef DARWIN
 extern int _mcount();
@@ -25,7 +26,6 @@ main(int argc,char * argv[],char *envp[]) {
   double d=0.1;
   long l;
   unsigned long ul;
-  double complex dc;
 
   sscanf(argv[1],"%lf",&d);
   bzero(&env,sizeof(env));
@@ -37,12 +37,6 @@ main(int argc,char * argv[],char *envp[]) {
   l=l%(l<<(l & 0x7));
   l/=ul/l;
   l/=((long)ul)/l;
-
-  l=__builtin_clzl(l);
-  l=__builtin_ctzl(l);
-  l=__builtin_popcountl(l);
-  l=__builtin_parityl(l);
-  l=__builtin_ffsl(l);
 
   ch=getc(f);
   ch&=putc(ch,f);
@@ -64,9 +58,6 @@ main(int argc,char * argv[],char *envp[]) {
   sincos(d,&d,&d);
 #endif
   d=tan(d);
-  dc=d+d*I;
-  dc*=dc;
-  d=creal(dc);
 
   d=acos(d);
   d=asin(d);
