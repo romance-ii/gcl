@@ -227,11 +227,11 @@ relocate(struct relocation_info **rip,ul *q,
   case PPC_RELOC_JBSR:
     if (ri->r_extern) {
 
-      ul b=0xfc000000;
+      ul b=0xfe000000;
       
-      if (!(a & b)) 
+      if (!(a & b) || (a & b)==b) 
 	val=(val&b)|a|0x3;
-      else if (!((a-=(ul)q) & b)) 
+      else if (!((a-=(ul)q) & b) || (a & b)==b) 
 	val=(val&b)|a|0x1;
       
       *q=val;
