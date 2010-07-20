@@ -353,7 +353,7 @@ $(HDIR)new_decl.h:
 $(HDIR)cmpinclude.h: $(CMPINCLUDE_FILES) $(HDIR)config.h
 	cat $(HDIR)config.h | sed -e "1,/Begin for cmpincl/d" \
 		-e "/End for cmpinclude/,50000d" > tmpx.c
-	echo -e '#include "h/config.h"\n#ifdef SGC\n"#define SGC"\n#else\n"#undef SGC"\n#endif' | $(CPP) 2>/dev/null| grep -v '^ *$$' | tail -1l | tr -d '"' >>tmpx.c
+	echo '#include "h/config.h"\n#ifdef SGC\n"#define SGC"\n#else\n"#undef SGC"\n#endif' | $(CPP) 2>/dev/null| grep -v '^ *$$' | tail -1l | tr -d '"' >>tmpx.c
 	cat $(CMPINCLUDE_FILES) >> tmpx.c
 	$(CPP) -P -dD tmpx.c | grep -v "#define *__STDC__ " | grep -v "#define *__STDC_HOSTED__ " | grep -v "#define  *__GNUC_PATCHLEVEL__ " | grep -v "#define  *__VERSION__ ">tmpx1 && mv tmpx1 tmpx.c
 	./xbin/move-if-changed mv tmpx.c h/cmpinclude.h
