@@ -1,3 +1,9 @@
+gclcvs (2.7.0-102) unstable; urgency=low
+
+  * bug fix calling notinline unknown globals
+
+ -- Camm Maguire <camm@debian.org>  Mon, 04 Apr 2011 15:35:17 +0000
+
 gclcvs (2.7.0-101) unstable; urgency=high
 
   * Bug fix: "/usr/lib/common-lisp/bin/gclcvs.sh is way out of date",
