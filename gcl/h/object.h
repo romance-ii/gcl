@@ -292,7 +292,7 @@ struct stdesig {
 
   ufixnum           pad;
   ufixnum           pad1;
-  char             *sd_self;
+  uchar             *sd_self;
   ufixnum           pad2:4;
   ufixnum           sd_fillp:LM4BITS;
   ufixnum           pad3;
@@ -740,6 +740,8 @@ struct pathname {
   SPAD;
 
 };
+
+EXTER object def_env1[2],*def_env;
 
 struct function {
 

@@ -418,6 +418,10 @@ gcl_main(int argc, char **argv, char **envp)
             MAXPAGE);
     fflush(stdout);
 
+    def_env1[0]=(object)1;/*FIXME better place*/
+    def_env1[1]=Cnil;
+    def_env=def_env1+1;
+
     initlisp();
 
     vs_base = vs_top;

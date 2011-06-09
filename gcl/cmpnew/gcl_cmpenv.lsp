@@ -64,7 +64,7 @@
   (setq *function-declarations* nil)
   (setq *inline-functions* nil)
   (setq *inline-blocks* 0)
-  (setq *tmp-pack* nil)
+;  (when *tmp-pack* (delete-package *tmp-pack*) (setq *tmp-pack* nil))
   (setq *notinline* nil))
 
 (defvar *next-cvar* 0)
@@ -117,10 +117,10 @@
 	 (add-sharp-comma (cdr object)))
 	((si:contains-sharp-comma object)
 	 (add-sharp-comma `(si::string-to-object ,(wt-to-string object))))
-	((typep object 'compiled-function)
-	 (add-sharp-comma `(function ,(or (gethash object *fun-id-hash*)
-					  (si::compiled-function-name object)
-					  (cmperr "Can't dump un named compiled funs")))))
+	;; ((typep object 'compiled-function)
+	;;  (add-sharp-comma `(function ,(or (gethash object *fun-id-hash*)
+	;; 				  (si::compiled-function-name object)
+	;; 				  (cmperr "Can't dump un named compiled funs")))))
 	((gethash object *objects*))
 	((push-data-incf object)
 	 (setf (gethash *next-vv* *objects-rev*) object)
@@ -267,7 +267,7 @@
 
 (defun get-arg-types (fname &aux x (y (load-time-value (tmpsym))))
   (cond ((setq x (assoc fname *function-declarations*)) (mapcar 'cmp-norm-tp (cadr x)))
-	((setq x (local-fun-p fname)) (car (fun-call x)))
+	((setq x (local-fun-p fname)) (caar (fun-call x)))
 	((setq x (gethash fname *sigs*)) (mapcar 'cmp-norm-tp (caar x)))
 	((setq x (si::sig fname)) (car x))
 	((not (symbolp fname)) '(*))
@@ -277,7 +277,7 @@
 
 (defun get-return-type (fname &aux x (y (load-time-value (tmpsym))))
   (cond ((setq x (assoc fname *function-declarations*)) (cmp-norm-tp (caddr x)))
-	((setq x (local-fun-p fname)) (cadr (fun-call x)))
+	((setq x (local-fun-p fname)) (cadar (fun-call x)))
 	((setq x (gethash fname *sigs*)) (cmp-norm-tp (cadar x)))
 	((setq x (si::sig fname)) (cadr x))
 	((not (symbolp fname)) '*)
@@ -289,9 +289,10 @@
   (list (get-arg-types fname) (get-return-type fname)))
 
 (defun cclosure-p (fname)
-  (let ((x (or (fifth (gethash fname *sigs*)) (si::props fname))))
-    (when x
-      (logand 1 x))))
+  (not 
+   (let ((x (or (fifth (gethash fname *sigs*)) (si::props fname))))
+     (when x
+       (logbitp 0 x)))))
 
 (defun get-local-arg-types (fun &aux x)
   (if (setq x (assoc fun *function-declarations*))
@@ -325,13 +326,27 @@
   (unless *compiler-push-events*
     (or 
      (member fname *inline*)
-     (local-fun-fun fname)
+     (local-fun-fn fname)
      (get fname 'cmp-inline))))
 
+;; (defun inline-asserted (fname)
+;;   (unless *compiler-push-events*
+;;     (or 
+;;      (member fname *inline*)
+;;      (local-fun-fun fname)
+;;      (get fname 'cmp-inline))))
+
 (defun inline-possible (fname)
-  (not (or *compiler-push-events*
+  (cond ((eq fname 'funcall));FIXME
+	((eq fname 'apply));FIXME
+	((not (or *compiler-push-events*
 	   (member fname *notinline*)
-	   (get fname 'cmp-notinline))))
+	   (get fname 'cmp-notinline))))))
+
+;; (defun inline-possible (fname)
+;;   (not (or *compiler-push-events*
+;; 	   (member fname *notinline*)
+;; 	   (get fname 'cmp-notinline))))
 
 (defun proclaim (decl)
  (declare (optimize (safety 2)))

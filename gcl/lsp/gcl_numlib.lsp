@@ -97,7 +97,10 @@
 
 (defun signum (x) (if (zerop x) x (/ x (abs x))))
 
-(defun cis (x) (exp (* #c(0 1) x)))
+(defun cis (x) 
+  (declare (optimize (safety 1)))
+  (check-type x real)
+  (exp (* #c(0 1) (float x))))
 
 ;; (defmacro asincos (x f)
 ;;   (let* ((rad (list 'sqrt (list '- 1d0 (list '* x x))))
@@ -252,7 +255,11 @@
 ;(defun logorc2 (x y) (boole boole-orc2 x y))
 
 ;(defun lognot (x) (logxor -1 x))
-(defun logtest (x y) (not (zerop (logand x y))))
+(defun logtest (x y) 
+  (declare (optimize (safety 1)))
+  (check-type x integer)
+  (check-type y integer)
+  (not (zerop (logand x y))))
 
 
 

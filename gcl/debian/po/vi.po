@@ -10,21 +10,22 @@ msgstr ""
 "PO-Revision-Date: 2009-01-28 21:03+1030\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
 "Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: LocFactoryEditor 1.8\n"
 
-#: ../in.gcl.templates:1001
 #. Type: boolean
 #. Description
+#: ../in.gcl.templates:1001
 msgid "Use the work-in-progress ANSI build by default?"
 msgstr "Dùng bản xây dựng đang phát triển ANSI theo mặc định không?"
 
-#: ../in.gcl.templates:1001
 #. Type: boolean
 #. Description
+#: ../in.gcl.templates:1001
 msgid ""
 "GCL is in the process of providing an ANSI compliant image in addition to "
 "its traditional CLtL1 image still in production use.  Please see the README."
@@ -34,17 +35,25 @@ msgid ""
 "variable to any non-empty string for the ANSI build, and to the empty string "
 "for the CLtL1 build, e.g. GCL_ANSI=t gcl@EXT@.  The flavor of the build in "
 "force will be reported in the initial startup banner."
-msgstr "GCL đang cung cấp một ảnh tương thích với ANSI, thêm vào ảnh CLtL1 truyền thống vẫn còn được sử dụng hằng ngày. Xem tập tin Đọc Đi README.Debian để tìm mô tả ngắn về hai thuật ngữ này. Đặt biến này thì quyết định ảnh nào bạn sử dụng theo mặc định khi thực hiện câu lệnh « gcl@EXT@ ». Bạn cũng có thể ghi đè lên sự chọn đó một cách cục bộ bằng cách đặt biến môi trường « GCL_ANSI » thành bất cứ chuỗi trống nào cho bản xây dựng ANSI, và thành chuỗi trống cho bản xây dựng CLtL1, v.d. « GCL_ANSI=t gcl@EXT@ ». Kiểu bản xây dựng vẫn hoạt động sẽ được thông báo trong băng cờ khởi chạy đầu tiên."
+msgstr ""
+"GCL đang cung cấp một ảnh tương thích với ANSI, thêm vào ảnh CLtL1 truyền "
+"thống vẫn còn được sử dụng hằng ngày. Xem tập tin Đọc Đi README.Debian để "
+"tìm mô tả ngắn về hai thuật ngữ này. Đặt biến này thì quyết định ảnh nào bạn "
+"sử dụng theo mặc định khi thực hiện câu lệnh « gcl@EXT@ ». Bạn cũng có thể "
+"ghi đè lên sự chọn đó một cách cục bộ bằng cách đặt biến môi trường « "
+"GCL_ANSI » thành bất cứ chuỗi trống nào cho bản xây dựng ANSI, và thành "
+"chuỗi trống cho bản xây dựng CLtL1, v.d. « GCL_ANSI=t gcl@EXT@ ». Kiểu bản "
+"xây dựng vẫn hoạt động sẽ được thông báo trong băng cờ khởi chạy đầu tiên."
 
-#: ../in.gcl.templates:2001
 #. Type: boolean
 #. Description
+#: ../in.gcl.templates:2001
 msgid "Use the profiling build by default?"
 msgstr "Dùng bản xây dựng đo hiệu năng sử dụng theo mặc định không?"
 
-#: ../in.gcl.templates:2001
 #. Type: boolean
 #. Description
+#: ../in.gcl.templates:2001
 msgid ""
 "GCL now has optional support for profiling via gprof.  Please see the "
 "documentation for si::gprof-start and si::gprof-quit for details. As this "
@@ -54,4 +63,13 @@ msgid ""
 "profiling support, and to the empty string for the more optimized builds, e."
 "g. GCL_PROF=t gcl@EXT@.  If profiling is enabled, this will be reported in "
 "the initial startup banner."
-msgstr "Phiên bản GCL này có tùy chọn hỗ trợ chức năng đo hiệu năng sử dụng, thông qua phần mềm gprof. Xem tài liệu hướng dẫn về « si::gprof-start » và « si::gprof-quit » để tìm chi tiết. Vì bản xây dựng này chạy chậm hơn bản không hỗ trợ gprof, không khuyên bạn đặt tùy chọn này khi làm việc hàng ngày. Bạn cũng có thể ghi đè lên sự chọn đó một cách cục bộ bằng cách đặt biến môi trường « GCL_PROF » thành bất cứ chuỗi trống nào cho bản hỗ trợ chức năng đo hiệu năng sử dụng, và thành chuỗi trống cho bản nhanh hơn, v.d. « GCL_PROF=t gcl@EXT@ ». Chức năng đo hiệu năng sử dụng vẫn hoạt động sẽ được thông báo trong băng cờ khởi chạy đầu tiên."
+msgstr ""
+"Phiên bản GCL này có tùy chọn hỗ trợ chức năng đo hiệu năng sử dụng, thông "
+"qua phần mềm gprof. Xem tài liệu hướng dẫn về « si::gprof-start » và « si::"
+"gprof-quit » để tìm chi tiết. Vì bản xây dựng này chạy chậm hơn bản không hỗ "
+"trợ gprof, không khuyên bạn đặt tùy chọn này khi làm việc hàng ngày. Bạn "
+"cũng có thể ghi đè lên sự chọn đó một cách cục bộ bằng cách đặt biến môi "
+"trường « GCL_PROF » thành bất cứ chuỗi trống nào cho bản hỗ trợ chức năng đo "
+"hiệu năng sử dụng, và thành chuỗi trống cho bản nhanh hơn, v.d. « GCL_PROF=t "
+"gcl@EXT@ ». Chức năng đo hiệu năng sử dụng vẫn hoạt động sẽ được thông báo "
+"trong băng cờ khởi chạy đầu tiên."

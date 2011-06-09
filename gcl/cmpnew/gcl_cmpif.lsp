@@ -172,23 +172,27 @@
 ;; 			       ((type>= #t(not null) tp)
 ;; 				(setq ttp (type-or1 (ints-tt3 ints) ttp) ints nil)))))))))))))
 
+(defun merge-fmla (x) x)
 
-;; (defun fmla-infer-inline (f)
-;;   (case (car f)
-;; 	((let let*) (sublis (mapcar 'cons (mapcar 'var-name (third f)) 
-;; 				    (mapcar (lambda (x) (when (and (consp x) (eq (car x) 'var))
-;; 							  (var-name (car (third x)))) (fourth f))))
-;; 			    (fmla-infer-inline (fifth f))))
-;; 	(block 
-;; 	 (merge-fmla (mapcar (lambda (x) (catch (third f) (fmla-infer-inline x))))))
-;; 	(progn (fmla-infer-inline (car (last (third f)))))
-;; 	(return-from 
-;; 	 (throw (third f) (fmla-infer-inline (sixth f))))
-;; 	(switch
-;; 	 (mapc (lambda (x) (fmla-infer-inline (sixth f)))))
-;; 	(infer-tp (let ((tp (info-type (cadr (fifth f)))))
-;; 		    (cond ((type>= #tnull tp) (list* (third f) #tt (fourth f)))
-;; 			  ((type>= #t(not null) tp) (list* (third f) (fourth f) #tt)))))))
+(defun fmla-infer-inline (f)
+  (when (consp f)
+  (case (car f)
+	((let let*) (sublis (mapcar 'cons 
+				    (mapcar 'var-name (third f)) 
+				    (mapcar (lambda (x) (when (and (consp x) (eq (car x) 'var))
+							  (var-name (car (third x))))) (fourth f)))
+			    (fmla-infer-inline (fifth f))))
+	(if (fmla-infer-inline (fourth f)));FIXME
+	(block 
+	 (merge-fmla (catch (third f) (fmla-infer-inline (fourth f)))))
+	(progn (fmla-infer-inline (car (last (third f)))))
+	(return-from 
+	 (throw (third f) (fmla-infer-inline (sixth f))))
+	(switch
+	 (mapc 'fmla-infer-inline (sixth f)))
+	(infer-tp (let ((tp (info-type (cadr (fifth f)))))
+		    (cond ((type>= #tnull tp) (list* (var-name (third f)) #tt (fourth f)))
+			  ((type>= #t(not null) tp) (list* (var-name (third f)) (fourth f) #tt))))))))
 
 	
 	
@@ -502,14 +506,16 @@
 		   (type>= #t(not null) (info-type (cadr form1)))))
 	 (vj (when (or rev reg) (and (consp v) (car (member (car v) '(jump-true jump-false))))))
 	 (fj (eq vj (if rev 'jump-true 'jump-false)))
-	 (Flabel (if vj (if fj (cadr v) (caddr v)) (next-label)))
+	 (Flabel (next-label))
+;	 (Flabel (if vj (if fj (cadr v) (caddr v)) (next-label))) FIXME: This needs working side-effects propagation
 	 (Tlabel (if vj (if fj (caddr v) (cadr v)) (next-label))))
     (let* ((*unwind-exit* (cons Flabel (cons Tlabel *unwind-exit*)))
 	   (*exit* Tlabel))
       (CJF fmla Tlabel Flabel))
     (unless vj (wt-label Tlabel))
     (let ((*unwind-exit* (cons 'JUMP *unwind-exit*))) (c2expr form1))
-    (unless vj (wt-label Flabel))
+    (wt-label Flabel)
+;    (unless vj (wt-label Flabel))
     (c2expr form2)))
 
 ;; (defun c2if (fmla form1 form2

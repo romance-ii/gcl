@@ -204,13 +204,12 @@
 			       (cons (c1nil) body1)))))))))
 
 (defun is-ttl-tag (x)
-  (when (tag-p x) (get (tag-name x) 'ttl-tag)))
+  (when (tag-p x) (when (symbolp (tag-name x)) (get (tag-name x) 'ttl-tag))))
 
 (defun c2tagbody (ref-clb ref-ccb body)
-  (let ((*recur-stack* (cons (car body) *recur-stack*)))
-    (cond (ref-ccb (c2tagbody-ccb body))
-	  (ref-clb (c2tagbody-clb body))
-	  ((c2tagbody-local body)))))
+  (cond (ref-ccb (c2tagbody-ccb body))
+	(ref-clb (c2tagbody-clb body))
+	((c2tagbody-local body))))
 
 (defun c2tagbody-local (body &aux (label (next-label)))
   (dolist (x body)
@@ -347,20 +346,22 @@
   (if (tag-ref-ccb tag)
     (wt-vs* (tag-ref-clb tag))
   (wt-vs (tag-ref-clb tag)))
-  (wt ")," (vv-str (tag-var tag)) ");"))
+  (wt ")," (vv-str (tag-var tag)) ");")
+  (unwind-exit nil))
 
 (defun c2go-ccb (tag)
   (wt-nl "{frame_ptr fr;")
   (wt-nl "fr=frs_sch(") (wt-ccb-vs (tag-ref-ccb tag)) (wt ");")
   (wt-nl "if(fr==NULL)FEerror(\"The GO tag ~s is missing.\",1," (vv-str (tag-var tag)) ");")
   (wt-nl "vs_base=vs_top;")
-  (wt-nl "unwind(fr," (vv-str (tag-var tag)) ");}"))
+  (wt-nl "unwind(fr," (vv-str (tag-var tag)) ");}")
+  (unwind-exit nil))
 
 
 (defun wt-switch-case (x)
   (cond (x (wt-nl (if (typep x #tfixnum) "case " "") x ":"))))
 
-(defun c1switch(form  &aux (*tags* *tags*) st)
+(defun c1switch(form  &aux (*tags* *tags*) st ls)
   (let* ((switch-op  (car form))
 	 (body (cdr form))
 	 (switch-op-1 (c1expr switch-op)))
@@ -401,8 +402,11 @@
 				    ((keyed-cmpnote 'branch-elimination
 						    "Eliminating unreachable switch ~s" b)))))
 			   ((not skip) (setq cs nil) (push b new-body))))))
-	   (when (and (not st) (= 1 (count-if 'consp body)) (ignorable-form switch-op-1))
-	     (return-from c1switch (c1expr (car (member-if 'consp body)))))
+	   (when (and (not st) 
+		      (not (cdr (setq ls (member-if 'consp body))))
+;		      (= 1 (count-if (lambda (x) (or (consp x) (symbolp x))) body));FIXME
+		      (ignorable-form switch-op-1))
+	     (return-from c1switch (c1expr (car ls))))
 	   (setq body
 		 (mapcar
 		  (lambda (x)

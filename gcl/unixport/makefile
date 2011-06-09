@@ -81,9 +81,18 @@ init_pcl_gcl.lsp.tmp: init_pcl_gcl.lsp.in \
 		../pcl/sys-package.lisp ../clcs/package.lisp \
 		$(shell ls -1 ../clcs/clcs_*.lisp)
 
-	awk '/^ *@LI-PCL-PACKAGE@/{i=1;next} {if (i==0) print}' $< >$@
+	awk '/^ *@LI-PCL-PACKAGE@/{i=1;next} \
+		/^ *@LI-CLCS-PACKAGE@/{i=2;next} {if (i==0) print}' $< >$@
 	cat ../pcl/sys-package.lisp >>$@
-	awk '/^ *@LI-PCL-PACKAGE@/{i=1;next} {if (i==1) print}' $< >>$@
+	awk '/^ *@LI-PCL-PACKAGE@/{i=1;next} \
+		/^ *@LI-CLCS-PACKAGE@/{i=2;next} {if (i==1) print}' $< >>$@
+	cat ../clcs/package.lisp >>$@
+	awk '/^ *@LI-PCL-PACKAGE@/{i=1;next} \
+		/^ *@LI-CLCS-PACKAGE@/{i=2;next} {if (i==2) print}' $< >>$@
+
+#	awk '/^ *@LI-PCL-PACKAGE@/{i=1;next} {if (i==0) print}' $< >$@
+#	cat ../pcl/sys-package.lisp >>$@
+#	awk '/^ *@LI-PCL-PACKAGE@/{i=1;next} {if (i==1) print}' $< >>$@
 
 init_ansi_gcl.lsp.tmp: init_ansi_gcl.lsp.in \
 		../pcl/sys-package.lisp ../clcs/package.lisp

@@ -114,19 +114,41 @@ FFN(siLAmake_special)(void)
 	vs_base[0]->s.s_stype = (short)stp_special;
 }
 
-static void
-FFN(siLAmake_constant)(void)
-{
-	check_arg(2);
-	check_type_symbol(&vs_base[0]);
-	if ((enum stype)vs_base[0]->s.s_stype == stp_special)
-		FEerror(
-		 "The argument ~S to DEFCONSTANT is a special variable.",
-		 1, vs_base[0]);
-	vs_base[0]->s.s_stype = (short)stp_constant;
-	vs_base[0]->s.s_dbind = vs_base[1];
-	vs_popp;
+
+DEFUN_NEW("*MAKE-CONSTANT",object,fSAmake_constant,SI,2,2,NONE,OO,OO,OO,OO, \
+	  (object s,object v),"") { 
+
+  check_type_symbol(&s);
+  switch(s->s.s_stype) {
+  case stp_special:
+    FEerror("The argument ~S to DEFCONSTANT is a special variable.", 1, s);
+    break;
+  case stp_constant:
+    break;
+  default:
+    s->s.s_dbind=v;
+    break;
+  }
+
+  s->s.s_stype=stp_constant;
+
+  RETURN1(s);
+
 }
+
+/* static void */
+/* FFN(siLAmake_constant)(void) */
+/* { */
+/* 	check_arg(2); */
+/* 	check_type_symbol(&vs_base[0]); */
+/* 	if ((enum stype)vs_base[0]->s.s_stype == stp_special) */
+/* 		FEerror( */
+/* 		 "The argument ~S to DEFCONSTANT is a special variable.", */
+/* 		 1, vs_base[0]); */
+/* 	vs_base[0]->s.s_stype = (short)stp_constant; */
+/* 	vs_base[0]->s.s_dbind = vs_base[1]; */
+/* 	vs_popp; */
+/* } */
 
 static void
 FFN(Feval_when)(object arg)
@@ -243,7 +265,7 @@ gcl_init_toplevel(void)
 {
 	make_special_form("DEFUN",Fdefun);
 	make_si_function("*MAKE-SPECIAL", siLAmake_special);
-	make_si_function("*MAKE-CONSTANT", siLAmake_constant);
+	/* make_si_function("*MAKE-CONSTANT", siLAmake_constant); */
 	make_special_form("EVAL-WHEN", Feval_when);
 	make_special_form("LOAD-TIME-VALUE", Fload_time_value);
 	make_special_form("THE", Fthe);

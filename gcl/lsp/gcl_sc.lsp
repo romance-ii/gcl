@@ -16,8 +16,7 @@
 
 (defun character-designator-p (s)
   (or (typep s 'fixnum)
-      (typep s 'fixnum)
-      (= (c::stdesig-fillp s) 1)))
+     (= (c::stdesig-fillp s) 1)))
 
 (deftype character-designator nil `(and string-designator (satisfies character-designator-p)))
 (deftype string-designator    nil `(or string symbol character (integer 0 255)))
@@ -40,9 +39,9 @@
 	     (char= (x z) (= x z))
 	     (char< (x z) (< x z))
 	     (char> (x z) (> x z))
-	     (char-equal (x z) (or (= x z) (= (char-up x) (char-up z))))
-	     (char-greaterp (x z) (> (char-up x) (char-up z)))
-	     (char-lessp    (x z) (< (char-up x) (char-up z))))
+	     (char-equal (x z) (or (= x z) (= (char-upcase x) (char-upcase z))))
+	     (char-greaterp (x z) (> (char-upcase x) (char-upcase z)))
+	     (char-lessp    (x z) (< (char-upcase x) (char-upcase z))))
 	    ,@body))
 
 (defmacro defstr (name (s1 s2) = &body body)
@@ -116,10 +115,11 @@
 (defun character (c)
   (declare (optimize (safety 1)))
   (check-type c character-designator)
-  (if (typep c 'character) c
-    (code-char
-     (if (typep c 'fixnum) c
-       (c::stdesig-self c 0)))))
+  (typecase
+   c
+   (character c)
+   (unsigned-char (code-char c))
+   (otherwise (code-char (c::stdesig-self c 0)))))
 
 
 (defun char-int (c)
@@ -177,10 +177,11 @@
     (the unsigned-char (ash (the seqind (- (address c) (address #\^@))) b))))
 
 (defun code-char (d)
-  (declare (optimize (safety 1)))
-  (check-type d unsigned-char)
-  (let ((b #.(1- (integer-length (- (address #\^A) (address #\^@))))))
-   (the character (nani (+ (address #\^@) (ash d b))))));FIXME
+;  (declare (optimize (safety 1)))
+  (typecase d
+	    (unsigned-char
+	     (let ((b #.(1- (integer-length (- (address #\^A) (address #\^@))))))
+	       (the character (nani (+ (address #\^@) (ash d b))))))));FIXME
 
 
 (defchr char=  (= address))
@@ -388,3 +389,29 @@
 	     ((or (< j i) (not (find (aref s j) b)))
 	      (if (and (= i 0) (= j l)) s (subseq s i (1+ j)))))))))
 
+
+(defun functionp (x)
+  (typecase x (function t)))
+
+(defun compiled-function-p (x)
+  (typecase x (compiled-function t)))
+
+;FIXME
+;; (defun interpreted-function-p (x) 
+;;   (typecase x (interpreted-function t)))
+
+;; (defun seqindp (x)
+;;   (typecase x (seqind t)))
+
+(defun fixnump (x)
+  (typecase x (fixnum t)))
+(si::putprop 'fixnump t 'compiler::cmp-inline)
+
+
+(defun constantp (x &optional env)
+  (declare (ignore env))
+  (typecase 
+   x
+   (symbol (= 1 (c::symbol-stype x)))
+   (cons (eq 'quote (car x)))
+   (otherwise t)))

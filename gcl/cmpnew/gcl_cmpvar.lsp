@@ -201,17 +201,26 @@
              (return-from c1vref (list var ccb))))))
 
 (defun c2var-kind (var)
-  (if (and (eq (var-kind var) 'LEXICAL)
+  (when (and (eq (var-kind var) 'LEXICAL)
            (not (var-ref-ccb var))
            (not (eq (var-loc var) 'clb)))
-      (if (eq (var-loc var) 'OBJECT)
-          'OBJECT
-          (let ((type (var-type var)))
-               (cond ((car (member type +c-local-var-types+ :test 'type<=)))
-                     ((and (boundp '*c-gc*) *c-gc* 'OBJECT))
-		     (t nil))))
-      nil)
-  )
+    (cond ((eq (var-loc var) 'object) (setf (var-type var) #tt) (var-loc var)) ;FIXME check ok; need *c-vars* and kind to agree
+	  ((car (member (var-type var) +c-local-var-types+ :test 'type<=)))
+	  ((and (boundp '*c-gc*) *c-gc* 'OBJECT)))))
+
+
+;; (defun c2var-kind (var)
+;;   (if (and (eq (var-kind var) 'LEXICAL)
+;;            (not (var-ref-ccb var))
+;;            (not (eq (var-loc var) 'clb)))
+;;       (if (eq (var-loc var) 'OBJECT)
+;;           'OBJECT
+;;           (let ((type (var-type var)))
+;;                (cond ((car (member type +c-local-var-types+ :test 'type<=)))
+;;                      ((and (boundp '*c-gc*) *c-gc* 'OBJECT))
+;; 		     (t nil))))
+;;       nil)
+;;   )
 
 (defun c2var (vref) (unwind-exit (cons 'var vref) nil 'single-value))
 
@@ -377,9 +386,8 @@
     (unless (type>= type it)
       (let ((nt (type-and type it)))
 	(when nt;FIXME
-	  (when (eq form +c1nil+) (break))
+;	  (when (eq form +c1nil+) (break))
 	  (setf (info-type (cadr form)) nt)
-					;)
 	  (case (car form)
 		(block (sft-block (fourth form) (third form) type))
 		((decl-body inline) (sft (car (last form)) type))
@@ -390,16 +398,46 @@
 		(var (do-setq-tp (caaddr form) nil nt))
 		(progn (sft (car (last (third form))) type))
 		(if 
-		    (let ((tt (type-and type (nil-to-t (info-type (cadr (fourth form))))))
-			  (ft (type-and type (nil-to-t (info-type (cadr (fifth form)))))))
-		      (unless tt
-			(sft (fifth form) type)
-			(setf (car form) 'progn (cadr form) (cadr (fifth form)) (caddr form) 
-			      (list (fifth form)) (cdddr form) nil))
-		      (unless ft
-			(sft (fourth form) type)
-			(setf (car form) 'progn (cadr form) (cadr (fourth form)) (caddr form) 
-			      (list (fourth form)) (cdddr form) nil))))))))))
+		    (when (ignorable-form (third form));FIXME put third form into progn
+		      (let ((tt (type-and type (nil-to-t (info-type (cadr (fourth form))))))
+			    (ft (type-and type (nil-to-t (info-type (cadr (fifth form)))))))
+			(unless tt
+			  (sft (fifth form) type)
+			  (setf (car form) 'progn (cadr form) (cadr (fifth form)) (caddr form) 
+				(list (fifth form)) (cdddr form) nil))
+			(unless ft
+			  (sft (fourth form) type)
+			  (setf (car form) 'progn (cadr form) (cadr (fourth form)) (caddr form) 
+				(list (fourth form)) (cdddr form) nil)))))))))))
+
+;; (defun sft (form type)
+;;   (let ((it (info-type (cadr form))))
+;;     (unless (type>= type it)
+;;       (let ((nt (type-and type it)))
+;; 	(when nt;FIXME
+;; 	  (when (eq form +c1nil+) (break))
+;; 	  (setf (info-type (cadr form)) nt)
+;; 					;)
+;; 	  (case (car form)
+;; 		(block (sft-block (fourth form) (third form) type))
+;; 		((decl-body inline) (sft (car (last form)) type))
+;; 		((let let*)
+;; 		 (sft (car (last form)) type)
+;; 		 (mapc (lambda (x y) (sft y (var-type x)))
+;; 		       (caddr form) (cadddr form)))
+;; 		(var (do-setq-tp (caaddr form) nil nt))
+;; 		(progn (sft (car (last (third form))) type))
+;; 		(if 
+;; 		    (let ((tt (type-and type (nil-to-t (info-type (cadr (fourth form))))))
+;; 			  (ft (type-and type (nil-to-t (info-type (cadr (fifth form)))))))
+;; 		      (unless tt
+;; 			(sft (fifth form) type)
+;; 			(setf (car form) 'progn (cadr form) (cadr (fifth form)) (caddr form) 
+;; 			      (list (fifth form)) (cdddr form) nil))
+;; 		      (unless ft
+;; 			(sft (fourth form) type)
+;; 			(setf (car form) 'progn (cadr form) (cadr (fourth form)) (caddr form) 
+;; 			      (list (fourth form)) (cdddr form) nil))))))))))
     
 ;; (defun sft (form type)
 ;;   (let* ((it (info-type (cadr form)))

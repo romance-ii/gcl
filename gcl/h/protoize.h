@@ -1289,8 +1289,8 @@ Lwrite_byte(void);
 void
 read_special_symbols(char *);
 
-int
-node_compare(const void *,const void *);
+/* int */
+/* node_compare(const void *,const void *); */
 #endif
 
 void
@@ -1898,3 +1898,13 @@ call_proc_cs1(object,...);
 
 object
 call_proc_cs2(object,...);
+
+void
+assert_error(const char *,unsigned,const char *,const char *);
+
+void *
+get_mmap(FILE *,void **);
+
+int
+un_mmap(void *,void *);
+

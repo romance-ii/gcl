@@ -52,9 +52,9 @@
 
 (defun c1the (args &aux info form type dtype)
   (when (or (endp args) (endp (cdr args)))
-        (too-few-args 'the 2 (length args)))
+    (too-few-args 'the 2 (length args)))
   (unless (endp (cddr args))
-          (too-many-args 'the 2 (length args)))
+    (too-many-args 'the 2 (length args)))
   (setq form (c1expr (cadr args)))
   (setq info (copy-info (cadr form)))
   (setq dtype (max-vtp (car args)))
@@ -77,7 +77,8 @@
 	    (when (member (var-tag v) *catch-tags*) (throw (var-tag v) v))))))
     (setq type dtype)
     (unless (not (and dtype (info-type info)))
-      (cmpwarn "Type mismatch was found in ~s.~%Modifying type ~s to ~s." (cons 'the args) (info-type info) type)))
+      (cmpwarn "Type mismatch was found in ~s.~%Modifying type ~s to ~s."
+	       (cons 'the args) (info-type info) type)))
 
   (setq form (list* (car form) info (cddr form)))
   (if (type>= #tboolean dtype) (setf (info-type (cadr form)) type) (set-form-type form type))
@@ -111,20 +112,34 @@
 (defvar *fun-ev-hash* (make-hash-table :test 'eq))
 (defvar *fun-tp-hash* (make-hash-table :test 'eq))
 
-(defun funid-to-fun1 (id)
-  (cond ((let ((id (si::funid-sym-p id)))
-	   (cond ((local-fun-fun id))
-		 ((when (fboundp id) (symbol-function id)))
-		 (id (cmp-eval `(function (lambda (&rest r) 
-					    (declare (:dynamic-extent r))
-					    (apply ',id r))))))))
-	((functionp id) id)
-	((cmp-eval `(function ,id)))))
+(defun funid-to-fn1 (funid)
+  (cond ((symbolp funid)
+	 (cond ((local-fun-fn funid))
+	       ((when (fboundp funid) (symbol-function funid)))
+	       (funid (cmp-eval `(function (lambda (&rest r) 
+					     (declare (:dynamic-extent r))
+					     (apply ',funid r)))))))
+	((cmp-eval `(function ,funid)))))
 
-(defun funid-to-fun (id)
-  (let ((fun (funid-to-fun1 id)))
-    (setf (gethash fun *fun-id-hash*) id)
-    fun))
+(defun funid-to-fn (funid)
+  (let ((fn (funid-to-fn1 funid)))
+    (setf (gethash fn *fun-id-hash*) funid)
+    fn))
+
+;; (defun funid-to-fun1 (id)
+;;   (cond ((let ((id (si::funid-sym-p id)))
+;; 	   (cond ((local-fun-fun id))
+;; 		 ((when (fboundp id) (symbol-function id)))
+;; 		 (id (cmp-eval `(function (lambda (&rest r) 
+;; 					    (declare (:dynamic-extent r))
+;; 					    (apply ',id r))))))))
+;; 	((functionp id) id)
+;; 	((cmp-eval `(function ,id)))))
+
+;; (defun funid-to-fun (id)
+;;   (let ((fun (funid-to-fun1 id)))
+;;     (setf (gethash fun *fun-id-hash*) id)
+;;     fun))
 
 (defun portable-closure-src (fn)
   (let* ((lam (when (si::interpreted-function-p fn) (si::interpreted-function-lambda fn)))
@@ -189,35 +204,102 @@
    (function-lambda-expression l)
    (compress-fle l y z)))
 
+(defun process-local-fun-env (env b f fun tp)
+  (under-env env (process-local-fun b f fun tp)))
+
+(defun fun-def-env (fn)
+  (let ((fun (car (member-if (lambda (x) (when (fun-p x) (eq (fun-fn x) fn))) *funs*))))
+    (if fun
+	(fun-denv fun)
+      (current-env))))
+
 (defun c1function (args &optional (provisional *provisional-inline*) b f)
 
   (when (endp args) (too-few-args 'function 1 0))
   (unless (endp (cdr args)) (too-many-args 'function 1 (length args)))
   
-  (let* ((fun (car args))
-	 (fid (si::funid-sym-p fun))
-	 (fn (funid-to-fun (or fid fun)))
-	 (tp (if fn `(member ,fn) #tfunction))
+  (let* ((funid (si::funid (car args)))
+	 (fn (funid-to-fn funid))
+	 (tp (if fn `(member ,fn) #tfunction))  ; intentionally unnormalized
 	 (info (make-info :type tp)))
     (cond (provisional
-	   (or (gethash fn *fun-tp-hash*);FIXME?
+	   (or (gethash fn *fun-tp-hash*)
 	       (setf (gethash fn *fun-tp-hash*)
-		     (list 'foo info args
-			   (setf (gethash fn *fun-ev-hash*) (list *vars* *blocks* *tags* *funs*))))))
-	  (fid
-	   (let ((fd (c1local-fun fun)))
+		     (list 'provfn info args
+			   (setf (gethash fn *fun-ev-hash*) (list (current-env) (fun-def-env fn)))))))
+	  ((symbolp funid)
+	   (let ((fd (c1local-fun funid t)))
 	     (unless fd
-	       (setf (info-sp-change info) (if (null (get fun 'no-sp-change)) 1 0)))
-	     (list 'function info (or fd (list 'call-global info fun)))))
-	  ((and (consp fun) (eq (car fun) 'lambda))
-	   (cmpck (endp (cdr fun)) "The lambda expression ~s is illegal." fun)
-	   (let ((r (process-local-fun 
-		     (or b 'cb)
-		     (or f (make-fun :name 'lambda :src fun :info (make-info :type '*))) fun tp)))
+	       (setf (info-sp-change info) (if (null (get funid 'no-sp-change)) 1 0)))
+	     (list 'function info (or fd (list 'call-global info funid)))))
+
+	  ((let ((r (process-local-fun (or b 'cb) (or f (make-fun :name 'lambda :src funid :info (make-info :type '*))) funid tp)))
 	     (add-info info (cadadr r))
 	     (setf (info-flags info) (logandc2 (info-flags info) (iflags side-effects)))
-	     `(function ,info ,r)))
-	  ((cmperr "The function ~s is illegal." fun)))))
+	     `(function ,info ,r))))))
+
+;; (defun c1function (args &optional (provisional *provisional-inline*) env)
+
+;;   (when (endp args) (too-few-args 'function 1 0))
+;;   (unless (endp (cdr args)) (too-many-args 'function 1 (length args)))
+  
+;;   (let* ((fun (car args))
+;; 	 (fid (si::funid-sym-p fun))
+;; 	 (fn (funid-to-fun (or fid fun)))
+;; 	 (tp (if fn `(member ,fn) #tfunction))  ; intentionally unnormalized
+;; 	 (info (make-info :type tp)))
+;;     (cond (provisional
+;; 	   (or (gethash fn *fun-tp-hash*)
+;; 	       (setf (gethash fn *fun-tp-hash*)
+;; 		     (list 'foo info args
+;; 			   (setf (gethash fn *fun-ev-hash*) (list *vars* *blocks* *tags* *funs*))))))
+;; 	  (fid
+;; 	   (let ((fd (c1local-fun fid t)))
+;; 	     (unless fd
+;; 	       (setf (info-sp-change info) (if (null (get fid 'no-sp-change)) 1 0)))
+;; 	     (list 'function info (or fd (list 'call-global info fid)))))
+
+;; 	  ((and (consp fun) (eq (car fun) 'lambda))
+;; 	   (cmpck (endp (cdr fun)) "The lambda expression ~s is illegal." fun)
+;; 	   (let ((r (process-local-fun-env env 'cb (make-fun :name 'lambda :src fun :info (make-info :type '*)) fun tp)))
+;; 	     (add-info info (cadadr r))
+;; 	     (setf (info-flags info) (logandc2 (info-flags info) (iflags side-effects)))
+;; 	     `(function ,info ,r)))
+;; 	  ((cmperr "The function ~s is illegal." fun)))))
+
+;; (defun c1function (args &optional (provisional *provisional-inline*) b f)
+
+;;   (when (endp args) (too-few-args 'function 1 0))
+;;   (unless (endp (cdr args)) (too-many-args 'function 1 (length args)))
+  
+;;   (let* ((fun (car args))
+;; 	 (fid (si::funid-sym-p fun))
+;; ;	 (ff (car (member fun *funs* :key (lambda (x) (when (fun-p x) (fun-src x))))))
+;; ;	 (fid (if ff (fun-name ff) fid))
+;; 	 (fn (funid-to-fun (or fid fun)))
+;; 	 (tp (if fn `(member ,fn) #tfunction))
+;; 	 (info (make-info :type tp)))
+;;     (cond (provisional
+;; 	   (or (gethash fn *fun-tp-hash*);FIXME?
+;; 	       (setf (gethash fn *fun-tp-hash*)
+;; 		     (list 'foo info args
+;; 			   (setf (gethash fn *fun-ev-hash*) (list *vars* *blocks* *tags* *funs*))))))
+;; 	  (fid
+;; 	   (let ((fd (c1local-fun fid)))
+;; 	     (unless fd
+;; 	       (setf (info-sp-change info) (if (null (get fid 'no-sp-change)) 1 0)))
+;; 	     (list 'function info (or fd (list 'call-global info fid)))))
+;; 	  ((and (consp fun) (eq (car fun) 'lambda))
+;; 	   (cmpck (endp (cdr fun)) "The lambda expression ~s is illegal." fun)
+;; 	   (let ((r (process-local-fun 
+;; 		     (or b 'cb)
+;; 		     (or f 
+;; ;			 (car (member ff *funs* :key (lambda (x) (when (fun-p x) (fun-src x)))))
+;; 			 (make-fun :name 'lambda :src fun :info (make-info :type '*))) fun tp)))
+;; 	     (add-info info (cadadr r))
+;; 	     (setf (info-flags info) (logandc2 (info-flags info) (iflags side-effects)))
+;; 	     `(function ,info ,r)))
+;; 	  ((cmperr "The function ~s is illegal." fun)))))
 
 (defun c2function (funob);FIXME
   (case (car funob)
@@ -235,8 +317,8 @@
 		(cl (fun-call fun))
 		(sig (pop cl))
 		(cle (pop cl))
-		(at (mapcar 'cmp-norm-tp (car sig)));FIXME
-		(rt (cmp-norm-tp (cadr sig)))
+		(at (mapcar (lambda (x) (global-type-bump (cmp-norm-tp x))) (car sig)));FIXME
+		(rt (global-type-bump (cmp-norm-tp (cadr sig))));FIXME Check not needed for local funs
 		(ha (mapcar (lambda (x) `',x) (cons sig (cons cle cl))))
 		(clc `(let ((si::f #'(lambda nil nil)))
 			(si::add-hash si::f ,@ha)

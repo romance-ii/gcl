@@ -5,9 +5,9 @@
 (in-package 'compiler)
 #+pre-gcl
 (progn
-  (defun tt3 (x) (lit :fixnum (cstr "fto(") (unbox :object x) (cstr ")")))
+  (defun tt3 (x) (lit :fixnum "fto(" (:object x) ")"))
   (si::putprop 'tt3 t 'cmp-inline)
-  (defun tt30 (x) (lit :boolean (cstr "!fto0(") (unbox :object x) (cstr ")")))
+  (defun tt30 (x) (lit :boolean "!fto0(" (:object x) ")"))
   (si::putprop 'tt30 t 'cmp-inline)
   (dolist (l '(add-info analyze-regs analyze-regs1 tt3 tt30 length))
     (compile l))

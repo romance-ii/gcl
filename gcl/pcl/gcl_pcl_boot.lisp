@@ -97,7 +97,7 @@ work during bootstrapping.
 ;;;
 (eval-when (load eval)
 
-(defun redirect-early-function-internal (real early)
+(defun redirect-early-function-internal (real early);(print (list  'baz real early))
   (setf (gdefinition real)
 	(set-function-name
 	 (lambda (&rest args)
@@ -1518,7 +1518,8 @@ work during bootstrapping.
 	     (fin-lambda-fn (&rest args)
 	       (declare (ignore args))
 	       (error "The function of the funcallable-instance ~S~
-                       has not been set" fin)))))
+                       has not been set" fin)
+	       (values-list (make-dummy-list))))))
     (setf (gdefinition spec) fin)
     (bootstrap-set-slot 'standard-generic-function fin 'name spec)
     (bootstrap-set-slot 'standard-generic-function fin 'source (load-truename))
@@ -1655,6 +1656,7 @@ work during bootstrapping.
 	(values (arg-info-applyp arg-info)
 		metatypes
 		arg-info))
+;      (print (list 'baz gf (early-gf-p gf) arg-info (arg-info-applyp arg-info)))
     (values (length metatypes) applyp metatypes
 	    (count-if (lambda (x) (neq x t)) metatypes)
 	    arg-info)))

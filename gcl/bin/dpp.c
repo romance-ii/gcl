@@ -430,7 +430,8 @@ put_declaration()
 {
 	int i;
 
-	fprintf(out, "\tint narg;\n");
+	if (nopt || rest_flag || key_flag)
+	  fprintf(out, "\tint narg;\n");
 	fprintf(out, "\tregister object *DPPbase=vs_base;\n");
 	
 	for (i = 0;  i < nopt;  i++)
@@ -453,10 +454,10 @@ put_declaration()
 		fprintf(out, "#define\t%s\tDPPbase[%d+%d+2*%d+%d]\n",
 			aux[i].a_var, nreq, nopt, nkey, i);
 	fprintf(out, "\n");
-	fprintf(out, "\tnarg = vs_top - vs_base;\n");
 	if (nopt == 0 && !rest_flag && !key_flag)
 		fprintf(out, "\tcheck_arg(%d);\n", nreq);
 	else {
+	        fprintf(out, "\tnarg = vs_top - vs_base;\n");
 		fprintf(out, "\tif (narg < %d)\n", nreq);
 		fprintf(out, "\t\ttoo_few_arguments();\n");
 	}

@@ -57,11 +57,15 @@
                                 ;;;     (* a (%f8))))
 	   (call (make-list 5))
 	   vv
-           src c1 prov)
+           src c1 c1cb denv fn)
 
-(defun local-fun-fun (id)
+(defun local-fun-fn (id)
   (let* ((fun (local-fun-p id)))
-    (when fun (car (atomic-tp (info-type (cadr (fun-prov fun))))))))
+    (when fun (fun-fn fun))))
+
+;; (defun local-fun-fun (id)
+;;   (let* ((fun (local-fun-p id)))
+;;     (when fun (car (atomic-tp (info-type (cadr (fun-prov fun))))))))
 
 ;; (defun local-fun-src (id)
 ;;   (let ((fun (local-fun-fun id)));FUN-SRC?
@@ -118,6 +122,9 @@
   (when (eq inner 'cb)
     (ref-inner inner)))
 
+;; (defun process-local-fun-env (env b fun src tp)
+;;   (under-env env (process-local-fun b fun src tp)))
+
 (defun process-local-fun (b fun def tp)
   (let* ((name (fun-name fun))
 	 (lam (do-fun name (cons name (cdr def)) (fun-call fun) (member fun *funs*) b))
@@ -139,21 +146,19 @@
 
   (when (endp args) (too-few-args 'flet 1 0))
 
-  (dolist (def (car args) (setq defs1 (nreverse defs1)));FIXME double eval
+  (dolist (def (car args) (setq defs1 (nreverse defs1)))
     (let* ((x (car def))(y (si::funid-sym x))) (unless (eq x y) (setq def (cons y (cdr def)))))
     (cmpck (or (endp def) (endp (cdr def))) "The function definition ~s is illegal." def)
     (when labels
       (cmpck (member (car def) fnames) "The function ~s was already defined." (car def))
       (push (car def) fnames))
-    (let ((fun (make-fun :name (car def) :src (si::block-lambda (cadr def) (car def) (cddr def))
-			 :info (make-info :type nil :sp-change 1))))
+    (let* ((src (si::block-lambda (cadr def) (car def) (cddr def)))
+	   (fun (make-fun :name (car def) :src src :info (make-info :type nil :sp-change 1) :fn (funid-to-fn src))))
       (push fun *funs*)
       (push (list fun (cdr def)) defs1)))
   
-
   (let ((*funs* (if labels *funs* ofuns)))
-    (mapc (lambda (x) 
-	    (setf (fun-prov (car x)) (c1function (list (fun-src (car x))) t))) defs1))
+    (mapc (lambda (x) (setf (fun-denv (car x)) (current-env))) defs1))
   
   (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
   
@@ -167,9 +172,84 @@
 
   (let ((funs (mapcar 'car defs1)))
     (list (if labels 'labels 'flet) info 
-	  (mapcar (lambda (x) (caddr (fun-c1 x))) (remove-if-not 'fun-ref funs))
-	  (mapcar (lambda (x) (caddr (fun-c1 x))) (remove-if-not 'fun-ref-ccb funs))
+	  (mapcar 'fun-c1 (remove-if-not 'fun-ref funs))
+	  (mapcar 'fun-c1cb (remove-if-not 'fun-ref-ccb funs))
 	  body)))
+
+;; (defun c1flet-labels (labels args &aux body ss ts is other-decl (info (make-info))
+;; 			     defs1 fnames (ofuns *funs*) (*funs* *funs*))
+
+;;   (when (endp args) (too-few-args 'flet 1 0))
+
+;;   (dolist (def (car args) (setq defs1 (nreverse defs1)));FIXME double eval
+;;     (let* ((x (car def))(y (si::funid-sym x))) (unless (eq x y) (setq def (cons y (cdr def)))))
+;;     (cmpck (or (endp def) (endp (cdr def))) "The function definition ~s is illegal." def)
+;;     (when labels
+;;       (cmpck (member (car def) fnames) "The function ~s was already defined." (car def))
+;;       (push (car def) fnames))
+;;     (let ((fun (make-fun :name (car def) :src (si::block-lambda (cadr def) (car def) (cddr def))
+;; 			 :info (make-info :type nil :sp-change 1))))
+;;       (push fun *funs*)
+;;       (push (list fun (cdr def)) defs1)))
+  
+;;   (let ((*funs* (if labels *funs* ofuns)))
+;;     (mapc (lambda (x) 
+;;   	    (let ((r (c1function (list (fun-src (car x))) t)))
+;; 	      (setf (third r) (list (fun-name (car x))))
+;; 	      (setf (fun-prov (car x)) r))) defs1))
+  
+;;   (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
+  
+;;   (c1add-globals ss)
+;;   (check-vdecl nil ts is)
+;;   (setq body (c1decl-body other-decl body))
+  
+;;   (mapc (lambda (x) (add-info info (fun-info (car x)))) defs1)
+;;   (add-info info (cadr body))
+;;   (setf (info-type info) (info-type (cadr body)))
+
+;;   (let ((funs (mapcar 'car defs1)))
+;;     (list (if labels 'labels 'flet) info 
+;; 	  (mapcar 'fun-c1 (remove-if-not 'fun-ref funs))
+;; 	  (mapcar 'fun-c1cb (remove-if-not 'fun-ref-ccb funs))
+;; 	  body)))
+
+;; (defun c1flet-labels (labels args &aux body ss ts is other-decl (info (make-info))
+;; 			     defs1 fnames (ofuns *funs*) (*funs* *funs*))
+
+;;   (when (endp args) (too-few-args 'flet 1 0))
+
+;;   (dolist (def (car args) (setq defs1 (nreverse defs1)));FIXME double eval
+;;     (let* ((x (car def))(y (si::funid-sym x))) (unless (eq x y) (setq def (cons y (cdr def)))))
+;;     (cmpck (or (endp def) (endp (cdr def))) "The function definition ~s is illegal." def)
+;;     (when labels
+;;       (cmpck (member (car def) fnames) "The function ~s was already defined." (car def))
+;;       (push (car def) fnames))
+;;     (let ((fun (make-fun :name (car def) :src (si::block-lambda (cadr def) (car def) (cddr def))
+;; 			 :info (make-info :type nil :sp-change 1))))
+;;       (push fun *funs*)
+;;       (push (list fun (cdr def)) defs1)))
+  
+
+;;   (let ((*funs* (if labels *funs* ofuns)))
+;;     (mapc (lambda (x) 
+;; 	    (setf (fun-prov (car x)) (c1function (list (fun-src (car x))) t))) defs1))
+  
+;;   (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
+  
+;;   (c1add-globals ss)
+;;   (check-vdecl nil ts is)
+;;   (setq body (c1decl-body other-decl body))
+  
+;;   (mapc (lambda (x) (add-info info (fun-info (car x)))) defs1)
+;;   (add-info info (cadr body))
+;;   (setf (info-type info) (info-type (cadr body)))
+
+;;   (let ((funs (mapcar 'car defs1)))
+;;     (list (if labels 'labels 'flet) info 
+;; 	  (mapcar (lambda (x) (caddr (fun-c1 x))) (remove-if-not 'fun-ref funs))
+;; 	  (mapcar (lambda (x) (caddr (fun-c1 x))) (remove-if-not 'fun-ref-ccb funs))
+;; 	  body)))
 
 (defun c1flet (args)
   (c1flet-labels nil args))
@@ -200,8 +280,8 @@
       (let* ((fun (car def))
 	     (cl (fun-call fun))
 	     (sig (car cl))
-	     (at (car sig))
-	     (rt (cadr sig)))
+	     (at (mapcar 'global-type-bump (car sig)))
+	     (rt (global-type-bump (cadr sig))))
 	
 	(wt-nl)
 	(wt-vs* (fun-ref fun))
@@ -239,7 +319,7 @@
     (cmpck (or (endp def) (endp (cdr def)))
            "The macro definition ~s is illegal." def)
     (let* ((n (car def))
-	   (b (si::interpreted-function-lambda (caddr (si:defmacro* n (cadr def) (cddr def))))))
+	   (b (si::defmacro-lambda n (cadr def) (cddr def))))
       (push (list n 'macro b) env)))
   (when env (setq *macrolet-env* (list nil (append (cadr *macrolet-env*) (nreverse env)) nil)))
   (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
@@ -250,25 +330,62 @@
 (defun ref-inner (b)
   (when (eq b 'cb)
     (let* ((bv (member b *vars*))
-	   (fv (member-if 'is-fun-var *vars*)))
+	   (fv (member-if 'is-fun-var (nreverse (ldiff *vars* bv)))))
       (when fv 
-	(when (tailp bv fv)
-	  (setf (var-ref (car fv)) t))))))
+	(setf (var-ref (car fv)) t)))))
+;; (defun ref-inner (b)
+;;   (when (eq b 'cb)
+;;     (let* ((bv (member b *vars*))
+;; 	   (fv (member-if 'is-fun-var *vars*)))
+;;       (when fv 
+;; 	(when (tailp bv fv)
+;; 	  (setf (var-ref (car fv)) t))))))
 
-(defvar *local-fun-recursion* nil)
-(defun c1local-fun (fname &aux ccb prev inner)
-  (dolist (fun *funs*)
-    (cond ((eq fun 'cb) (setq ccb t inner (or inner 'cb)))
-	  ((eq fun 'lb) (setq inner (or inner 'lb)))
-          ((eq (fun-name fun) fname)
-	   (cond (ccb (ref-inner inner) (setf prev (fun-ref-ccb fun) (fun-ref-ccb fun) t))
-		 ((setf prev (fun-ref fun) (fun-ref fun) t)))
-	   (unless prev
-	     (unless (member fname *local-fun-recursion*)
-	       (let* ((*local-fun-recursion* (cons fname *local-fun-recursion*)))
-		 (setf (fun-c1 fun) (unfoo (fun-prov fun) (if ccb 'cb 'lb) fun)))))
-	   (setf (info-type (fun-info fun)) (cadar (fun-call fun)))
-	   (return (list 'call-local (fun-info fun) (list fun ccb)))))))
+;(defvar *local-fun-recursion* nil)
+;; (defun c1local-fun (fname &aux ccb prev inner)
+;;   (dolist (fun *funs*)
+;;     (cond ((eq fun 'cb) (setq ccb t inner (or inner 'cb)))
+;; 	  ((eq fun 'lb) (setq inner (or inner 'lb)))
+;;           ((eq (fun-name fun) fname)
+;; 	   (cond (ccb (ref-inner inner) (setf prev (fun-ref-ccb fun) (fun-ref-ccb fun) t))
+;; 		 ((setf prev (fun-ref fun) (fun-ref fun) t)))
+;; 	   (unless prev
+;; 	     (unless (member fname *local-fun-recursion*)
+;; 	       (let* ((*local-fun-recursion* (cons fname *local-fun-recursion*)))
+;; 		 (setf (fun-c1 fun) (unfoo (fun-prov fun) (if ccb 'cb 'lb) fun)))))
+;; 	   (setf (info-type (fun-info fun)) (cadar (fun-call fun)))
+;; 	   (return (list 'call-local (fun-info fun) (list fun ccb)))))))
+(defun c1local-fun (fname &optional cl &aux ccb inner)
+  (macrolet ((pf (fun ref c1 b) 
+		 `(unless (,ref ,fun) 
+		    (setf (,ref ,fun) t
+			  (,c1 ,fun) (caddr (unprovfn (list (list (fun-src ,fun)) (list (fun-denv ,fun))) ,b ,fun))))))
+	    (dolist (fun *funs*)
+	      (cond ((not (fun-p fun)) (setq ccb (or (eq fun 'cb) ccb) inner (or inner fun)))
+		    ((eq (fun-name fun) fname)
+		     (cond ((or ccb cl)
+			    (ref-inner inner) 
+			    (pf fun fun-ref-ccb fun-c1cb 'cb))
+			   ((pf fun fun-ref fun-c1 'lb)))
+		     (setf (info-type (fun-info fun)) (cadar (fun-call fun)))
+		     (return (list 'call-local (fun-info fun) (list fun ccb))))))))
+
+;; (defun c1local-fun (fname &optional cl &aux ccb inner)
+;;   (macrolet ((pf (fun ref c1 b &aux (s (tmpsym))) 
+;; 		 `(let ((,s (fun-prov ,fun)))
+;; 		    (unless (,ref ,fun) 
+;; 		      (setf (,ref ,fun) t
+;; 			    (,c1 ,fun) (process-local-fun-env (fourth ,s) ,b ,fun (fun-src ,fun) (info-type (cadr ,s))))))))
+;; 	    (dolist (fun *funs*)
+;; 	      (cond ((not (fun-p fun)) (setq ccb (or (eq fun 'cb) ccb) inner (or inner fun)))
+;; 		    ((eq (fun-name fun) fname)
+;; 		     (cond ((or ccb cl)
+;; 			    (ref-inner inner) 
+;; 			    (pf fun fun-ref-ccb fun-c1cb 'cb))
+;; 			   ((pf fun fun-ref fun-c1 'lb)))
+;; 		     (setf (info-type (fun-info fun)) (cadar (fun-call fun)))
+;; 		     (return (list 'call-local (fun-info fun) (list fun ccb))))))))
+
 
 (defun sch-local-fun (fname)
   ;;; Returns fun-ob for the local function (not locat macro) named FNAME,
@@ -293,11 +410,11 @@
 		      (if (and (cdr x) (not (equal (cadr x) "#?")))
 			  (list (car x) ",") (list (car x)))) inl))))
 
-(defun vfun-wrap (x sig &optional clp (ref-ccb (when clp (baboon))))
+(defun vfun-wrap (x sig clp)
   (let ((mv (not (single-type-p (cadr sig))))
 	(va (member '* (car sig))))
   (concatenate 'string "(" 
-	       (if clp (strcat "fcall.fun=" (ccb-vs-str ref-ccb) ",") "")
+	       (if clp  (concatenate 'string "fcall.fun=" clp  ",") "")
 	       (if mv "FUN_VALP=(fixnum)#v," "")
 	       (if va "VFUN_NARGS= #n   ," "") x ")")))
 
@@ -310,7 +427,7 @@
 	 (mv (not (single-type-p (cadr sig))))
 	 (nm (c-function-name "L" (fun-cfun fun) (fun-name fun)))
 	 (nm (if clp (strcat (ccb-vs-str (fun-ref-ccb fun)) "->fun.fun_self") nm))
-	 (inl (g0 nm sig ap (if clp -1 (fun-level fun)))))
+	 (inl (g0 nm sig ap (when clp (ccb-vs-str (fun-ref-ccb fun))) (if clp -1 (fun-level fun)))))
     `(,(car sig) ,(cadr sig) 
       ,(if mv (flags rfa svt) (flags rfa))
       ,inl)))

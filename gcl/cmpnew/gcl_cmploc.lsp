@@ -172,6 +172,7 @@
         ((or (not (consp loc))
              (not (symbolp (car loc))))
          (baboon))
+	((unless (eq (car loc) 'inline-cond) (rassoc (car loc) +inline-types-alist+)) (wt-gen-loc :object loc))
         (t (let ((fd (get (car loc) 'wt-loc)))
 	     (when (null fd) (baboon))
 	     (values (apply fd (cdr loc)))))))
@@ -351,7 +352,7 @@
 		(kind (var-kind var)))
 	   (case kind
 		 (replaced (loc-kind (var-loc var)))
-		 (object #tt)
+		 ((global object lexical) #tt)
 		 (otherwise kind))))
 	((eq cl 'cvar)
 	 (or (car (member (or (car (rassoc (cadr loc) *c-vars*)) 
@@ -362,20 +363,18 @@
 	((car (rassoc cl +value-types+)))
 	(#tt)))
 
-(defun loc-type (loc &aux (cl (car loc)))
-  (cond ((eq cl 'var)  	 
-	 (let* ((var (cadr loc))
-		(kind (var-kind var)))
-	   (case kind
-		 (replaced (loc-type (var-loc var)))
-		 (object #tt)
-		 (otherwise kind))))
-	((eq cl 'cvar) (or (car (rassoc (cadr loc) *c-vars*)) 
-			   (cdr (assoc (cadr loc) *c-vars*)) #tt))
-	((car (rassoc cl +inline-types-alist+)))
-	((car (rassoc cl +value-types+)))
-;	((eq cl 'character-value) #tchar);FIXME
-	(#tt)))
+(defun wt-lexical-var (loc)
+  (let* ((var (pop loc))
+	 (ccb (car loc)))
+    (cond (ccb (wt-ccb-vs (var-ref-ccb var)))
+	  ((var-ref-ccb var) (wt-vs* (var-ref var)))
+	  ((and (eq t (var-ref var)) 
+		(si:fixnump (var-loc var))
+		*c-gc*
+		(eq t (var-type var)))
+	   (setf (var-kind var) 'object)
+	   (wt-var var ccb))
+	  (t (wt-vs (var-ref var))))));FIXME side-effect propagation
 
 (defun wt-gen-loc (key loc)
   (let* ((cl   (when (consp loc) (car loc)))
@@ -383,8 +382,9 @@
 	 (fvt  (car (rassoc cl +value-types+)))
 	 (ft   (loc-kind loc))
 	 (tt   (cmp-norm-tp (get key 'lisp-type)))
-	 (cast (strcat "(" key ")"))
+	 (cast (if (member key '(:cnum :creal)) "" (strcat "(" key ")")))
 	 (pp   (search "*" cast)))
+
     (cond ((eq ft tt) (wt "("))
 	  ((eq ft #tt) 
 	   (if *compiler-new-safety*
@@ -396,7 +396,13 @@
 		 
     (cond ((not loc) (wt "Cnil"))
 	  ((eq loc t) (wt "Ct"))
-	  ((eq cl 'var) (wt (if (integerp (var-loc (cadr loc))) "V" "") (var-loc (cadr loc))))
+	  ((eq cl 'var) (case (var-kind (cadr loc)) 
+			      ((special global) (wt "(" (vv-str (var-loc (cadr loc))) "->s.s_dbind)"))
+			      (lexical (wt-lexical-var (cdr loc)))
+			      (otherwise (cond ((integerp (var-loc (cadr loc))) (wt "V" (var-loc (cadr loc))))
+					       ((and (consp (var-loc (cadr loc))) (rassoc (car (var-loc (cadr loc))) +value-types+))
+						(wt (caddr (var-loc (cadr loc)))))
+					       ((wt (var-loc (cadr loc))))))))
 	  ((eq cl 'cvar) (wt "V" (cadr loc)))
 	  ((eq cl 'vv) (wt loc))
 ;	  ((eq cl 'character-value) (wt "code_char(" (caddr loc) ")"));FIXME
@@ -406,7 +412,8 @@
 	  ((baboon)))
 
     (when pp (unless *compiler-new-safety* (wt "->v.v_self")))
-    (wt ")")))
+    (wt ")")
+    (when (and (eq tt #tt) (eq ft #tboolean)) (wt "?Ct:Cnil"))))
 
 (defun wt-short-float-loc (loc)
   (cond ((and (consp loc)

@@ -535,6 +535,9 @@
   (if x nil t))
 
 (defun get-properties (p i &aux s)
+  (declare (optimize (safety 1)));FIXME, safety 2 and no check-type loses signature info
+  (check-type p proper-list)
+  (check-type i proper-list)
   (cond ((endp p) (values nil nil nil))
 	((member (setq s (car p)) i :test 'eq) (values s (cadr p) p))
 	((endp (setq s (cdr p))) (error "Bad plist"))
@@ -557,6 +560,8 @@
 (defun atom (x) (not (consp x)))
 
 (defun getf (l i &optional d &aux s)
+  (declare (optimize (safety 1)))
+  (check-type l proper-list)
   (cond ((endp l) d) 
 	((eq (car l) i) (cadr l)) 
 	((endp (setq s (cdr l))) (error "Bad plist"))

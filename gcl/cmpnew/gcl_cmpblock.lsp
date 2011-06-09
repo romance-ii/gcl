@@ -75,9 +75,7 @@
         ((blk-ref-clb blk) (c2block-clb blk body))
         (t (c2block-local blk body))))
 
-(defvar *recur-stack* nil)
-
-(defun c2block-local (blk body &aux (*recur-stack* (cons blk *recur-stack*)))
+(defun c2block-local (blk body)
   (setf (blk-exit blk) *exit*)
   (setf (blk-value-to-go blk) *value-to-go*)
   (c2expr body))
@@ -160,7 +158,7 @@
         (clb (c2return-clb blk val))
         (t (c2return-local blk val))))
 
-(defun c2return-local (blk val &aux (*recur-stack* (cons (cons 'return blk) *recur-stack*)))
+(defun c2return-local (blk val)
   (let ((*value-to-go* (blk-value-to-go blk))
         (*exit* (blk-exit blk)))
        (c2expr val)))
@@ -170,7 +168,7 @@
   (wt-nl "unwind(frs_sch(")
   (if (blk-ref-ccb blk) (wt-vs* (blk-ref-clb blk)) (wt-vs (blk-ref-clb blk)))
   (wt "),Cnil);")
-  )
+  (unwind-exit nil))
 
 (defun c2return-ccb (blk val)
   (wt-nl "{frame_ptr fr;")
@@ -178,4 +176,4 @@
   (wt-nl "if(fr==NULL) FEerror(\"The block ~s is missing.\",1," (vv-str (blk-var blk)) ");")
   (let ((*value-to-go* 'top)) (c2expr* val))
   (wt-nl "unwind(fr,Cnil);}")
-  )
+  (unwind-exit nil))

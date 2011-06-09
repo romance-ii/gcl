@@ -1266,15 +1266,7 @@ DEFUN_NEW("MAXIMUM-CONTIGUOUS-PAGES",object,fSmaximum_contiguous_pages,SI
 
 
 DEFUN_NEW("ALLOCATE-RELOCATABLE-PAGES",object,fSallocate_relocatable_pages,SI
-	  ,1,2,NONE,OI,OO,OO,OO,(fixnum npages,...),"") {
-
-  va_list ap;
-  object l=Cnil,f=OBJNULL,really_do;
-  fixnum nargs=INIT_NARGS(1);
-
-  va_start(ap,npages);
-  really_do=NEXT_ARG(nargs,ap,l,f,Cnil);
-  va_end(ap);
+	  ,1,1,NONE,OI,OO,OO,OO,(fixnum npages),"") {
 
   if (npages  <= 0)
     FEerror("Requires positive arg",0);

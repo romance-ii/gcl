@@ -32,9 +32,46 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 
-#ifdef __GNUC__
-#ifndef alloca
-#define alloca __builtin_alloca
+#ifdef HAVE_BFD_BOOLEAN
+#define MY_BFD_BOOLEAN bfd_boolean
+#define MY_BFD_FALSE FALSE
+#define MY_BFD_TRUE TRUE
+#else
+#define MY_BFD_BOOLEAN int
+#define MY_BFD_FALSE 0
+#define MY_BFD_TRUE 1
+#endif
+
+#ifdef IN_NUM_CO
+#ifdef HAVE_ISNORMAL
+#define ISNORMAL(a) isnormal(a)
+#else
+#ifdef HAVE_IEEEFP
+#define ISNORMAL(a) (fpclass(a)>=FP_NZERO)
+#else
+#define ISNORMAL(a) ((sizeof (a) == sizeof (float)) ? \
+       gcl_isnormal_float(a) : \
+       gcl_isnormal_double(a))
+#endif
+#endif
+#endif
+
+#ifdef NEED_ISFINITE
+#ifdef HAVE_ISFINITE
+#define ISFINITE(a) isfinite(a)
+#else
+#ifdef HAVE_FINITE
+#define ISFINITE(a) finite(a)
+#else
+#error "No isfinite found"
+#endif
+#endif
+#endif
+
+#ifdef IN_NUM_CO
+#ifdef HAVE_VALUES_H
+#endif
+#ifdef HAVE_FLOAT_H
 #endif
 #endif
 
@@ -50,6 +87,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #if defined(GMP) || defined(NEED_MP_H)
 #endif
+
 
 
 

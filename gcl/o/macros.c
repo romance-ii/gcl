@@ -80,20 +80,20 @@ FFN(Fdefmacro)(object form)
 	name = MMcar(form);
 	if (type_of(name) != t_symbol)
 		not_a_symbol(name);
-	vs_push(ifuncall3(sSdefmacroA,
+	vs_push(ifuncall3(sSdefmacro_lambda,
 			  name,
 			  MMcadr(form),
 			  MMcddr(form)));
-	if (MMcar(top[0]) != Cnil)
-		name->s.s_plist
-		= putf(name->s.s_plist,
-		       MMcar(top[0]),
-		       sSfunction_documentation);
-	if (MMcadr(top[0]) != Cnil)
-		name->s.s_plist
-		= putf(name->s.s_plist,
-		       MMcadr(top[0]),
-		       sSpretty_print_format);
+	/* if (MMcar(top[0]) != Cnil) */
+	/* 	name->s.s_plist */
+	/* 	= putf(name->s.s_plist, */
+	/* 	       MMcar(top[0]), */
+	/* 	       sSfunction_documentation); */
+	/* if (MMcadr(top[0]) != Cnil) */
+	/* 	name->s.s_plist */
+	/* 	= putf(name->s.s_plist, */
+	/* 	       MMcadr(top[0]), */
+	/* 	       sSpretty_print_format); */
 	if (name->s.s_sfdef != NOT_SPECIAL) {
 		if (name->s.s_mflag) {
 			if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
@@ -102,7 +102,15 @@ FFN(Fdefmacro)(object form)
 			FEerror("~S, a special form, cannot be redefined.",
 				1, name);
 	}
-	clear_compiler_properties(name,MMcaddr(top[0]));
+
+	{
+	  object x=alloc_object(t_ifun);
+	  x->ifn.ifn_self=top[0];
+	  x->ifn.ifn_name=x->ifn.ifn_call=Cnil;
+	  top[0]=x;
+	}
+	
+	clear_compiler_properties(name,top[0]);
 	if (name->s.s_hpack == lisp_package &&
 	    name->s.s_gfdef != OBJNULL && initflag) {
 		vs_push(make_simple_string(
@@ -110,7 +118,7 @@ FFN(Fdefmacro)(object form)
 		ifuncall2(sLwarn, vs_head, name);
 		vs_popp;
 	}
-	name->s.s_gfdef = MMcaddr(top[0]);
+	name->s.s_gfdef = top[0];
 	name->s.s_mflag = TRUE;
 	vs_base = vs_top = top;
 	vs_push(name);
@@ -334,7 +342,8 @@ END:
 
 DEF_ORDINARY("FUNCALL",sLfuncall,LISP,"");
 DEFVAR("*MACROEXPAND-HOOK*",sLAmacroexpand_hookA,LISP,sLfuncall,"");
-DEF_ORDINARY("DEFMACRO*",sSdefmacroA,SI,"");
+/* DEF_ORDINARY("DEFMACRO*",sSdefmacroA,SI,""); */
+DEF_ORDINARY("DEFMACRO-LAMBDA",sSdefmacro_lambda,SI,"");
 DEFVAR("*INHIBIT-MACRO-SPECIAL*",sSAinhibit_macro_specialA,SI,Cnil,"");
 void
 gcl_init_macros(void)

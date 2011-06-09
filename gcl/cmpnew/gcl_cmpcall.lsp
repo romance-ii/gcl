@@ -69,42 +69,42 @@
 ;;   (c::symbol-gfdef s))
 ;; (declaim (inline fsf))
 
-(defun c1funob (fun &aux sym)
-  ;;; NARGS is the number of arguments.  If the number is unknown, (e.g.
-  ;;; in case of APPLY), then NARGS should be NIL.
-  (cond ((and (consp fun)
-	      (symbolp (car fun))
-	      (cmp-macro-function (car fun)))
-	 (setq fun (cmp-macroexpand fun))))
-  (or
-   (and
-    (consp fun)
-    (or (and (eq (car fun) 'quote)
-             (not (endp (cdr fun)))
-             (endp (cddr fun))
-             (or 
-                 (and (symbolp (cadr fun))
-                      (or (c1local-fun (cadr fun))
-                          (list 'call-global
-                                (make-info :type (get-return-type (cadr fun))
-                                 :sp-change (if (null (get (cadr fun) 'no-sp-change)) 1 0))
-                                (cadr fun)))
-                      )))
-        (and (eq (car fun) 'function)
-             (not (endp (cdr fun)))
-             (endp (cddr fun))
-             (or 
-                 (and (setq sym (si::funid-sym-p (cadr fun)))
-                      (or (c1local-fun sym)
-                          (list 'call-global
-                                (make-info :type (get-return-type sym)
-                                 :sp-change (if (null (get sym 'no-sp-change)) 1 0))
-                                sym))
-                      )))))
-   (let* ((x (c1expr (let ((x (tmpsym))) `(let ((,x ,fun)) (if (symbolp ,x) (fsf ,x) ,x)))))
-	  (info (make-info :type (get-return-type fun) :sp-change 1)))
-        (add-info info (cadr x))
-        (list 'ordinary info x))))
+;; (defun c1funob (fun &aux sym)
+;;   ;;; NARGS is the number of arguments.  If the number is unknown, (e.g.
+;;   ;;; in case of APPLY), then NARGS should be NIL.
+;;   (cond ((and (consp fun)
+;; 	      (symbolp (car fun))
+;; 	      (cmp-macro-function (car fun)))
+;; 	 (setq fun (cmp-macroexpand fun))))
+;;   (or
+;;    (and
+;;     (consp fun)
+;;     (or (and (eq (car fun) 'quote)
+;;              (not (endp (cdr fun)))
+;;              (endp (cddr fun))
+;;              (or 
+;;                  (and (symbolp (cadr fun))
+;;                       (or (c1local-fun (cadr fun))
+;;                           (list 'call-global
+;;                                 (make-info :type (get-return-type (cadr fun))
+;;                                  :sp-change (if (null (get (cadr fun) 'no-sp-change)) 1 0))
+;;                                 (cadr fun)))
+;;                       )))
+;;         (and (eq (car fun) 'function)
+;;              (not (endp (cdr fun)))
+;;              (endp (cddr fun))
+;;              (or 
+;;                  (and (setq sym (si::funid-sym-p (cadr fun)))
+;;                       (or (c1local-fun sym)
+;;                           (list 'call-global
+;;                                 (make-info :type (get-return-type sym)
+;;                                  :sp-change (if (null (get sym 'no-sp-change)) 1 0))
+;;                                 sym))
+;;                       )))))
+;;    (let* ((x (c1expr (let ((x (tmpsym))) `(let ((,x ,fun)) (if (symbolp ,x) (fsf ,x) ,x)))))
+;; 	  (info (make-info :type (get-return-type fun) :sp-change 1)))
+;;         (add-info info (cadr x))
+;;         (list 'ordinary info x))))
 
 
 (defun c2funcall-aux(form &aux (funob (caddr form)) (args (cadddr form)))
@@ -195,21 +195,6 @@
 	 (append (car (third l)) (find-ttl-vars (fifth l) vars t)))
 	((or (find-ttl-vars (car l) vars local) (find-ttl-vars (cdr l) vars local)))))
 	
-(defun recur-exit (fn tag &optional (rs *recur-stack*))
-  (cond ((not rs) nil)
-	((let* ((s rs)
-		(r (pop s))
-		(b (when (consp r) (when (eq (car r) 'return) (cdr r))))
-		(tt (pop s)))
-	   (and b
-		(eq fn (blk-name b))
-		(eq tag tt)
-		(eq b (pop s))
-		(eq *exit* (blk-exit b))
-		(eq *value-to-go* (blk-value-to-go b))
-		(car s))))
-	((recur-exit fn tag (cdr rs)))))
-
 (defun kp (x y)
   (setf (get y 'kp) x)
   (cons x y))
@@ -279,7 +264,7 @@
 	((type>= #tboolean tp) #tt);FIXME
 	((car (member tp `(,@(if global +c-global-arg-types+ +c-local-var-types+) t *) :test 'type<=)))))
 
-(defun g0 (cname sig apnarg &optional (lev -1))
+(defun g0 (cname sig apnarg clp &optional (lev -1))
   (let* ((at (car sig))
 	 (st (member '* at))
 	 (nreg (length (ldiff at st)))
@@ -298,7 +283,7 @@
 		    (char= (char x (1- z)) #\,) (char= (char x (1- z)) #\*)) "" ","))
 	 (x (strcat x s y))
 	 (x (format nil "(~a(~a))" cname x))
-	 (x (vfun-wrap x sig))
+	 (x (vfun-wrap x sig clp))
 	 (ss (when apnarg (search "#n" x)))
 	 (x (if ss (progn (setf (aref x (1- ss)) #\-) 
 			  (when u
@@ -312,19 +297,22 @@
 	 (x (if (> w 0) (concatenate 'string "({" nx x ";})") x)))
     x))
 
-(defun g (fname n sig &optional apnarg);*
-  (g0 (format nil "/* ~a */(*LnkLI~d)" (function-string fname) n) sig apnarg))
+(defun g (fname n sig &optional apnarg (clp t)
+		&aux (cname (format nil "/* ~a */(*LnkLI~d)" (function-string fname) n))
+		(clp (when clp (concatenate 'string (vv-str (add-object fname)) "->s.s_gfdef"))))
+  (g0 cname sig apnarg clp))
 
 (defun add-fast-link (fname &optional apnarg
 			    &aux n
 			    (at (mapcar (lambda (x) (link-rt x t)) (get-arg-types fname)))
 			    (rt (link-rt (get-return-type fname) t))
-			    (tail (list rt at (cclosure-p fname) apnarg)))
+			    (clp (cclosure-p fname))
+			    (tail (list rt at clp apnarg)))
   
   (cond ((setq n (caddar (member-if 
-			 (lambda (x) 
-			   (and (eq (car x) fname) 
-				(equal (cdddr x) tail))) *function-links*)))
+			  (lambda (x) 
+			    (and (eq (car x) fname) 
+				 (equal (cdddr x) tail))) *function-links*)))
 	 (car (member-if
 	       (lambda (x) 
 		 (let ((x (last x 2))) 
@@ -336,15 +324,15 @@
 		(f (if apnarg (flag-or f aa) f)))
 	   (push (list* fname (format nil "LI~d" n) n tail) *function-links*)
 	   (car (push (list fname at rt f
-		       (g fname n (list at rt) apnarg);*
+		       (g fname n (list at rt) apnarg clp);*
 		       'link-call n)
 		      *inline-functions*))))))
 
 
 (defun declaration-type (type) 
-  (cond ((equal type "") "void")
-	((equal type "long ") "object ")
-	(t type)))
+  (if (or (equal type "") (equal type "long "))
+      "object "
+    type))
 
 ;;make a function which will be called hopefully only once,
 ;;and will establish the link.
@@ -353,6 +341,7 @@
 	 (num (pop x))
 	 (n (pop x))
 	 (type (pop x))
+	 (type (or type t));FIXME
 	 (args (pop x))
 	 (clp (pop x)))
     (declare (ignore n))
@@ -439,30 +428,34 @@
   (base-used))
 
 ;;; Functions that use SAVE-FUNOB should reset *vs*.
-(defun save-funob (funob &optional force)
-  (case (car funob)
-        ((call-quote-lambda call-local))
-        (call-global
-         (unless (and (not force)
-		      (inline-possible (caddr funob))
-		      (or (get (caddr funob) 'Lfun)
-			  (get (caddr funob) 'Ufun)
-			  (assoc (caddr funob) *global-funs*)))
+(defun save-funob (funob &aux (temp (list 'vs (vs-push))))
+  (let ((*value-to-go* temp))
+    (c2expr* funob)
+    temp))
+;; (defun save-funob (funob &optional force)
+;;   (case (car funob)
+;;         ((call-quote-lambda call-local))
+;;         (call-global
+;;          (unless (and (not force)
+;; 		      (inline-possible (caddr funob))
+;; 		      (or (get (caddr funob) 'Lfun)
+;; 			  (get (caddr funob) 'Ufun)
+;; 			  (assoc (caddr funob) *global-funs*)))
 		     
-           (let ((temp (list 'vs (vs-push))))
-                (if *safe-compile*
-                    (wt-nl
-                     temp
-                     "=symbol_function(" (vv-str (add-symbol (caddr funob))) ");")
-                    (wt-nl temp
-                           "=" (vv-str (add-symbol (caddr funob))) "->s.s_gfdef;"))
-                temp)))
-        (ordinary (let* ((temp (list 'vs (vs-push)))
-                         (*value-to-go* temp))
-                        (c2expr* (caddr funob))
-                        temp))
-        (otherwise (baboon))
-        ))
+;;            (let ((temp (list 'vs (vs-push))))
+;;                 (if *safe-compile*
+;;                     (wt-nl
+;;                      temp
+;;                      "=symbol_function(" (vv-str (add-symbol (caddr funob))) ");")
+;;                     (wt-nl temp
+;;                            "=" (vv-str (add-symbol (caddr funob))) "->s.s_gfdef;"))
+;;                 temp)))
+;;         (ordinary (let* ((temp (list 'vs (vs-push)))
+;;                          (*value-to-go* temp))
+;;                         (c2expr* (caddr funob))
+;;                         temp))
+;;         (otherwise (baboon))
+;;         ))
 
 (defun push-args (args &optional lastp)
   (cond ((null args) (wt-nl "vs_base=vs_top;"))

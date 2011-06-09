@@ -617,11 +617,12 @@
   (let ((fun (ihs-fun ihs-index)))
     (cond ((symbolp fun) fun)
 	  ((when (compiled-function-p fun) (compiled-function-name fun)));FIXME
-	  ((functionp fun) (multiple-value-bind ;FIXME faster
-			    (x y fun) 
-			    (function-lambda-expression fun)
-			    (declare (ignore x y))
-			    fun))
+	  ((functionp fun) (name fun))
+	   ;; (multiple-value-bind ;FIXME faster
+	   ;;  (x y fun) 
+	   ;;  (function-lambda-expression fun)
+	   ;;  (declare (ignore x y))
+	   ;;  fun))
           ((consp fun)
            (case (car fun)
              (lambda 'lambda)

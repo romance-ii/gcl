@@ -38,7 +38,7 @@
 		   (list 'list 'list* 'si::cons-car 'si::cons-cdr 'compiler::unbox 'si::clzl 
 			 'system::check-type-symbol 'si::number-plus 'si::number-minus
 			 'si::number-times 'si::number-divide 'compiler::tt3 'compiler::tt30)))
-  (setf (get l 'c1no-side-effects) t));FIXME
+  (setf (get l 'compiler::c1no-side-effects) t));FIXME
 
  (in-package "USER")
 

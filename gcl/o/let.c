@@ -331,11 +331,17 @@ FFN(Fmacrolet)(object args)
 			FEerror("~S~%\
 is an illegal macro definition in MACROFLET.",
 				1, def);
-		top[0] = ifuncall3(sSdefmacroA,
+		top[0] = ifuncall3(sSdefmacro_lambda,
 				   MMcar(def),
 				   MMcadr(def),
 				   MMcddr(def));
-		lex_macro_bind(MMcar(def), MMcaddr(top[0]));
+		{
+		  object x=alloc_object(t_ifun);
+		  x->ifn.ifn_self=top[0];
+		  x->ifn.ifn_name=x->ifn.ifn_call=Cnil;
+		  top[0]=x;
+		}
+		lex_macro_bind(MMcar(def), top[0]);
 		def_list = MMcdr(def_list);
 	}
 	vs_push(find_special(MMcdr(args), NULL, NULL,NULL));

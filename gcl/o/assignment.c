@@ -215,6 +215,8 @@ DEFUNO_NEW("FSET",object,fSfset,SI
 		sym->s.s_mflag = FALSE;
 	}
 
+	sym->s.s_sfdef=NOT_SPECIAL;/*FIXME?*/
+
 	RETURN1(function);
 }
 #ifdef STATIC_FUNCTION_POINTERS
@@ -373,12 +375,12 @@ setf(object place, object form)
 		goto OTHERWISE;
 	args = place->c.c_cdr;
 	if (fun == sLget) {
-            object sym,val,key,deflt,deflt1;
+            object sym,val,key,deflt1;
 	  sym = Ieval1(car(args));
 	  key = Ieval1(car(Mcdr(args)));
           deflt1 = Mcddr(args);
           if (consp(deflt1))
-	    deflt = Ieval1(car(deflt1));
+	    Ieval1(car(deflt1));
 	  val = Ieval1(form);
 	  return putprop(sym,val,key); 
 	}

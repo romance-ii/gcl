@@ -53,21 +53,19 @@ round_up(void *address, unsigned long n)
 
 static MY_BFD_BOOLEAN
 madd_archive_element (struct bfd_link_info * link_info,
-		       bfd *abfd,
-		       const char *name) {
+		      bfd *abfd,
+		      const char *name,
+		      bfd **subsbfd) {
 
 return MY_BFD_FALSE;
 
 }
 
 static MY_BFD_BOOLEAN
-mmultiple_definition (struct bfd_link_info * link_info,
-		      const char *name,
-		      bfd *obfd,
-		      asection *osec,
-		      bfd_vma oval,
-		      bfd *nbfd,
-		      asection *nsec,
+mmultiple_definition (struct bfd_link_info *li, 
+		      struct bfd_link_hash_entry *h,
+		      bfd *nbfd, 
+		      asection *nsec, 
 		      bfd_vma nval) {
 
 return MY_BFD_FALSE;
@@ -75,13 +73,10 @@ return MY_BFD_FALSE;
 }
 
 static MY_BFD_BOOLEAN
-mmultiple_common (struct bfd_link_info * link_info,
-		  const char *name,
-		  bfd *obfd,
-		  enum bfd_link_hash_type otype,
-		  bfd_vma osize,
-		  bfd *nbfd,
-		  enum bfd_link_hash_type ntype,
+mmultiple_common (struct bfd_link_info *li, 
+		  struct bfd_link_hash_entry *h,
+		  bfd *nbfd, 
+		  enum bfd_link_hash_type ntype, 
 		  bfd_vma nsize) {
 
 return MY_BFD_FALSE;

@@ -35,12 +35,12 @@ $(addsuffix .c,$(AFILES)) $(addsuffix .data,$(AFILES))\
 	cp ../h/cmpinclude.h .
 	echo ${SETUP} '(pcl::compile-pcl)' | ../unixport/saved_mod_gcl
 	rm *gazonk*.o
-	touch gcl_pcl_methods.c # FIXME workaround for -g -Os gcc bug
+#	touch gcl_pcl_methods.c # FIXME workaround for -g -Os gcc bug
 	for i in gazonk* ; do \
 		j=$$(echo $$i | sed 's,\..*$$,,1');k="gazonk$$(echo $$j | cut -f3 -d\_)";\
 		l=$$(echo $$i | sed 's,^.*\.,,1');\
 		cat $$i | sed   -e "s,$$j\.h,gcl_pcl_$$k.h,1" \
-				-e "s,init_.*$$j,init_gcl_pcl_$$k,g" >gcl_pcl_$$k.$$l && rm $$i; done
+				-e "s,init_.*$$j(),init_gcl_pcl_$$k(),g" >gcl_pcl_$$k.$$l && rm $$i; done
 
 %.o: %.c %.h %.data
 	$(CC) $(CFLAGS) -c $< -o $@

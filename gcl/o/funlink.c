@@ -151,9 +151,10 @@ is supplied and FLAG is nil, then this function is deleted from the fast links")
  } else {
 
    if ((type_of(sym)==t_symbol))
-     fun = sym->s.s_gfdef;
+     fun=sym->s.s_gfdef;
    else 
-     FEerror("Second arg: ~a must be symbol or closure",0,sym);
+     fun=sym;
+     /* FEerror("Second arg: ~a must be symbol or closure",0,sym); */
 
    if (Rset) {
 
@@ -1096,7 +1097,7 @@ call_proc_new(object sym,ufixnum clp,ufixnum vld,void **link,ufixnum argd,object
   enum type tp;
   ufixnum margs,nargs,fas,do_link,varg,pushed=0;
   fixnum vald;
-  object *tmp,*x,*p;
+  object *tmp,*x/* ,*p */;
   int i;
   fu u;
 
@@ -1110,11 +1111,11 @@ call_proc_new(object sym,ufixnum clp,ufixnum vld,void **link,ufixnum argd,object
 
   u.i=vld;
   
-  p=0;
+  /* p=0; */
   if (u.f.pu) {
     u.f.ma=vs_top-vs_base;
     u.f.va=u.f.nv=u.f.vv=0;
-    p=vs_base;
+    /* p=vs_base; */
     pushed=1;
   }
   
@@ -1137,9 +1138,9 @@ call_proc_new(object sym,ufixnum clp,ufixnum vld,void **link,ufixnum argd,object
   switch(tp) {
   case t_function:
     {
-      fixnum neval=fun->fun.fun_neval,nvald=vald;
+      fixnum neval=fun->fun.fun_neval/* ,nvald=vald */;
       neval=fun->fun.fun_vv ? neval : -neval;
-      nvald=FUN_VALP ? vald : 0;
+      /* nvald=FUN_VALP ? vald : 0; */
       if (pushed)
 	fas=0;
       else if (margs!=fun->fun.fun_minarg) /*margs < fun->fun.fun_minarg*/
@@ -1151,7 +1152,7 @@ call_proc_new(object sym,ufixnum clp,ufixnum vld,void **link,ufixnum argd,object
 	fas=0;
       else if (vald!=neval && (vald<=0 || !neval || neval>vald))/*margs funvalp aggregate across file*/
 	fas=0;
-      else if (fun->fun.fun_env && !clp)
+      else if (fun->fun.fun_env!=def_env && !clp)
 	fas=0;
       else if (fun->fun.fun_argd!=argd)
 	fas=0;
@@ -1193,7 +1194,7 @@ call_proc_new(object sym,ufixnum clp,ufixnum vld,void **link,ufixnum argd,object
   } else {
     
     object res;
-    register object *base;
+    register object *base,*old_top;
     enum ftype result_type;
     fixnum larg=0,i;
 
@@ -1239,6 +1240,7 @@ call_proc_new(object sym,ufixnum clp,ufixnum vld,void **link,ufixnum argd,object
     }
 
     base=vs_base;
+    old_top=vs_top;
     funcall(fun);
     
     res=vs_base[0];
@@ -1253,6 +1255,7 @@ call_proc_new(object sym,ufixnum clp,ufixnum vld,void **link,ufixnum argd,object
     } else
       vs_top=base;
 
+    for (;--old_top>=vs_top;) *old_top=Cnil;
     
     switch(result_type) {
     case f_fixnum:

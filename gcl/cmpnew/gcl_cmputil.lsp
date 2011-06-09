@@ -91,7 +91,7 @@
 	(f (cadr *current-form*)))
     (dolist (s *src-inline-recursion*)
       (unless (eq (caar s) f)
-	(format t ";   inlining ~s~%" (caar s))))))
+	(format t ";   inlining ~s~%" (name-sir s))))))
 
 (defun cmpwarn (string &rest args &aux (*print-case* :upcase))
   (unless *suppress-compiler-warnings*

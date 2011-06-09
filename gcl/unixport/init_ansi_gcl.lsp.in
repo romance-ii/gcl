@@ -2,8 +2,6 @@
 (push :common-lisp *features*)
 (push :ansi-cl *features*)
   
-(make-package "C")
-(make-package "COMPILER" :use '("LISP"))
 (make-package "SLOOP" :use '("LISP"))
 (make-package "SERROR" :use '("LISP" "SLOOP"))
 (make-package "ANSI-LOOP" :use '("LISP"))

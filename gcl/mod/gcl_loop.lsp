@@ -958,7 +958,7 @@ a LET-like macro, and a SETQ-like macro, which perform LOOP-style destructuring.
 
 
 (defun loop-warn (format-string &rest format-args)
-  (warn "~?~%Current LOOP context:~{ ~S~}." format-string format-args (loop-context)))
+  (warn :style-warning :format-control "~?~%Current LOOP context:~{ ~S~}." :format-arguments (list format-string format-args (loop-context))))
 
 
 (defun loop-check-data-type (specified-type required-type
@@ -1190,7 +1190,7 @@ collected result will be returned as the value of the LOOP."
 		(loop-pop-source)
 		(labels ((translate (k v)
 			   (cond ((null k) nil)
-				 ((atom k)
+				 ((symbolp k)
 				  (replicate
 				    (or (gethash k (loop-universe-type-symbols *loop-universe*))
 					(gethash (symbol-name k) (loop-universe-type-keywords *loop-universe*))
@@ -1198,7 +1198,7 @@ collected result will be returned as the value of the LOOP."
 					  "Destructuring type pattern ~S contains unrecognized type keyword ~S."
 					  z k))
 				    v))
-				 ((atom v)
+				 ((or (atom k) (atom v))
 				  (loop-error
 				    "Destructuring type pattern ~S doesn't match variable pattern ~S."
 				    z variable))
@@ -2068,7 +2068,7 @@ collected result will be returned as the value of the LOOP."
 			 ,@(and other-p other-var `((,other-var nil))))))
 	(if (eq which 'hash-key)
 	    (setq key-var variable val-var (and other-p other-var))
-	    (setq key-var (and other-p other-var) val-var variable))
+	  (setq key-var (and other-p other-var) val-var variable))
 	(push `(with-hash-table-iterator (,next-fn ,ht-var)) *loop-wrappers*)
 	(when (consp key-var)
 	  (setq post-steps `(,key-var ,(setq key-var (loop-gentemp 'loop-hash-key-temp-))

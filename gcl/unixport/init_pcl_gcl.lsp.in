@@ -1,5 +1,4 @@
-(make-package "C")
-(make-package "COMPILER" :use '("LISP"))
+(setq si::*optimize-maximum-pages* nil)
 (make-package "SLOOP" :use '("LISP"))
 (make-package "SERROR" :use '("LISP" "SLOOP"))
 (make-package "ANSI-LOOP" :use '("LISP"))
@@ -15,6 +14,8 @@
 (defvar *the-pcl-package* (find-package :pcl))
 (defun load-truename (&optional (errorp nil))
   (flet () *load-pathname* nil))
+
+@LI-CLCS-PACKAGE@
 
 (in-package "SYSTEM")
 

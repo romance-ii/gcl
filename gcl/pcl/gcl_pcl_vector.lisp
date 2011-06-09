@@ -968,6 +968,7 @@
 	    (when (eq arg '&aux) (return nil))
 	    (incf nreq)(push arg args))
 	  (setq args (nreverse args))
+;	  (print (list 'baz lambda-list nreq restp)) (break)
 	  (setf (getf (getf initargs ':plist) ':arg-info) (cons nreq restp))
 	  (make-method-initargs-form-internal1
 	   initargs (cddr lmf) args lmf-params restp)))))

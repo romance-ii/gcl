@@ -209,7 +209,6 @@
 (defconstant +coerce-list+ '(list vector string array character short-float
 				  long-float float complex function null cons))
 
-(declaim (notinline coerce));FIXME
 (defun coerce (object type)
   (declare (optimize (safety 2)))
   (check-type type (and (not null) type-spec))
@@ -253,6 +252,8 @@
 	 (complex (coerce (realpart object) (cadr type))
 		  (coerce (imagpart object) (cadr type)))))
       (otherwise (check-type-eval object type)))))
+(putprop 'coerce t 'compiler::cmp-notinline);FIXME
+
 
 (defun maybe-clear-tp (sym)
   (let* ((p (find-package "COMPILER")) (s (and p (find-symbol "*NORM-TP-HASH*" p))))
@@ -329,6 +330,7 @@
 (deftype seqind ()
   `(integer 0 ,array-dimension-limit))
 (defun seqindp (x) (and (fixnump x) (>= x 0) (<= x array-dimension-limit)))
+(si::putprop 'seqindp t 'compiler::cmp-inline)
 
 (deftype rnkind ()
   `(integer 0 ,array-rank-limit))
@@ -460,7 +462,7 @@
 (deftype compiled-function (&optional as vs) 
   (declare (ignore as vs)) 
   `(or new-compiled-function old-compiled-function))
-(deftype generic-function nil nil);Overwritten by pcl check
+(deftype generic-function nil nil);Overwritten by pcl check ;FIXME
 
 (deftype integer (&optional (low '*) (high '*)) `(integer ,low ,high))
 (deftype ratio (&optional (low '*) (high '*)) `(ratio ,low ,high))
@@ -623,7 +625,8 @@
 (defconstant +singleton-types+ '(non-keyword-symbol keyword standard-char
 				      non-standard-base-char 
 				      package cons
-				      broadcast-stream concatenated-stream echo-stream file-stream string-stream
+				      broadcast-stream concatenated-stream echo-stream
+				      file-stream string-stream
 				      synonym-stream two-way-stream 
 				      non-logical-pathname logical-pathname
 				      readtable 
@@ -1179,16 +1182,20 @@
 
 (defun classp (object) (declare (ignore object)) (the boolean *prevent-compiler-optimization*))
 (defun class-precedence-list (object) (declare (ignore object)) (the proper-list *prevent-compiler-optimization*))
-(defun find-class (object &optional errorp environment) (declare (ignore object errorp environment)) *prevent-compiler-optimization*)
+(defun find-class (object &optional errorp environment
+			  &aux (*prevent-compiler-optimization* (car (member object '(generic-function)))));FIXME
+  (declare (ignore errorp environment))
+  *prevent-compiler-optimization*)
 (defun class-name (class) (declare (ignore class)) (the symbol *prevent-compiler-optimization*))
 (defun class-of (object) (declare (ignore object)) *prevent-compiler-optimization*)
 (defun class-direct-subclasses (object) (declare (ignore object)) (the proper-list *prevent-compiler-optimization*))
 
-(defun is-standard-class-symbol (sym) 
-  (let* ((z (get sym 'deftype-definition))
-	 (z (and z (not (caddr (get sym 'deftype-form))) (funcall z)))
-	 (z (and (consp z) (eq (car z) 'satisfies) (cadr z))))
-    (and z (not (member (symbol-package z) '(lisp si compiler) :key 'find-package)))))
+(defun is-standard-class-symbol (sym) ;FIXME
+  (or (eq sym 'generic-function)
+      (let* ((z (get sym 'deftype-definition))
+	     (z (and z (not (caddr (get sym 'deftype-form))) (funcall z)))
+	     (z (and (consp z) (eq (car z) 'satisfies) (cadr z))))
+	(and z (not (member (symbol-package z) '(lisp si compiler) :key 'find-package))))))
 
 (defun find-standard-class (object)
   (and (symbolp object)
@@ -1460,7 +1467,11 @@
 	((eq w 'proper-cons) w)
 	((atom w) nil)
 	((eq (car w) 'member) w)
-	((eq (car w) 'not) `(not ,(cons-recon `(cons ,(cadr w)))))
+	((eq (car w) 'not)
+	 (let ((r (cons-recon `(cons ,(cadr w))))) 
+	   (if (and (consp r) (eq (car r) 'cons))
+	       `(not ,r)
+	     `(and (cons t t) (not ,r)))))
 	((cons-atm w)
 	 (let ((car (nreconstruct-type-int (copy-tree (car w))));FIXME
 	       (cdr (nreconstruct-type-int (copy-tree (cdr w)))))

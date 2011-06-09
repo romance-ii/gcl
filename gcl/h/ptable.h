@@ -15,7 +15,7 @@ there are tab.n_symbols pairs occurring.
 typedef unsigned long addr;
 
 struct node{
-  char *string;
+  const char *string;
   addr address;
 #ifdef AIX3
   unsigned short tc_offset;
@@ -26,8 +26,8 @@ struct lsymbol_table{
   unsigned int n_symbols ;
   unsigned int tot_leng;};
 
-#define SYM_ADDRESS(table,i) ((*(table).ptable))[i].address
-#define SYM_STRING(table,i) ((*(table).ptable))[i].string
+#define SYM_ADDRESS(table,i) table.ptable[i].address
+#define SYM_STRING(table,i)  table.ptable[i].string
 #define SYM_TC_OFF(table,i) ((*(table).ptable))[i].tc_offset
 
 /* typedef struct node *TABL;  */
@@ -35,10 +35,8 @@ struct lsymbol_table{
 
 typedef struct node TABL[]; 
 
-struct node * find_sym_ptable();
-
 struct  string_address_table
-{ TABL *ptable;
+{ struct node *ptable;
   unsigned int length;
   unsigned int alloc_length;
 };

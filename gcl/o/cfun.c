@@ -199,6 +199,7 @@ MM(object sym, void (*self)(), char *start, int size, object data)
 	data->cfd.cfd_size=size;
 	sym = 	clear_compiler_properties(sym,cf);
 	sym->s.s_gfdef = cf;
+	sym->s.s_sfdef = NOT_SPECIAL;
 	sym->s.s_mflag = TRUE;
 	return sym;
 }
@@ -294,4 +295,5 @@ DEFUN_NEW("COMPILED-FUNCTION-NAME",object,fScompiled_function_name,SI
 }
 
 void
-gcl_init_cfun(void) {}
+gcl_init_cfun(void) {
+}

@@ -35,6 +35,20 @@ object siSuniversal_error_handler;
 object sSterminal_interrupt;
 
 void
+assert_error(const char *a,unsigned l,const char *f,const char *n) {
+
+  if (initflag)
+    FEerror("The assertion ~a on line ~a of ~a in function ~a failed",4,
+	    make_simple_string(a),make_fixnum(l),
+	    make_simple_string(f),make_simple_string(n));
+  else {
+    fprintf(stderr,"The assertion %s on line %d of %s in function %s failed",a,l,f,n);
+    exit(-1);
+  }
+
+}
+
+void
 terminal_interrupt(int correctable)
 {
     signals_allowed = sig_normal; 

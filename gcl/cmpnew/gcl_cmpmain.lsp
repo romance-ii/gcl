@@ -162,6 +162,7 @@
        (setf (car *split-files*) (+ (third *split-files*) section-length)))))
 
 (defvar *init-name*)
+(defvar *c-debug* nil)
 (defun compile-file1 (input-pathname
                       &key (output-file (merge-pathnames *o-ext* input-pathname))
                            (o-file t)
@@ -185,7 +186,7 @@
 			   (*data* (list (make-array 50 :fill-pointer 0 :adjustable t) nil nil nil))
 			   (*fasd-data* *fasd-data*)
                            (*error-count* 0))
-  (declare (special *c-debug* system-p))
+;  (declare (special *c-debug* system-p))
 
   (when input-pathname
     (setq input-pathname (si:search-local-pathname input-pathname)))

@@ -778,7 +778,7 @@ parse_number(char *s, int end, int *ep, int radix) {
   object x=Cnil;
   fixnum sign;
   object integer_part;
-  double fraction, fraction_unit, f;
+  double fraction, fraction_unit;
   char exponent_marker;
   int exponent,exp_pos=-1;
   int i, j, k;
@@ -947,7 +947,6 @@ parse_number(char *s, int end, int *ep, int radix) {
     i++;
   } while (i < end && (d = digitp(s[i], radix)) >= 0);
   d = exponent;
-  f = 10.0;
   /* Use pow because it is more accurate */
   { double po = pow(10.0,(double)(sign * d));
   if (po == 0.0)
@@ -2545,14 +2544,14 @@ DEFUN_NEW("LISTEN",object,fLlisten,LISP,0,1,NONE,OO,OO,OO,OO,(object f,...),"") 
 DEFUN_NEW("READ-CHAR-NO-HANG",object,fLread_char_no_hang,LISP,0,4,NONE,OO,OO,OO,OO,(object f,...),"") {
 
   fixnum nargs=INIT_NARGS(0);
-  object l=Cnil,strm,eof_errorp,eof_value,recursivep;
+  object l=Cnil,strm,eof_errorp,eof_value/* ,recursivep */;
   va_list ap;
 
   va_start(ap,f);
   strm=NEXT_ARG(nargs,ap,l,f,sLAstandard_inputA->s.s_dbind);
   eof_errorp=NEXT_ARG(nargs,ap,l,f,Ct);
   eof_value= NEXT_ARG(nargs,ap,l,f,Cnil);
-  recursivep=NEXT_ARG(nargs,ap,l,f,Cnil);
+  /* FIXME: recursivep=NEXT_ARG(nargs,ap,l,f,Cnil); */
   va_end(ap);
 
   if (strm == Cnil)

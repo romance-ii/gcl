@@ -47,6 +47,7 @@
 
 
 (import 'si::switch)
+(import 'si::static)
 (import 'si::switch-finish)
 (import 'si::strcat 'compiler)
 (import 'si::old-compiled-function 'compiler)
@@ -57,9 +58,6 @@
 (import 'si::hash-table-equalp 'compiler)
 (import 'si::str-ref 'compiler)
 (import 'compiler::lit 'si)
-(import 'compiler::litt 'si)
-(import 'compiler::unbox 'si)
-(import 'compiler::cstr 'si)
 (import 'si::fsf 'compiler)
 (import 'si::funcallable-symbol 'compiler)
 (import 'si::funcallable-symbol-p 'compiler)
@@ -183,7 +181,7 @@
 		(`(,(car tp) ,@(mapcar 'cmp-norm-tp (cdr tp))))))
 	 ((let ((tp (resolve-type tp))) (if (cadr tp) '* (readable-tp (car tp))))))))
   
-(defun cmp-norm-tp (tp);(when (and (symbolp tp) (string= "STD-INSTANCE" (symbol-name tp))) (break))
+(defun cmp-norm-tp (tp);(when (and (symbolp tp) (string= "FUNCTION" (symbol-name tp))) (break))
   (multiple-value-bind 
    (r f) (gethash tp *norm-tp-hash*)
    (cond (f r)
@@ -462,7 +460,7 @@
 				  (real 0.0 0.0) (real * (0.0)) (real (0.0)) (real * 0.0) (real 0.0) real
 				  fcomplex dcomplex (complex integer) (complex ratio) complex
 				  number
-				  character hash-table
+				  character hash-table function
 				  t))
 (defconstant +useful-types+ (mapcar (lambda (x) (load-time-value (cmp-norm-tp x))) +useful-type-list+))
 (mapc (lambda (x) 
@@ -805,12 +803,12 @@
     (list 'call-global info 'rplaca nargs)))
 (si::putprop 'rplaca 'c1rplaca 'c1)
 
-(defun cons-propagator (f t1 t2)
+(defun cons-propagator (f t1 t2 &aux tmp)
   (declare (ignore f))
   (cond ((let ((a1 (atomic-tp t1))
 	       (a2 (atomic-tp t2)))
 	   (and a1 a2 (cmp-norm-tp `(member ,(cons (car a1) (car a2)))))));FIXME dont-normalize or clean hash
-	((cons-tp-limit-tp t2 0 0) (cmp-norm-tp `(cons ,t1 ,t2)))
+	((cons-tp-limit (setq tmp `(cons ,t1 ,t2)) 0 0) (cmp-norm-tp tmp))
 	((type>= #tproper-list t2) #tproper-cons)
 	(#tcons)))
 (si::putprop 'cons 'cons-propagator 'type-propagator)
@@ -1108,12 +1106,22 @@
 
 (defvar *pmct-hash* (make-hash-table :test 'eq))
 (defun promoted-c-type (type)
-  (or (gethash type *pmct-hash*)
-      (setf (gethash type *pmct-hash*)
-	    (let ((type (coerce-to-one-value type)))
-	      (cond ((eq type 'object) type)
-		    ((when type (car (member type `(,#tnull ,#tboolean ,@+c-local-var-types+) :test 'type<=))))
-		    (t))))))
+  (multiple-value-bind
+   (r f)
+   (gethash type *pmct-hash*)
+   (if f r
+     (setf (gethash type *pmct-hash*)
+	   (let ((type (coerce-to-one-value type)))
+	     (cond ((eq type 'object) type);FIXME
+		   ((setq r (member type `(,#tnil ,#tnull ,#tboolean ,@+c-local-var-types+) :test 'type<=)) (car r))
+		   (#tt)))))))
+;; (defun promoted-c-type (type)
+;;   (or (gethash type *pmct-hash*)
+;;       (setf (gethash type *pmct-hash*)
+;; 	    (let ((type (coerce-to-one-value type)))
+;; 	      (cond ((eq type 'object) type)
+;; 		    ((when type (car (member type `(,#tnull ,#tboolean ,@+c-local-var-types+) :test 'type<=))))
+;; 		    (t))))))
 
 (defvar *ctov-hash* (make-hash-table :test 'eq))
 (defun coerce-to-one-value (type)
@@ -1128,8 +1136,7 @@
       (setf (gethash type *stp-hash*)
 	    (type>= t type))))	   
 
-(defconstant +export-type-alist+ (cons (cons 'function #tfunction)
-				       (mapcar 'cons +useful-type-list+ +useful-types+)))
+(defconstant +export-type-alist+ (mapcar 'cons +useful-type-list+ +useful-types+))
 (defvar *ext-hash* (make-hash-table :test 'eq))
 (defun export-type (type)
   (or (gethash type *ext-hash*)

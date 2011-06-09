@@ -134,6 +134,7 @@
      (let ((pe (process-error datum arguments 'error)))
        (proto-invoke-debugger pe)
        (throw *quit-tag* *quit-tag*)))))
+(putprop 'error t 'compiler::cmp-notinline)
   
 (defvar *default-continue-string* nil)
 
@@ -147,6 +148,7 @@
 	  (proto-continue (apply 'format nil continue-string arguments))
 	  (apply 'error datum arguments)))
        nil))))
+(putprop 'cerror t 'compiler::cmp-notinline)
 
 (defvar *ignore-floating-point-errors* nil)
 (defun universal-error-handler
@@ -263,6 +265,7 @@
 	      nil))))
        (terpri *debug-io*)
        (break-current)))))
+(putprop 'break-level t 'compiler::cmp-notinline)
 
 (defun break (&optional format-string &rest args &aux message)
 
@@ -285,3 +288,4 @@
     (proto-continue "Return from break.")
     (let ((*break-enable* t)) (break-level message)))
    nil))
+(putprop 'break t 'compiler::cmp-notinline)

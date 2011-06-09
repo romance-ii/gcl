@@ -202,18 +202,18 @@
    (get 'system:fill-pointer-set 'inline-always))
 
 ;;SYSTEM:FIXNUMP
- (push '((t) boolean #.(flags rfa)"type_of(#0)==t_fixnum")
-   (get 'system:fixnump 'inline-always))
-(push '((fixnum) boolean #.(flags rfa)"1")
-   (get 'system:fixnump 'inline-always))
+;;  (push '((t) boolean #.(flags rfa)"type_of(#0)==t_fixnum")
+;;    (get 'system:fixnump 'inline-always))
+;; (push '((fixnum) boolean #.(flags rfa)"1")
+;;    (get 'system:fixnump 'inline-always))
 
 ;;SYSTEM:SEQINDP
- (push '((t) boolean #.(flags rfa) #.(format nil "(type_of(#0)==t_fixnum && ({fixnum _t=fix(#0);_t>=0 && _t<=~s;}))" array-dimension-limit))
-   (get 'system::seqindp 'inline-always))
-(push '((fixnum) boolean #.(flags rfa)#.(format nil "(#0>=0 && #0<=~s)" array-dimension-limit))
-   (get 'system::seqindp 'inline-always))
-(push '((seqind) boolean #.(flags rfa)"1")
-   (get 'system::seqindp 'inline-always))
+;;  (push '((t) boolean #.(flags rfa) #.(format nil "(type_of(#0)==t_fixnum && ({fixnum _t=fix(#0);_t>=0 && _t<=~s;}))" array-dimension-limit))
+;;    (get 'system::seqindp 'inline-always))
+;; (push '((fixnum) boolean #.(flags rfa)#.(format nil "(#0>=0 && #0<=~s)" array-dimension-limit))
+;;    (get 'system::seqindp 'inline-always))
+;; (push '((seqind) boolean #.(flags rfa)"1")
+;;    (get 'system::seqindp 'inline-always))
 
 ;;SYSTEM:MV-REF
  (push '((fixnum) t #.(flags)"(MVloc[(#0)])")
@@ -1055,6 +1055,8 @@
 
 (setf (get :boolean 'lisp-type) 'boolean)
 (setf (get :void 'lisp-type) nil)
+(setf (get :cnum 'lisp-type) #tcnum)
+(setf (get :creal 'lisp-type) #t(and real cnum))
 
 (dolist (l '((:float      "make_shortfloat"      short-float     cnum)
 	     (:double     "make_longfloat"       long-float      cnum)
@@ -1105,6 +1107,8 @@
 	     (pack (or null package)) (direl (or keyword null string))))
   (let ((s (intern (symbol-name (car l)) 'keyword)))
     (setf (get s 'lisp-type) (cmp-norm-tp (cadr l)))))
+
+(defvar *box-alist* (mapcar (lambda (x) (cons x (cmp-norm-tp (get x 'lisp-type)))) '(:char :fixnum :float :double :fcomplex :dcomplex)))
 
 (deftype stdesig nil '(or string symbol character))
 (deftype longfloat nil 'long-float)

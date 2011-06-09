@@ -925,6 +925,90 @@ FFN(siLrmdir)(void)
 			1, vs_base[0]);
 }
 
+DEFVAR("*LOAD-WITH-FREAD*",sSAload_with_freadA,SI,Cnil,"");
+
+#ifdef _WIN32
+
+void *
+get_mmap(FILE *fp,void **ve) {
+  
+  int n;
+  void *st;
+  size_t sz;
+  HANDLE handle;
+
+  massert((sz=file_len(fp))>0);
+  if (sSAload_with_freadA->s.s_dbind==Cnil) {
+    n=fileno(fp);
+    massert((n=fileno(fp))>2);
+    massert(handle = CreateFileMapping((HANDLE)_get_osfhandle(n), NULL, PAGE_WRITECOPY, 0, 0, NULL));
+    massert(st=MapViewOfFile(handle,FILE_MAP_COPY,0,0,sz));
+    CloseHandle(handle);
+  } else {
+    massert(st=malloc(sz));
+    massert(fread(st,sz,1,fp)==1);
+  }
+
+  *ve=st+sz;
+
+  return st;
+
+}
+
+int
+un_mmap(void *v1,void *ve) {
+
+  if (sSAload_with_freadA->s.s_dbind==Cnil)
+    return UnmapViewOfFile(v1) ? 0 : -1;
+  else {
+    free(v1);
+    return 0;
+  }
+
+}
+
+
+#else
+
+#include <sys/mman.h>
+
+void *
+get_mmap(FILE *fp,void **ve) {
+  
+  int n;
+  void *v1;
+  struct stat ss;
+
+  massert((n=fileno(fp))>2);
+  massert(!fstat(n,&ss));
+  if (sSAload_with_freadA==Cnil) {
+    massert((v1=mmap(0,ss.st_size,PROT_READ|PROT_WRITE,MAP_PRIVATE,n,0))!=(void *)-1);
+  } else {
+    massert(v1=malloc(ss.st_size));
+    massert(fread(v1,ss.st_size,1,fp)==1);
+  }
+
+  *ve=v1+ss.st_size;
+  return v1;
+
+}
+ 
+
+int
+un_mmap(void *v1,void *ve) {
+
+  if (sSAload_with_freadA==Cnil)
+    return munmap(v1,ve-v1);
+  else {
+    free(v1);
+    return 0;
+  }
+
+}
+
+#endif
+
+
 void
 gcl_init_unixfsys(void)
 {

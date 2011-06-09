@@ -37,6 +37,7 @@
 	  (var-mt v) (var-type v)
 	  (var-loc v) (unless (and (eq (var-loc v) 'object)
 				   (t-to-nil (var-type v))) (var-loc v)))
+    (unless (var-type v) (cmpwarn "Variable ~s initialized with type ~s" (var-name v) (var-type v)))
     (keyed-cmpnote (list (var-name v) 'type-propagation 'type 'init-type)
 		   "Setting init type of ~s to ~s" (var-name v) (var-type v))))
 
@@ -71,7 +72,8 @@
       (let ((var (car vs)) (form (car fs)))
 	(cond ((and (eq (var-kind var) 'LEXICAL)
 		    (not (eq t (var-ref var))) ;;; This field may be IGNORE.
-		    (not (var-ref-ccb var)))
+		    (not (var-ref-ccb var))
+		    (not *provisional-inline*));FIXME
 	       (unless (ignorable-form form) 
 		 (let* ((*vars* (if nf (if star fv *vars*) av))
 			(f (if nf (car nf) body))
@@ -80,14 +82,14 @@
 	      ((push var nv) (push form nf))))))
 
 
-(defun mvars (args ss is ts info star &aux *c1exit*)
+(defun mvars (args ss is ts info star &aux *c1exit* (ov *vars*))
   (mapcar (lambda (x)
 	    (let* ((n (if (atom x) x (pop x)))
 		   (f (unless (atom x) (car x)))
 		   (v (c1make-var n ss is ts))
 		   (fm (if (and *inline-forms* 
 				(eq f (caar *inline-forms*))) (cdr (pop *inline-forms*)) (c1expr f))))
-	      (add-info info (cadr fm))
+	      (let ((*vars* ov)) (add-info info (cadr fm)));FIXME?  top-level info
 	      (set-var-init-type v (info-type (cadr fm)))
 	      (when (eq (car fm) 'var) (pushnew (caaddr fm) (var-aliases v)))
 	      (maybe-reverse-type-prop (var-type v) fm)

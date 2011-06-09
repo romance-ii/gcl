@@ -547,7 +547,7 @@ sgc_mark_object1(object x) {
   case t_random:
     if ((int)what_to_collect >= (int)t_contiguous) {
       SGC_MARK_MP(x->rnd.rnd_state._mp_seed);
-#if __GNU_MP_VERSION < 4 || __GNU_MP_VERSION_MINOR < 2
+#if __GNU_MP_VERSION < 4 || (__GNU_MP_VERSION == 4 && __GNU_MP_VERSION_MINOR < 2)
       if (x->rnd.rnd_state._mp_algdata._mp_lc) {
 	SGC_MARK_MP(x->rnd.rnd_state._mp_algdata._mp_lc->_mp_a);
 	if (!x->rnd.rnd_state._mp_algdata._mp_lc->_mp_m2exp) SGC_MARK_MP(x->rnd.rnd_state._mp_algdata._mp_lc->_mp_m);
@@ -593,7 +593,7 @@ sgc_mark_object1(object x) {
   case t_function:	
     sgc_mark_object(x->fun.fun_data);
     sgc_mark_object(x->fun.fun_plist);
-    if (x->fun.fun_env != NULL) {
+    if (x->fun.fun_env != def_env) {
       sgc_mark_object(x->fun.fun_env[0]);
       if (what_to_collect >= t_contiguous) {
 	object *p=x->fun.fun_env-1;

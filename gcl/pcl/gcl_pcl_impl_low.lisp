@@ -94,8 +94,22 @@
 
 
 (defun cclosure-env-nthcdr (n f)
-  (declare (inline c::fn-env))
-  (nthcdr n (c::fn-env f)))
+  (declare (optimize (safety 1)))
+  (check-type n seqind)
+  (typecase f
+   (compiler::new-compiled-function
+    (let ((x (compiler::lit :fixnum "(fixnum)" (:object f) "->fun.fun_env[-1]-1")));FIXME
+      (when (< n x)
+	(c::function-env f n))))))
+
+(defun %cclosure-env-nthcdr (n f)
+  (c::function-env f n))
+
+(defun set-cclosure-env (f v)
+  (si::set-function-environment f v))
+
+(defun %set-cclosure-env (f v)
+  (si::set-function-environment f v))
 
 ;; FIXME The non-inlined versions should really check for uncompiled 
 ;; closeres and set the environment properly in them.  In reality,
@@ -123,7 +137,12 @@
 ;; (defentry cclosurep (object) (static object cclosurep))
 
 (defun cclosurep (x) (typecase x (compiler::new-compiled-function t)))
-(defun cclosure-env (x) (typecase x (compiler::new-compiled-function (c::function-env x 0))))
+(defun cclosure-env (f)
+  (declare (inline c::fn-env))
+  (compiler::fn-env f))
+(defun %cclosure-env (f)
+  (declare (inline c::fn-env))
+  (compiler::fn-env f))
 
 ;; (clines "
 ;; static object
@@ -236,6 +255,29 @@
          (setf (car fn) 'lambda-block
                (cdr fn) (cons new-name (cdr fn)))))
   fn)
+
+(defun %set-cclosure (r v s)
+  (declare (fixnum s))
+  (unless (typep r 'compiler::new-compiled-function)
+    (error "Bad fn 1"))
+  (unless (typep v 'compiler::new-compiled-function)
+    (error "Bad fn 1"))
+  (si::use-fast-links nil r)
+  (progn (compiler::side-effects) (compiler::lit :object (:object r) "->fun.fun_self=" (:object v) "->fun.fun_self"));FIXME
+  (c::set-function-minarg (c::function-minarg v) r)
+  (c::set-function-maxarg (c::function-maxarg v) r)
+  (c::set-function-neval  (c::function-neval v) r)
+  (c::set-function-vv     (c::function-vv v) r)
+  (c::set-function-data   (c::function-data v) r)
+  (c::set-function-plist  (c::function-plist v) r)
+  (c::set-function-argd   (c::function-argd v) r)
+;  (progn (compiler::side-effects) (compiler::lit :object (:object r) "->fun.fun_env=" (:object v) "->fun.fun_env"))
+;  (maplist (lambda (x) (setf (car x) nil)) (%cclosure-env r))
+  (let* ((ve (%cclosure-env v))
+	 (l (- (length ve) s))
+	 (ve (if (> l 0) (butlast ve l) ve)))
+    (maplist (lambda (x y) (setf (car x) (car y))) (%cclosure-env r) ve))
+  )
 
 
 ;; (clines "

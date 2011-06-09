@@ -24,7 +24,7 @@
 
 
 (in-package 'lisp)
-(export '(&whole &environment &body))
+(export '(lambda defvar import &whole &environment &body))
 
 
 (in-package 'system)
@@ -81,38 +81,81 @@
 	((stringp x) (gensym1s x))
 	((gensym1ig x))))
 			 
-(defun si:defmacro* (name vl body
-                          &aux *dl* (*key-check* nil)
-			  (*arg-check* nil)
-			  doc decls whole ppn (env nil) envp)
+(defun defmacro-lambda (name vl body &aux whole)
+
   (cond ((listp vl))
         ((symbolp vl) (setq vl (list '&rest vl)))
-        (t (error "The defmacro-lambda-list ~s is not a list." vl)))
-  (multiple-value-setq (doc decls body) (find-doc body nil))
+        ((error "The defmacro-lambda-list ~s is not a list." vl)))
+  
   (cond ((and (listp vl) (eq (car vl) '&whole))
-         (setq whole (cadr vl)) (setq vl (cddr vl)))
-        (t (setq whole (gensym))))
-  (multiple-value-setq (vl env)
-		       (get-&environment vl))
-  (setq envp env)
-  (or env (setq env (gensym)))
-  (setq *dl* `(&aux ,env ,whole))
-  (setq ppn (dm-vl vl whole t))
-  (dolist (kc *key-check*)
-    (push `(unless (getf ,(car kc) :allow-other-keys);FIXME order?
-	     (do ((vl ,(car kc) (cddr vl)))
-		 ((endp vl))
-		 (unless (member (car vl) ',(cons :allow-other-keys (cdr kc)))
-		   (dm-key-not-allowed (car vl)))))
-	  body))
-  (dolist (ac *arg-check*)
-    (push `(when ,(dm-nth-cdr (cdr ac) (car ac))
-	     (dm-too-many-arguments)) body))
-  (unless envp (push `(declare (ignore ,env)) decls))
-;  (list doc ppn `(lambda-block ,name ,(reverse *dl*) ,@(append decls body)))
-  (list doc ppn (eval `(function (lambda ,(reverse *dl*) ,@decls (block ,name ,@body)))))
-;  (list doc ppn (let ((nn (gensym))) (eval `(defun ,nn ,(reverse *dl*) ,@decls (block ,name ,@body))) (symbol-function nn)))
-  )
+	 (setq whole (cadr vl)) (setq vl (cddr vl)))
+	((setq whole (gensym))))  
+  
+  (multiple-value-bind
+   (doc decls ctps body)
+   (parse-body-header body)
+
+   (declare (ignore doc))
+   
+   (multiple-value-bind
+    (vl env)
+    (get-&environment vl)
+    
+    (let* ((envp env)
+	   (env (or env (gensym)))
+	   (*dl* `(&aux ,env ,whole))
+	   *key-check* *arg-check*
+	   (ppn (dm-vl vl whole t)))
+
+      (declare (ignore ppn))
+      
+      (dolist (kc *key-check*)
+	(push `(unless (getf ,(car kc) :allow-other-keys);FIXME order?
+		 (do ((vl ,(car kc) (cddr vl)))
+		     ((endp vl))
+		     (unless (member (car vl) ',(cons :allow-other-keys (cdr kc)))
+		       (dm-key-not-allowed (car vl)))))
+	      body))
+      
+      (dolist (ac *arg-check*)
+	(push `(when ,(dm-nth-cdr (cdr ac) (car ac)) (dm-too-many-arguments)) body))
+
+      (unless envp (push `(declare (ignore ,env)) decls))
+
+      (make-blocked-lambda (nreverse *dl*) decls ctps body name)))))
+
+;; (defun si:defmacro* (name vl body
+;;                           &aux *dl* (*key-check* nil)
+;; 			  (*arg-check* nil)
+;; 			  doc decls whole ppn (env nil) envp)
+;;   (cond ((listp vl))
+;;         ((symbolp vl) (setq vl (list '&rest vl)))
+;;         (t (error "The defmacro-lambda-list ~s is not a list." vl)))
+;;   (multiple-value-setq (doc decls body) (find-doc body nil))
+;;   (cond ((and (listp vl) (eq (car vl) '&whole))
+;;          (setq whole (cadr vl)) (setq vl (cddr vl)))
+;;         (t (setq whole (gensym))))
+;;   (multiple-value-setq (vl env)
+;; 		       (get-&environment vl))
+;;   (setq envp env)
+;;   (or env (setq env (gensym)))
+;;   (setq *dl* `(&aux ,env ,whole))
+;;   (setq ppn (dm-vl vl whole t))
+;;   (dolist (kc *key-check*)
+;;     (push `(unless (getf ,(car kc) :allow-other-keys);FIXME order?
+;; 	     (do ((vl ,(car kc) (cddr vl)))
+;; 		 ((endp vl))
+;; 		 (unless (member (car vl) ',(cons :allow-other-keys (cdr kc)))
+;; 		   (dm-key-not-allowed (car vl)))))
+;; 	  body))
+;;   (dolist (ac *arg-check*)
+;;     (push `(when ,(dm-nth-cdr (cdr ac) (car ac))
+;; 	     (dm-too-many-arguments)) body))
+;;   (unless envp (push `(declare (ignore ,env)) decls))
+;; ;  (list doc ppn `(lambda-block ,name ,(reverse *dl*) ,@(append decls body)))
+;;   (list doc ppn (eval `(function (lambda ,(reverse *dl*) ,@decls (block ,name ,@body)))))
+;; ;  (list doc ppn (let ((nn (gensym))) (eval `(defun ,nn ,(reverse *dl*) ,@decls (block ,name ,@body))) (symbol-function nn)))
+;;   )
 
 (defun dm-vl (vl whole top)
   (when (consp whole)

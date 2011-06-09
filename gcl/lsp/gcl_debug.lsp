@@ -715,7 +715,7 @@
 				      (base (ihs-vs ihs))
 				      (end (min (ihs-vs (1+ ihs)) (vs-top))))
   (format *display-string* "")
-  (do ((i base )
+  (do ((i base)
        (v (get (ihs-fname ihs) 'debugger) (cdr v)))
       ((or (fb >= i end)(fb > (fill-pointer *display-string*) plength)(= 0 (address (vs i)))));FIXME
     (format *display-string* "~a~@[~d~]=~s~@[,~]"

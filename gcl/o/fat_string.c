@@ -77,83 +77,6 @@ DEFUN_NEW("FUNCTION-START",object,fSfunction_start,SI
 char *data_load_addr =0;
 #endif
 
-
-#ifdef SPECIAL_RSYM
-void
-read_special_symbols(symfile)
-char *symfile;
-{FILE *symin;
- char *symbols;
- int i;
- unsigned long  jj;
- struct lsymbol_table tab;
-#ifdef AIX3
- {char buf[500];
-  struct ld_info * ld;
- loadquery(L_GETINFO,buf,sizeof(buf));
-  ld = (struct ld_info *)buf;
-  data_load_addr = ld->ldinfo_dataorg ;}
-#endif  
- if (!(symin=fopen(symfile,"r")))
-   {perror(symfile);exit(1);};
- if(!fread((char *)&tab,sizeof(tab),1,symin))
-   FEerror("No header",0);
-  symbols=malloc(tab.tot_leng);
- c_table.alloc_length=( (PTABLE_EXTRA+ tab.n_symbols));
- (c_table.ptable) = (TABL *) malloc(sizeof(struct node) * c_table.alloc_length);
- if (!(c_table.ptable)) {perror("could not allocate"); exit(1);};
- i=0; c_table.length=tab.n_symbols;
- while(i < tab.n_symbols)
-   { fread((char *)&jj,sizeof(jj),1,symin);
-#ifdef FIX_ADDRESS
-     FIX_ADDRESS(jj);
-#endif       
-     (SYM_ADDRESS(c_table,i))=jj;
-     SYM_STRING(c_table,i)=symbols;
- 
-     while((*(symbols++) =   getc(symin)))
-       {;}
-/*     dprintf( name %s ,  SYM_STRING(c_table,i));
-     dprintf( addr %d , jj);
-*/
-     i++;
-   }
-
- /*
-   for(i=0;i< 5;i++)
-   {printf("Symbol: %d %s %d \n",i,SYM_STRINGN(c_table,i),
-   SYM_ADDRESS(*ptable,i));}
-   */
- if (symin) fclose(symin);
-}
-
-int
-node_compare(const void *node1,const void *node2)
-{ return(strcmp( ((struct node *)node1)->string,
-	         ((struct node *)node2)->string));}
-
-
-
-DEFUNO_NEW("READ-EXTERNALS",object,fSread_externals,SI
-       ,1,1,NONE,OO,OO,OO,OO,void,siLread_externals,(object x0),"")
-{/* 1 args */
- {object x=x0;
-  unsigned int n;
-  char *str;
-  n=x->st.st_fillp;
- check_type_string(&x);
- str=malloc(n+1);
-  str[n]=0;
- (void) strncpy(str,x->st.st_self,n);
- read_special_symbols(str);
-  /* we sort them since these are used by the sfasl loader too */
- qsort((char*)(c_table.ptable),(int)(c_table.length),sizeof(struct node),node_compare);
-  free(str);}
- RETURN1(x0);
-}
-
-#endif /* special_rsym */
-
 #define CFUN_LIM 10000
 
 int maxpage;
@@ -173,7 +96,7 @@ cfuns_to_combined_table(unsigned int n) /* non zero n will ensure new table leng
  if (n && combined_table.alloc_length < n)
    { 
      (combined_table.ptable)=NULL;
-     (combined_table.ptable)= (TABL *)malloc(n* sizeof(struct node));
+     (combined_table.ptable)= (struct node *)malloc(n* sizeof(struct node));
      if(!combined_table.ptable)
        FEerror("unable to allocate",0);
      combined_table.alloc_length=n;}
@@ -359,7 +282,7 @@ DEFUN_NEW("DISPLAY-PROFILE",object,fSdisplay_profile,SI
 	 if ( prev < prof_start) continue;
 	 upto=prof_ind(next,scale);
 	 if (upto >= dim) upto=dim;
-	 {char *name; unsigned long uname;
+	 {const char *name; unsigned long uname;
 	  count=0;
 	  for( ; j<upto;j++)
 	    count += ar[j];

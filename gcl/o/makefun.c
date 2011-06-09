@@ -52,7 +52,7 @@ make_fun(void *addr,object data,object call,object env,ufixnum argd,ufixnum size
   x->fun.fun_maxarg=POP_BITS(sizes,6);
   x->fun.fun_neval =POP_BITS(sizes,5);
   x->fun.fun_vv    =POP_BITS(sizes,1);
-  x->fun.fun_env=0;
+  x->fun.fun_env=def_env;
 
   FFN(fSset_function_environment)(x,env);
 
@@ -113,7 +113,7 @@ DEFUN_NEW("INIT-FUNCTION",object,fSinit_function,SI,7,7,NONE,OO,OO,OI,II, \
 #ifdef STATIC_FUNCTION_POINTERS
 object
 fSinit_function(object x,object y,object z,object w,fixnum a,fixnum b,fixnum c) {
-  return FFN(fLrow_major_aref)(x,y,z,w,a,b,c);
+  return FFN(fSinit_function)(x,y,z,w,a,b,c);
 }
 #endif
 

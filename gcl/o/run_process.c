@@ -403,6 +403,9 @@ int	server;
 #else
 	res = fcntl(sock,F_SETFL,FASYNC);
 #endif
+	if (res==-1)
+	  FEerror("fnctl F_SETFL error",0);
+
 	return(sock);
 }
 
@@ -666,6 +669,7 @@ DEFUNO_NEW("WRITE-POINTER-OBJECT",object,fSwrite_pointer_object,SI,2,2,NONE,OO,O
   fixnum pid,s;
 
   unpack_handle(z,pid,s);
+  ASSERT(pid);
 
   y=x;
   if (stack_alloc_end<=stack_alloc_start || !writable_ptr(x)) 
@@ -688,6 +692,7 @@ DEFUNO_NEW("READ-POINTER-OBJECT",object,fSread_pointer_object,SI,1,1,NONE,OO,OO,
   fixnum pid,s;
 
   unpack_handle(z,pid,s);
+  ASSERT(pid);
 
   ASSERT(read(s,&x,sizeof(x))==sizeof(x));
   if (x==OBJNULL) {

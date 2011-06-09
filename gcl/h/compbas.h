@@ -119,7 +119,8 @@ typedef double complex dcomplex;
 #define immnum_ge(x,y) immnum_comp(x,y,>=)
 
 /* #define tand(_x,_y,_z) fimf((((ufixnum)_x)&((ufixnum)_y))|(IM_FIX_LIM&((ufixnum)_z))) */
-#define tand(_x,_z) fimf(((ufixnum)_x)&((ufixnum)_z))
+/* #define tand(_x,_z) fimf(((ufixnum)_x)&((ufixnum)_z)) */
+#define tand(_x,_z) fimf(((((ufixnum)_x)&((ufixnum)_z))|(IM_FIX_LIM&((ufixnum)_z))))
 
 #define immnum_plus(x,y) \
   ({object _x=x,_y=y,_z=(object)(((ufixnum)_x)+((ufixnum)_y)-fimoff);tand(_x,_z) ? _z : number_plus(_x,_y);})

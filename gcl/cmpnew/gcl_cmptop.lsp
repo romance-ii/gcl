@@ -137,7 +137,8 @@
 ;;; Pass 2 initializers.
 
 (si:putprop 'defun 't2defun 't2)
-(si:putprop 'defmacro 't2defmacro 't2)
+(si:putprop 'mflag 't2mflag 't2)
+;(si:putprop 'defmacro 't2defmacro 't2)
 (si:putprop 'ordinary 't2ordinary 't2)
 (si:putprop 'declare 't2declare 't2)
 (si:putprop 'sharp-comma 't2sharp-comma 't2)
@@ -147,7 +148,7 @@
 ;;; Pass 2 C function generators.
 
 (si:putprop 'defun 't3defun 't3)
-(si:putprop 'defmacro 't3defmacro 't3)
+;(si:putprop 'defmacro 't3defmacro 't3)
 (si:putprop 'clines 't3clines 't3)
 (si:putprop 'defcfun 't3defcfun 't3)
 ;(si:putprop 'defentry 't3defentry 't3)
@@ -385,6 +386,7 @@
     (let* ((num (second x))
 	   (type (fourth x))
 	   (type (if (link-arg-p type) type t))
+	   (type (or type t));FIXME
 	   (args (fifth x))
 	   (pc (eq type 'proclaimed-closure))
 	   (newtype (cond (pc "") ((not type) "") ((rep-type type))))
@@ -499,7 +501,7 @@
   (dolist (form forms)
     (cond ((stringp form))
 	  ((and (consp form) (eq (car form) 'declare)
-		(mapc (lambda (x) (and (consp x) (eq (car x) 'special) (member sym (cdr x))) (return t)) (cdr form)))))))
+		(mapc (lambda (x) (and (consp x) (eq (car x) 'special) (member sym (cdr x)) (return t))) (cdr form)))))))
 
 (defun portable-source (form &optional cdr)
   (cond ((atom form) form)
@@ -586,6 +588,7 @@
 	       (unless (<= (length b) 3)
 		 (cmperr "Unknown class declaration: ~s" b))
 	       (if (member (cadr b) auxs) (push `(declare ,b) ad) (push `(declare ,b) dd)))
+	      ((eq (car b) 'special) (push `(declare ,b) ad))
 	      ((multiple-value-bind
 		(tt q)
 		(list-split (cdr b) auxs)
@@ -673,7 +676,7 @@
   (cond ((consp (car d)) (max (decl-safety (car d) s) (decl-safety (cdr d) s)))
 	((eq (car d) 'declare) (decl-safety (cdr d) 1))
 	((and s (= s 1) (eq (car d) 'optimize)) (decl-safety (cdr d) 2))
-	((and s (= s 2) (eq (car d) 'safety)) (cadr d))
+	((and s (= s 2) (eq (car d) 'safety)) (or (cadr d) 3))
 	(0)))
 
 (defun effective-safety (decls)
@@ -760,40 +763,104 @@
 (setf (get 'fun-fun 'c2) 'c2fun-fun)
 (setf (get 'fun-fun 'wt-loc) 'wt-fun-fun)
 
+(defun c1side-effects (args)
+  (declare (ignore args))
+  (list 'side-effects (make-info :flags (iflags side-effects))))
+(defun c2side-effects nil nil)
+(setf (get 'side-effects 'c1) 'c1side-effects)
+(setf (get 'side-effects 'c2) 'c2side-effects)
+  
+
 (defun c1bind-reg-clv (args)
   (declare (ignore args))
   (list 'bind-reg-clv (make-info :type #tt :flags (iflags side-effects))))
-(defun c2bind-reg-clv (&aux var)
+(defun c2bind-reg-clv (&aux x clb var)
   (do nil
-      ((not (setq var (pop *reg-clv*))))
+      ((not (setq x (pop *reg-clv*) clb (pop x) var (car x))))
       (wt-nl)
-      (cond ((var-ref-ccb var)
-	     (setf (var-ref var) (list 'cvar (var-loc var)))
-	     (clink (var-ref var))
-	     (setf (var-ref-ccb var) (ccb-vs-push)))
-	    ((setf (var-ref var) (vs-push));FIXME
-	     (wt-vs (var-ref var)) (wt "= " (list 'cvar (var-loc var)) ";")))))
+      (cond (clb
+	     (setf (var-ref var) (vs-push));FIXME ?
+	     (wt-vs (var-ref var)) (wt "= " (list 'cvar (var-loc var)) ";"))
+	    ((setf (var-ref var) (list 'cvar (var-loc var)))))
+      (when (var-ref-ccb var)
+	(clink (var-ref var))
+	(setf (var-ref-ccb var) (ccb-vs-push)))))
+
+;; (defun c2bind-reg-clv (&aux var)
+;;   (do nil
+;;       ((not (setq var (pop *reg-clv*))))
+;;       (wt-nl)
+;;       (cond ((and (var-ref-ccb var) (not (eq 'clb (var-loc var))))
+;; 	     (setf (var-ref var) (list 'cvar (var-loc var)))
+;; 	     (clink (var-ref var))
+;; 	     (setf (var-ref-ccb var) (ccb-vs-push)))
+;; 	    ((setf (var-ref var) (vs-push));FIXME
+;; 	     (wt-vs (var-ref var)) (wt "= " (list 'cvar (var-loc var)) ";")))))
 (setf (get 'bind-reg-clv 'c1) 'c1bind-reg-clv)
 (setf (get 'bind-reg-clv 'c2) 'c2bind-reg-clv)
   
 (defun c1ub (args)
   (let* ((key (pop args))
-	 (info (make-info :type #topaque :flags (iflags side-effects)))
+;	 (info (make-info :type #topaque :flags (iflags side-effects)));FIXME
+	 (info (make-info :type #topaque))
 	 (nargs (c1args args info)))
     (list* 'ub info key nargs)))
 (setf (get 'ub 'c1) 'c1ub)
 (setf (get 'unbox 'c1) 'c1ub)
 
+;; (defun c1lit (args)
+;;   (let* ((tp (get (pop args) 'lisp-type :opaque))
+;; 	 (info (make-info :type (cmp-norm-tp tp) :flags (iflags side-effects))) ;FIXME boolean
+;; 	 (nargs (c1args args info)))
+;;     (when (eq tp :opaque) (baboon))
+;;     (list 'lit info (info-type info) nargs)))
+;; (defun c2lit (tp args)
+;;   (let* ((sig (list (mapcar (lambda (x) (info-type (cadr x))) args) tp))
+;; 	 (i -1)
+;; 	 (inl (reduce (lambda (y x) (strcat y "#" (write-to-string (incf i)))) args :initial-value ""))
+;; 	 (*inline-blocks* 0)
+;; 	 (*restore-avma*  *restore-avma*))
+;;     (unwind-exit (get-inline-loc (list (car sig) (cadr sig) (flags rfa) inl) args)
+;; 		 nil (cons 'values (if (eq (cadr sig) #t(returns-exactly)) 0 1)))
+;;     (close-inline-blocks)))
+;; (setf (get 'lit 'c1) 'c1lit)
+;; (setf (get 'lit 'c2) 'c2lit)
+
+
+;; (defun c1litt (args)
+;;   (let* ((tp (get (pop args) 'lisp-type :opaque))
+;; 	 (info (make-info :type (cmp-norm-tp tp) :flags (iflags side-effects))) ;FIXME boolean
+;; 	 (inl "")(i -1)
+;; 	 (nargs (mapcan (lambda (x &aux (sp (stringp x))) 
+;; 			  (setq inl (strcat inl (if sp x (strcat "#" (write-to-string (incf i))))))
+;; 			  (unless sp (list (c1expr* (cons 'ub x) info)))) args)))
+;;     (when (eq tp :opaque) (baboon))
+;;     (list 'litt info (info-type info) inl nargs)))
+;; (defun c2litt (tp inl args)
+;;   (let* ((sig (list (mapcar (lambda (x) (info-type (cadr x))) args) tp))
+;; 	 (*inline-blocks* 0)
+;; 	 (*restore-avma*  *restore-avma*))
+;;     (unwind-exit (get-inline-loc (list (car sig) (cadr sig) (flags rfa) inl) args)
+;; 		 nil (cons 'values (if (eq (cadr sig) #t(returns-exactly)) 0 1)))
+;;     (close-inline-blocks)))
+;; (setf (get 'litt 'c1) 'c1litt)
+;; (setf (get 'litt 'c2) 'c2litt)
+
+
 (defun c1lit (args)
-  (let* ((tp (get (pop args) 'lisp-type :opaque))
-	 (info (make-info :type (cmp-norm-tp tp) :flags (iflags side-effects))) ;FIXME boolean
-	 (nargs (c1args args info)))
-    (when (eq tp :opaque) (baboon))
-    (list 'lit info (info-type info) nargs)))
-(defun c2lit (tp args)
+  (flet ((strcat (&rest r) (apply 'concatenate 'string r)))
+	(let* ((tp (get (pop args) 'lisp-type :opaque))
+					;	 (info (make-info :type (cmp-norm-tp tp) :flags (iflags side-effects))) ;FIXME boolean
+	       (info (make-info :type (cmp-norm-tp tp))) ;FIXME boolean
+	       (inl "")(i -1)
+	       (nargs (mapcan (lambda (x &aux (sp (stringp x))) 
+				(setq inl (strcat inl (if sp x (strcat "#" (write-to-string (incf i))))))
+				(unless sp (list (c1expr* (cons 'ub x) info)))) args)))
+	  (when (eq tp :opaque) (baboon))
+	  (list 'lit info (info-type info) inl nargs))))
+
+(defun c2lit (tp inl args)
   (let* ((sig (list (mapcar (lambda (x) (info-type (cadr x))) args) tp))
-	 (i -1)
-	 (inl (reduce (lambda (y x) (strcat y "#" (write-to-string (incf i)))) args :initial-value ""))
 	 (*inline-blocks* 0)
 	 (*restore-avma*  *restore-avma*))
     (unwind-exit (get-inline-loc (list (car sig) (cadr sig) (flags rfa) inl) args)
@@ -801,26 +868,6 @@
     (close-inline-blocks)))
 (setf (get 'lit 'c1) 'c1lit)
 (setf (get 'lit 'c2) 'c2lit)
-
-
-(defun c1litt (args)
-  (let* ((tp (get (pop args) 'lisp-type :opaque))
-	 (info (make-info :type (cmp-norm-tp tp) :flags (iflags side-effects))) ;FIXME boolean
-	 (inl "")(i -1)
-	 (nargs (mapcan (lambda (x &aux (sp (stringp x))) 
-			  (setq inl (strcat inl (if sp x (strcat "#" (write-to-string (incf i))))))
-			  (unless sp (list (c1expr* (cons 'ub x) info)))) args)))
-    (when (eq tp :opaque) (baboon))
-    (list 'litt info (info-type info) inl nargs)))
-(defun c2litt (tp inl args)
-  (let* ((sig (list (mapcar (lambda (x) (info-type (cadr x))) args) tp))
-	 (*inline-blocks* 0)
-	 (*restore-avma*  *restore-avma*))
-    (unwind-exit (get-inline-loc (list (car sig) (cadr sig) (flags rfa) inl) args)
-		 nil (cons 'values (if (eq (cadr sig) #t(returns-exactly)) 0 1)))
-    (close-inline-blocks)))
-(setf (get 'litt 'c1) 'c1litt)
-(setf (get 'litt 'c2) 'c2litt)
 
 
 (defun ttl-ll (ll)
@@ -852,7 +899,9 @@
 	 (*blocks* (when b (cons b *blocks*)))
 	 (*tags*   (when b (cons b *tags*)))
 	 (tag (tmpsym))
-	 (*src-inline-recursion* (when vis (list (list (list name) tag (ttl-ll (cadr src))))))
+	 (*prev-sri* (append *src-inline-recursion* *prev-sri*))
+	 (*src-inline-recursion* (when vis (list (list (list (sir-name name)) tag (ttl-ll (cadr src))))))
+	 *provisional-inline*
 	 (*c1exit* (list name))
 	 (*current-form* `(defun ,name))
 	 (l (do-l1-fun name (cdr (new-defun-args src tag)) e))
@@ -860,7 +909,7 @@
     (setf (car e) (export-sig (car e))
 	  (third e) (compress-fle src clv name)
 	  (fourth e) (unless *compiler-compile* (namestring (pathname *compiler-input*)))
-	  (fifth e) (if (> (length clv) 0) 1 0))
+	  (fifth e) (if (= (length clv) 0) 1 0))
     l))
 	 
 
@@ -1082,7 +1131,8 @@
 	       (rt (global-type-bump (get-return-type fname))))
 	   (add-init `(si::init-function
 		       ',fname
-		       ,(add-address (c-function-name "LI" (format nil "G~a" cfun) fname))
+;		       ,(add-address (c-function-name "LI" (format nil "G~a" cfun) fname))
+		       ,(add-address (c-function-name "LI" (format nil "~a" cfun) fname))
 		       nil nil -1 ,(new-proclaimed-argd at rt)
 		       ,(argsizes at rt (xa lambda-expr)))))
 ;         (wt-h "static void " (c-function-name "L" cfun fname) "();")
@@ -1131,33 +1181,76 @@
     
     ;;; Local entry
       (analyze-regs (cadr lambda-expr) 0)
-      (let ((lambda-expr (if (fast-link-proclaimed-type-p fname) lambda-expr (ttl-to-top lambda-expr fname))))
-	(t3defun-aux 't3defun-local-entry
-		     (or (cdr (assoc (promoted-c-type (caddr inline-info)) +return-alist+)) 'return-object)
-		     fname cfun lambda-expr sp inline-info))
 
+      (mapc (lambda (x) (setf (var-type x) (global-type-bump (var-type x)))) (caaddr lambda-expr))
+      (setf (info-type (cadr (fifth lambda-expr))) (global-type-bump (info-type (cadr (fifth lambda-expr)))))
+      (setf (caddr inline-info) (global-type-bump (cadr (lam-e-to-sig lambda-expr))))
 
-      (when (not (fast-link-proclaimed-type-p fname))
-	(let* ((sig (lam-e-to-sig lambda-expr))
-	       (lsig (list (car sig) (if (type>= #tboolean (cadr sig)) #tt (cadr sig))));FIXME
-	       (fun (make-fun :level -1 
-			      :info (make-info :type (cadr lsig)) :call (list lsig) 
-			      :name fname :cfun (format nil "I~a" cfun)))
-	       (ttl (find-ttl-vars lambda-expr))
-	       (vp (member-if-not 'var-p ttl))
-	       (ttl (ldiff ttl vp))
-	       (v (mapcar (lambda (x) (list 'var (make-info :type (var-type x)) (list x nil))) ttl))
-	       (tp (cadr sig))
-	       (inline-info (copy-tree inline-info)))
-	  (setf (caddr inline-info) (global-type-bump tp))
-	  (rcl lambda-expr fun v fname)
-	  (t3defun-aux 't3defun-local-entry
-		       (or (cdr (assoc (promoted-c-type (caddr inline-info)) +return-alist+)) 'return-object)
-		       fname (format nil "G~a" cfun) lambda-expr sp inline-info))))
-
+      (t3defun-aux 't3defun-local-entry
+		   (or (cdr (assoc (promoted-c-type (caddr inline-info)) +return-alist+)) 'return-object)
+		   fname cfun lambda-expr sp inline-info))
      ((baboon)))
     
     (add-debug-info fname lambda-expr)))
+
+;; (defun t3defun (fname cfun lambda-expr doc sp &aux inline-info 
+;; 		      (*current-form* (list 'defun fname))
+;; 		      (*volatile* (volatile (second lambda-expr))))
+
+;;   (declare (ignore doc))
+
+;;   (let ((*compiler-check-args* *compiler-check-args*)
+;;         (*safe-compile* *safe-compile*)
+;;         (*compiler-push-events* *compiler-push-events*)
+;;         (*compiler-new-safety* *compiler-new-safety*)
+;;         (*notinline* *notinline*)
+;;         (*space* *space*)
+;;         (*debug* *debug*))
+    
+;;     (when (eq (car (caddr (cddr lambda-expr))) 'decl-body)
+;;       (local-compile-decls (caddr (caddr (cddr lambda-expr)))))
+
+;;     (cond
+;;      ((dolist (v *inline-functions*)
+;; 	(or (si::fixnump (nth 3 v))
+;; 	    (error "Old style inline"))
+;; 	(and (eq (car v) fname)
+;; 	     (not (nth 5 v)) ; ie.not  'link-call or 'ifuncall
+;; 	     (return (setq inline-info v))))
+      
+;;     ;;; Add global entry information.
+;; ;; 	(push (list fname cfun (cadr inline-info) (caddr inline-info))
+;; ;; 	      *global-entries*))
+    
+;;     ;;; Local entry
+;;       (analyze-regs (cadr lambda-expr) 0)
+;;       (let ((lambda-expr (if (fast-link-proclaimed-type-p fname) lambda-expr (ttl-to-top lambda-expr fname))))
+;; 	(t3defun-aux 't3defun-local-entry
+;; 		     (or (cdr (assoc (promoted-c-type (caddr inline-info)) +return-alist+)) 'return-object)
+;; 		     fname cfun lambda-expr sp inline-info))
+
+
+;;       (when (not (fast-link-proclaimed-type-p fname))
+;; 	(let* ((sig (lam-e-to-sig lambda-expr))
+;; 	       (lsig (list (car sig) (if (type>= #tboolean (cadr sig)) #tt (cadr sig))));FIXME
+;; 	       (fun (make-fun :level -1 
+;; 			      :info (make-info :type (cadr lsig)) :call (list lsig) 
+;; 			      :name fname :cfun (format nil "I~a" cfun)))
+;; 	       (ttl (find-ttl-vars lambda-expr))
+;; 	       (vp (member-if-not 'var-p ttl))
+;; 	       (ttl (ldiff ttl vp))
+;; 	       (v (mapcar (lambda (x) (list 'var (make-info :type (var-type x)) (list x nil))) ttl))
+;; 	       (tp (cadr sig))
+;; 	       (inline-info (copy-tree inline-info)))
+;; 	  (setf (caddr inline-info) (global-type-bump tp))
+;; 	  (rcl lambda-expr fun v fname)
+;; 	  (t3defun-aux 't3defun-local-entry
+;; 		       (or (cdr (assoc (promoted-c-type (caddr inline-info)) +return-alist+)) 'return-object)
+;; 		       fname (format nil "G~a" cfun) lambda-expr sp inline-info))))
+
+;;      ((baboon)))
+    
+;;     (add-debug-info fname lambda-expr)))
 
 (defun t3defun-aux (f *exit* &rest lis)
   (let-pass3 ()   (apply f lis)))   
@@ -1181,7 +1274,8 @@
       ((endp vl))
       (cond ((eq (var-kind (car vl)) 'special)
 	     (push (cons (car vl) (var-loc (car vl))) specials))
-	    ((var-cb (car vl)) (push (car vl) *reg-clv*))
+	    ((var-cb (car vl)) (push (list (eq 'clb (var-loc (car vl))) (car vl)) *reg-clv*))
+;	    ((var-cb (car vl)) (push (car vl) *reg-clv*))
 	    ((setf (var-kind (car vl))
 		   (or (car (member (promoted-c-type (var-type (car vl))) +c-local-arg-types+)) 'object))))
       (setf (var-loc (car vl)) (cs-push (var-type (car vl)) t)))
@@ -1202,7 +1296,6 @@
   (wt-h ";")
   (let* ((cm *reservation-cmacro*)
 	 (tri (tail-recursion-info fname nil lambda-expr))
-	 (*recur-stack* (if tri (cons tri *recur-stack*) *recur-stack*))
 	 (*unwind-exit* (if tri (cons 'tail-recursion-mark *unwind-exit*) *unwind-exit*)))
     (wt-nl1 "{	")
     (wt " VMB" cm " VMS" cm " VMV" cm)
@@ -1397,6 +1490,7 @@
 
 (defun rcl (form fun vars name)
   (cond ((var-p form)
+;	 (setf form (copy-var form))
 	 (when (eq (var-kind form) 'replaced)
 	   (setf (var-kind form) (if (var-aliases form) (var-kind (car (var-aliases form))) 'object))))
 	((atom form))
@@ -1410,11 +1504,13 @@
 		(y (cadr x))
 		(tp (info-type y)))
 	   (setf (info-type y) (global-type-bump tp))
+	   (mapl (lambda (x) (mapl (lambda (y) (when (var-p (car y)) (setf (car y) (copy-var (car y))))) (car x))) (caddr form))
 	   (rcl x fun vars name)))
 	(t (rcl (car form) fun vars name) (rcl (cdr form) fun vars name))))
 	
 
-(defconstant +wt-c-rep-alist+ `((,#tchar ."int8_t ")
+(defconstant +wt-c-rep-alist+ `((,#tnil ."object ")
+				(,#tchar ."int8_t ")
 				(,#tfixnum ."fixnum ")
 ;				(,#tinteger ."GEN ") 
 ;				(,#tcharacter  ."unsigned char ")
@@ -1423,75 +1519,94 @@
 				(,#tfcomplex ."fcomplex ")
 				(,#tdcomplex ."dcomplex ")
 				(object . "object ")))
+;; (defconstant +wt-c-rep-alist+ `((,#tchar ."int8_t ")
+;; 				(,#tfixnum ."fixnum ")
+;; ;				(,#tinteger ."GEN ") 
+;; ;				(,#tcharacter  ."unsigned char ")
+;; 				(,#tlong-float  ."double ")
+;; 				(,#tshort-float ."float ")
+;; 				(,#tfcomplex ."fcomplex ")
+;; 				(,#tdcomplex ."dcomplex ")
+;; 				(object . "object ")))
 
 (defun rep-type (type)
   (let ((z (promoted-c-type type)))
     (or (cdr (assoc z +wt-c-rep-alist+)) "object ")))
 
 
-(defun t1defmacro (args)
-  (when (or (endp args) (endp (cdr args)))
-        (too-few-args 'defmacro 2 (length args)))
-  (cmpck (not (symbolp (car args)))
-         "The macro name ~s is not a symbol." (car args))
-  (maybe-eval (not (macro-function (car args))) (cons 'defmacro args))
-  (setq *non-package-operation* t)
-  (let ((*vars* nil) (*funs* nil) (*blocks* nil) (*tags* nil)
-        (*sharp-commas* nil) (*special-binding* nil)
-        macro-lambda (cfun (next-cfun)))
-       (setq macro-lambda (c1dm (car args) (cadr args) (cddr args)))
-       (add-load-time-sharp-comma)
-       (push (list 'defmacro (car args) cfun (cddr macro-lambda)
-		   (car macro-lambda)   ;doc
-		   (cadr macro-lambda)  ; ppn
-                   *special-binding*)
-             *top-level-forms*)))
+(defun t1defmacro (args &aux (w args) (n (pop args)) (ll (pop args)))
+  (t1expr `(defun ,n ,@(cdr (si::defmacro-lambda n ll args))))
+  (maybe-eval (not (macro-function n)) (cons 'defmacro w));FIXME?
+  (push `(mflag ,n) *top-level-forms*))
+
+(defun t2mflag (n)
+  (add-init `(c::set-symbol-mflag 1 ',n)))
+
+(setf (get 'mflag 't2) 't2mflag)
+
+;; (defun t1defmacro (args)
+;;   (when (or (endp args) (endp (cdr args)))
+;;         (too-few-args 'defmacro 2 (length args)))
+;;   (cmpck (not (symbolp (car args)))
+;;          "The macro name ~s is not a symbol." (car args))
+;;   (maybe-eval (not (macro-function (car args))) (cons 'defmacro args))
+;;   (setq *non-package-operation* t)
+;;   (let ((*vars* nil) (*funs* nil) (*blocks* nil) (*tags* nil)
+;;         (*sharp-commas* nil) (*special-binding* nil)
+;;         macro-lambda (cfun (next-cfun)))
+;;        (setq macro-lambda (c1dm (car args) (cadr args) (cddr args)))
+;;        (add-load-time-sharp-comma)
+;;        (push (list 'defmacro (car args) cfun (cddr macro-lambda)
+;; 		   (car macro-lambda)   ;doc
+;; 		   (cadr macro-lambda)  ; ppn
+;;                    *special-binding*)
+;;              *top-level-forms*)))
 
 
-(defun t2defmacro (fname cfun macro-lambda doc ppn sp)
+;; (defun t2defmacro (fname cfun macro-lambda doc ppn sp)
 
-  (declare (ignore macro-lambda sp))
-  (when doc (add-init `(si::putprop ',fname ,doc 'si::function-documentation) ))
-  (when ppn
-	(add-init `(si::putprop ',fname ',ppn 'si::pretty-print-format) ))
-  (let ((nm (c-function-name "L" cfun fname)))
-    (wt-h "static void " nm "();")
-    (add-init `(si::MM ',fname ,(add-address nm)))))
+;;   (declare (ignore macro-lambda sp))
+;;   (when doc (add-init `(si::putprop ',fname ,doc 'si::function-documentation) ))
+;;   (when ppn
+;; 	(add-init `(si::putprop ',fname ',ppn 'si::pretty-print-format) ))
+;;   (let ((nm (c-function-name "L" cfun fname)))
+;;     (wt-h "static void " nm "();")
+;;     (add-init `(si::MM ',fname ,(add-address nm)))))
 
-(defun t3defmacro (fname cfun macro-lambda doc ppn sp
-                         &aux (*volatile* (if (get fname 'contains-setjmp)
-					      " VOL " "")))
-  (declare (ignore doc ppn))
+;; (defun t3defmacro (fname cfun macro-lambda doc ppn sp
+;;                          &aux (*volatile* (if (get fname 'contains-setjmp)
+;; 					      " VOL " "")))
+;;   (declare (ignore doc ppn))
 
-  (let ((*compiler-check-args* *compiler-check-args*)
-        (*safe-compile* *safe-compile*)
-        (*compiler-push-events* *compiler-push-events*)
-        (*compiler-new-safety* *compiler-new-safety*)
-        (*notinline* *notinline*)
-        (*space* *space*)
-        (*debug* *debug*))
+;;   (let ((*compiler-check-args* *compiler-check-args*)
+;;         (*safe-compile* *safe-compile*)
+;;         (*compiler-push-events* *compiler-push-events*)
+;;         (*compiler-new-safety* *compiler-new-safety*)
+;;         (*notinline* *notinline*)
+;;         (*space* *space*)
+;;         (*debug* *debug*))
     
-    (when (eq (car (cadddr macro-lambda)) 'decl-body)
-      (local-compile-decls (caddr (cadddr macro-lambda))))
+;;     (when (eq (car (cadddr macro-lambda)) 'decl-body)
+;;       (local-compile-decls (caddr (cadddr macro-lambda))))
     
-    (let-pass3
-     ((*exit* 'return))
-     (wt-comment "macro definition for " fname)
-     (wt-nl1 "static void " (c-function-name "L" cfun fname) "()")
-     (wt-nl1 "{register object *" *volatile* "base=vs_base;")
-     (wt-nl "register object *"*volatile* "sup=base+VM" *reservation-cmacro* ";")
-     (wt " VC" *reservation-cmacro*)
-     (if *safe-compile*
-	 (wt-nl "vs_reserve(VM" *reservation-cmacro* ");")
-       (wt-nl "vs_check;"))
-     (when sp (wt-nl "bds_check;"))
-     (when *compiler-push-events* (wt-nl "ihs_check;"))
-     (c2dm (car macro-lambda) (cadr macro-lambda) (caddr macro-lambda)
-	   (cadddr macro-lambda))
-     (wt-nl1 "}")
-     (push (cons *reservation-cmacro* *max-vs*) *reservations*)
-     (wt-h "#define VC" *reservation-cmacro*)
-     (wt-cvars))))
+;;     (let-pass3
+;;      ((*exit* 'return))
+;;      (wt-comment "macro definition for " fname)
+;;      (wt-nl1 "static void " (c-function-name "L" cfun fname) "()")
+;;      (wt-nl1 "{register object *" *volatile* "base=vs_base;")
+;;      (wt-nl "register object *"*volatile* "sup=base+VM" *reservation-cmacro* ";")
+;;      (wt " VC" *reservation-cmacro*)
+;;      (if *safe-compile*
+;; 	 (wt-nl "vs_reserve(VM" *reservation-cmacro* ");")
+;;        (wt-nl "vs_check;"))
+;;      (when sp (wt-nl "bds_check;"))
+;;      (when *compiler-push-events* (wt-nl "ihs_check;"))
+;;      (c2dm (car macro-lambda) (cadr macro-lambda) (caddr macro-lambda)
+;; 	   (cadddr macro-lambda))
+;;      (wt-nl1 "}")
+;;      (push (cons *reservation-cmacro* *max-vs*) *reservations*)
+;;      (wt-h "#define VC" *reservation-cmacro*)
+;;      (wt-cvars))))
 
 
 (defun c1fset (args)
@@ -1512,7 +1627,8 @@
 
 (defun tlclp (form)
   (cond ((atom form) nil)
-	((member (car form) '(si::define-macro si::fset)))
+	((eq (car form) 'si::fset))
+;	((member (car form) '(si::define-macro si::fset)))
 	((or (tlclp (car form)) (tlclp (cdr form))))))
 
 (defun t1ordinary (form)
@@ -1684,26 +1800,52 @@
 
 (defmacro defentry (n args c &optional (lt t))
   (let* ((cp (consp c))
-	 (c (if (and cp (eq (car c) 'static)) (cdr c) c))
+	 (st (and cp (eq (car c) 'static)))
+	 (c (if st (cdr c) c))
 	 (m (if cp (cadr c) c))
 	 (m (if (symbolp m) (string-downcase m) m))
 	 (rt (intern (symbol-name (if cp (car c) lt)) 'keyword))
 	 (tps (mapcar (lambda (x) (intern (string (if (consp x) (car x) x)) 'keyword)) args))
 	 (decl (reduce (lambda (y x) (strcat y (if (> (length y) 0) "," "") x)) args :initial-value ""))
 	 (decl (concatenate 'string (string-downcase rt) " " m "(" decl ");"))
+	 (decl (if st "" decl))
 	 (syms (mapcar (lambda (x) (declare (ignore x)) (tmpsym)) args)))
   `(defun ,n ,syms 
      (declare (optimize (safety 2)))
      ,@(mapcar (lambda (x y) `(check-type ,x ,(get y 'lisp-type))) syms tps)
      (lit ,rt 
-	  (cstr "({") (cstr ,decl) 
-	  ,@(when (eq rt :void) `((cstr "(")))
-	  (cstr ,m) (cstr "(")
-	  ,@(mapcon (lambda (x y z) `((unbox ,(car z) ,(car y))
-				      (cstr ,(if (cdr x) (if (consp (car x)) "+" ",") "")))) args syms tps)
-	  (cstr ")")
-	  ,@(when (eq rt :void) `((cstr ",Cnil)")))
-	  (cstr ";})")))))
+	  "({" ,decl 
+	  ,@(when (eq rt :void) `("("))
+	  ,m "("
+	  ,@(mapcon (lambda (x y z) `((,(car z) ,(car y))
+				      ,(if (cdr x) (if (consp (car x)) "+" ",") ""))) args syms tps)
+	  ")"
+	  ,@(when (eq rt :void) `(",Cnil)"))
+	  ";})"))))
+
+
+;; (defmacro defentry (n args c &optional (lt t))
+;;   (let* ((cp (consp c))
+;; 	 (c (if (and cp (eq (car c) 'static)) (cdr c) c))
+;; 	 (m (if cp (cadr c) c))
+;; 	 (m (if (symbolp m) (string-downcase m) m))
+;; 	 (rt (intern (symbol-name (if cp (car c) lt)) 'keyword))
+;; 	 (tps (mapcar (lambda (x) (intern (string (if (consp x) (car x) x)) 'keyword)) args))
+;; 	 (decl (reduce (lambda (y x) (strcat y (if (> (length y) 0) "," "") x)) args :initial-value ""))
+;; 	 (decl (concatenate 'string (string-downcase rt) " " m "(" decl ");"))
+;; 	 (syms (mapcar (lambda (x) (declare (ignore x)) (tmpsym)) args)))
+;;   `(defun ,n ,syms 
+;;      (declare (optimize (safety 2)))
+;;      ,@(mapcar (lambda (x y) `(check-type ,x ,(get y 'lisp-type))) syms tps)
+;;      (lit ,rt 
+;; 	  (cstr "({") (cstr ,decl) 
+;; 	  ,@(when (eq rt :void) `((cstr "(")))
+;; 	  (cstr ,m) (cstr "(")
+;; 	  ,@(mapcon (lambda (x y z) `((unbox ,(car z) ,(car y))
+;; 				      (cstr ,(if (cdr x) (if (consp (car x)) "+" ",") "")))) args syms tps)
+;; 	  (cstr ")")
+;; 	  ,@(when (eq rt :void) `((cstr ",Cnil)")))
+;; 	  (cstr ";})")))))
 
 
 ;; (defmacro defentry1 (n args c &optional (lt t))
@@ -1839,7 +1981,8 @@
   (dolist (vl requireds)
     (cond ((eq (var-kind vl) 'special)
 	   (push (cons vl (var-loc vl)) specials))
-	  ((var-cb vl) (push vl *reg-clv*))
+	  ((var-cb vl) (push (list (eq 'clb (var-loc vl)) vl) *reg-clv*))
+;	  ((var-cb vl) (push vl *reg-clv*))
 	  ((setf (var-kind vl)
 		 (or (car (member (promoted-c-type (var-type vl)) +c-local-arg-types+)) 'object))))
     (setf (var-loc vl) (cs-push (var-type vl) t)))
@@ -1885,7 +2028,6 @@
    (wt-nl1 "{	")
    (let* ((cm *reservation-cmacro*)
 	  (tri (tail-recursion-info (fun-name fun) nil lambda-expr))
-	  (*recur-stack* (if tri (cons tri *recur-stack*) *recur-stack*))
 	  (*unwind-exit* (if tri (cons 'tail-recursion-mark *unwind-exit*) *unwind-exit*)))
      (wt-nl "VMB" cm " VMS" cm " VMV" cm)
      (when nargs (wt-nl "va_list ap;")(wt-nl "va_start(ap,V" (var-loc nargs) ");"))

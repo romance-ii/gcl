@@ -95,7 +95,7 @@
 	(if (eq *boot-state* 'complete)
 	    (get-accessor-method-function gf type class slotd)
 	    (get-optimized-std-accessor-method-function class slotd type))
-      #+kcl (si:turbo-closure function)
+;      #+kcl (si:turbo-closure function)
       (setf (slot-accessor-std-p slotd type) std-p)
       (setf (slot-accessor-function slotd type) function))
     (when (and old-slotd (not (eq old-std-p (slot-accessor-std-p slotd 'all))))

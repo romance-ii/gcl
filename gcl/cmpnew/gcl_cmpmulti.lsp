@@ -38,7 +38,7 @@
 	((single-type-p x) 1)
 	((consp x) (1- (length x)))))
 
-(defun c1multiple-value-call (args &aux info funob)
+(defun c1multiple-value-call (args)
   (when (endp args) (too-few-args 'multiple-value-call 1 0))
   (let* ((nargs (c1args (cdr args) (make-info)))
 	 (tps (mapcar (lambda (x) (info-type (cadr x))) nargs)))
@@ -57,20 +57,19 @@
 					      (dotimes (i n) (push (pop r) syms))
 					      (list (nreverse syms) y))) tps (cdr args))
 		      :from-end t :initial-value `(funcall ,(car args) ,@syms)))))
-	  ((setq funob (c1funob (car args)))
-	   (setq info (copy-info (cadr funob)))
-	   (setq args (c1args (cdr args) info))
-	   (list 'multiple-value-call info funob args)))))
+	  ((let* ((info (make-info))
+		  (nargs (c1args args info)))
+	     (list 'multiple-value-call info (pop nargs) nargs))))))
 
 (defun c2multiple-value-call (funob forms &aux (*vs* *vs*) loc top sup)
   (cond ((endp (cdr forms))
-         (setq loc (save-funob funob t))
+         (setq loc (save-funob funob))
          (let ((*value-to-go* 'top)) (c2expr* (car forms)))
          (c2funcall funob 'args-pushed loc))
         (t
          (setq top (cs-push t t))
          (setq sup (cs-push t t))
-         (setq loc (save-funob funob t))
+         (setq loc (save-funob funob))
          (base-used)
 	 ;; Add (sup .var) handling in unwind-exit -- in
 	 ;; c2multiple-value-prog1 and c2-multiple-value-call, apparently
@@ -161,8 +160,8 @@
   (if *mv-var*
     (let* ((*inline-blocks* 0)
 	   (types (mapcar (lambda (x) (let ((x (info-type (cadr x)))) (if (type>= #tboolean x) t x))) forms))
-	   (i (char-code #\0))
-	   (s (mapcar (lambda (x &aux (x (when x (incf i)))) (strcat "@" x "(#" x ")@")) (cdr forms)))
+	   (i 0)
+	   (s (mapcar (lambda (x &aux (x (when x (write-to-string (incf i))))) (strcat "@" x "(#" x ")@")) (cdr forms)))
 	   (s (strcat "({" (apply 'strcat s) "#0;})"))
 	   (s (cons s (mapcar 'inline-type (cdr types))))
 	   (in (list (inline-type (car types)) (flags) s (inline-args forms types))))
@@ -241,7 +240,7 @@
 
   (c1add-globals (set-difference ss vnames))
 
-  (setq init-form (c1expr* (cadr args) info))
+  (let (*c1exit*) (setq init-form (c1expr* (cadr args) info)))
 
   (setq vars (nreverse vars))
   (let* ((tp (info-type (second init-form)))

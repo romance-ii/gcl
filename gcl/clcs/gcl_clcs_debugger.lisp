@@ -71,7 +71,7 @@
   (WHEN RESTARTS
     (DO ((W (IF TARGET-COLUMN
 		(- TARGET-COLUMN 3)
-		(CEILING (LOG MAX 10))))
+		(CEILING (LOG MAX 10.0))));FIXME
          (P RESTARTS (CDR P))
          (I 0 (1+ I)))
         ((OR (NOT P) (= I MAX)))

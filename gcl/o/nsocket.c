@@ -204,7 +204,7 @@ CreateSocket(int port, char *host, int server, char *myaddr, int myport, int asy
                                  * attempt to do an async connect. Otherwise
                                  * do a synchronous connect or bind. */
 {
-    int status, sock, asyncConnect, curState, origState;
+    int status, sock/* , asyncConnect */, curState, origState;
     struct sockaddr_in sockaddr;	/* socket address */
     struct sockaddr_in mysockaddr;	/* Socket address for client */
 
@@ -230,7 +230,7 @@ CreateSocket(int port, char *host, int server, char *myaddr, int myport, int asy
 
     fcntl(sock, F_SETFD, FD_CLOEXEC);
     
-    asyncConnect = 0;
+    /* asyncConnect = 0; */
     status = 0;
     if (server) {
 
@@ -285,7 +285,7 @@ CreateSocket(int port, char *host, int server, char *myaddr, int myport, int asy
                     sizeof(sockaddr));
             if (status < 0) {
                 if (errno == EINPROGRESS) {
-                    asyncConnect = 1;
+                    /* asyncConnect = 1; */
                     status = 0;
                 }
             }

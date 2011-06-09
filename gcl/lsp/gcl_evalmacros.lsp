@@ -44,23 +44,16 @@
 
 (defmacro defparameter (var form &optional doc-string)
   (declare (optimize (safety 2)))
-  (if doc-string
-      `(progn (si:*make-special ',var)
-              (si:putprop ',var ,doc-string 'variable-documentation)
-              (setq ,var ,form)
-              ',var)
-      `(progn (si:*make-special ',var)
-              (setq ,var ,form)
-              ',var)))
+  `(progn (si:*make-special ',var)
+	  ,@(when doc-string `((si:putprop ',var ,doc-string 'variable-documentation)))
+	  (setq ,var ,form)
+	  ',var))
 
 (defmacro defconstant (var form &optional doc-string)
   (declare (optimize (safety 2)))
-  (if doc-string
-      `(progn (si:*make-constant ',var ,form)
-              (si:putprop ',var ,doc-string 'variable-documentation)
-              ',var)
-      `(progn (unless (and (boundp ',var) (constantp ',var)) (si:*make-constant ',var ,form))
-              ',var)))
+  `(progn (si:*make-constant ',var ,form)
+	  ,@(when doc-string `((si:putprop ',var ,doc-string 'variable-documentation)))
+	  ',var))
 
 
 ;;; Each of the following macros is also defined as a special form.
@@ -164,46 +157,54 @@
 ;; 		  (symbol-name funid))
 ;; 		 (load-time-value (or (find-package 'setf) (make-package 'setf))))))))
 
-(defmacro defmacro (name vl &rest body &aux whole)
+(defmacro defmacro (name vl &rest body)
 
   (declare (optimize (safety 2)))
 
-  (cond ((listp vl))
-        ((symbolp vl) (setq vl (list '&rest vl)))
-        ((error "The defmacro-lambda-list ~s is not a list." vl)))
+  `(progn
+     (setf (macro-function ',name) ,(defmacro-lambda name vl body))
+     ',name))
+
+;; (defmacro defmacro (name vl &rest body &aux whole)
+
+;;   (declare (optimize (safety 2)))
+
+;;   (cond ((listp vl))
+;;         ((symbolp vl) (setq vl (list '&rest vl)))
+;;         ((error "The defmacro-lambda-list ~s is not a list." vl)))
   
-  (cond ((and (listp vl) (eq (car vl) '&whole))
-	 (setq whole (cadr vl)) (setq vl (cddr vl)))
-	((setq whole (gensym))))  
+;;   (cond ((and (listp vl) (eq (car vl) '&whole))
+;; 	 (setq whole (cadr vl)) (setq vl (cddr vl)))
+;; 	((setq whole (gensym))))  
   
-  (multiple-value-bind
-   (doc decls ctps body)
-   (parse-body-header body)
+;;   (multiple-value-bind
+;;    (doc decls ctps body)
+;;    (parse-body-header body)
    
-   (multiple-value-bind
-    (vl env)
-    (get-&environment vl)
+;;    (multiple-value-bind
+;;     (vl env)
+;;     (get-&environment vl)
     
-    (let* ((envp env)
-	   (env (or env (gensym)))
-	   (*dl* `(&aux ,env ,whole))
-	   *key-check* *arg-check*
-	   (ppn (dm-vl vl whole t)))
+;;     (let* ((envp env)
+;; 	   (env (or env (gensym)))
+;; 	   (*dl* `(&aux ,env ,whole))
+;; 	   *key-check* *arg-check*
+;; 	   (ppn (dm-vl vl whole t)))
       
-      (dolist (kc *key-check*)
-	(push `(unless (getf ,(car kc) :allow-other-keys);FIXME order?
-		 (do ((vl ,(car kc) (cddr vl)))
-		     ((endp vl))
-		     (unless (member (car vl) ',(cons :allow-other-keys (cdr kc)))
-		       (dm-key-not-allowed (car vl)))))
-	      body))
+;;       (dolist (kc *key-check*)
+;; 	(push `(unless (getf ,(car kc) :allow-other-keys);FIXME order?
+;; 		 (do ((vl ,(car kc) (cddr vl)))
+;; 		     ((endp vl))
+;; 		     (unless (member (car vl) ',(cons :allow-other-keys (cdr kc)))
+;; 		       (dm-key-not-allowed (car vl)))))
+;; 	      body))
       
-      (dolist (ac *arg-check*)
-	(push `(when ,(dm-nth-cdr (cdr ac) (car ac)) (dm-too-many-arguments)) body))
-      (unless envp (push `(declare (ignore ,env)) decls))
-      `(si:define-macro 
-	',name 
-	(list ',doc ',ppn ,(make-blocked-lambda (reverse *dl*) decls ctps body name)))))))
+;;       (dolist (ac *arg-check*)
+;; 	(push `(when ,(dm-nth-cdr (cdr ac) (car ac)) (dm-too-many-arguments)) body))
+;;       (unless envp (push `(declare (ignore ,env)) decls))
+;;       `(si:define-macro 
+;; 	',name 
+;; 	(list ',doc ',ppn ,(make-blocked-lambda (reverse *dl*) decls ctps body name)))))))
 
 (defmacro define-symbol-macro (sym exp) 
   (declare (optimize (safety 2)) (ignore sym exp)) nil);FIXME placeholder

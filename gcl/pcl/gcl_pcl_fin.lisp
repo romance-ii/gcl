@@ -1327,21 +1327,29 @@ dbg:
 (defmacro funcallable-instance-marker (x)
   `(car (cclosure-env-nthcdr funcallable-instance-closure-size1 ,x)))
 
+(defun allocate-funcallable-instance-2 ()
+  (let (dummy)
+    (lambda (&rest args)
+      (declare (ignore args))
+      (called-fin-without-function)
+      (values-list (make-dummy-list (setq dummy (make-dummy-var)))))))
+
 (defun allocate-funcallable-instance-1 ()
   (let ((fin (allocate-funcallable-instance-2))
         (env (make-list funcallable-instance-closure-size :initial-element nil)))
-    (setf (%cclosure-env fin) env)
-    #+:turbo-closure (si:turbo-closure fin)
+    (si::set-function-environment fin env)
+    ;; (setf (%cclosure-env fin) env)
+    ;; #+:turbo-closure (si:turbo-closure fin)
     (setf (funcallable-instance-marker fin) *funcallable-instance-marker*)
     fin))
 
-(defun allocate-funcallable-instance-2 ()
-  (let ((what-a-dumb-closure-variable ()))
-    #'(lambda (&rest args)
-        (declare (ignore args))
-        (called-fin-without-function)
-        (setq what-a-dumb-closure-variable
-              (dummy-function what-a-dumb-closure-variable)))))
+;; (defun allocate-funcallable-instance-2 ()
+;;   (let ((what-a-dumb-closure-variable ()))
+;;     #'(lambda (&rest args)
+;;         (declare (ignore args))
+;;         (called-fin-without-function)
+;;         (setq what-a-dumb-closure-variable
+;;               (dummy-function what-a-dumb-closure-variable)))))
 
 (defun funcallable-instance-p (x)
   (eq *funcallable-instance-marker* (funcallable-instance-marker x)))
@@ -1358,9 +1366,8 @@ dbg:
               (<= (length (%cclosure-env new-value))
                   funcallable-instance-available-size))
          (%set-cclosure fin new-value funcallable-instance-available-size))
-        (t
-         (set-funcallable-instance-function
-           fin (make-trampoline new-value))))
+        ((set-funcallable-instance-function
+	  fin (make-trampoline new-value))))
   fin)
 
 (defmacro funcallable-instance-data-1 (fin data &environment env)
@@ -1375,7 +1382,7 @@ dbg:
                          `(- funcallable-instance-closure-size
                              (funcallable-instance-data-position ,data)
                              2))))
-    `(car (cclosure-env-nthcdr ,index-form ,fin))))
+    `(car (%cclosure-env-nthcdr ,index-form ,fin))))
 
 
 (defun make-trampoline (function)

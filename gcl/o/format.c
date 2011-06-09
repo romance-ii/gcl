@@ -170,6 +170,22 @@ object sSAindent_formatted_outputA;
 			fmt_string = old_fmt_string ; \
                         fmt_paramp = old_fmt_paramp 
 
+#define	fmt_old1	VOL object old_fmt_stream; \
+			VOL int old_ctl_origin; \
+			VOL int old_ctl_index; \
+			VOL int old_ctl_end; \
+			jmp_bufp   VOL old_fmt_jmp_bufp; \
+			VOL int old_fmt_indents; \
+			VOL object old_fmt_string ; \
+                        VOL format_parameter *old_fmt_paramp
+#define	fmt_save1       old_fmt_stream = fmt_stream; \
+			old_ctl_origin = ctl_origin; \
+			old_ctl_index = ctl_index; \
+			old_ctl_end = ctl_end; \
+			old_fmt_jmp_bufp = fmt_jmp_bufp; \
+			old_fmt_indents = fmt_indents; \
+			old_fmt_string = fmt_string ; \
+                        old_fmt_paramp = fmt_paramp
 #define	fmt_restore1	fmt_stream = old_fmt_stream; \
 			ctl_origin = old_ctl_origin; \
 			ctl_index = old_ctl_index; \
@@ -1792,7 +1808,7 @@ fmt_indirection(bool colon, bool atsign) {
 				fmt_error("illegal ~:^");
 		} else
 			format(fmt_stream, 0, s->st.st_fillp);
-		fmt_restore1;
+		fmt_restore1;  /*FIXME restore?*/
 	} else {
 		l = fmt_advance();
 		fmt_save;
@@ -1817,7 +1833,7 @@ fmt_case(bool colon, bool atsign)
 {
 	VOL object x;
 	VOL int i, j;
-	fmt_old;
+	fmt_old1;
 	jmp_buf fmt_jmp_buf0;
 	int up_colon;
 	bool b;
@@ -1828,7 +1844,7 @@ fmt_case(bool colon, bool atsign)
 	j = fmt_skip();
 	if (ctl_string[--j] != ')' || ctl_string[--j] != '~')
 		fmt_error("~) expected");
-	fmt_save;
+	fmt_save1;
 	fmt_jmp_bufp = &fmt_jmp_buf0;
 	if ((up_colon = setjmp(*fmt_jmp_bufp)))
 		;
@@ -1891,7 +1907,7 @@ fmt_conditional(bool colon, bool atsign)
 	object x;
 	int n=0;
 	bool done;
-	fmt_old;
+	fmt_old1;
 
 	fmt_not_colon_atsign(colon, atsign);
 	if (colon) {
@@ -1904,11 +1920,11 @@ fmt_conditional(bool colon, bool atsign)
 		if (ctl_string[--k] != ']' || ctl_string[--k] != '~')
 			fmt_error("~] expected");
 		if (fmt_advance() == Cnil) {
-			fmt_save;
+			fmt_save1;
 			format(fmt_stream, ctl_origin + i, j - i);
 			fmt_restore1;
 		} else {
-			fmt_save;
+			fmt_save1;
 			format(fmt_stream, ctl_origin + j + 2, k - (j + 2));
 			fmt_restore1;
 		}
@@ -1921,7 +1937,7 @@ fmt_conditional(bool colon, bool atsign)
 			;
 		else {
 			--fmt_index;
-			fmt_save;
+			fmt_save1;
 			format(fmt_stream, ctl_origin + i, j - i);
 			fmt_restore1;
 		}
@@ -1940,7 +1956,7 @@ fmt_conditional(bool colon, bool atsign)
 			for (k = j;  ctl_string[--k] != '~';)
 				;
 			if (n == 0) {
-				fmt_save;
+				fmt_save1;
 				format(fmt_stream, ctl_origin + i, k - i);
 				fmt_restore1;
 				done = TRUE;
@@ -1966,7 +1982,7 @@ fmt_conditional(bool colon, bool atsign)
 		if (ctl_string[--j] != ']' || ctl_string[--j] != '~')
 			fmt_error("~] expected");
 		if (!done) {
-			fmt_save;
+			fmt_save1;
 			format(fmt_stream, ctl_origin + i, j - i);
 			fmt_restore1;
 		}
@@ -2066,7 +2082,7 @@ fmt_iteration(bool colon, bool atsign) {
 			}
 			format(fmt_stream, o + i, j - i);
 		}
-		fmt_restore1;
+		fmt_restore1; /*FIXME restore?*/
 	} else if (colon && atsign) {
 		if (colon_close)
 			goto L4;
@@ -2103,7 +2119,7 @@ fmt_justification(volatile bool colon, bool atsign)
 {
 	int mincol=0, colinc=0, minpad=0, padchar=0;
 	object fields[FORMAT_DIRECTIVE_LIMIT];
-	fmt_old;
+	fmt_old1;
 	jmp_buf fmt_jmp_buf0;
 	VOL int i,j,n,j0;
 	int k,l,m,l0;
@@ -2131,7 +2147,7 @@ fmt_justification(volatile bool colon, bool atsign)
 			;
 		fields[n] = make_string_output_stream(64);
 		vs_push(fields[n]);
-		fmt_save;
+		fmt_save1;
 		fmt_jmp_bufp = &fmt_jmp_buf0;
 		if ((up_colon = setjmp(*fmt_jmp_bufp))) {
 			--n;
@@ -2177,7 +2193,7 @@ fmt_justification(volatile bool colon, bool atsign)
 			special = 1;
 			for (j = j0;  ctl_string[j] != '~';  --j)
 				;
-			fmt_save;
+			fmt_save1;
 			format(fmt_stream, ctl_origin + j, j0 - j + 2);
 			fmt_restore1;
 			spare_spaces = fmt_spare_spaces;

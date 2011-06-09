@@ -633,8 +633,7 @@
 	(t (error 'type-error :datum x :expected-type '(or null seqind)))))
   
 
-(defun fill (sequence item
-		      &key start end )
+(defun fill (sequence item &key start end )
   (declare (optimize (safety 2)))
   (with-start-end start end sequence
 		  (do ((i start (f+ 1 i)))

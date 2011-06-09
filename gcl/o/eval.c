@@ -125,7 +125,9 @@ static object
 unwind_vals(object *vals,object *base) {
   
   ufixnum n;
+  object o;
 
+  o=vs_base[0];
   n=vs_top-vs_base;
   if (vals) {
     if (n>1) memcpy(vals,vs_base+1,(n-1)*sizeof(*vals));
@@ -133,7 +135,7 @@ unwind_vals(object *vals,object *base) {
   } else
     vs_top=base;
   
-  return n>0 ? vs_base[0] : Cnil;
+  return n>0 ? o : Cnil;
   
 }
 
@@ -161,8 +163,23 @@ funcall_vec(object fun,ufixnum n,object *b) {
   fcall.argd=n;
   fcall.fun=fun;
 
-  return type_of(fun)==t_function ? 
-    quick_call_function_vec_coerce(fun,n,b) : funcall_cs(fun,n,b);
+  if (type_of(fun)==t_function) {
+
+    if (n<fun->fun.fun_minarg) {
+      FEtoo_few_arguments(b,b+n);
+      return Cnil;
+    }
+    
+    if (n>fun->fun.fun_maxarg) {
+      FEtoo_many_arguments(b,b+n);
+      return Cnil;
+    }
+    
+    return quick_call_function_vec_coerce(fun,n,b);
+
+  } else
+
+    return funcall_cs(fun,n,b);
 
 }
 
@@ -950,8 +967,8 @@ DEFUNO_NEW("CONSTANTP",object,fLconstantp,LISP
   
 /*   env=NEXT_ARG(n,ap,l,f,Cnil); */
   tp=type_of(x0);
-  RETURN1((tp==t_cons && x0->c.c_car==sLquote)||
-	  (tp==t_symbol && x0->s.s_stype==stp_constant) ? Ct : Cnil);
+  RETURN1((tp==t_cons && x0->c.c_car!=sLquote)||
+	  (tp==t_symbol && x0->s.s_stype!=stp_constant) ? Cnil : Ct);
 
 }
 
