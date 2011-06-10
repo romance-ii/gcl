@@ -357,7 +357,7 @@
 		      ((or (and (flag-p (caddr ii) ans)(not *c-gc*)); returns new object
 			   (and (member (cadr ii) +c-local-var-types+)
 				(not (eq type (cadr ii)))))
-		      (push (wt-push-loc loc type) locs))
+		       (push (wt-push-loc loc type) locs))
 		      ((or (need-to-protect (cdr forms) (cdr types))
 			   ;;if either new form or side effect,
 			   ;;we don't want double evaluation
@@ -379,16 +379,19 @@
 				(if (eq (car v) 'var) (cons (car v) tv) tv))) locs))
               (structure-ref (push (coerce-loc-structure-ref (cdr form) type) locs))
               (SETQ
-               (let ((vref (caddr form))
-                     (form1 (cadddr form)))
-                 (let ((*value-to-go* (cons 'var vref))) (c2expr* form1))
-                 (cond ((eq (car form1) 'LOCATION)
-                        (push (coerce-loc (caddr form1) type) locs))
-                       (t
-			(setq forms (list* form (list 'VAR (cadr form) vref) (cdr forms)))
-			;; want (setq types (list* type type (cdr  types)))
-			;; but type is first of types
-			(setq types (list* type  types))))))
+	       (let* ((vref (caddr form))
+		      (form1 (cadddr form))
+		      (v (car vref))
+		      (vv (cons 'var vref))
+		      (vt (if (or (eq t (var-ref v)) (consp (var-ref v)) (var-cb v) (eq (var-kind v) 'global)) vv *value-to-go*)))
+		 (cond ((eq vt vv)
+			(let ((*value-to-go* vt)) (c2expr* form1))
+			(if (eq (car form1) 'LOCATION)
+			    (push (coerce-loc (caddr form1) type) locs)
+			  (setq forms (list* form (list 'VAR (cadr form) vref) (cdr forms))
+				types (list* type  types))))
+		       ((setq forms (list* form form1 (cdr forms))
+			      types (list* type  types))))));; want (setq types (list* type type (cdr  types))) but type is first of types
               (otherwise (push (wt-push-loc form type t) locs))))))
 
 ;; (defun inline-args (forms types &optional fun &aux locs ii)

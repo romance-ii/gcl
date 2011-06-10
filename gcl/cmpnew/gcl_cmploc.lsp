@@ -146,7 +146,11 @@
 		 (wt-nl "for (vs_top=vs_top<V" l "? V" l ": vs_top;vs_top<V" l "+" (var-space *mv-var*) ";) *vs_top++=Cnil;")))
 	     (reset-top)
 	     (wt-nl "vals_set=1;"))))
-        ((setq fd (cdr (assoc *value-to-go* +set-return-alist+))) (values (funcall fd loc)))
+	((setq fd (cdr (assoc (car (rassoc *value-to-go* +return-alist+)) +wt-loc-alist+)))
+	 (wt-nl "VMR" *reservation-cmacro* "(")
+	 (funcall fd loc)
+	 (wt ");"))
+;        ((setq fd (cdr (assoc *value-to-go* +set-return-alist+))) (values (funcall fd loc)))
         ((or (not (consp *value-to-go*))
              (not (symbolp (car *value-to-go*))))
          (baboon))
@@ -238,22 +242,22 @@
 	 (wt loc))
         (t (wt (if *safe-compile* "fixint(" "fix(") loc ")"))))
 
-(defun wt-integer-loc (loc  &aux (avma t)(first (and (consp loc) (car loc))))
-  (case first
-    (inline-fixnum
-     (wt "stoi(")
-     (wt-inline-loc (caddr loc) (cadddr loc))
-     (wt ")"))
-    (INLINE-INTEGER (setq avma nil)  (wt-inline-loc (caddr loc) (cadddr loc)))
-    (fixnum-value       (wt "stoi(" (caddr loc) ")"))
-    (var
-     (cond
-       ((eq (var-kind (cadr loc)) #tinteger)  (setq avma nil)   (wt "V" (var-loc (cadr loc))))
-       ((eq (var-kind (cadr loc)) #tfixnum)   (wt "stoi(V" (var-loc (cadr loc))")"))
-       ((wt "otoi(" loc ")"))))
-    (otherwise (wt "otoi(" loc ")")))
-;  (and avma (not *restore-avma*)(wfs-error))
-  )
+;; (defun wt-integer-loc (loc  &aux (avma t)(first (and (consp loc) (car loc))))
+;;   (case first
+;;     (inline-fixnum
+;;      (wt "stoi(")
+;;      (wt-inline-loc (caddr loc) (cadddr loc))
+;;      (wt ")"))
+;;     (INLINE-INTEGER (setq avma nil)  (wt-inline-loc (caddr loc) (cadddr loc)))
+;;     (fixnum-value       (wt "stoi(" (caddr loc) ")"))
+;;     (var
+;;      (cond
+;;        ((eq (var-kind (cadr loc)) #tinteger)  (setq avma nil)   (wt "V" (var-loc (cadr loc))))
+;;        ((eq (var-kind (cadr loc)) #tfixnum)   (wt "stoi(V" (var-loc (cadr loc))")"))
+;;        ((wt "otoi(" loc ")"))))
+;;     (otherwise (wt "otoi(" loc ")")))
+;; ;  (and avma (not *restore-avma*)(wfs-error))
+;;   )
      
 
 (defun fixnum-loc-p (loc)

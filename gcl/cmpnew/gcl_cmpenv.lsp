@@ -51,6 +51,7 @@
   (clrhash *objects*)
   (clrhash *objects-rev*)
   (clrhash *dlinks*)
+;  (clrhash *sigs*)
   (setq *constants* nil)
   (setq *local-funs* nil)
   (setq *global-funs* nil)

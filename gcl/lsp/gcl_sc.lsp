@@ -62,6 +62,7 @@
 	      (e2 end2)(c2 0)
 	      (end1 (or end1 l1))
 	      (end2 (or end2 l2)))
+	 (declare (ignorable c1 c2))
 	 (unless (if e1 (<= start1 end1 l1) (<= start1 l1))
 	   (error 'type-error "Bad array bounds"))
 	 (unless (if e2 (<= start2 end2 l2) (<= start2 l2))

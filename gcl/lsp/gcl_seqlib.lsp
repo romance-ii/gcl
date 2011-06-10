@@ -832,7 +832,7 @@
 
   (let ((s1 sequence1)(s2 sequence2)(i1 start1)(i2 start2)(e1 end1)(e2 end2)(st (or test test-not)))
     (declare (sequence s1 s2)(seqind i1 i2)((or null seqind) e1 e2))
-    (let* ((eq (unless st (every (lambda (x) (eql-is-eq (if key (funcall key x) x))) s1))) m (mv 0) x1 x2
+    (let* ((eq (unless st (every (lambda (x) (eql-is-eq (if key (funcall key x) x))) s1))) m (mv 0) x1
 	   (l1 (listp s1))(l2 (listp s2))
 	   (e1 (or e1 (unless l1 (length s1))))(e2 (or e2 (unless l2 (length s2)))))
       (do ((is2 i2 (1+ is2))
@@ -846,7 +846,7 @@
 	       (i1 i1  (1+ i1))
 	       (i2 is2 (1+ i2)))
 	      ((or (setq x1 (if e1 (>= i1 e1) (endp p1)))
-		   (setq x2 (if e2 (>= i2 e2) (endp p2))))
+		   (if e2 (>= i2 e2) (endp p2)))
 	       (when x1 (if from-end (setq m t mv is2) (return-from search is2))))
 	      (declare (seqind i1 i2))
 	      (let ((el1 (if l1 (car p1) (aref s1 i1)))

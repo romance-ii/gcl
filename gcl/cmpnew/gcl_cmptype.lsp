@@ -1050,8 +1050,6 @@
 (defun get-sym (args)
   (intern (apply 'concatenate 'string (mapcar 'string args))))
 
-(defconstant +set-return-alist+ 
-  (mapcar (lambda (x) (cons (get-sym `("RETURN-" ,x)) (get-sym `("SET-RETURN-" ,x)))) +c-local-arg-types-syms+))
 (defconstant +return-alist+ 
   (mapcar (lambda (x) (cons (if (eq x 'object) x (cmp-norm-tp x)) (get-sym `("RETURN-" ,x)))) (cons 'object +c-local-arg-types-syms+)))
 (defconstant +wt-loc-alist+ 
@@ -1187,3 +1185,19 @@
         (cmpwarn "The type of the form ~s is not ~s, but ~s." original-form type (info-type (cadr form)))))
 
 
+(defun member-type-p (tp)
+  (and (consp tp)
+       (eq (car tp) 'member)
+       (cadr tp)))
+
+(defun purge-member-types-hash (h)
+  (maphash (lambda (x y) (when (member-type-p x) (remhash x h))) h))
+
+(defun purge-member-types nil
+  (dolist (l (list *norm-tp-hash* *uniq-tp-hash* *and-tp-hash* *or-tp-hash* *pmct-hash* *ctov-hash* *stp-hash* *ext-hash* *bump-hash*))
+    (purge-member-types-hash l))
+  (dolist (l (list *and-tp-hash* *or-tp-hash*))
+    (maphash (lambda (x y) (purge-member-types-hash y)) l))
+  (let ((h *oth*))
+    (maphash (lambda (x y) (when (member-type-p y) (remhash x h))) h))
+  (clrhash *sigs*))

@@ -458,10 +458,11 @@
 (deftype atom () `(not cons))
 (deftype function (&optional as vs) 
   (declare (ignore as vs)) 
-  `(or interpreted-function compiled-function generic-function))
+  `(or interpreted-function compiled-function))
 (deftype compiled-function (&optional as vs) 
   (declare (ignore as vs)) 
   `(or new-compiled-function old-compiled-function))
+(deftype new-compiled-function nil `(or generic-function non-generic-new-compiled-function))
 (deftype generic-function nil nil);Overwritten by pcl check ;FIXME
 
 (deftype integer (&optional (low '*) (high '*)) `(integer ,low ,high))
@@ -562,6 +563,10 @@
 (deftype type-spec nil `(or symbol class structure proper-cons))
 (deftype fpvec nil `(and vector (satisfies array-has-fill-pointer-p)))
 
+(defun non-generic-new-compiled-function-p (x)
+  (cond ((typep x 'generic-function) nil)
+	((new-compiled-function-p x))))
+
 (defconstant +type-alist+ '((null . null)
 	  (not-type . not)
           (symbol . symbolp)
@@ -614,6 +619,7 @@
           (function . functionp)
           (old-compiled-function . old-compiled-function-p)
           (new-compiled-function . new-compiled-function-p)
+          (non-generic-new-compiled-function . non-generic-new-compiled-function-p)
           (common . commonp)))
 
 (dolist (l +type-alist+)
@@ -633,7 +639,7 @@
 				      hash-table-eq hash-table-eql hash-table-equal hash-table-equalp
 				      random-state standard-object structure 
 				      interpreted-function
-				      new-compiled-function
+				      non-generic-new-compiled-function
 				      old-compiled-function))
 
 
@@ -1218,6 +1224,7 @@
   (cond ((not (and x y)) nil)
 	((eq x t) y)
 	((eq y t) x)
+	((eq x y) x) ;needed for early generic function processing
 	((and (consp x) (eq (car x) 'member))
 	 (let ((q (lremove-if-not (lambda (z) (typep-int z y)) (cdr x))))
 	   (when q `(member ,@q))))

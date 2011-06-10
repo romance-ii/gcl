@@ -56,8 +56,7 @@
 	                        ;;;           (defun foo (a) (flet ((%f8 nil (setq a 2)))
                                 ;;;     (* a (%f8))))
 	   (call (make-list 5))
-	   vv
-           src c1 c1cb denv fn)
+	   vv src c1 c1cb prov fn)
 
 (defun local-fun-fn (id)
   (let* ((fun (local-fun-p id)))
@@ -125,12 +124,22 @@
 ;; (defun process-local-fun-env (env b fun src tp)
 ;;   (under-env env (process-local-fun b fun src tp)))
 
+(defun bump-closure-lam-sig (lam)
+  (flet ((nt (x) (type-or1 x #tt)))
+	(mapc (lambda (x) (setf (var-type x) (nt (var-type x)))) (caaddr lam))
+	(let ((i (cadar (last lam))))
+	  (setf (info-type i) (nt (info-type i))))
+	(lam-e-to-sig lam)))
+
 (defun process-local-fun (b fun def tp)
   (let* ((name (fun-name fun))
 	 (lam (do-fun name (cons name (cdr def)) (fun-call fun) (member fun *funs*) b))
 	 (cvs (let (r) (do-referred (v (cadr lam)) (when (and (var-p v) (var-cbb v)) (push v r))) r))
 	 (res (list fun lam))
 	 (l (si::interpreted-function-lambda (cadr tp))))
+
+    ;closures almost always called anonymously which will be slow unless argd is 0
+    (when (or (eq b 'cb) (fun-ref-ccb fun)) (setf (car (fun-call fun)) (bump-closure-lam-sig lam)))
 
     (ref-environment)
     (setf (fun-cfun fun) (next-cfun))
@@ -158,7 +167,8 @@
       (push (list fun (cdr def)) defs1)))
   
   (let ((*funs* (if labels *funs* ofuns)))
-    (mapc (lambda (x) (setf (fun-denv (car x)) (current-env))) defs1))
+    (mapc (lambda (x &aux (x (car x))) (setf (fun-prov x) (c1function (list (fun-src x)) t))) defs1))
+;    (mapc (lambda (x) (setf (fun-denv (car x)) (current-env))) defs1))
   
   (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
   
@@ -280,8 +290,8 @@
       (let* ((fun (car def))
 	     (cl (fun-call fun))
 	     (sig (car cl))
-	     (at (mapcar 'global-type-bump (car sig)))
-	     (rt (global-type-bump (cadr sig))))
+	     (at (car sig))
+	     (rt (cadr sig)))
 	
 	(wt-nl)
 	(wt-vs* (fun-ref fun))
@@ -359,7 +369,8 @@
   (macrolet ((pf (fun ref c1 b) 
 		 `(unless (,ref ,fun) 
 		    (setf (,ref ,fun) t
-			  (,c1 ,fun) (caddr (unprovfn (list (list (fun-src ,fun)) (list (fun-denv ,fun))) ,b ,fun))))))
+			  (,c1 ,fun) (caddr (unprovfn (cddr (fun-prov ,fun)) ,b ,fun))))))
+;			  (,c1 ,fun) (caddr (unprovfn (list (list (fun-src ,fun)) (list (fun-denv ,fun))) ,b ,fun))))))
 	    (dolist (fun *funs*)
 	      (cond ((not (fun-p fun)) (setq ccb (or (eq fun 'cb) ccb) inner (or inner fun)))
 		    ((eq (fun-name fun) fname)

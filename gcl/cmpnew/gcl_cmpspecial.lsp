@@ -210,7 +210,8 @@
 (defun fun-def-env (fn)
   (let ((fun (car (member-if (lambda (x) (when (fun-p x) (eq (fun-fn x) fn))) *funs*))))
     (if fun
-	(fun-denv fun)
+	(car (fourth (fun-prov fun)))
+;	(fun-denv fun)
       (current-env))))
 
 (defun c1function (args &optional (provisional *provisional-inline*) b f)
@@ -220,7 +221,7 @@
   
   (let* ((funid (si::funid (car args)))
 	 (fn (funid-to-fn funid))
-	 (tp (if fn `(member ,fn) #tfunction))  ; intentionally unnormalized
+	 (tp (if fn (cmp-norm-tp `(member ,fn)) #tfunction))
 	 (info (make-info :type tp)))
     (cond (provisional
 	   (or (gethash fn *fun-tp-hash*)
@@ -317,8 +318,8 @@
 		(cl (fun-call fun))
 		(sig (pop cl))
 		(cle (pop cl))
-		(at (mapcar (lambda (x) (global-type-bump (cmp-norm-tp x))) (car sig)));FIXME
-		(rt (global-type-bump (cmp-norm-tp (cadr sig))));FIXME Check not needed for local funs
+		(at (car sig))
+		(rt (cadr sig))
 		(ha (mapcar (lambda (x) `',x) (cons sig (cons cle cl))))
 		(clc `(let ((si::f #'(lambda nil nil)))
 			(si::add-hash si::f ,@ha)

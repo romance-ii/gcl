@@ -1517,7 +1517,7 @@
 	     (let ((x (pop body))) (if (stringp x) (unless doc (push x doc)) (push x d)))) body))
 
 
-(defun blla (l a last body &optional n nr f &aux r k rb lvp np npp negp rbr z ff rr
+(defun blla (l a last body &optional n nr f &aux r k rb lvp np npp negp rbr ff rr
 	       (llk '(&optional &rest &key &allow-other-keys &aux)));FIXME centralize
   (assert (not (and last n)))
   (labels
@@ -1548,7 +1548,7 @@
        ((not l) `(let* ,(nreverse r) 
 		   ,@(unless rr (when np `((declare (:dynamic-extent ,lvp)))))
 		   ,@(remove-doc-string body)))
-       (cond ((setq z (member (car l) llk)) (setq k (pop l)))
+       (cond ((member (car l) llk) (setq k (pop l)))
 	     ((when last (unless a (push (list (setq lvp (tmpsym)) last) r) (setq last nil))))
 	     ((not k) (push (list (pop l) (cond (a (pop a)) (lvp `(pop ,lvp)) ((baboon)))) r))
 	     ((when n (assert (null a))

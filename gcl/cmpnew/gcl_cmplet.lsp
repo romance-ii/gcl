@@ -64,7 +64,11 @@
 ;; 	((side-effects-p f) nil)
 ;; 	(t)))
 
-(defun trim-vars (vars forms body &optional star)
+(defun have-provfn (form)
+  (cond ((atom form) (eq form 'provfn))
+	((or (have-provfn (car form)) (have-provfn (cdr form))))))
+
+(defun trim-vars (vars forms body &optional star &aux (bp (have-provfn body)))
 
   (do* (nv nf (vs vars (cdr vs)) (fs forms (cdr fs)) 
 	   (av (append vars *vars*)) (fv (cdr av) (cdr fv)))
@@ -73,13 +77,30 @@
 	(cond ((and (eq (var-kind var) 'LEXICAL)
 		    (not (eq t (var-ref var))) ;;; This field may be IGNORE.
 		    (not (var-ref-ccb var))
-		    (not *provisional-inline*));FIXME
+		    (unless bp (unless (when star (have-provfn fs)) t)));FIXME better way?
 	       (unless (ignorable-form form) 
 		 (let* ((*vars* (if nf (if star fv *vars*) av))
 			(f (if nf (car nf) body))
 			(np (new-c1progn form f)))
 		   (if nf (setf (car nf) np) (setf body np)))))
 	      ((push var nv) (push form nf))))))
+
+;; (defun trim-vars (vars forms body &optional star)
+
+;;   (do* (nv nf (vs vars (cdr vs)) (fs forms (cdr fs)) 
+;; 	   (av (append vars *vars*)) (fv (cdr av) (cdr fv)))
+;;       ((or (endp vs) (endp fs)) (list nv nf body))
+;;       (let ((var (car vs)) (form (car fs)))
+;; 	(cond ((and (eq (var-kind var) 'LEXICAL)
+;; 		    (not (eq t (var-ref var))) ;;; This field may be IGNORE.
+;; 		    (not (var-ref-ccb var))
+;; 		    (not *provisional-inline*));FIXME
+;; 	       (unless (ignorable-form form) 
+;; 		 (let* ((*vars* (if nf (if star fv *vars*) av))
+;; 			(f (if nf (car nf) body))
+;; 			(np (new-c1progn form f)))
+;; 		   (if nf (setf (car nf) np) (setf body np)))))
+;; 	      ((push var nv) (push form nf))))))
 
 
 (defun mvars (args ss is ts info star &aux *c1exit* (ov *vars*))
