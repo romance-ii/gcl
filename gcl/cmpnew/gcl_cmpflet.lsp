@@ -134,16 +134,17 @@
 (defun process-local-fun (b fun def tp)
   (let* ((name (fun-name fun))
 	 (lam (do-fun name (cons name (cdr def)) (fun-call fun) (member fun *funs*) b))
-	 (cvs (let (r) (do-referred (v (cadr lam)) (when (and (var-p v) (var-cbb v)) (push v r))) r))
+;	 (cvs (let (r) (do-referred (v (cadr lam)) (when (and (var-p v) (var-cbb v)) (push v r))) r))
 	 (res (list fun lam))
-	 (l (si::interpreted-function-lambda (cadr tp))))
+;	 (l (si::interpreted-function-lambda (cadr tp)))
+	 )
 
     ;closures almost always called anonymously which will be slow unless argd is 0
     (when (or (eq b 'cb) (fun-ref-ccb fun)) (setf (car (fun-call fun)) (bump-closure-lam-sig lam)))
 
     (ref-environment)
     (setf (fun-cfun fun) (next-cfun))
-    (setf (cadr l) cvs)
+;    (setf (cadr l) cvs)
     (add-info (fun-info fun) (cadr lam));FIXME copy-info?
     (setf (info-type (fun-info fun)) (cadar (fun-call fun)))
     (setf (info-type (cadr lam)) tp)
@@ -162,13 +163,14 @@
       (cmpck (member (car def) fnames) "The function ~s was already defined." (car def))
       (push (car def) fnames))
     (let* ((src (si::block-lambda (cadr def) (car def) (cddr def)))
-	   (fun (make-fun :name (car def) :src src :info (make-info :type nil :sp-change 1) :fn (funid-to-fn src))))
+	   (fun (make-fun :name (car def) :src src :info (make-info :type nil :sp-change 1) :fn (funid-to-fn (car def)))))
       (push fun *funs*)
       (push (list fun (cdr def)) defs1)))
   
   (let ((*funs* (if labels *funs* ofuns)))
-    (mapc (lambda (x &aux (x (car x))) (setf (fun-prov x) (c1function (list (fun-src x)) t))) defs1))
-;    (mapc (lambda (x) (setf (fun-denv (car x)) (current-env))) defs1))
+    (mapc (lambda (x &aux (x (car x)))
+	    (setf (fun-c1 x) (c1function (list (fun-src x)) t)
+		  (fun-c1cb x) (copy-list (fun-c1 x)))) defs1))
   
   (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
   
@@ -182,8 +184,8 @@
 
   (let ((funs (mapcar 'car defs1)))
     (list (if labels 'labels 'flet) info 
-	  (mapcar 'fun-c1 (remove-if-not 'fun-ref funs))
-	  (mapcar 'fun-c1cb (remove-if-not 'fun-ref-ccb funs))
+	  (mapcar (lambda (x) (caddr (fun-c1 x))) (remove-if-not 'fun-ref funs))
+	  (mapcar (lambda (x) (caddr (fun-c1cb x))) (remove-if-not 'fun-ref-ccb funs))
 	  body)))
 
 ;; (defun c1flet-labels (labels args &aux body ss ts is other-decl (info (make-info))
@@ -191,22 +193,20 @@
 
 ;;   (when (endp args) (too-few-args 'flet 1 0))
 
-;;   (dolist (def (car args) (setq defs1 (nreverse defs1)));FIXME double eval
+;;   (dolist (def (car args) (setq defs1 (nreverse defs1)))
 ;;     (let* ((x (car def))(y (si::funid-sym x))) (unless (eq x y) (setq def (cons y (cdr def)))))
 ;;     (cmpck (or (endp def) (endp (cdr def))) "The function definition ~s is illegal." def)
 ;;     (when labels
 ;;       (cmpck (member (car def) fnames) "The function ~s was already defined." (car def))
 ;;       (push (car def) fnames))
-;;     (let ((fun (make-fun :name (car def) :src (si::block-lambda (cadr def) (car def) (cddr def))
-;; 			 :info (make-info :type nil :sp-change 1))))
+;;     (let* ((src (si::block-lambda (cadr def) (car def) (cddr def)))
+;; 	   (fun (make-fun :name (car def) :src src :info (make-info :type nil :sp-change 1) :fn (funid-to-fn src))))
 ;;       (push fun *funs*)
 ;;       (push (list fun (cdr def)) defs1)))
   
 ;;   (let ((*funs* (if labels *funs* ofuns)))
-;;     (mapc (lambda (x) 
-;;   	    (let ((r (c1function (list (fun-src (car x))) t)))
-;; 	      (setf (third r) (list (fun-name (car x))))
-;; 	      (setf (fun-prov (car x)) r))) defs1))
+;;     (mapc (lambda (x &aux (x (car x))) (setf (fun-prov x) (c1function (list (fun-src x)) t))) defs1))
+;; ;    (mapc (lambda (x) (setf (fun-denv (car x)) (current-env))) defs1))
   
 ;;   (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
   
@@ -224,42 +224,6 @@
 ;; 	  (mapcar 'fun-c1cb (remove-if-not 'fun-ref-ccb funs))
 ;; 	  body)))
 
-;; (defun c1flet-labels (labels args &aux body ss ts is other-decl (info (make-info))
-;; 			     defs1 fnames (ofuns *funs*) (*funs* *funs*))
-
-;;   (when (endp args) (too-few-args 'flet 1 0))
-
-;;   (dolist (def (car args) (setq defs1 (nreverse defs1)));FIXME double eval
-;;     (let* ((x (car def))(y (si::funid-sym x))) (unless (eq x y) (setq def (cons y (cdr def)))))
-;;     (cmpck (or (endp def) (endp (cdr def))) "The function definition ~s is illegal." def)
-;;     (when labels
-;;       (cmpck (member (car def) fnames) "The function ~s was already defined." (car def))
-;;       (push (car def) fnames))
-;;     (let ((fun (make-fun :name (car def) :src (si::block-lambda (cadr def) (car def) (cddr def))
-;; 			 :info (make-info :type nil :sp-change 1))))
-;;       (push fun *funs*)
-;;       (push (list fun (cdr def)) defs1)))
-  
-
-;;   (let ((*funs* (if labels *funs* ofuns)))
-;;     (mapc (lambda (x) 
-;; 	    (setf (fun-prov (car x)) (c1function (list (fun-src (car x))) t))) defs1))
-  
-;;   (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
-  
-;;   (c1add-globals ss)
-;;   (check-vdecl nil ts is)
-;;   (setq body (c1decl-body other-decl body))
-  
-;;   (mapc (lambda (x) (add-info info (fun-info (car x)))) defs1)
-;;   (add-info info (cadr body))
-;;   (setf (info-type info) (info-type (cadr body)))
-
-;;   (let ((funs (mapcar 'car defs1)))
-;;     (list (if labels 'labels 'flet) info 
-;; 	  (mapcar (lambda (x) (caddr (fun-c1 x))) (remove-if-not 'fun-ref funs))
-;; 	  (mapcar (lambda (x) (caddr (fun-c1 x))) (remove-if-not 'fun-ref-ccb funs))
-;; 	  body)))
 
 (defun c1flet (args)
   (c1flet-labels nil args))
@@ -368,9 +332,9 @@
 (defun c1local-fun (fname &optional cl &aux ccb inner)
   (macrolet ((pf (fun ref c1 b) 
 		 `(unless (,ref ,fun) 
-		    (setf (,ref ,fun) t
-			  (,c1 ,fun) (caddr (unprovfn (cddr (fun-prov ,fun)) ,b ,fun))))))
-;			  (,c1 ,fun) (caddr (unprovfn (list (list (fun-src ,fun)) (list (fun-denv ,fun))) ,b ,fun))))))
+		    (setf (,ref ,fun) t)
+		    (when (eq (car (,c1 ,fun)) 'provfn)
+		      (unprovfn (,c1 ,fun) ,b ,fun)))))
 	    (dolist (fun *funs*)
 	      (cond ((not (fun-p fun)) (setq ccb (or (eq fun 'cb) ccb) inner (or inner fun)))
 		    ((eq (fun-name fun) fname)

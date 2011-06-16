@@ -102,7 +102,7 @@
 
 (defun get-object-value (c1x)
   (when (and (eq 'location (car c1x)) (eq 'vv (caaddr c1x)))
-    (gethash (cadr (caddr c1x)) *objects-rev*)))
+    (values (gethash (cadr (caddr c1x)) *objects-rev*))))
 
 (defvar *gen-nil* (list (cons +gen+ (cons nil t))))
 (defvar *gen-t*   (list (cons +gen+ (cons t nil))))
@@ -482,7 +482,7 @@
   (declare (ignore fn))
   (let* ((tp (when (and args (eq (last *c1exit*) +fmla+)) #t(member t)))
 	 (arg (pop args))
-	 (tp (or tp (info-type (cadr (c1expr arg)))))
+	 (tp (or tp (info-type (cadr (c1expr arg)))));FIXME? double eval
 	 (atp (car (atomic-tp (type-and tp #t(not null))))))
     (when (and atp (c1constant-value atp nil))
       (c1expr `(if ,arg ',atp (or ,@args))))))

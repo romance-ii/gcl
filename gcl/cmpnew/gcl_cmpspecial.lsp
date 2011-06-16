@@ -34,8 +34,7 @@
 (defun c1quote (args)
   (when (endp args) (too-few-args 'quote 1 0))
   (unless (endp (cdr args)) (too-many-args 'quote 1 (length args)))
-  (c1constant-value (car args) t)
-  )
+  (c1constant-value (car args) t))
 
 (defun c1eval-when (args)
   (when (endp args) (too-few-args 'eval-when 1 0))
@@ -112,19 +111,30 @@
 (defvar *fun-ev-hash* (make-hash-table :test 'eq))
 (defvar *fun-tp-hash* (make-hash-table :test 'eq))
 
-(defun funid-to-fn1 (funid)
-  (cond ((symbolp funid)
-	 (cond ((local-fun-fn funid))
-	       ((when (fboundp funid) (symbol-function funid)))
-	       (funid (cmp-eval `(function (lambda (&rest r) 
-					     (declare (:dynamic-extent r))
-					     (apply ',funid r)))))))
-	((cmp-eval `(function ,funid)))))
+(defvar *fn-src-fn* (make-hash-table :test 'eq))
+;; (defun funid-to-fn1 (funid)
+;;   (cond ((symbolp funid)
+;; 	 (cond ((local-fun-fn funid))
+;; 	       ((when (fboundp funid) (symbol-function funid)))
+;; 	       (funid (cmp-eval `(function (lambda (&rest r) 
+;; 					     (declare (:dynamic-extent r))
+;; 					     (apply ',funid r)))))))
+;; 	((gethash funid *fn-src-fn*))
+;; 	((setf (gethash funid *fn-src-fn*) (cmp-eval `(function ,funid))))))
 
-(defun funid-to-fn (funid)
-  (let ((fn (funid-to-fn1 funid)))
-    (setf (gethash fn *fun-id-hash*) funid)
-    fn))
+;; (defun funid-to-fn1 (funid)
+;;   (cond ((symbolp funid)
+;; 	 (cond ((local-fun-fn funid))
+;; 	       ((when (fboundp funid) (symbol-function funid)))
+;; 	       (funid (cmp-eval `(function (lambda (&rest r) 
+;; 					     (declare (:dynamic-extent r))
+;; 					     (apply ',funid r)))))))
+;; 	((cmp-eval `(function ,funid)))))
+
+;; (defun funid-to-fn (funid)
+;;   (let ((fn (funid-to-fn1 funid)))
+;;     (setf (gethash fn *fun-id-hash*) funid)
+;;     fn))
 
 ;; (defun funid-to-fun1 (id)
 ;;   (cond ((let ((id (si::funid-sym-p id)))
@@ -155,7 +165,7 @@
 (defun coerce-to-funid (fn)
   (cond ((symbolp fn) fn)
 	((not (functionp fn)) nil)
-	((gethash fn *fun-id-hash*))
+	((fn-get fn 'id))
 	((si::function-name fn))
 	((portable-closure-src fn))))
 
@@ -210,9 +220,27 @@
 (defun fun-def-env (fn)
   (let ((fun (car (member-if (lambda (x) (when (fun-p x) (eq (fun-fn x) fn))) *funs*))))
     (if fun
-	(car (fourth (fun-prov fun)))
-;	(fun-denv fun)
+	(car (fourth (fun-c1 fun)))
       (current-env))))
+
+(defun mc nil (let (env)  (lambda nil env)))
+
+(defun afe (a f)
+  (push a (car (fn-env f)))
+  f)
+
+(defun mf (id)
+  (let* ((f (mc)))
+    (when (consp id) (setf (caddr (si::call f)) (compress-fle id nil nil)))
+    (afe (cons 'id id) f)
+    f))
+
+(defun fn-get (fn prop)
+  (cdr (assoc prop (car (fn-env fn)))))
+
+(defun funid-to-fn (funid)
+  (or (local-fun-fn funid) (gethash funid *fn-src-fn*) (setf (gethash funid *fn-src-fn*) (mf funid))))
+
 
 (defun c1function (args &optional (provisional *provisional-inline*) b f)
 
@@ -221,13 +249,16 @@
   
   (let* ((funid (si::funid (car args)))
 	 (fn (funid-to-fn funid))
-	 (tp (if fn (cmp-norm-tp `(member ,fn)) #tfunction))
+	 (tp (if fn (object-type fn) #tfunction))
 	 (info (make-info :type tp)))
-    (cond (provisional
-	   (or (gethash fn *fun-tp-hash*)
-	       (setf (gethash fn *fun-tp-hash*)
-		     (list 'provfn info args
-			   (setf (gethash fn *fun-ev-hash*) (list (current-env) (fun-def-env fn)))))))
+    (cond ((and provisional (not (when (symbolp funid) (not (local-fun-p funid)))));FIXME
+	   (let* ((df (fun-def-env fn))
+		  (ce (current-env))
+		  (res (list 'provfn info args (list ce df))))
+	     (afe (cons 'ce ce) fn)
+	     (afe (cons 'df df) fn)
+	     (afe (cons 'prov res) fn)
+	     res))
 	  ((symbolp funid)
 	   (let ((fd (c1local-fun funid t)))
 	     (unless fd
@@ -238,6 +269,32 @@
 	     (add-info info (cadadr r))
 	     (setf (info-flags info) (logandc2 (info-flags info) (iflags side-effects)))
 	     `(function ,info ,r))))))
+
+;; (defun c1function (args &optional (provisional *provisional-inline*) b f)
+
+;;   (when (endp args) (too-few-args 'function 1 0))
+;;   (unless (endp (cdr args)) (too-many-args 'function 1 (length args)))
+  
+;;   (let* ((funid (si::funid (car args)))
+;; 	 (fn (funid-to-fn funid))
+;; 	 (tp (if fn (object-type fn) #tfunction))
+;; ;	 (tp (if fn (cmp-norm-tp `(member ,fn)) #tfunction))
+;; 	 (info (make-info :type tp)))
+;;     (cond (provisional
+;; 	   (or ;(gethash fn *fun-tp-hash*)
+;; 	       (setf (gethash fn *fun-tp-hash*)
+;; 		     (list 'provfn info args
+;; 			   (setf (gethash fn *fun-ev-hash*) (list (current-env) (fun-def-env fn)))))))
+;; 	  ((symbolp funid)
+;; 	   (let ((fd (c1local-fun funid t)))
+;; 	     (unless fd
+;; 	       (setf (info-sp-change info) (if (null (get funid 'no-sp-change)) 1 0)))
+;; 	     (list 'function info (or fd (list 'call-global info funid)))))
+
+;; 	  ((let ((r (process-local-fun (or b 'cb) (or f (make-fun :name 'lambda :src funid :info (make-info :type '*))) funid tp)))
+;; 	     (add-info info (cadadr r))
+;; 	     (setf (info-flags info) (logandc2 (info-flags info) (iflags side-effects)))
+;; 	     `(function ,info ,r))))))
 
 ;; (defun c1function (args &optional (provisional *provisional-inline*) env)
 

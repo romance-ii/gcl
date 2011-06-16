@@ -629,7 +629,7 @@
 	    ((fboundp na)(return (mv-values na j)))))))
 
 (defun dbl-what-frame (ihs &aux (j *ihs-top*) (i 0) na)
-  (declare (fixnum ihs j i))
+  (declare (fixnum ihs j i) (ignorable na))
   (loop
    (mv-setq (na j)   (get-next-visible-fun j))
    (cond ((fb <= j ihs) (return i)))
@@ -651,7 +651,7 @@
 			  break-level   evalhook find-line-in-fun))
   (setf (get v 'dbl-invisible) t))
 
-(defun next-stack-frame (ihs  &aux line-info li i k na)
+(defun next-stack-frame (ihs &aux line-info li i k na)
   (cond
    ((fb < ihs *ihs-base*) (mv-values nil nil nil nil nil))
    (t (let (fun)
@@ -661,10 +661,10 @@
 	(cond
 	 ((and
 	   (setq line-info (get fun 'line-info))
-	   (do ((j (f + ihs 1) (f - j 1))
-		(form ))
+	   (do ((j (f + ihs 1) (f - j 1)))
+;		(form ))
 	       ((<= j i) nil)
-	     (setq form (ihs-fun j))
+;	     (setq form (ihs-fun j))
 	     (cond ((setq li (get-line-of-form (ihs-fun j) line-info))
 		    (return-from next-stack-frame 
 				 (mv-values

@@ -64,9 +64,16 @@
 ;; 	((side-effects-p f) nil)
 ;; 	(t)))
 
-(defun have-provfn (form)
+(defun have-provfn (form);FIXME provisional flag
   (cond ((atom form) (eq form 'provfn))
 	((or (have-provfn (car form)) (have-provfn (cdr form))))))
+
+(defun provisional-block-trim (n bp fs star)
+  (declare (ignorable n))
+  (when *provisional-inline*
+    (or bp
+	(when star
+	  (have-provfn (cdr fs))))))
 
 (defun trim-vars (vars forms body &optional star &aux (bp (have-provfn body)))
 
@@ -77,7 +84,7 @@
 	(cond ((and (eq (var-kind var) 'LEXICAL)
 		    (not (eq t (var-ref var))) ;;; This field may be IGNORE.
 		    (not (var-ref-ccb var))
-		    (unless bp (unless (when star (have-provfn fs)) t)));FIXME better way?
+		    (not (provisional-block-trim (var-name var) bp fs star)))
 	       (unless (ignorable-form form) 
 		 (let* ((*vars* (if nf (if star fv *vars*) av))
 			(f (if nf (car nf) body))
@@ -146,7 +153,7 @@
       (setf (var-type var) (var-mt var)));FIXME?
   
     (let* ((*vars* ov)
-	   (z (trim-vars vars forms body star))) 
+	   (z (trim-vars vars forms body star))) ;FIXME mi5 too
       (add-info info (cadr body))
       (setf (info-type info) (info-type (cadr body)))
       (unless (eq setjmps *setjmps*) (setf (info-volatile info) 1))

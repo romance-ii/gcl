@@ -307,7 +307,7 @@ funcall(object fun) {
   case t_ifun:
     {
       object x = fun->ifn.ifn_self;
-      if (x) { fun = x; break;}
+      if (x) { fun = x;  /* ihs_check;ihs_push(fun); */break;}
       else
 	FEundefined_function(fun);
     }

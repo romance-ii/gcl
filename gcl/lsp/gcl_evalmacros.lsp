@@ -469,7 +469,9 @@
  `(eval-when (compile eval load)
 	     ,@(mapcar #'(lambda (x) `(proclaim ',x)) l)))
 
-(defmacro lambda ( &rest l)   (declare (optimize (safety 2))) `(function (lambda ,@l)))
+(defmacro lambda (&whole l &rest args)
+  (declare (optimize (safety 2)) (ignore args))
+  `(function ,l))
 
 (defmacro memq (a b) `(member ,a ,b :test 'eq))
 

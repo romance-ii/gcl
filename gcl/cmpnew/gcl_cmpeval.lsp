@@ -46,10 +46,12 @@
   form)
 
 (defun c1expr** (form info)
-  (setq form (copy-list (c1expr form)))
-  (setf (cadr form) (copy-info (cadr form)))
-  (add-info (cadr form) info)
-  form)
+  (let* ((f (c1expr form))
+	 (c (or (eq f (c1nil)) (eq f (c1t))));FIXME centralize
+	 (f (if c (list* (car f) (cadr f) (cddr f)) f)));FIXME why add-info here?
+    (setf (cadr f) (copy-info (cadr f)))
+    (add-info (cadr f) info)
+    f))
 
 (defun readable-val (val)
   (cond ((not (arrayp val)))
@@ -60,14 +62,11 @@
 (defun setq-p (form l) 
   (cond ((eq form l)) ((atom form) nil) ((or (setq-p (car form) l) (setq-p (cdr form) l)))))
 
-(defun new-constant-value (res atp &aux (c (car res)) a)
+(defun new-constant-value (res atp &aux (c (car res)) a);FIXME expand, member lists, symbol in c1expr below
   (cond ((eq c 'location) res)
 	((functionp (setq a (car atp))) res)
-	((c1constant-value a nil))))
-
-;; (defun new-constant-value (res atp)
-;;   (if (eq (car res) 'location) res
-;;     (c1constant-value (car atp) nil)))
+	((sequencep a) res)
+	((c1constant-value a (when (symbolp a) (symbol-package a))))))
 
 (defun c1expr (form)
   (setq form (catch *cmperr-tag*
@@ -90,15 +89,16 @@
 			(unless (var-ref v) (setf (var-ref v) 'ignorable))
 			(let ((val (car atp))
 			      (*fn-val-list* (cons form *fn-val-list*)))
-			  (cond ((functionp val) (gethash val *fun-tp-hash*))
+			  (cond ((functionp val) (fn-get val 'prov))
+				((sequencep val) nil)
 				((c1constant-value val (when (symbolp val) (symbol-package val))))))))))
                  ((c1var form))))
           ((consp form)
            (let* ((fun (car form))
 		  (res (cond ((symbolp fun)
-			      (c1symbol-fun fun (cdr form)))
+			      (c1symbol-fun form))
 			     ((and (consp fun) (eq (car fun) 'lambda))
-			      (c1symbol-fun 'funcall form))
+			      (c1symbol-fun (cons 'funcall form)))
 			     ((and (consp fun) (eq (car fun) 'si:|#,|))
 			      (cmperr "Sharp-comma-macro was found in a bad place."))
 			     (t (cmperr "The function ~s is illegal." fun))))
@@ -1105,10 +1105,20 @@
 	   (multiple-value-bind (s k) (find-symbol (symbol-name n) 'lisp) 
 				(when (eq n s) (eq k :external))))
        (or (local-fun-src n)
-	   (gethash n *src-hash*) 
-	   (setf (gethash n *src-hash*)
-		 (let ((fn (when (fboundp n) (symbol-function n))))
-		   (when (functionp fn) (function-lambda-expression fn)))))))
+	   (let ((fn (when (fboundp n) (symbol-function n))))
+	     (when (functionp fn) (values (function-lambda-expression fn)))))))
+
+;; (defun inline-sym-src (n)
+;;   (and (inline-possible n)
+;;        (or (inline-asserted n)
+;; 	   (eq (symbol-package n) (load-time-value (find-package 'c)))
+;; 	   (multiple-value-bind (s k) (find-symbol (symbol-name n) 'lisp) 
+;; 				(when (eq n s) (eq k :external))))
+;;        (or (local-fun-src n)
+;; 	   (gethash n *src-hash*) 
+;; 	   (setf (gethash n *src-hash*)
+;; 		 (let ((fn (when (fboundp n) (symbol-function n))))
+;; 		   (when (functionp fn) (function-lambda-expression fn)))))))
 
 (defun inline-src (fn)
   (when (and (not *compiler-new-safety*) (> *speed* 0))
@@ -1156,8 +1166,17 @@
   (cadar (member-if (lambda (x) (and (eq (caar x) (car sir)) (cadddr x))) 
 		    (reverse *src-inline-recursion*))))
 
+(defun discrete-tp (tp)
+  (cond ((atomic-tp tp))
+	((and (consp tp) (eq (car tp) 'or)) (not (member-if-not 'discrete-tp (cdr tp))))))
+
 (defun bbump-tp (tp)
-  (if (type>= #tseqind tp) #tseqind (bump-tp tp)))
+  (cond ((type>= #tseqind tp) #tseqind)
+	((discrete-tp tp) tp)
+	((bump-tp tp))))
+
+;; (defun bbump-tp (tp)
+;;   (if (type>= #tseqind tp) #tseqind (bump-tp tp)))
 
 (defun prev-sir (sir &optional (s (append *src-inline-recursion* *prev-sri*) sp))
   (cond ;((not sp) (or (> (length s) 5) (prev-sir sir s)));FIXME
@@ -1166,7 +1185,7 @@
 	   (when (eq (car x) (car sir))
 	     (if (cdr x)
 		 (and (= (length (cdr x)) (length (cdr sir)));FIXME unroll strategy	       
-		      (every (lambda (x y) (eq (bbump-tp x) (bbump-tp y))) (cdr x) (cdr sir)))
+		      (every (lambda (x y) (type<= (bbump-tp x) (bbump-tp y))) (cdr x) (cdr sir)))
 	       (not (member-if 'atomic-tp (cdr sir)))))));FIXME all eq
 	((prev-sir sir s))))
 
@@ -1366,8 +1385,15 @@
   (if (functionp ob) ob (local-fun-fn ob)))
 
 (defun ff-env (ff)
-  (when ff
-    (gethash (coerce-to-local-fn (car (atomic-tp (info-type (cadr ff))))) *fun-ev-hash*)))
+  (let* ((fn (when ff (coerce-to-local-fn (car (atomic-tp (info-type (cadr ff))))))))
+    (when fn
+      (let* ((ce (fn-get fn 'ce))
+	     (df (fn-get fn 'df)))
+	(list ce df)))))
+
+;; (defun ff-env (ff)
+;;   (when ff
+;;     (values (gethash (coerce-to-local-fn (car (atomic-tp (info-type (cadr ff))))) *fun-ev-hash*))))
 
 ;; (defun coerce-to-local-fun (ob)
 ;;   (if (functionp ob) ob (local-fun-fun ob)))
@@ -1380,7 +1406,7 @@
 ;; 	(foo (gethash (car (atomic-tp (info-type (cadr ff)))) *fun-ev-hash*))))
 ;  (when (member (car ff) '(foo location)) (gethash (car (atomic-tp (info-type (cadr ff)))) *fun-ev-hash*)))
 
-(defun mi1a (fun args last info &aux (*in-inline* t))
+(defun mi1a (fun args last info &aux (*in-inline* t) *provisional-inline*)
 
   (let* ((fms (make-c1forms fun args last info))
 	 (af (member fun '(apply funcall)))
@@ -1389,7 +1415,7 @@
 	 (fun (if ff (coerce-ff ff) fun))
 	 (tp (type-from-args fun fms last info))
 	 (inl (when tp (mi2 fun args last fms (ff-env ff)))))
-    (uu (or inl (mi5 (or (when (symbolp fun) fun) ff) info fms last)))))
+    (or (uui inl) (mi5 (or (when (symbolp fun) fun) (uu ff)) info (uu fms) last))))
 
 ;; (defun mi1a (fun args last info &aux (*in-inline* t))
 
@@ -1403,17 +1429,34 @@
 ;;     (uu (or inl (mi5 (or (when (symbolp fun) fun) ff) info fms last)))))
 
 
-(defun unprovfn (f &optional b fun &aux (args (pop f)) (env (caar f)))
-  (under-env env (c1function args nil b fun)))
+(defun unprovfn (w &optional b fun &aux (f (cddr w)) (args (pop f)) (env (caar f)))
+  (let ((r (under-env env (c1function args nil b fun))))
+    (mapl (lambda (x y) (setf (car x) (car y))) w r)
+    (setf (cdddr w) nil)
+    w))
+
+;; (defun unprovfn (f &optional b fun &aux (args (pop f)) (env (caar f)))
+;;   (under-env env (c1function args nil b fun)))
 ;; (defun unfoo (f)
 ;;   (c1function (caddr f) nil (cadddr f)))
 
 (defun current-env nil (list *vars* *blocks* *tags* *funs*))
 
+(defun uui (inl &aux (m inl))
+  (when (eq (car m) 'inline)
+    (when (eq (car (setq m (car (last m)))) 'let*)
+      (uu (fourth m))))
+  inl)
+
 (defun uu (f)
   (cond ((atom f) f)
-	((eq (car f) 'provfn) (unprovfn (cddr f)))
-	((setf (car f) (uu (car f)) (cdr f) (uu (cdr f)) f f))))
+	((eq (car f) 'provfn) (unprovfn f))
+	(t (uu (car f)) (uu (cdr f)) f)))
+
+;; (defun uu (f)
+;;   (cond ((atom f) f)
+;; 	((eq (car f) 'provfn) (unprovfn (cddr f)))
+;; 	((setf (car f) (uu (car f)) (cdr f) (uu (cdr f)) f f))))
 ;; (defun uu (f)
 ;;   (cond ((atom f) f)
 ;; 	((eq (car f) 'foo) (unfoo f))
@@ -1435,12 +1478,18 @@
   (let* ((fun (local-fun-p id)))
     (when fun (fun-call fun))))
 
-(defun c1symbol-fun (fname args &aux fd)
+(defun cmp-expand-macro-w (fd x)
+  (macroexpand-helper
+   (and *record-call-info* (add-macro-callee (car x)))
+   `(funcall *macroexpand-hook* ',fd ',x ',*macrolet-env*)
+   x))
+
+(defun c1symbol-fun (whole &aux (fname (car whole)) (args (cdr whole)) fd)
   (values
    (cond ((setq fd (get fname 'c1special)) (funcall fd args))
 	 ((and (setq fd (get fname 'co1special)) (funcall fd fname args)))
 	 ((setq fd (caddar (member fname (cadr *macrolet-env*) :key 'car)))
-	  (c1expr (cmp-expand-macro fd fname args)));FIXME scope level with local funs
+	  (c1expr (cmp-expand-macro-w fd whole)));FIXME scope level with local funs
 	 ((local-fun-p fname) (mi1 'funcall (cons (list 'function fname) args)))
 	 ((let ((fn (get fname 'si::compiler-macro-prop)) (res (cons fname args)))
 	    (and fn
@@ -1485,7 +1534,7 @@
 	 ;;    nil))
 	 ;;continue
 	 ((setq fd (macro-function fname))
-	  (c1expr (cmp-expand-macro fd fname args)))
+	  (c1expr (cmp-expand-macro-w fd whole)))
 	 ((and (setq fd (get fname 'si::structure-access))
 	       (inline-possible fname)
               ;;; Structure hack.
@@ -1500,6 +1549,72 @@
 	 ((eq fname 'si:|#,|)
 	  (cmperr "Sharp-comma-macro was found in a bad place."))
 	 ((mi1 fname args)))))
+
+;; (defun c1symbol-fun (fname args &aux fd)
+;;   (values
+;;    (cond ((setq fd (get fname 'c1special)) (funcall fd args))
+;; 	 ((and (setq fd (get fname 'co1special)) (funcall fd fname args)))
+;; 	 ((setq fd (caddar (member fname (cadr *macrolet-env*) :key 'car)))
+;; 	  (c1expr (cmp-expand-macro fd fname args)));FIXME scope level with local funs
+;; 	 ((local-fun-p fname) (mi1 'funcall (cons (list 'function fname) args)))
+;; 	 ((let ((fn (get fname 'si::compiler-macro-prop)) (res (cons fname args)))
+;; 	    (and fn
+;; 		 (not (member fname *notinline*))
+;; 		 (let ((fd (funcall fn res nil)));(cmp-eval `(funcall ',fn ',res nil))))
+;; 		   (and (not (eq res fd))
+;; 			(c1expr fd))))))
+;; 	 ((when (and *compiler-auto-proclaim*
+;; ;		     (not *in-inline*)
+;; 		     (not (macro-function fname))
+;; 		     (not (member fname '(comment recur fun-fun fun-valp vfun-nargs)));FIXME
+;; 		     (member (first *current-form*) '(defun))
+;; 		     (symbolp (second *current-form*))
+;; 		     (symbol-package (second *current-form*)))
+;; 	    (let ((fname (or (cdr (assoc fname +cmp-fn-alist+)) fname)))
+;; 	      (pushnew (cons fname (export-sig (get-sig fname)))
+;; 		       *callees* :test 'eq :key 'car))
+;; 	    nil))
+;; ;	 ((and (get fname 'c1no-side-effects) 
+;; ;	       (not (member fname '(min max)));FIXME
+;; ;	       (not (member-if-not 'constantp args)))
+;; ;	  (c1expr `(quote ,(cmp-eval `(,fname ,@args)))))
+;; 	 ((and (setq fd (get fname 'co1))
+;; 	       (inline-possible fname)
+;; 	       (funcall fd fname args)))
+;; 	 ((and (setq fd (get fname 'c1)) (inline-possible fname))
+;; 	  (funcall fd args))
+;; 	 ((and (setq fd (get fname 'c1g)) (inline-possible fname))
+;; 	  (funcall fd fname args))
+;; 	 ((and (setq fd (get fname 'c1conditional))
+;; 	       (inline-possible fname)
+;; 	       (funcall (car fd) args))
+;; 	  (funcall (cdr fd) args))
+;; 	 ;; record the call info if we get to here
+;; 	 ;; ((progn
+;; 	 ;;    (and (eq (symbol-package fname) (symbol-package 'and))
+;; 	 ;; 	 (not (fboundp fname))
+;; 	 ;; 	 (cmpwarn "~A (in lisp package) is called as a function--not yet defined"
+;; 	 ;; 		  fname))
+;; 	 ;;    (and *record-call-info* (record-call-info 'record-call-info
+;; 	 ;; 					      fname))
+;; 	 ;;    nil))
+;; 	 ;;continue
+;; 	 ((setq fd (macro-function fname))
+;; 	  (c1expr (cmp-expand-macro fd fname args)))
+;; 	 ((and (setq fd (get fname 'si::structure-access))
+;; 	       (inline-possible fname)
+;;               ;;; Structure hack.
+;; 	       (consp fd)
+;; 	       (si:fixnump (cdr fd))
+;; 	       (not (endp args))
+;; 	       (endp (cdr args)))
+;; 	  (case (car fd)
+;; 		(vector (c1expr `(elt ,(car args) ,(cdr fd))))
+;; 		(list (c1expr `(si:list-nth ,(cdr fd) ,(car args))))
+;; 		(t (c1structure-ref1 (car args) (car fd) (cdr fd)))))
+;; 	 ((eq fname 'si:|#,|)
+;; 	  (cmperr "Sharp-comma-macro was found in a bad place."))
+;; 	 ((mi1 fname args)))))
 
 (defun replace-constant (lis &aux found tem)
   (do ((v lis (cdr v)))

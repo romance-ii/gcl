@@ -205,11 +205,17 @@
 	(kn (caar x))
 	((cadar x))))
 
-(defun ll-alist (l &aux k)
+(defun ll-alist (l &aux k (a "G"))
   (mapcan (lambda (x) 
-	    (cond ((member x lambda-list-keywords) (setq k x) nil)
+	    (cond ((member x lambda-list-keywords) (setq k x a (string (aref (symbol-name k) 1))) nil)
 		  (`(,@(when (and (consp x) (caddr x)) (list (kp (caddr x) (gensym "P"))))
-		     ,(kp (ll-sym x) (gensym (if k (string (aref (symbol-name k) 1)) "G"))))))) l))
+		     ,(kp (ll-sym x) (gensym a)))))) l))
+
+;; (defun ll-alist (l &aux k)
+;;   (mapcan (lambda (x) 
+;; 	    (cond ((member x lambda-list-keywords) (setq k x) nil)
+;; 		  (`(,@(when (and (consp x) (caddr x)) (list (kp (caddr x) (gensym "P"))))
+;; 		     ,(kp (ll-sym x) (gensym (if k (string (aref (symbol-name k) 1)) "G"))))))) l))
 
 (defun name-keys (l &aux k)
   (mapcar (lambda (x)
@@ -223,7 +229,7 @@
 
 
 (defun blla-recur (tag ll args last) 
-  (let* (;(ll (ldiff ll (member '&aux ll)));FIXME ? impossible check?
+  (let* ((ll (ldiff ll (member '&aux ll)));FIXME ? impossible check?
 	 (ll (name-keys ll))
 	 (s (ll-alist ll))
 	 (sl (sublis s ll)))

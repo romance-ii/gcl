@@ -137,8 +137,8 @@
 
   (loop 
 
-;   (clrhash *sigs*)
-   (purge-member-types)
+   (clrhash *sigs*)
+;   (purge-member-types)
 
    (do nil ((not (eq (setq tem (let (*new-sigs-in-file*) (apply 'compile-file1 filename args))) 'again))))
 
@@ -464,7 +464,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	(t (error "can't compile ~a" name))))
 
 
-(defun disassemble (name &optional (asm t) &aux tem)
+(defun disassemble (name &optional (asm t) file &aux tem)
   (check-type name (or function function-identifier))
   (cond ((and (consp name)
 	      (eq (car name) 'lambda))
@@ -472,10 +472,10 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	   (remprop 'cmp-anon l))
 ;	 (remhash 'cmp-anon si::*call-hash-table*)
 	 (eval `(defun cmp-anon ,@ (cdr name)))
-	 (disassemble 'cmp-anon asm))
+	 (disassemble 'cmp-anon asm file))
 	((not(symbolp name)) (princ "Not a lambda or a name") nil)
 	((setq tem (get-named-form name))
-	 (let ((gaz (gazonk-name)))
+	 (let ((gaz (gazonk-name))(*compiler-compile* (unless file tem)))
 	   (with-open-file
 	     (st gaz :direction :output)
 	     (prin1-cmp tem st))
