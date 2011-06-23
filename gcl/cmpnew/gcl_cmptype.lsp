@@ -134,7 +134,7 @@
   (let ((x (or (pop *tmpsyms*) (gensym))))
     (setf (symbol-plist x) '(tmp t))
     x))
-(defconstant +tmpsyms+ (let ((*gensym-counter* 0) r) (dotimes (i 1000 r) (push (tmpsym) r))))
+(defconstant +tmpsyms+ (let ((*gensym-counter* 0)) (mapl (lambda (x) (rplaca x (tmpsym))) (make-list 1000)))
 
 
 (let ((p (find-package "DEFPACKAGE")))
