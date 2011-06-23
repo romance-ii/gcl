@@ -11,8 +11,8 @@
 	     (((si::function-identifier) boolean) . fboundp)
 	     (((structure) structure) . si::structure-def)
 ;	     (((t) t) . si::type-of-c)
-	     (((list) t) . si::cons-car)
-	     (((list) t) . si::cons-cdr)
+;	     (((list) t) . si::cons-car)
+;	     (((list) t) . si::cons-cdr)
 	     (((t t) cons) . cons)
 	     (((fixnum) t) . si::nani)
 	     (((t) fixnum) . si::address);FIXME
@@ -22,25 +22,25 @@
 	     (((number number) number) . si::number-minus)
 	     (((number number) number) . si::number-times)
 	     (((number number) number) . si::number-divide)
-	     (((cons t) cons) . rplaca)
-	     (((cons t) cons) . rplacd)
-	     (((symbol) boolean) . boundp)
-	     (((symbol) (or null package)) . symbol-package)
-	     (((symbol) string) . symbol-name)
-	     (((symbol) t) . symbol-value)
+;	     (((cons t) cons) . rplaca)
+;	     (((cons t) cons) . rplacd)
+;	     (((symbol) boolean) . boundp)
+;	     (((symbol) (or null package)) . symbol-package)
+;	     (((symbol) string) . symbol-name)
+;	     (((symbol) t) . symbol-value)
 	     (((symbol t t) t) . si::sputprop)
-	     (((symbol) (or cons function)) . symbol-function);fixme
+;	     (((symbol) (or cons function)) . symbol-function);fixme
 	     (((array rnkind)  seqind) . array-dimension)
 	     (((array)  seqind) . array-total-size)
 	     (((array)  symbol) . array-element-type)
 	     (((array)  rnkind) . array-rank)
 	     (((vector) seqind) . si::fill-pointer-internal)
 	     (((string) symbol) . make-symbol)
-	     (((integer integer) integer) . ash)
+;	     (((integer integer) integer) . ash)
 	     (((float) (returns-exactly (integer 0) fixnum (member 1 -1))) . integer-decode-float);fixme
-	     (((t *) nil) . error);fixme
+;	     (((t *) nil) . error);fixme
 	     (((*) string) . si::string-concatenate)))
-  (si::add-hash (cdr l) (car l) nil nil nil))
+  (si::add-hash (cdr l) (export-sig (car l)) nil nil nil))
 
 ;; ;(DEFSYSFUN 'symbol-name "Lsymbol_name" '(T) 'string NIL NIL) 
 ;; ;(DEFSYSFUN 'si::sputprop "sputprop" '(T T T) 'T NIL NIL) 

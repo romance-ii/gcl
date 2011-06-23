@@ -278,6 +278,7 @@
 
 (defvar *mvb-vals* nil)
 
+(defvar *vals-set* nil)
 (defun c2multiple-value-bind (vars init-form body
 				   &aux (labels nil)
 				   (*unwind-exit* *unwind-exit*)
@@ -290,7 +291,8 @@
 	 (nv (1- (length vars)))
 	 (ns1 (stack-space init-form))
 	 (ns (max nv (or ns1 (max-stack-space init-form))))
-	 (*mvb-vals* t))
+	 (*mvb-vals* t)
+	 *vals-set*)
     (setf (var-kind mv) (c2var-kind mv) (var-space mv) nv (var-known-init mv) (or ns1 -1))
     (setq lbs
 	  (mapcar (lambda (x)
@@ -299,7 +301,7 @@
 				     (var-loc x) (cs-push (if f (var-type x) t) t))
 			(setf (var-ref x) (vs-push) x (cs-push (if f (var-type x) t) t)))))
 		  vars))
-    (wt-nl "{")
+;    (wt-nl "{")
 ;    (wt-nl "int vals_set=0;")
     (when vars
 	(wt-nl "register " (rep-type (var-type (car vars))) " V" (car lbs) ";")
@@ -309,7 +311,7 @@
     (dotimes (i (1+ (length vars))) (push (next-label) labels))
     
     (wt-nl "{")
-    (wt-nl "int vals_set=0;")
+    ;; (wt-nl "int vals_set=0;")
     (let ((*mv-var* mv)
 	  (*value-to-go* (or (mapcar (lambda (x) (list 'cvar x)) lbs) 'trash))
 	  *top-data*)
@@ -318,27 +320,29 @@
     
     (and *record-call-info* (record-call-info nil (car top-data)))
 
-    (wt-nl "if (!vals_set) {")
+    (when lbs (unless *vals-set* (baboon)))
 
-    (setq labels (nreverse labels))
-    (do ((lb lbs (cdr lb))
-	 (lab labels (cdr lab)))
-	((endp lb)(reset-top)(wt-go (car lab)))
-      (wt-nl "if(vs_base>=vs_top){")
-      (reset-top)
-      (wt-go (car lab)) 
-      (wt "}")
-      (set-cvar '(vs-base 0) (car lb))
-      (when (cdr lb)
-	(wt-nl "vs_base++;")))
+    ;; (wt-nl "if (!vals_set) {")
+
+    ;; (setq labels (nreverse labels))
+    ;; (do ((lb lbs (cdr lb))
+    ;; 	 (lab labels (cdr lab)))
+    ;; 	((endp lb)(reset-top)(wt-go (car lab)))
+    ;;   (wt-nl "if(vs_base>=vs_top){")
+    ;;   (reset-top)
+    ;;   (wt-go (car lab)) 
+    ;;   (wt "}")
+    ;;   (set-cvar '(vs-base 0) (car lb))
+    ;;   (when (cdr lb)
+    ;; 	(wt-nl "vs_base++;")))
 	   
-    (do ((lb lbs (cdr lb))
-	 (lab labels (cdr lab)))
-	((endp lb)(wt-label (car lab)))
-      (wt-label (car lab))
-      (set-cvar nil (car lb)))
+    ;; (do ((lb lbs (cdr lb))
+    ;; 	 (lab labels (cdr lab)))
+    ;; 	((endp lb)(wt-label (car lab)))
+    ;;   (wt-label (car lab))
+    ;;   (set-cvar nil (car lb)))
 
-    (wt-nl "}}")
+    ;; (wt-nl "}}")
 
     (do ((vs vars (cdr vs)) (lb lbs (cdr lb)))
 	((endp vs))
@@ -349,3 +353,75 @@
   (mapc (lambda (x) (wt-nl "#undef V" x)) (cdr lbs))
   (wt-nl "")
   (wt-nl "}"))
+
+;; (defun c2multiple-value-bind (vars init-form body
+;; 				   &aux (labels nil)
+;; 				   (*unwind-exit* *unwind-exit*)
+;; 				   (*vs* *vs*) (*clink* *clink*) (*ccb-vs* *ccb-vs*)
+;; 				   top-data lbs)
+
+;;   (multiple-value-check vars init-form)
+
+;;   (let* ((mv (make-var :type #tfixnum :kind 'lexical :loc (cs-push #tfixnum t)))
+;; 	 (nv (1- (length vars)))
+;; 	 (ns1 (stack-space init-form))
+;; 	 (ns (max nv (or ns1 (max-stack-space init-form))))
+;; 	 (*mvb-vals* t))
+;;     (setf (var-kind mv) (c2var-kind mv) (var-space mv) nv (var-known-init mv) (or ns1 -1))
+;;     (setq lbs
+;; 	  (mapcar (lambda (x)
+;; 		    (let ((kind (c2var-kind x))(f (eq x (car vars))))
+;; 		      (if kind (setf (var-kind x) (if f kind 'object)
+;; 				     (var-loc x) (cs-push (if f (var-type x) t) t))
+;; 			(setf (var-ref x) (vs-push) x (cs-push (if f (var-type x) t) t)))))
+;; 		  vars))
+;;     (wt-nl "{")
+;; ;    (wt-nl "int vals_set=0;")
+;;     (when vars
+;; 	(wt-nl "register " (rep-type (var-type (car vars))) " V" (car lbs) ";")
+;; 	(wt-nl "object V" (var-loc mv) "[" ns "];"))
+;;     (let ((i -1)) (mapc (lambda (x) (wt-nl "#define V" x " V" (var-loc mv) "[" (incf i) "]")) (cdr lbs)))
+;;     (wt-nl);FIXME
+;;     (dotimes (i (1+ (length vars))) (push (next-label) labels))
+    
+;;     (wt-nl "{")
+;;     (wt-nl "int vals_set=0;")
+;;     (let ((*mv-var* mv)
+;; 	  (*value-to-go* (or (mapcar (lambda (x) (list 'cvar x)) lbs) 'trash))
+;; 	  *top-data*)
+;;       (c2expr* init-form)
+;;       (setq top-data *top-data*))
+    
+;;     (and *record-call-info* (record-call-info nil (car top-data)))
+
+;;     (wt-nl "if (!vals_set) {")
+
+;;     (setq labels (nreverse labels))
+;;     (do ((lb lbs (cdr lb))
+;; 	 (lab labels (cdr lab)))
+;; 	((endp lb)(reset-top)(wt-go (car lab)))
+;;       (wt-nl "if(vs_base>=vs_top){")
+;;       (reset-top)
+;;       (wt-go (car lab)) 
+;;       (wt "}")
+;;       (set-cvar '(vs-base 0) (car lb))
+;;       (when (cdr lb)
+;; 	(wt-nl "vs_base++;")))
+	   
+;;     (do ((lb lbs (cdr lb))
+;; 	 (lab labels (cdr lab)))
+;; 	((endp lb)(wt-label (car lab)))
+;;       (wt-label (car lab))
+;;       (set-cvar nil (car lb)))
+
+;;     (wt-nl "}}")
+
+;;     (do ((vs vars (cdr vs)) (lb lbs (cdr lb)))
+;; 	((endp vs))
+;; 	(when (member (var-kind (car vs)) '(lexical special down))
+;; 	  (c2bind-loc (car vs) (list 'cvar (car lb))))))
+  
+;;   (c2expr body)
+;;   (mapc (lambda (x) (wt-nl "#undef V" x)) (cdr lbs))
+;;   (wt-nl "")
+;;   (wt-nl "}"))

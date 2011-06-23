@@ -588,7 +588,6 @@
 	       (unless (<= (length b) 3)
 		 (cmperr "Unknown class declaration: ~s" b))
 	       (if (member (cadr b) auxs) (push `(declare ,b) ad) (push `(declare ,b) dd)))
-	      ((eq (car b) 'special) (push `(declare ,b) ad))
 	      ((multiple-value-bind
 		(tt q)
 		(list-split (cdr b) auxs)
@@ -597,6 +596,25 @@
 		    (push `(declare (,@z ,@tt)) ad))
 		  (when q
 		    (push `(declare (,@z ,@q)) dd))))))))))
+
+;; (defun split-decls (auxs decls &aux ad dd)
+;;   (dolist (l decls (list (nreverse ad) (nreverse dd)))
+;;     (dolist (bb (cdr l))
+;;       (let ((b (if (eq (car bb) 'type) (cdr bb) bb)))
+;; 	(cond ((eq (car b) 'optimize) (push `(declare ,b) dd))
+;; 	      ((eq (car b) 'class)
+;; 	       (unless (<= (length b) 3)
+;; 		 (cmperr "Unknown class declaration: ~s" b))
+;; 	       (if (member (cadr b) auxs) (push `(declare ,b) ad) (push `(declare ,b) dd)))
+;; 	      ((eq (car b) 'special) (push `(declare ,b) ad))
+;; 	      ((multiple-value-bind
+;; 		(tt q)
+;; 		(list-split (cdr b) auxs)
+;; 		(let ((z (if (eq b bb) (list (car bb)) (list (car bb) (cadr bb)))))
+;; 		  (when tt
+;; 		    (push `(declare (,@z ,@tt)) ad))
+;; 		  (when q
+;; 		    (push `(declare (,@z ,@q)) dd))))))))))
 
 (defun split-ctps (auxs ctps)
   (let (ad dd)
@@ -687,7 +705,7 @@
 	 (args (ttl-tag-src args tag nm))
 	 (args (cdr args))
 	 (ll (pop args))
-	 (opts (member-if (lambda (x) (member x '(&optional &rest &key))) ll)))
+	 (opts (member-if (lambda (x) (member x '(&optional &rest &key &aux))) ll)));FIXME centralize
     (multiple-value-bind
      (doc decls ctps args)
      (parse-body-header args)
@@ -695,20 +713,18 @@
 	    (dl (decl-safety decls))
 	    (sl (effective-safety decls))
 	    (s (> sl 0))
-	    (rd (split-decls regs decls))
-	    (od (cadr rd))
-	    (rd (car rd))
-	    (rc (split-ctps regs ctps))
-	    (oc (cadr rc))
-	    (rc (car rc))
-	    (oc (append (when s rc) oc))
+	    (od (split-decls regs decls))
+	    (rd (pop od))
+	    (oc (split-ctps regs ctps))
+	    (rc (pop oc))
+	    (oc (append (when s rc) (car oc)))
 	    (rc (mapcar (lambda (x) `(declare (,@(when s `(hint)) ,(caddr x) ,(cadr x)))) rc))
 	    (rc (cons `(declare (optimize (safety ,dl))) rc))
 	    (narg (when opts +nargs+))
 	    (nr (length regs))
 	    (regs (or regs (when narg (list +first+))))
 	    (m (min 63 (mll ll)))
-	    (args `(,@od ,@oc (bind-reg-clv) ,@args))
+	    (args `(,@(car od) ,@oc (bind-reg-clv) ,@args))
 	    (opts (if narg (cons narg opts) opts))
 	    (args (if narg `((declare ((integer ,(- m) ,m) ,narg)) ,@args) args))
 	    (opts (cons +fun+ (cons +mv+ opts)))
@@ -718,6 +734,43 @@
        `(,nm ,regs 
 	     ,@(when doc `(,doc))
 	     ,@rd ,@rc ,@bl)))))
+
+;; (defun new-defun-args (args &optional (tag (tmpsym)))
+;;   (let* ((nm (si::funid-to-sym (car args)))
+;; 	 (args (ttl-tag-src args tag nm))
+;; 	 (args (cdr args))
+;; 	 (ll (pop args))
+;; 	 (opts (member-if (lambda (x) (member x '(&optional &rest &key))) ll)))
+;;     (multiple-value-bind
+;;      (doc decls ctps args)
+;;      (parse-body-header args)
+;;      (let* ((regs (ldiff ll opts))
+;; 	    (dl (decl-safety decls))
+;; 	    (sl (effective-safety decls))
+;; 	    (s (> sl 0))
+;; 	    (rd (split-decls regs decls))
+;; 	    (od (cadr rd))
+;; 	    (rd (car rd))
+;; 	    (rc (split-ctps regs ctps))
+;; 	    (oc (cadr rc))
+;; 	    (rc (car rc))
+;; 	    (oc (append (when s rc) oc))
+;; 	    (rc (mapcar (lambda (x) `(declare (,@(when s `(hint)) ,(caddr x) ,(cadr x)))) rc))
+;; 	    (rc (cons `(declare (optimize (safety ,dl))) rc))
+;; 	    (narg (when opts +nargs+))
+;; 	    (nr (length regs))
+;; 	    (regs (or regs (when narg (list +first+))))
+;; 	    (m (min 63 (mll ll)))
+;; 	    (args `(,@od ,@oc (bind-reg-clv) ,@args))
+;; 	    (opts (if narg (cons narg opts) opts))
+;; 	    (args (if narg `((declare ((integer ,(- m) ,m) ,narg)) ,@args) args))
+;; 	    (opts (cons +fun+ (cons +mv+ opts)))
+;; 	    (args `((declare (ignorable ,+fun+ ,+mv+) (fixnum ,+mv+)) ,@args))
+;; 	    (vals `((fun-fun) (fun-valp) ,@(when narg `((vfun-nargs)))));FIXME
+;; 	    (bl (list (blla opts vals nil args narg nr (when (eq (car regs) +first+) +first+)))))
+;;        `(,nm ,regs 
+;; 	     ,@(when doc `(,doc))
+;; 	     ,@rd ,@rc ,@bl)))))
     
 (defun c1va-pop (args)
   (declare (ignore args))
@@ -1261,10 +1314,10 @@
 ;;   (when *do-tail-recursion*
 ;;     (cons fname (append (if mv-var (cdr (car ll)) (car ll)) (ll-optionals ll) (list (ll-rest ll)) (ll-keywords ll)))))
 
-(defun tail-recursion-info (fname mv-var l)
-  (declare (ignore mv-var))
-  (when *do-tail-recursion*
-    (cons fname (find-ttl-vars l))))
+;; (defun tail-recursion-info (fname mv-var l)
+;;   (declare (ignore mv-var))
+;;   (when *do-tail-recursion*
+;;     (cons fname (find-ttl-vars l))))
 
 
 (defun t3defun-local-entry (fname cfun lambda-expr sp inline-info
@@ -1294,9 +1347,9 @@
   (wt-nl1 "static " (declaration-type (rep-type (caddr inline-info))) (c-function-name "LI" cfun fname) "(")
   (wt-requireds requireds (cadr inline-info) nil nargs)
   (wt-h ";")
-  (let* ((cm *reservation-cmacro*)
-	 (tri (tail-recursion-info fname nil lambda-expr))
-	 (*unwind-exit* (if tri (cons 'tail-recursion-mark *unwind-exit*) *unwind-exit*)))
+  (let* ((cm *reservation-cmacro*))
+	 ;; (tri (tail-recursion-info fname nil lambda-expr))
+	 ;; (*unwind-exit* (if tri (cons 'tail-recursion-mark *unwind-exit*) *unwind-exit*)))
     (wt-nl1 "{	")
     (wt " VMB" cm " VMS" cm " VMV" cm)
     (when nargs (wt-nl "va_list ap;")(wt-nl "va_start(ap,V" (var-loc nargs) ");"))
@@ -2026,9 +2079,9 @@
    (when (eq (car (caddr (cddr lambda-expr))) 'decl-body)
      (local-compile-decls (caddr (caddr (cddr lambda-expr)))))
    (wt-nl1 "{	")
-   (let* ((cm *reservation-cmacro*)
-	  (tri (tail-recursion-info (fun-name fun) nil lambda-expr))
-	  (*unwind-exit* (if tri (cons 'tail-recursion-mark *unwind-exit*) *unwind-exit*)))
+   (let* ((cm *reservation-cmacro*))
+	  ;; (tri (tail-recursion-info (fun-name fun) nil lambda-expr))
+	  ;; (*unwind-exit* (if tri (cons 'tail-recursion-mark *unwind-exit*) *unwind-exit*)))
      (wt-nl "VMB" cm " VMS" cm " VMV" cm)
      (when nargs (wt-nl "va_list ap;")(wt-nl "va_start(ap,V" (var-loc nargs) ");"))
      (if *safe-compile*

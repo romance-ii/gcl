@@ -21,7 +21,7 @@
 	     (defstruct (call (:type list)
 			      (:constructor make-call))
 			      sig callees src file props name)
-	     (defvar *needs-recompile* (make-array 10 :fill-pointer 0 :adjustable t))
+	     (defvar *needs-recompile* nil);(make-array 10 :fill-pointer 0 :adjustable t))
 	     (defvar *us* nil)
 	     (defvar *cmr* nil)
 	     (defvar *rfns* nil)
@@ -99,7 +99,7 @@
 
 	   (let ((new (call code t :sig (when h (call-sig h)))))
 	     
-	     (let ((nr (find code *needs-recompile* :key (lambda (x) (symbol-to-function x)))))
+	     (let ((nr (member code *needs-recompile* :key (lambda (x) (symbol-to-function x)))))
 	       (when nr (add-recompile sym (cadr nr) (caddr nr) (cadddr nr))))
 	     (when h
 	       (let ((ns (call-sig new)))
@@ -111,20 +111,16 @@
 	       (pushnew sym (get l 'callers) :test 'eq)))))))
 
 (defun add-recompile (fn why assumed-sig actual-sig)
-  (unless (find fn *needs-recompile* :key 'car)
-    (vector-push-extend (list fn why assumed-sig actual-sig) *needs-recompile*)
-    nil))
+  (let* ((q (car (member fn *needs-recompile* :key 'car))))
+    (if q
+	(setf (cadr q) why (caddr q) assumed-sig (cadddr q) actual-sig)
+      (push (list fn  why assumed-sig actual-sig) *needs-recompile*))))
 
 (defun remove-recompile (fn)
-  (let ((p (position fn *needs-recompile* :key 'car)))
-    (when p
-      (decf (fill-pointer *needs-recompile*))
-      (do ((i p (1+ i))) ((>= i (length *needs-recompile*)))
-	(setf (aref *needs-recompile* i) (aref *needs-recompile* (1+ i)))))))
+  (setq *needs-recompile* (remove fn *needs-recompile* :key 'car)))
 
 (defun clr-call nil 
-  (setf (fill-pointer *needs-recompile*) 0))
-
+  (setq *needs-recompile* nil))
 
 (defun same-file-all-callees (x y fn)
 ;  (let ((z (remove-if-not (lambda (x) (equal (file x) fn)) (callees x)))) ;FIXME remove inline
@@ -330,7 +326,10 @@
 
       (do nil ((and (not *cmr*) (= (length *needs-recompile*) 0)) (setq rfns (nreverse rfns)))
 
-	  (when (= 0 (length *needs-recompile*)) (do nil ((not *cmr*)) (convert-to-state (pop *cmr*))))
+	  (when (= 0 (length *needs-recompile*)) 
+	    (if (and pnp (not pn)) 
+		(setq *cmr* nil);no new file in which to place the generated state functions
+	      (do nil ((not *cmr*)) (convert-to-state (pop *cmr*)))))
 
 	  (unless (= 0 (length *needs-recompile*))
 
@@ -345,10 +344,11 @@
 	    (format t "Pass1 signature discovery on ~s functions ...~%" (length *needs-recompile*))
 
 	    (let (fns)
-	      (dotimes (i (length *needs-recompile*)) 
-		(let ((fn (car (aref *needs-recompile* i))))
-		(pushnew fn rfns)
-		(push fn fns)))
+
+	      (dolist (i *needs-recompile*)
+		(let ((fn (car i)))
+		  (pushnew fn rfns)
+		  (push fn fns)))
 
 	      (let ((*sig-discovery* t)(*compile-verbose* nil)) 
 		(dolist (fn (nreverse fns))
@@ -356,7 +356,7 @@
 
       (if (and pnp (not pn))
 
-	  (let (files)
+	  (let (files);FIXME mutual-recursion fns somewhere
 	    (dolist (l rfns)
 	      (let ((file (file l))) (when file (pushnew file files :test 'string=))))
 	    (when files (format t "Updating original source files ~s~%" files))

@@ -110,7 +110,7 @@ typedef double complex dcomplex;
 
 /* #define immnum_comp(x,y,c) (fimf(((ufixnum)x)&((ufixnum)y)) ? (x c y) : (number_compare(x,y) c 0)) */
 #define immnum_comp(x,y,c) ({register object _x=x,_y=y;\
-			      fimf(((ufixnum)_x)&((ufixnum)_y)) ? (_x c _y) : (number_compare(_x,_y) c 0);})
+      fimf(((ufixnum)_x)&((ufixnum)_y)) ? (_x c _y) : (number_compare(_x,_y) c 0);})/*FIXME? comparisons with marked immfix*/
 #define immnum_lt(x,y) immnum_comp(x,y,<)
 #define immnum_le(x,y) immnum_comp(x,y,<=)
 #define immnum_eq(x,y) immnum_comp(x,y,==)

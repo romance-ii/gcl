@@ -329,16 +329,16 @@
 ;; 	   (when h2 (setf (gethash t1 h2) q))
 ;; 	   q))))
 
-(defun type-or1 (t1 t2 &aux h1 h2 r f c1 c2);m1 m2
-  (flet ((to (t1 t2 &aux (x (uniq-tp-from-stack `or t1 t2))) (type-or1-int t1 t2 x)))
+(defun type-or1 (t1 t2 &aux h1 h2 r f c1 c2 m1 m2);FIXME think about atomic types
+  (flet ((to (t1 t2 &aux (x (uniq-tp-from-stack `or t1 t2))) (cmp-norm-tp x)));(type-or1-int t1 t2 x)))
 	(cond ((eq t1 t2) t2);accelerator
 	      ((eq t1 '*) t1);accelerator
 	      ((eq t2 '*) t2);accelerator
 ;	      ((when (setq m1 (atomic-tp t1) c1 (car m1) m2 (atomic-tp t2) c2 (car m2)) nil))
-	      ((when (setq c1 (car (atomic-tp t1)) c2 (car (atomic-tp t2))) nil))
-	      ((and c1 c2) (if (eql c1 c2) t2 (to t1 t2)))
-	      (c2 (if (typep c2 t1) t1 (to t1 t2)))
-	      (c1 (if (typep c1 t2) t2 (to t1 t2)))
+	      ((when (setq m1 (atomic-tp t1) c1 (car m1) m2 (atomic-tp t2) c2 (car m2)) nil))
+	      ((and m1 m2) (if (eql c1 c2) t2 (to t1 t2)))
+	      (m2 (if (typep c2 t1) t1 (to t1 t2)))
+	      (m1 (if (typep c1 t2) t2 (to t1 t2)))
 	      ((when (setq h1 (gethash t1 *or-tp-hash*)) (multiple-value-setq (r f) (gethash t2 h1)) f) r)
 	      ((when (setq h2 (gethash t2 *or-tp-hash*)) (multiple-value-setq (r f) (gethash t1 h2)) f) r)
 	      ((let ((q (let ((x (uniq-tp-from-stack `or t1 t2)))
@@ -396,8 +396,8 @@
 ;;; Check if THING is an object of the type TYPE.
 ;;; Depends on the implementation of TYPE-OF.
 
-(defvar *car-limit* 0);-1);1)
-(defvar *cdr-limit* 5);-1);5)
+(defvar *car-limit* -1);1)
+(defvar *cdr-limit* -1);5)
 (defun cons-tp-limit (x i j)
   (declare (seqind i j))
   (cond ((> i *car-limit*) nil)
@@ -413,22 +413,20 @@
 	((not (eq (car x) 'cons)))
 	((and (cons-tp-limit-tp (cadr x) (1+ i) 0) (cons-tp-limit-tp (caddr x) i (1+ j))))))
 
-(defvar *oth* (make-hash-table :test 'eql))
-(defun othf (thing tp)
-  (setf (gethash thing *oth*) (cmp-norm-tp tp)))
-(declaim (inline othf))
+;; (defvar *oth* (make-hash-table :test 'eql))
+;; (defun othf (thing tp)
+;;   (setf (gethash thing *oth*) (cmp-norm-tp tp)))
+;; (declaim (inline othf))
 
 (defun object-type (thing); &optional lim
-  (or (gethash thing *oth*);FIXME necessary?
-      (setf (gethash thing *oth*)
-	    (typecase
-	     thing
-	     (integer `(integer ,thing ,thing))
-	     (short-float `(short-float ,thing ,thing))
-	     (long-float `(long-float ,thing ,thing))
-	     (null #tnull)
-	     ((or symbol character complex cons function) `(member ,thing))
-	     (otherwise (cmp-norm-tp (type-of thing)))))))
+  (typecase
+   thing
+   (integer `(integer ,thing ,thing))
+   (short-float `(short-float ,thing ,thing))
+   (long-float `(long-float ,thing ,thing))
+   (null #tnull)
+   ((or symbol character complex cons function) `(member ,thing))
+   (otherwise (cmp-norm-tp (type-of thing)))))
 
 ;; (defun object-type (thing); &optional lim
 ;;   (typecase
@@ -487,7 +485,7 @@
 				  null 
 				  boolean keyword symbol 
 				  proper-cons cons proper-list list 
-				  simple-vector string (vector fixnum) vector
+				  simple-vector string (vector fixnum) vector array
 				  proper-sequence sequence
 ;				  (integer 0 0) (integer 1 1) 
 				  bit rnkind non-negative-char unsigned-char signed-char char
@@ -508,7 +506,7 @@
 				  (real * (0.0)) (real (0.0)) (real * 0.0) (real 0.0) real
 				  fcomplex dcomplex (complex integer) (complex ratio) complex
 				  number
-				  character hash-table function
+				  character structure package hash-table function
 				  t))
 (defconstant +useful-types+ (mapcar (lambda (x) (load-time-value (cmp-norm-tp x))) +useful-type-list+))
 (mapc (lambda (x) 
@@ -791,7 +789,7 @@
 	  ((and (consp t1) (eq (car t1) 'cons)) (caddr t1))
 	  ((let ((a1 (atomic-tp t1))) (when a1 (object-type (cdar a1)))))
 	  ((type>= #tproper-list t1) #tproper-list))))
-(si::putprop 'si::cons-cdr 'cdr-propagator 'type-propagator)
+(si::putprop 'cdr 'cdr-propagator 'type-propagator)
 
 (defun make-list-propagator (f t1 &rest r)
   (declare (ignore f r))
@@ -878,7 +876,7 @@
 ;; (defun car-propagator (f t1)
 ;;   (declare (ignore f))
 ;;   (when (type>= #tnull t1) #tnull))
-(si::putprop 'si::cons-car 'car-propagator 'type-propagator)
+(si::putprop 'car 'car-propagator 'type-propagator)
 
 (defun mod-propagator (f t1 t2)
   (cond ((and (consp t1) (eq (car t1) 'or))
@@ -1190,18 +1188,33 @@
       (setf (gethash type *stp-hash*)
 	    (type>= t type))))	   
 
-(defconstant +export-type-alist+ (mapcar 'cons +useful-type-list+ +useful-types+))
-(defvar *ext-hash* (make-hash-table :test 'eq))
 (defun export-type (type)
-  (or (gethash type *ext-hash*)
-      (setf (gethash type *ext-hash*)
-	    (cond ((when (single-type-p type) (car (rassoc type +export-type-alist+ :test 'type<=))))
-		  ((and (consp type) (eq (car type) 'member)) (export-type (bump-tp type)));FIXME?
-		  ((consp type) `(,(car type) ,@(mapcan (lambda (x) 
-							  (let ((x (export-type x)))
-							    (if (and (cmpao x) (eq (car x) (car type)))
-								(copy-tree (cdr x)) (list x)))) (cdr type))))
-		  (type)))))
+  (cond ((atom type) type)
+	((eq (car type) 'member) 
+	 (if (member #t(or function cons array) (cdr type) :test (lambda (x y) (typep y x)))
+	     (bump-tp type) type))
+	((let* ((a (car type))(d (cdr type))(ea (export-type a))(ed (export-type d)))
+	   (if (and (eq a ea) (eq d ed)) type (cons ea ed))))))
+
+(defconstant +export-type-alist+ (mapcar 'cons +useful-type-list+ +useful-types+))
+;; (defvar *ext-hash* (make-hash-table :test 'eq))
+;; (defun export-type (type)
+;;   (or (gethash type *ext-hash*)
+;;       (setf (gethash type *ext-hash*)
+;; 	    (cond ((and (consp type) (eq (car type) 'member) 
+;; 			(member #t(or function cons array) (cdr type) :test (lambda (x y) (typep y x))))
+;; 					;FIXME centralize with atomic-type-constant-value
+;; 		   (bump-tp type))
+;; 		  (type)
+;; 		  ;((and (type>= type #tnull) (type-and type #t(not null)) (not (type>= (export-type (type-and type #t(not null))) #tnull)))
+;; 		  ; `(or ,(export-type #tnull) ,(export-type (type-and type #t(not null)))));FIXME
+;; 		  ((when (single-type-p type) (car (rassoc type +export-type-alist+ :test 'type<=))))
+;; ;		  ((and (consp type) (eq (car type) 'member)) (export-type (bump-tp type)));FIXME?
+;; 		  ((consp type) `(,(car type) ,@(mapcan (lambda (x) 
+;; 							  (let ((x (export-type x)))
+;; 							    (if (and (cmpao x) (eq (car x) (car type)))
+;; 								(copy-tree (cdr x)) (list x)))) (cdr type))))
+;; 		  (type)))))
 
 (defvar *unique-sigs* (make-hash-table :test 'equal))
 (defun unique-sigs (sig)
@@ -1250,10 +1263,10 @@
   (maphash (lambda (x y) (when (member-type-p x) (remhash x h))) h))
 
 (defun purge-member-types nil
-  (dolist (l (list *norm-tp-hash* *uniq-tp-hash* *and-tp-hash* *or-tp-hash* *pmct-hash* *ctov-hash* *stp-hash* *ext-hash* *bump-hash*))
+  (dolist (l (list *norm-tp-hash* *uniq-tp-hash* *and-tp-hash* *or-tp-hash* *pmct-hash* *ctov-hash* *stp-hash* *bump-hash*)); *ext-hash*
     (purge-member-types-hash l))
   (dolist (l (list *and-tp-hash* *or-tp-hash*))
     (maphash (lambda (x y) (purge-member-types-hash y)) l))
-  (let ((h *oth*))
-    (maphash (lambda (x y) (when (member-type-p y) (remhash x h))) h))
+  ;; (let ((h *oth*))
+  ;;   (maphash (lambda (x y) (when (member-type-p y) (remhash x h))) h))
   (clrhash *sigs*))

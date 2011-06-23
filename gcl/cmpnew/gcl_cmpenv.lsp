@@ -168,7 +168,7 @@
 
 ;;; Tail recursion information.
 (defvar *do-tail-recursion* t)
-(defvar *tail-recursion-info* nil)
+;(defvar *tail-recursion-info* nil)
 ;;; Tail recursion optimization never occurs if *do-tail-recursion* is NIL.
 ;;; *tail-recursion-info* holds NIL, if tail recursion is impossible.
 ;;; If possible, *tail-recursion-info* holds
@@ -309,8 +309,8 @@
 	((setq x (gethash fname *sigs*)) (cmp-norm-tp (cadar x)))
 	((setq x (si::sig fname)) (cadr x))
 	((not (symbolp fname)) '*)
-	((not (eq (setq x (get fname 'proclaimed-return-type y)) y)) x)
-	((not (eq (setq x (get fname 'return-type y)) y)) x)
+	((not (eq (setq x (get fname 'proclaimed-return-type y)) y)) (cmp-norm-tp x));FIXME
+	((not (eq (setq x (get fname 'return-type y)) y)) (cmp-norm-tp x));FIXME
 	('*)))
 
 (defun get-sig (fname)

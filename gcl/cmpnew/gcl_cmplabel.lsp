@@ -225,10 +225,10 @@
 ;;;	   onto the frame-stack (such as BLOCK and TAGBODY whose tags are
 ;;;	   enclosed in a closure, and CATCH),
 
-(defun tail-recursion-possible ()
-  (dolist (ue *unwind-exit* (baboon))
-    (cond ((eq ue 'tail-recursion-mark) (return t))
-          ((or (numberp ue) (eq ue 'bds-bind) (eq ue 'frame))
-           (return nil))
-          ((or (consp ue) (eq ue 'jump)))
-          (t (baboon)))))
+;; (defun tail-recursion-possible ()
+;;   (dolist (ue *unwind-exit* (baboon))
+;;     (cond ((eq ue 'tail-recursion-mark) (return t))
+;;           ((or (numberp ue) (eq ue 'bds-bind) (eq ue 'frame))
+;;            (return nil))
+;;           ((or (consp ue) (eq ue 'jump)))
+;;           (t (baboon)))))

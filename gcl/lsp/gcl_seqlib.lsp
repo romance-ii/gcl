@@ -49,7 +49,7 @@
 	     `(if (eq ,key #'identity) 0 1))
 	   
 	   (defmacro do-key (key n x) 
-	     (let ((xx (gens x)))
+	     (let ((xx (sgen)))
 	       `(let ((,xx ,x)) (case ,n (0 ,xx) (otherwise (funcall ,key ,xx))))))
 	   
 	   (defmacro comp-red (f) 
@@ -74,7 +74,7 @@
 			   (if (eq ,test #'funcall) 8 10))))))))
 	   
 	   (defmacro do-test (test nn x y) 
-	     (let ((r (gensym))(n (gens nn))(nx (gens x))(ny (gens y)))
+	     (let ((r (sgen))(n (sgen))(nx (sgen))(ny (sgen)))
 	       `(let* ((,n ,nn)(,nx ,x)(,ny ,y)
 		       (,r (case ,n 
 				 ((0 1) (eq ,nx ,ny))
@@ -86,7 +86,7 @@
 		  (if (= (logand ,n 1) 1) (not ,r) ,r))))
 
 	   (defmacro do-red (f nn x y) 
-	     (let ((n (gens nn))(nx (gens x))(ny (gens y)))
+	     (let ((n (sgen))(nx (sgen))(ny (sgen)))
 	       `(let* ((,n ,nn)(,nx ,x)(,ny ,y))
 		  (case ,n 
 			(0 (+ ,nx ,ny))
@@ -101,7 +101,7 @@
 			(otherwise (funcall f ,nx ,ny))))))
 
 	   (defmacro bump-test (nn i) 
-	     (let ((n (gens nn)))
+	     (let ((n (sgen)))
 	       `(let ((,n ,nn))
 		  (case ,n 
 			((0 1) ,n) 
@@ -139,7 +139,7 @@
 						       (mapcar (lambda (x) (cons x (array-type-size x))) +array-types+))))
 	   
 	   (defmacro comp-array (aet);FIXME position can't run in compiler on constant types
-	     (let ((r (gens aet)))
+	     (let ((r (sgen)))
 	       `(let ((,r ,aet))
 		  (ecase ,r
 			 ,@(let ((k -1)) (mapcar (lambda (x) `(,x ,(incf k))) +grouped-array-types+))))))
@@ -568,14 +568,14 @@
         (t (error "~S is not a sequence." sequence))))
 
 (defmacro call-test (test test-not item keyx)
-  (let ((j1 (gens item)) (j2 (gens keyx))(tst (gens test))(tstn (gens test-not)))
+  (let ((j1 (sgen)) (j2 (sgen))(tst (sgen))(tstn (sgen)))
     `(let ((,j1 ,item)(,j2 ,keyx)(,tst ,test)(,tstn ,test-not))
        (cond (,tst (funcall ,tst ,j1 ,j2))
 	     (,tstn (not (funcall ,tstn ,j1 ,j2)))
 	     ((eql ,j1 ,j2))))))
 
 (defmacro call-test-key (test test-not key i1 i2)
-  (let ((j1 (gens i1)) (j2 (gens i2))(tst (gens test))(tstn (gens test-not))(ky (gens key)))
+  (let ((j1 (sgen)) (j2 (sgen))(tst (sgen))(tstn (sgen))(ky (sgen)))
     `(let ((,ky ,key)(,j1 ,i1)(,j2 ,i2)(,tst ,test)(,tstn ,test-not))
        (if ,ky 
 	   (call-test ,tst ,tstn (funcall ,ky ,j1) (funcall ,ky ,j2))
@@ -1080,8 +1080,8 @@
 
 (defmacro with-hash-table-iterator ((name hash-table) &body body)
   (declare (optimize (safety 2)))
-  (let ((table (gens hash-table ))
-	(ind (gensym "ind")))
+  (let ((table (sgen))
+	(ind (sgen)))
     `(let ((,table ,hash-table)
 	   (,ind 0))
        (macrolet ((,name ()

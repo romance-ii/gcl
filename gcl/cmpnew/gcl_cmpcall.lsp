@@ -270,47 +270,153 @@
 	((type>= #tboolean tp) #tt);FIXME
 	((car (member tp `(,@(if global +c-global-arg-types+ +c-local-var-types+) t *) :test 'type<=)))))
 
-(defun g0 (cname sig apnarg clp &optional (lev -1))
+(defun ldiffn (list tail)
+  (if tail (ldiff list tail) list))
+(declaim (inline ldiffn))
+
+(defun commasep (x)
+  (mapcon (lambda (x) (if (cdr x) (list (car x) ",") (list (car x)))) x))
+
+(defun ms (&rest r) 
+  (apply 'concatenate 'string 
+	 (mapcar (lambda (x) 
+		   (cond ((listp x) (apply 'ms x))
+			 ((stringp x) x)
+			 ((write-to-string x)))) r)))
+
+(defun nords (n &aux (i -1))
+  (mapl (lambda (x) (setf (car x) (incf i))) (make-list n)))
+
+(defun nobs (n &optional (p "_x"))
+  (mapcar (lambda (x) (ms p x)) (nords n)))
+
+(defun bind-str (nreq nsup nl)
+  (let* ((unroll (nobs (- nreq nsup)))
+	 (decl (commasep (cons (list "_l=#" nsup) unroll)))
+	 (unroll (mapcar (lambda (x) (list nl x "=_l->c.c_car;if (_l!=Cnil) _n--;_l=_l->c.c_cdr;")) unroll))
+	 (ndecl (unless (= nreq nsup) (list "fixnum _n=" (- (1+ nsup)) ";"))))
+    (ms ndecl "object " decl ";" unroll)))
+
+(defun cond-str (nreq nsup st)
+  (ms "(" 
+      (unless (= nreq nsup) (list "_n==" (- (1+ nreq)) (unless st "&&")))
+      (unless st "_l==Cnil") ")"))
+
+(defun mod-argstr (n call st nsup)
+  (let* ((x (commasep (append (nobs nsup "#") (nobs (- n nsup)) (when st (list "_l")))))
+	 (s (or (search "#" call) (length call))))
+    (ms (subseq call 0 s) x)))
+
+(defun nvfun-wrap (cname argstr sig clp ap)
+  (vfun-wrap (ms cname "(" argstr ")") sig clp ap))
+
+(defun wrong-number-args (&rest r)
+  (error :program-error :format-control "Wrong number of arguments to anonymous function: ~a" :format-arguments (list r)))
+
+(defun insufficient-arg-str (fnstr nreq nsup sig st
+				   &aux (sig (if st sig (cons '(*) (cdr sig)))) 
+				   (fnstr (or fnstr (ms (vv-str (add-object 'wrong-number-args)) "->s.s_gfdef"))))
+  (ms (cdr (assoc (cadr sig) +to-c-var-alist+))
+      "("
+      (nvfun-wrap "call_proc_cs2" 
+		  (ms (commasep (append (nobs nsup "#") (nobs (- nreq nsup)) `(("#" ,nsup))))) 
+		  sig fnstr (1+ nreq)) 
+      ")"));FIXME beter way?
+
+;;FIXME can unroll in lisp only?
+;; (defun lisp-unroll (sig args)
+;;   (let* ((at (car sig))
+;; 	 (st (member '* at))
+;; 	 (regs (ldiffn at st))
+;; 	 (nr (length regs))
+;; 	 (la (1- (length args)))
+;; 	 (nd (- nr la))
+;; 	 (binds (mapc (lambda (x) (setf (car x) (tmpsym))) (make-list la)))
+;; 	 (l (tmpsym))
+;; 	 (unrolls (mapc (lambda (x) (setf (car x) (tmpsym))) (make-list nd))))
+;;     `(let (,@(mapcar 'list binds args)
+;; 	   (,l (car (last args)))
+;; 	   ,@(mapcar (lambda (x) (list x `(pop ,l))) unrolls))
+;;        (if (,l)
+;; 	   (apply ',fn ,@binds ,@unrolls ,l)
+;; 	 (funcall ',fn ,@binds ,@unrolls)))))
+
+(defun maybe-unroll (argstr cname sig ap clp fnstr)
   (let* ((at (car sig))
 	 (st (member '* at))
-	 (nreg (length (ldiff at st)))
-	 (apreg (if apnarg (1- apnarg) nreg))
-	 (u (when (< apreg nreg) (- nreg apreg)))
-	 (x (make-inline-arg-str sig lev))
-	 (ss (when u (search (strcat "#" (write-to-string apreg)) x)))
-	 (x (if ss (subseq x 0 ss) x))
-	 (yy (when u (let (r) (dotimes (i u (nreverse r)) (push i r)))))
-	 (yy (mapcar (lambda (x) (strcat "_x" (write-to-string x))) yy))
-	 (y (append yy (when (when st u) (list "_l"))))
-	 (y (mapcon (lambda (x) (if (cdr x) (list (car x) ",") (list (car x)))) y))
-	 (y (apply 'strcat y))
-	 (z (length x))(w (length y))
-	 (s (if (or (= w 0) (= z 0) 
-		    (char= (char x (1- z)) #\,) (char= (char x (1- z)) #\*)) "" ","))
-	 (x (strcat x s y))
-	 (x (format nil "(~a(~a))" cname x))
-	 (x (vfun-wrap x sig clp))
-	 (ss (when apnarg (search "#n" x)))
-	 (x (if ss (progn (setf (aref x (1- ss)) #\-) 
-			  (when u
-			    (setf (aref x (+ 2 ss)) #\-)
-			    (setf (aref x (+ 3 ss)) (code-char (+ (truncate u 10) (char-code #\0))))
-			    (setf (aref x (+ 4 ss)) (code-char (+ (mod u 10) (char-code #\0)))))
-			  x) x))
-	 (nx (apply 'strcat (mapcar (lambda (x) (strcat x "=_l->c.c_car;_l=_l->c.c_cdr;")) yy)))
-	 (nx (strcat "object _l=#" (write-to-string apreg) 
-		     (apply 'strcat (mapcar (lambda (x) (strcat "," x)) yy)) ";" nx))
-	 (x (if (> w 0) (concatenate 'string "({" nx x ";})") x)))
-    x))
+	 (nreq (length (ldiffn at st)))
+	 (nsup (if ap (1- ap) nreq)))
+    (when (or (< nsup nreq) (and ap (= nsup nreq) (not st)))
+      (let ((nl (list (string #\Newline) "        ")))
+	(ms (list "@" (nords (1+ nsup)) ";") 
+	    "({" (bind-str nreq nsup nl) nl (cond-str nreq nsup st)  " ? " nl
+	    (nvfun-wrap cname (mod-argstr nreq argstr st nsup) sig clp ap) " : " nl
+	    (insufficient-arg-str fnstr nreq nsup sig st) ";})")))))
+
+
+(defun g1 (fnstr cname sig ap clp &optional (lev -1))
+  (let* ((x (make-inline-arg-str sig lev)))
+    (or (maybe-unroll x cname sig ap clp fnstr)
+	(nvfun-wrap cname x sig clp ap))))
+
+;; (defun g0 (cname sig apnarg clp &optional (lev -1))
+;;   (let* ((at (car sig))
+;; 	 (st (member '* at))
+;; 	 (nreg (length (ldiff at st)))
+;; 	 (apreg (if apnarg (1- apnarg) nreg))
+;; 	 (u (when (< apreg nreg) (- nreg apreg)))
+;; 	 (x (make-inline-arg-str sig lev))
+;; 	 (ss (when u (search (strcat "#" (write-to-string apreg)) x)))
+;; 	 (x (if ss (subseq x 0 ss) x))
+;; 	 (yy (when u (let (r) (dotimes (i u (nreverse r)) (push i r)))))
+;; 	 (yy (mapcar (lambda (x) (strcat "_x" (write-to-string x))) yy))
+;; 	 (y (append yy (when (when st u) (list "_l"))))
+;; 	 (y (mapcon (lambda (x) (if (cdr x) (list (car x) ",") (list (car x)))) y))
+;; 	 (y (apply 'strcat y))
+;; 	 (z (length x))(w (length y))
+;; 	 (s (if (or (= w 0) (= z 0) 
+;; 		    (char= (char x (1- z)) #\,) (char= (char x (1- z)) #\*)) "" ","))
+;; 	 (x (strcat x s y))
+;; 	 (x (format nil "(~a(~a))" cname x))
+;; 	 (x (vfun-wrap x sig clp))
+;; 	 (ss (when apnarg (search "#n" x)))
+;; 	 (x (if ss (progn (setf (aref x (1- ss)) #\-) 
+;; 			  (when u
+;; 			    (setf (aref x (+ 2 ss)) #\-)
+;; 			    (setf (aref x (+ 3 ss)) (code-char (+ (truncate u 10) (char-code #\0))))
+;; 			    (setf (aref x (+ 4 ss)) (code-char (+ (mod u 10) (char-code #\0)))))
+;; 			  x) x))
+;; 	 (nx (apply 'strcat (mapcar (lambda (x) (strcat x "=_l->c.c_car;_l=_l->c.c_cdr;")) yy)))
+;; 	 (nx (strcat "object _l=#" (write-to-string apreg) 
+;; 		     (apply 'strcat (mapcar (lambda (x) (strcat "," x)) yy)) ";" nx))
+;; 	 (x (if (> w 0) (concatenate 'string "({" nx x ";})") x)))
+;;     x))
 
 (defun g (fname n sig &optional apnarg (clp t)
 		&aux (cname (format nil "/* ~a */(*LnkLI~d)" (function-string fname) n))
-		(clp (when clp (concatenate 'string (vv-str (add-object fname)) "->s.s_gfdef"))))
-  (g0 cname sig apnarg clp))
+		(fnstr (ms (vv-str (add-object fname)) "->s.s_gfdef"))
+		(clp (when clp fnstr)))
+  (g1 fnstr cname sig apnarg clp))
 
-(defun add-fast-link (fname &optional apnarg
+;; (defun g (fname n sig &optional apnarg (clp t)
+;; 		&aux (cname (format nil "/* ~a */(*LnkLI~d)" (function-string fname) n))
+;; 		(clp (when clp (concatenate 'string (vv-str (add-object fname)) "->s.s_gfdef"))))
+;;   (g0 cname sig apnarg clp))
+
+(defun call-arg-types (at la apnarg)
+  (let* ((st (member '* at))
+	 (reg (ldiff at st))
+	 (nr (length reg))
+	 (la (if apnarg (max nr (1- la)) la))
+	 (ns (- nr la)))
+    (cond ((> ns 0) (butlast reg ns));funcall too few args
+	  (st at)
+	  ((= ns 0) at)
+	  ((append at '(*))))));let call_proc_new foil fast linking and catch errors
+
+(defun add-fast-link (fname la &optional apnarg
 			    &aux n
-			    (at (mapcar (lambda (x) (link-rt x t)) (get-arg-types fname)))
+			    (at (call-arg-types (mapcar (lambda (x) (link-rt x t)) (get-arg-types fname)) la apnarg))
 			    (rt (link-rt (get-return-type fname) t))
 			    (clp (cclosure-p fname))
 			    (tail (list rt at clp apnarg)))
@@ -330,9 +436,35 @@
 		(f (if apnarg (flag-or f aa) f)))
 	   (push (list* fname (format nil "LI~d" n) n tail) *function-links*)
 	   (car (push (list fname at rt f
-		       (g fname n (list at rt) apnarg clp);*
+		       (g fname n (list at rt) apnarg clp)
 		       'link-call n)
 		      *inline-functions*))))))
+
+;; (defun add-fast-link (fname &optional apnarg
+;; 			    &aux n
+;; 			    (at (mapcar (lambda (x) (link-rt x t)) (get-arg-types fname)))
+;; 			    (rt (link-rt (get-return-type fname) t))
+;; 			    (clp (cclosure-p fname))
+;; 			    (tail (list rt at clp apnarg)))
+  
+;;   (cond ((setq n (caddar (member-if 
+;; 			  (lambda (x) 
+;; 			    (and (eq (car x) fname) 
+;; 				 (equal (cdddr x) tail))) *function-links*)))
+;; 	 (car (member-if
+;; 	       (lambda (x) 
+;; 		 (let ((x (last x 2))) 
+;; 		   (when (eq 'link-call (car x)) 
+;; 		     (eql n (cadr x))))) *inline-functions*)))
+;; 	((let* ((n (next-cfun))
+;; 		(f (flags ans set))
+;; 		(f (if (single-type-p rt) f (flag-or f svt)))
+;; 		(f (if apnarg (flag-or f aa) f)))
+;; 	   (push (list* fname (format nil "LI~d" n) n tail) *function-links*)
+;; 	   (car (push (list fname at rt f
+;; 		       (g fname n (list at rt) apnarg clp)
+;; 		       'link-call n)
+;; 		      *inline-functions*))))))
 
 
 (defun declaration-type (type) 

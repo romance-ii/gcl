@@ -158,7 +158,7 @@
   (when (and *compiler-compile* (symbolp x))
     (unless (symbol-package x)
       (setq *tmp-pack* (or *tmp-pack* (make-package (symbol-name (tmpsym)))))
-      (import x *tmp-pack*)
+      (unless (find-symbol (symbol-name x) *tmp-pack*) (import x *tmp-pack*))
       x)))
 
 (defun push-data-incf (x)

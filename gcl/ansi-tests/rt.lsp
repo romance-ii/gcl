@@ -261,7 +261,7 @@
 			    (t
 			     (multiple-value-list
 			      (eval (form entry))))))))
-		(if t;*catch-errors*
+		(if *catch-errors*
 		    (handler-bind
 		     (#-ecl (style-warning #'(lambda (c) (if (has-note entry :do-not-muffle-warnings)
 							     c

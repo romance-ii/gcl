@@ -62,11 +62,12 @@
 (defun setq-p (form l) 
   (cond ((eq form l)) ((atom form) nil) ((or (setq-p (car form) l) (setq-p (cdr form) l)))))
 
-(defun new-constant-value (res atp &aux (c (car res)) a);FIXME expand, member lists, symbol in c1expr below
-  (cond ((eq c 'location) res)
-	((functionp (setq a (car atp))) res)
-	((sequencep a) res)
-	((c1constant-value a (when (symbolp a) (symbol-package a))))))
+(defun atomic-type-constant-value (atp &aux (a (car atp)))
+  (when atp
+    (typecase 
+     a
+     ((or function cons array))
+     (otherwise (c1constant-value a (when (symbolp a) (symbol-package a)))))))
 
 (defun c1expr (form)
   (setq form (catch *cmperr-tag*
@@ -90,8 +91,7 @@
 			(let ((val (car atp))
 			      (*fn-val-list* (cons form *fn-val-list*)))
 			  (cond ((functionp val) (fn-get val 'prov))
-				((sequencep val) nil)
-				((c1constant-value val (when (symbolp val) (symbol-package val))))))))))
+				((atomic-type-constant-value atp))))))))
                  ((c1var form))))
           ((consp form)
            (let* ((fun (car form))
@@ -103,7 +103,7 @@
 			      (cmperr "Sharp-comma-macro was found in a bad place."))
 			     (t (cmperr "The function ~s is illegal." fun))))
 		  (atp (atomic-tp (info-type (cadr res)))))
-	     (or (and atp (ignorable-form res) (new-constant-value res atp)) res)))
+	     (or (when (ignorable-form res) (atomic-type-constant-value atp)) res)))
           (t (c1constant-value form t)))))
   (if (eq form '*cmperr-tag*) (c1nil) form))
 
@@ -548,7 +548,7 @@
 	 (ttfs (remove-if-not (lambda (x) (intersection ints (car x))) ttfs))
 	 (b (mapcar (lambda (x) `(,(if (type>= (min-ftp (cadr x)) tp) t
 				     `(typep ,f ',(type-and tp (cadr x))))
-				  ,@(cddr x))) ttfs)))
+				  ,@(or (cddr x) (list nil)))) ttfs)))
     (when b `((,ints (infer-tp ,f ,tp (cond ,@b)))))))
 
 
@@ -749,22 +749,22 @@
   `(si::fboundp-sym (si::funid-sym ,(cadr form))))
 (si::putprop 'fboundp 'fboundp-expander 'si::compiler-macro-prop)
 
-(defun maphash-expander (form env)
-  (declare (ignore env))
-  (let ((block (tmpsym))(tag (gensym)) (ind (gensym)) (key (gensym)) (val (gensym)))
-    `(block 
-      ,block
-      (let ((,ind -1))
-	(declare (,+hash-index-type+ ,ind))
-	(tagbody 
-	 ,tag
-	 (when (< (setq ,ind (si::next-hash-table-index ,(caddr form) (1+ ,ind))) 0)
-	   (return-from ,block))
-	 (let ((,key (si::hash-key-by-index ,(caddr form) ,ind))
-	       (,val (si::hash-entry-by-index ,(caddr form) ,ind)))
-	   (funcall ,(cadr form) ,key ,val))
-	 (go ,tag))))))
-(si::putprop 'maphash 'maphash-expander 'si::compiler-macro-prop)
+;; (defun maphash-expander (form env)
+;;   (declare (ignore env))
+;;   (let ((block (tmpsym))(tag (gensym)) (ind (gensym)) (key (gensym)) (val (gensym)))
+;;     `(block 
+;;       ,block
+;;       (let ((,ind -1))
+;; 	(declare (,+hash-index-type+ ,ind))
+;; 	(tagbody 
+;; 	 ,tag
+;; 	 (when (< (setq ,ind (si::next-hash-table-index ,(caddr form) (1+ ,ind))) 0)
+;; 	   (return-from ,block))
+;; 	 (let ((,key (si::hash-key-by-index ,(caddr form) ,ind))
+;; 	       (,val (si::hash-entry-by-index ,(caddr form) ,ind)))
+;; 	   (funcall ,(cadr form) ,key ,val))
+;; 	 (go ,tag))))))
+;; (si::putprop 'maphash 'maphash-expander 'si::compiler-macro-prop)
 	
 (defun array-row-major-index-expander (form env &optional (it 0))
   (declare (fixnum it)(ignorable env))
@@ -788,7 +788,7 @@
 
 (defmacro with-pulled-array (bindings form &body body) ;FIXME
   `(let ((,(car bindings) (cadr ,form)))
-     (let ((,(cadr bindings) `((,(gens ,(car bindings)) ,,(car bindings)))))
+     (let ((,(cadr bindings) `((,(tmpsym) ,,(car bindings)))))
        (let ((,(caddr bindings) (or (caar ,(cadr bindings)) ,(car bindings))))
 	 ,@body))))
 	
@@ -871,11 +871,13 @@
     (list 'inline (copy-info (cadr nargs)) nm (with-output-to-string (s) (princ (car args) s)) nargs)))
 
 (defun c2inline (name comment expr)
+  (declare (ignore name))
   (wt-nl "/*" comment "*/")
-  (let* ((tri (tail-recursion-info name nil expr))
-	 (tri (when (cdr tri) tri))
-	 (*unwind-exit* (if tri (cons 'tail-recursion-mark *unwind-exit*) *unwind-exit*)))
-    (c2expr expr))
+  (c2expr expr)
+  ;; (let* ((tri (tail-recursion-info name nil expr))
+  ;; 	 (tri (when (cdr tri) tri))
+  ;; 	 (*unwind-exit* (if tri (cons 'tail-recursion-mark *unwind-exit*) *unwind-exit*)))
+  ;;   (c2expr expr))
   (wt-nl "/* END " comment "*/"))
 (si::putprop 'inline 'c1inline 'c1)
 (si::putprop 'inline 'c2inline 'c2)
@@ -1102,6 +1104,8 @@
   (and (inline-possible n)
        (or (inline-asserted n)
 	   (eq (symbol-package n) (load-time-value (find-package 'c)))
+	   (eq (symbol-package n) (load-time-value (find-package "libm")))
+	   (eq (symbol-package n) (load-time-value (find-package "libc")))
 	   (multiple-value-bind (s k) (find-symbol (symbol-name n) 'lisp) 
 				(when (eq n s) (eq k :external))))
        (or (local-fun-src n)
@@ -1130,21 +1134,40 @@
   (multiple-value-bind
    (doc decls ctps body)
    (parse-body-header src)
-   (let* ((aux (member '&aux ll))
+   (let* ((aux (member '&aux ll));FIXME centralize with new-defun-args
 	  (ll (ldiff ll aux))
-	  (aux (cdr aux))
-	  (auxv (mapcar (lambda (x) (if (consp x) (car x) x)) aux))
-	  (ad (split-decls auxv decls))
-	  (od (cadr ad))
-	  (ad (car ad))
-	  (ac (split-ctps auxv ctps))
-	  (oc (cadr ac))
-	  (ac (car ac))
+	  (regs (mapcar (lambda (x) (cond ((symbolp x) x) ((symbolp (car x)) (car x)) ((cadar x)))) ll))
+	  (regs (set-difference regs '(&optional &rest &key &allow-other-keys)))
+	  (od (split-decls regs decls))
+	  (rd (cons `(declare (optimize (safety ,(decl-safety decls)))) (pop od)))
+	  (oc (split-ctps regs ctps))
+	  (rc (pop oc))
 	  (n (blocked-body-name body))
 	  (body (if n (cddar body) body))
 	  (n (or n block))
-	  (body `(block ,n (tagbody ,tag (return-from ,n (let* ,aux ,@ad ,@ac ,@body))))))
-     `(,h ,ll ,@(when doc (list doc)) ,@od ,@oc ,body))))
+	  (body `(block ,n (tagbody ,tag (return-from ,n (let* ,(cdr aux) ,@(car od) ,@(car oc) ,@body))))))
+     `(,h ,ll ,@(when doc (list doc)) ,@rd ,@rc ,body))))
+
+;; (defun ttl-tag-src (src &optional (tag (tmpsym)) block &aux (h (pop src)) (ll (pop src)))
+;;   (setf (get tag 'ttl-tag) t)
+;;   (multiple-value-bind
+;;    (doc decls ctps body)
+;;    (parse-body-header src)
+;;    (let* ((aux (member '&aux ll))
+;; 	  (ll (ldiff ll aux))
+;; 	  (aux (cdr aux))
+;; 	  (auxv (mapcar (lambda (x) (if (consp x) (car x) x)) aux))
+;; 	  (ad (split-decls auxv decls))
+;; 	  (od (cadr ad))
+;; 	  (ad (car ad))
+;; 	  (ac (split-ctps auxv ctps))
+;; 	  (oc (cadr ac))
+;; 	  (ac (car ac))
+;; 	  (n (blocked-body-name body))
+;; 	  (body (if n (cddar body) body))
+;; 	  (n (or n block))
+;; 	  (body `(block ,n (tagbody ,tag (return-from ,n (let* ,aux ,@ad ,@ac ,@body))))))
+;;      `(,h ,ll ,@(when doc (list doc)) ,@od ,@oc ,body))))
 
 (defvar *int* nil)
 (defmacro ttm (fn &body body)
@@ -1349,7 +1372,11 @@
 	    (bump-pcons (caaddr f) p)))))))
 
 
-(defun mi5 (fn info fms la &aux (ll (when la (list (length fms)))))
+(defun mi5 (fn info fms la 
+	       &aux (nlast (when la (type>= #tnull (info-type (cadr (car (last fms)))))))
+	       (fms (if nlast (butlast fms) fms))
+	       (la (unless nlast la))
+	       (ll (when la (list (length fms)))))
   (mi6 fn fms)
   (when (eq fn (cadr *current-form*)) (setq *recursion-detected* t))
   (cond	((consp fn) `(,(if la 'apply 'funcall) ,info ,(make-ordinary fn) ,fms))
@@ -1359,6 +1386,17 @@
 	     (setf (info-type info) (if (eq (info-type (cadr fd)) 'boolean) #tboolean (info-type (cadr fd))))
 	     `(call-local ,info ,(append (caddr fd) ll) ,fms))))
 	(`(call-global ,info ,fn ,fms nil ,@ll))))
+
+;; (defun mi5 (fn info fms la &aux (ll (when la (list (length fms)))))
+;;   (mi6 fn fms)
+;;   (when (eq fn (cadr *current-form*)) (setq *recursion-detected* t))
+;;   (cond	((consp fn) `(,(if la 'apply 'funcall) ,info ,(make-ordinary fn) ,fms))
+;; 	((let ((fd (c1local-fun fn)))
+;; 	   (when fd
+;; 	     (add-info info (cadr fd))
+;; 	     (setf (info-type info) (if (eq (info-type (cadr fd)) 'boolean) #tboolean (info-type (cadr fd))))
+;; 	     `(call-local ,info ,(append (caddr fd) ll) ,fms))))
+;; 	(`(call-global ,info ,fn ,fms nil ,@ll))))
 
 
 (defun type-from-args (fun fms last info &aux x)
@@ -1748,8 +1786,8 @@
 	  ((list 'call-global info 'funcallable-symbol-function nargs)))))
 (si::putprop 'funcallable-symbol-function 'c1funcallable-symbol-function 'c1)
 
-(defun c1lambda-fun (lambda-expr args)
-  (c1expr (blla (car lambda-expr) args nil (cdr lambda-expr))))
+;; (defun c1lambda-fun (lambda-expr args)
+;;   (c1expr (blla (car lambda-expr) args nil (cdr lambda-expr))))
 
 (defun c2expr (form)
   (values
@@ -2019,18 +2057,18 @@
 
 (defun sv-wrap (x) `(symbol-value ',x))
 
-(defun c1constant-value (val always-p &aux (info (make-info :type (object-type val))))
+(defun c1constant-value (val always-p); &aux (info (make-info :type (object-type val))))
 ;							    :referred-array +empty-info-array+
 ;							    :changed-array +empty-info-array+)))
   (cond
    ((eq val nil) (c1nil))
    ((eq val t) (c1t))
    ((typep val 'char)
-    (list 'LOCATION info (list 'CHAR-VALUE nil val)))
+    (list 'LOCATION (make-info :type (object-type val)) (list 'CHAR-VALUE nil val)))
    ((si:fixnump val)
-    (list 'LOCATION info (list 'FIXNUM-VALUE (unless (si::seqindp val) (add-object val)) val)))
+    (list 'LOCATION (make-info :type (object-type val)) (list 'FIXNUM-VALUE (unless (si::seqindp val) (add-object val)) val)))
    ((characterp val)
-    (list 'LOCATION info (list 'CHARACTER-VALUE nil (char-code val))))
+    (list 'LOCATION (make-info :type (object-type val)) (list 'CHARACTER-VALUE nil (char-code val))))
    ((typep val 'long-float)
     ;; We can't read in long-floats which are too big:
     (let* (sc 
@@ -2040,30 +2078,30 @@
 		  ((not (isfinite val)) (add-object (cons 'si::|#,| `(symbol-value ','nan))))
 		  ((> (abs val) (/ most-positive-long-float 2))
 		   (add-object (cons 'si::|#,| `(* ,(/ val most-positive-long-float) most-positive-long-float))))
-		  ((< (abs val) (* least-positive-long-float 1.0d20))
+		  ((< 0.0 (abs val) (* least-positive-long-float 1.0d20))
 		   (add-object (cons `si::|#,| `(* ,(/ val least-positive-long-float) least-positive-long-float))))
 		  ((setq sc t) (add-object val)))))
 ;      (unless (isfinite val) (setf (info-type info) #tlong-float))
-      `(location ,info ,(if sc `(long-float-value ,vv ,val) `(vv ,vv)))))
+      `(location ,(make-info :type (object-type val)) ,(if sc `(long-float-value ,vv ,val) `(vv ,vv)))))
    ((typep val 'short-float)
-    (list 'LOCATION info
+    (list 'LOCATION (make-info :type (object-type val))
           (list 'SHORT-FLOAT-VALUE (add-object val) val)))
    ((typep val #tfcomplex)
-    (list 'LOCATION info
+    (list 'LOCATION (make-info :type (object-type val))
           (list 'FCOMPLEX-VALUE (add-object val) val)))
    ((typep val #tdcomplex)
-    (list 'LOCATION info
+    (list 'LOCATION (make-info :type (object-type val))
           (list 'DCOMPLEX-VALUE (add-object val) val)))
    ((and (consp val) (eq (car val) 'si::|#,|))
-    (setf (info-type info) t);(object-type (cmp-eval (cdr val))))
-    (list 'LOCATION info (list 'VV (add-object val))))
+;    (setf (info-type info) t);(object-type (cmp-eval (cdr val))))
+    (list 'LOCATION (make-info :type t) (list 'VV (add-object val))))
    ((and *compiler-compile* (not *keep-gaz*))
-    (setf (info-type info) (object-type val))
-    (list 'LOCATION info (list 'VV (add-object (cons 'si::|#,| `(si::nani ,(si::address val)))))))
+;    (setf (info-type info) (object-type val))
+    (list 'LOCATION (make-info :type (object-type val)) (list 'VV (add-object (cons 'si::|#,| `(si::nani ,(si::address val)))))))
    ((and (arrayp val) (not (si::staticp val)) (eq (array-element-type val) t)) ;; This must be readable
-    (list 'LOCATION info (list 'VV (add-object val))))
+    (list 'LOCATION (make-info :type (object-type val)) (list 'VV (add-object val))))
    (always-p
-    (list 'LOCATION info (list 'VV (add-object val))))));FIXME check readability
+    (list 'LOCATION (make-info :type (object-type val)) (list 'VV (add-object val))))));FIXME check readability
 
 
 (defmacro si::define-compiler-macro (name vl &rest body)

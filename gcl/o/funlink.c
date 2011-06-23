@@ -1095,7 +1095,7 @@ call_proc_new(object sym,ufixnum clp,ufixnum vld,void **link,ufixnum argd,object
 
   object fun;
   enum type tp;
-  ufixnum margs,nargs,fas,do_link,varg,pushed=0;
+  ufixnum margs,nargs,fas,do_link,varg,pushed=0,nfargs;
   fixnum vald;
   object *tmp,*x/* ,*p */;
   int i;
@@ -1122,6 +1122,7 @@ call_proc_new(object sym,ufixnum clp,ufixnum vld,void **link,ufixnum argd,object
   margs=u.f.ma;
   varg=u.f.va;
   nargs=u.f.va ? abs(VFUN_NARGS) : margs;
+  nfargs=u.f.va && VFUN_NARGS<0 ? nargs-1 : nargs;
   vald=!u.f.vv ? -(fixnum)u.f.nv : u.f.nv;
   
   x=tmp=(u.f.pu && !fun->fun.fun_argd && VFUN_NARGS>=fun->fun.fun_minarg) ? 
@@ -1134,6 +1135,10 @@ call_proc_new(object sym,ufixnum clp,ufixnum vld,void **link,ufixnum argd,object
 	   *x++=(i || u.f.nf) ? va_arg(ll,object) : first;
   }
 
+  /*FIXME: Problem here relying on VFUN_NARGS or fcall.fun or FUN_VALP might foil sharing these links in different contexts*/
+  /*links currently shared by rt at clp apnarg, so VFUN_NARGS<0 is safe*/
+  /*abs(VFUN_NARGS) above is dangerous*/
+
   fas=do_link=Rset;
   switch(tp) {
   case t_function:
@@ -1143,14 +1148,19 @@ call_proc_new(object sym,ufixnum clp,ufixnum vld,void **link,ufixnum argd,object
       /* nvald=FUN_VALP ? vald : 0; */
       if (pushed)
 	fas=0;
-      else if (margs!=fun->fun.fun_minarg) /*margs < fun->fun.fun_minarg*/
+      /* else if (margs!=fun->fun.fun_minarg) /\*margs < fun->fun.fun_minarg*\/ */
+      /* 	fas=0; */
+      else if (/* u.f.va &&  */(nfargs<fun->fun.fun_minarg || nfargs>fun->fun.fun_maxarg))/*u.f.va -> varg, xxx*/
 	fas=0;
-      else if (u.f.va && VFUN_NARGS<0 &&
-	       (nargs<fun->fun.fun_minarg || nargs>fun->fun.fun_maxarg))/*u.f.va -> varg, xxx*/
+      else if (u.f.va && VFUN_NARGS<0 && fun->fun.fun_minarg==fun->fun.fun_maxarg)/*runtime apply #arg checking omitted in reg fns*/
 	fas=0;
+      /* else if (u.f.va && VFUN_NARGS<0 && */
+      /* 	       (nargs-1<fun->fun.fun_minarg || nargs-1>fun->fun.fun_maxarg))/\*u.f.va -> varg, xxx*\/ */
+      /* 	fas=0; */
+      /* FIXME: below should be removed?*/
       else if (!varg && (fun->fun.fun_minarg!=fun->fun.fun_maxarg))/*and maybe inverse for error checking*/
 	fas=0;
-      else if (vald!=neval && (vald<=0 || !neval || neval>vald))/*margs funvalp aggregate across file*/
+      else if (vald!=neval && (vald<=0 || !neval || neval>vald))/*margs funvalp aggregate across file*//*FIXME check valp*/
 	fas=0;
       else if (fun->fun.fun_env!=def_env && !clp)
 	fas=0;

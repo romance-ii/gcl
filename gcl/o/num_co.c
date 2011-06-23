@@ -504,128 +504,108 @@ LFD(Ldenominator)(void)
 		vs_base[0] = small_fixnum(1);
 }
 
-LFD(Lfloor)(void)
-{
-	object x, y, q, q1;
-	double d;
-	int n;
-	object one_minus(object x);
+DEFUNM_NEW("FLOOR",object,fLfloor,LISP,1,2,NONE,OO,OO,OO,OO,(object x,...),"") {
 
-	n = vs_top - vs_base;
-	if (n == 0)
-		too_few_arguments();
-	if (n > 1)
-		goto TWO_ARG;
-	x = vs_base[0];
-	switch (type_of(x)) {
+  fixnum nargs=INIT_NARGS(1);
+  object f=OBJNULL,l=Cnil,y,z,w,q,q1;
+  double d;
+  fixnum vals=(fixnum)fcall.valp;
+  object *base=vs_top;
+  va_list ap;
 
-	case t_fixnum:
-	case t_bignum:
-		vs_push(small_fixnum(0));
-		return;
+  va_start(ap,x);
+  y=NEXT_ARG(nargs,ap,l,f,make_fixnum(1));
+  va_end(ap);
 
-	case t_ratio:
-		q = x;
-		y = small_fixnum(1);
-		goto RATIO;
+  if (y!=make_fixnum(1))
+    goto TWO_ARG;
 
-	case t_shortfloat:
-		d = (double)(sf(x));
-		q1 = double_to_integer(d);
-		d -= number_to_double(q1);
-		if (sf(x) < 0.0 && d != 0.0) {
-			vs_push(q1);
-			q1 = one_minus(q1);
-			d += 1.0;
-		}
-		vs_base = vs_top;
-		vs_push(q1);
-		vs_push(make_shortfloat((shortfloat)d));
-		return;
+  switch (type_of(x)) {
+    
+  case t_fixnum:
+  case t_bignum:
+    RETURN2(x,make_fixnum(0));
+    
+  case t_ratio:
+    q = x;
+    y = small_fixnum(1);
+    goto RATIO;
+    
+  case t_shortfloat:
+    d = (double)(sf(x));
+    q1 = double_to_integer(d);
+    d -= number_to_double(q1);
+    if (sf(x) < 0.0 && d != 0.0) {
+      vs_push(q1);
+      q1 = one_minus(q1);
+      d += 1.0;
+    }
+    RETURN2(q1,make_shortfloat((shortfloat)d));
+    
+  case t_longfloat:
+    d = lf(x);
+    q1 = double_to_integer(d);
+    d -= number_to_double(q1);
+    if (lf(x) < 0.0 && d != 0.0) {
+      vs_push(q1);
+      q1 = one_minus(q1);
+      d += 1.0;
+    }
+    RETURN2(q1,make_longfloat(d));
+    
+  default:
+    FEwrong_type_argument(TSor_rational_float, x);
+  }
 
-	case t_longfloat:
-		d = lf(x);
-		q1 = double_to_integer(d);
-		d -= number_to_double(q1);
-		if (lf(x) < 0.0 && d != 0.0) {
-			vs_push(q1);
-			q1 = one_minus(q1);
-			d += 1.0;
-		}
-		vs_base = vs_top;
-		vs_push(q1);
-		vs_push(make_longfloat(d));
-		return;
+ TWO_ARG:
+  if ( number_zerop ( y ) == TRUE ) DIVISION_BY_ZERO(sLfloor,list(2,x,y));
+  if ((type_of(x) == t_fixnum || type_of(x) == t_bignum) &&
+      (type_of(y) == t_fixnum || type_of(y) == t_bignum)) {
+    if (number_zerop(x))
+      RETURN2(make_fixnum(0),make_fixnum(0));
+    
+    integer_quotient_remainder_1(x, y, &z, &w);
+    if (number_minusp(x) ? number_plusp(y) : number_minusp(y)) {
+      if (number_zerop(w))
+	RETURN2(z,w);
+      z = one_minus(z);
+      w = number_plus(w, y);
+    }
+    RETURN2(z,w);
+  }
 
-	default:
-		FEwrong_type_argument(TSor_rational_float, x);
-	}
+  check_type_or_rational_float(&x);
+  check_type_or_rational_float(&y);
+  q = number_divide(x, y);
+  
+  switch (type_of(q)) {
 
-TWO_ARG:
-	if (n > 2)
-		too_many_arguments();
-	x = vs_base[0];
-	y = vs_base[1];
-        if ( number_zerop ( y ) == TRUE ) DIVISION_BY_ZERO(sLfloor,list(2,x,y));
-	if ((type_of(x) == t_fixnum || type_of(x) == t_bignum) &&
-	    (type_of(y) == t_fixnum || type_of(y) == t_bignum)) {
-		vs_base = vs_top;
-		if (number_zerop(x)) {
-			vs_push(small_fixnum(0));
-			vs_push(small_fixnum(0));
-			return;
-		}
-		vs_push(Cnil);
-		vs_push(Cnil);
-		integer_quotient_remainder_1(x, y, &vs_base[0], &vs_base[1]);
-		if (number_minusp(x) ? number_plusp(y) : number_minusp(y)) {
-			if (number_zerop(vs_base[1]))
-				return;
-			vs_base[0] = one_minus(vs_base[0]);
-			vs_base[1] = number_plus(vs_base[1], y);
-		}
-		return;
-	}
-	check_type_or_rational_float(&vs_base[0]);
-	check_type_or_rational_float(&vs_base[1]);
-	q = number_divide(x, y);
-	vs_push(q);
-	switch (type_of(q)) {
-	case t_fixnum:
-	case t_bignum:
-		vs_base = vs_top;
-		vs_push(q);
-		vs_push(small_fixnum(0));
-		break;
+  case t_fixnum:
+  case t_bignum:
+    RETURN2(q,make_fixnum(0));
 	
-	case t_ratio:
-	RATIO:
-		q1 = integer_divide1(q->rat.rat_num, q->rat.rat_den);
-		if (number_minusp(q)) {
-			vs_push(q1);
-			q1 = one_minus(q1);
-		} else
-			q1 = q1;
-		vs_base = vs_top;
-		vs_push(q1);
-		vs_push(num_remainder(x, y, q1));
-		return;
+  case t_ratio:
+  RATIO:
+    q1 = integer_divide1(q->rat.rat_num, q->rat.rat_den);
+    if (number_minusp(q))
+      q1 = one_minus(q1);
+    else
+      q1 = q1;
+    RETURN2(q1,num_remainder(x, y, q1));
 
-	case t_shortfloat:
-	case t_longfloat:
-		q1 = double_to_integer(number_to_double(q));
-		if (number_minusp(q) && number_compare(q, q1)) {
-			vs_push(q1);
-			q1 = one_minus(q1);
-		} else
-			q1 = q1;
-		vs_base = vs_top;
-		vs_push(q1);
-		vs_push(num_remainder(x, y, q1));
-		return;
-	default:
-	  break;
-	}
+  case t_shortfloat:
+  case t_longfloat:
+    q1 = double_to_integer(number_to_double(q));
+    if (number_minusp(q) && number_compare(q, q1)) 
+      q1 = one_minus(q1);
+    else
+      q1 = q1;
+    RETURN2(q1,num_remainder(x, y, q1));
+
+  default:
+    TYPE_ERROR(q,sLreal);
+    RETURN2(make_fixnum(0),make_fixnum(0));
+  }
 }
 
 LFD(Lceiling)(void)
@@ -1007,8 +987,10 @@ TWO_ARG:
 LFD(Lmod)(void)
 {
 	check_arg(2);
-	Lfloor();
-	vs_base++;
+	fcall.valp=(fixnum)vs_base;
+	FFN(fLfloor)(vs_base[0],vs_base[1]);
+	/* Lfloor(); */
+	/* vs_base=vs_top-1; */
 }
 
 LFD(Lrem)(void)
@@ -1547,7 +1529,7 @@ gcl_init_num_co(void)
 	make_function("FLOAT", Lfloat);
 	make_function("NUMERATOR", Lnumerator);
 	make_function("DENOMINATOR", Ldenominator);
-	make_function("FLOOR", Lfloor);
+	/* make_function("FLOOR", Lfloor); */
 	make_function("CEILING", Lceiling);
 	make_function("TRUNCATE", Ltruncate);
 	make_function("ROUND", Lround);

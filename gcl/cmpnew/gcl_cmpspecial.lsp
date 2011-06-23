@@ -187,7 +187,7 @@
   (find-special-var l 'is-fun-var))
 
 (defun export-sig (sig)
-  `((,@(mapcar 'export-type (car sig))) ,(export-type (cadr sig))))
+  (unique-sigs `((,@(mapcar 'export-type (car sig))) ,(export-type (cadr sig)))))
 
 (defun lam-e-to-sig (l &aux (args (caddr l)) (regs (car args)) (narg (is-narg-le l))
 		       (first (is-first-var (car regs))) (regs (if first (cdr regs) regs)))
@@ -214,8 +214,8 @@
    (function-lambda-expression l)
    (compress-fle l y z)))
 
-(defun process-local-fun-env (env b f fun tp)
-  (under-env env (process-local-fun b f fun tp)))
+;; (defun process-local-fun-env (env b f fun tp)
+;;   (under-env env (process-local-fun b f fun tp)))
 
 (defun fun-def-env (fn)
   (let ((fun (car (member-if (lambda (x) (when (fun-p x) (eq (fun-fn x) fn))) *funs*))))

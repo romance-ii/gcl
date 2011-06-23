@@ -46,7 +46,7 @@
    `(if (eq ,key #'identity) 0 1))
  
  (defmacro do-key (key n x) 
-   (let ((xx (gens x)))
+   (let ((xx (sgen)))
      `(let ((,xx ,x)) (case ,n (0 ,xx) (otherwise (funcall ,key ,xx))))))
  
  (defmacro comp-test (test test-not) 
@@ -59,7 +59,7 @@
 		 (if (eq ,test #'funcall) 8 10))))))))
  
  (defmacro do-test (test nn x y) 
-   (let ((n (gens nn))(nx (gens x))(ny (gens y)))
+   (let ((n (sgen))(nx (sgen))(ny (sgen)))
      `(let* ((,n ,nn)(,nx ,x)(,ny ,y))
 	(case ,n 
 	      (0 (eq ,nx ,ny))
@@ -77,7 +77,7 @@
  
  
  (defmacro bump-test (nn i) 
-   (let ((n (gens nn)))
+   (let ((n (sgen)))
      `(let ((,n ,nn))
 	(case ,n 
 	      (2 (if (eql-is-eq ,i) 0 ,n))
@@ -293,7 +293,7 @@
 
 (defun copy-tree (tr)
   (declare (optimize (safety 2)))
-  (do (st cs a (g (load-time-value (gensym)))) (nil)
+  (do (st cs a (g (sgen))) (nil)
       (declare (:dynamic-extent st cs))
       (cond ((atom tr)
 	     (do nil ((or (not cs) (eq g (car cs))))
@@ -338,7 +338,7 @@
   (let* ((test (or test test-not #'eql))
 	 (test (if (functionp test) test (funcallable-symbol-function test)))
 	 (test-comp (comp-test test test-not)))
-    (do (st1 cs1 st2 (g (load-time-value (gensym)))) (nil)
+    (do (st1 cs1 st2 (g (sgen))) (nil)
 	(declare (:dynamic-extent st1 cs1 st2))
 	(cond ((and (atom tr1) (consp tr2)) (return nil))
 	      ((and (consp tr1) (atom tr2)) (return nil))
@@ -352,7 +352,7 @@
 		     st2 (cons tr2 st2) tr2 (car tr2)))))))
 
 (deflist subst ((n o) tr t nil)
-  (do (st cs a c rep (g (load-time-value (gensym)))) (nil)
+  (do (st cs a c rep (g (sgen))) (nil)
       (declare (:dynamic-extent st cs))
       (setq rep (do-test test test-comp o (do-key key key-comp tr)))
       (cond ((or rep (atom tr))
@@ -363,7 +363,7 @@
 	    ((setq st (cons tr st) cs (cons g cs) tr (car tr))))))
 
 (deflist nsubst ((n o) tr t nil)
-  (do (st cs rep (g (load-time-value (gensym)))) (nil)
+  (do (st cs rep (g (sgen))) (nil)
       (declare (:dynamic-extent st cs))
       (setq rep (do-test test test-comp o (do-key key key-comp tr)))
       (cond ((or rep (atom tr))
@@ -375,7 +375,7 @@
 
 (defllist sublis (al tr nil)
   (or (unless al tr)
-      (do (st cs a c rep (g (load-time-value (gensym)))) (nil)
+      (do (st cs a c rep (g (sgen))) (nil)
 	(declare (:dynamic-extent st cs))
 	(setq rep (assoc (do-key key key-comp tr) al :test test :test-not test-not))
 	(cond ((or rep (atom tr))
@@ -387,7 +387,7 @@
   
 (defllist nsublis (al tr nil)
   (or (unless al tr)
-      (do (st cs rep (g (load-time-value (gensym)))) (nil)
+      (do (st cs rep (g (sgen))) (nil)
 	(declare (:dynamic-extent st cs))
 	(setq rep (assoc (do-key key key-comp tr) al :test test :test-not test-not))
 	(cond ((or rep (atom tr))

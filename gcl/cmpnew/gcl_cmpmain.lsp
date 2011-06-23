@@ -416,16 +416,12 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
        (function-lambda-expression fun)
        (let ((form `(,(if mac 'defmacro 'defun) ,na ,(cadr lam) ,@(cddr lam))))
 	 (values (if clo 
-		     (let ((f (tmpsym))(v (tmpsym))(o (tmpsym))(n (tmpsym))(i (tmpsym)))
-		       `(let* (,@(mapcar (lambda (x) (list (car x) `(tmpsym))) clo)
+		     (let ((f (tmpsym))(v (tmpsym))(o (tmpsym)))
+		       `(let* (,@(mapcar (lambda (x) (list (car x) `(tmpsym))) (reverse clo))
 			       (,o (fun-env ',name))
 			       (,v ,form)
-			       (,f (c::symbol-gfdef ,v))
-			       (,n (fun-env ',name))
-			       (,i -1))
-			  (mapl (lambda (x y) 
-				  (declare (ignore y))
-				  (c::set-function-env x ,f (incf ,i))) ,o ,n)
+			       (,f (c::symbol-gfdef ,v)))
+			  (si::set-function-environment ,f ,o)
 			  ,v)) form) na))))))
 
 (defun compile (name &optional def &aux na tem gaz (*default-pathname-defaults* #"."))
@@ -862,3 +858,6 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	(delete-file raw)
 	(delete-file init)
 	image))))
+
+(defun cdebug nil 
+  (setq *default-system-p* t *default-c-file* t *default-data-file* t *default-h-file* t *keep-gaz* t))

@@ -482,10 +482,10 @@
   (declare (ignore fn))
   (let* ((tp (when (and args (eq (last *c1exit*) +fmla+)) #t(member t)))
 	 (arg (pop args))
-	 (tp (or tp (info-type (cadr (c1expr arg)))));FIXME? double eval
-	 (atp (car (atomic-tp (type-and tp #t(not null))))))
-    (when (and atp (c1constant-value atp nil))
-      (c1expr `(if ,arg ',atp (or ,@args))))))
+	 (tp (or tp (info-type (cadr (c1expr arg)))))
+	 (atp (atomic-tp (type-and tp #t(not null)))))
+    (when (atomic-type-constant-value atp)
+      (c1expr `(if ,arg ',(car atp) (or ,@args))))))
 (setf (get 'or 'co1special) 'co1or)
 
 (defun c1fmla (fmla info &aux (*c1exit* +fmla+))

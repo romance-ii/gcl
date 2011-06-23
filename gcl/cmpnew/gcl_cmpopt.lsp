@@ -388,9 +388,9 @@
    (get 'boundp 'inline-always))
 
 ;;CONS-CAR
- (push '((list) t #.(flags rfa)"(#0)->c.c_car") (get 'si::cons-car 'inline-always))
+; (push '((list) t #.(flags rfa)"(#0)->c.c_car") (get 'si::cons-car 'inline-always))
 ;;CONS-CDR
- (push '((list) t #.(flags rfa)"(#0)->c.c_cdr") (get 'si::cons-cdr 'inline-always))
+; (push '((list) t #.(flags rfa)"(#0)->c.c_cdr") (get 'si::cons-cdr 'inline-always))
 
 ;;CHAR
  (push '((t t) t #.(flags ans)"elt(#0,fixint(#1))")

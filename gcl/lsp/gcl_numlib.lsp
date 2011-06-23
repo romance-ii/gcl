@@ -95,6 +95,15 @@
   (if (= 0 x) 0.0
        (atan (imagpart x) (realpart x))))
 
+;; (defun signum (x)
+;;   (declare (optimize (safety 1)))
+;;   (check-type x number)
+;;   (typecase
+;;    x
+;;    (rational (cond ((zerop x) x) ((plusp x) 1) (-1)))
+;;    (real     (cond ((zerop x) x) ((plusp x) (float 1 x)) ((float -1 x))))
+;;    (otherwise (cond ((zerop x) x) ((/ x (abs x)))))))
+
 (defun signum (x) (if (zerop x) x (/ x (abs x))))
 
 (defun cis (x) 

@@ -489,13 +489,23 @@ AC_SUBST(CPP)
 
 TCFLAGS="-fsigned-char "
 if test "$GCC" = "yes" ; then
-	TCFLAGS="$TCFLAGS -pipe -Wall "
-	case $use in
-	     *mingw*)
+
+   TCFLAGS="$TCFLAGS -pipe -Wall "
+   case $use in
+        *mingw*)
 	        echo "WARNING: Remove -fno-zero-initialized-in-bss from makedefs if gcc less than 3.3.1."
 	        echo "         It is ptherwise needed for the Unexec stuff to work."
 		TCFLAGS="$TCFLAGS -fno-zero-initialized-in-bss -mms-bitfields $win_flags";;
-        esac
+   esac
+
+   #FIXME -Wno-unused-but-set-variable when time
+   TMPF=-Wno-unused-but-set-variable
+   AC_MSG_CHECKING([for CFLAG $TMPF])
+   CFLAGS_ORI=$CFLAGS
+   CFLAGS="$CFLAGS $TMPF"
+   AC_TRY_RUN([int main() {return 0;}],TCFLAGS="$TCFLAGS $TMPF";AC_MSG_RESULT(yes),AC_MSG_RESULT(no))
+   CFLAGS=$CFLAGS_ORI
+
 fi
 #if test -f /proc/sys/kernel/exec-shield ; then
 #	exec_stat=`cat /proc/sys/kernel/exec-shield`

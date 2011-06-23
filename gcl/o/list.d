@@ -517,17 +517,17 @@ object alist, *treep;
 #endif
 
 
-DEFUN_NEW("CONS-CAR",object,fScons_car,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") { 
-  if (!listp(x))
-    TYPE_ERROR(x,sLlist);
-  RETURN1(x->c.c_car);
-}
+/* DEFUN_NEW("CONS-CAR",object,fScons_car,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {  */
+/*   if (!listp(x)) */
+/*     TYPE_ERROR(x,sLlist); */
+/*   RETURN1(x->c.c_car); */
+/* } */
 
-DEFUN_NEW("CONS-CDR",object,fScons_cdr,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") { 
-  if (!listp(x))
-    TYPE_ERROR(x,sLlist);
-  RETURN1(x->c.c_cdr);
-}
+/* DEFUN_NEW("CONS-CDR",object,fScons_cdr,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {  */
+/*   if (!listp(x)) */
+/*     TYPE_ERROR(x,sLlist); */
+/*   RETURN1(x->c.c_cdr); */
+/* } */
 
 
 DEFUN_NEW("CONS",object,fLcons,LISP,2,2,NONE,OO,OO,OO,OO,(object a,object d),"") {

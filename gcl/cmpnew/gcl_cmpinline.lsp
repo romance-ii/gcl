@@ -563,7 +563,14 @@
   (setq args (mapcar (lambda (form) (info-type (cadr form))) args))
   (cond ((get-plist-inline fname args return-type apnarg (get fname sui)))
 	((get-plist-inline fname args return-type apnarg (get fname 'inline-always)))
-	((cdr (add-fast-link fname apnarg)))))
+	((cdr (add-fast-link fname (length args) apnarg)))))
+
+;; (defun get-inline-info (fname args return-type &optional apnarg
+;; 			      &aux (sui (if *safe-compile* 'inline-safe 'inline-unsafe)))
+;;   (setq args (mapcar (lambda (form) (info-type (cadr form))) args))
+;;   (cond ((get-plist-inline fname args return-type apnarg (get fname sui)))
+;; 	((get-plist-inline fname args return-type apnarg (get fname 'inline-always)))
+;; 	((cdr (add-fast-link fname apnarg)))))
 
 
 (defun adj-cnum-tp (tp ref)
