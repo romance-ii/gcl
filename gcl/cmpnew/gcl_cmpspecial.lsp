@@ -170,12 +170,10 @@
 	((portable-closure-src fn))))
 
 (defun find-special-var (l f)
-  (cond ((atom l) nil)
+  (cond ((funcall f l) l)
+	((atom l) nil)
 	((eq (car l) 'block) nil)
-	((eq (car l) 'let*)
-	 (car (member-if f (third l))))
 	((or (find-special-var (car l) f) (find-special-var (cdr l) f)))))
-
 
 (defun is-narg-le (l)
   (find-special-var l 'is-narg-var))
@@ -223,52 +221,89 @@
 	(car (fourth (fun-c1 fun)))
       (current-env))))
 
-(defun mc nil (let (env)  (lambda nil env)))
+(defun mc nil (let ((env (cons nil nil))) (lambda nil env)))
 
 (defun afe (a f)
-  (push a (car (fn-env f)))
+  (push a (car (funcall f)))
   f)
+
+(defun fn-get (fn prop)
+  (cdr (assoc prop (car (funcall fn)))))
+
+;; (defun mc nil (let (env) (lambda nil env)))
+
+;; (defun afe (a f)
+;;   (push a (car (fn-env f)))
+;;   f)
 
 (defun mf (id)
   (let* ((f (mc)))
-    (when (consp id) (setf (caddr (si::call f)) (compress-fle id nil nil)))
+;    (when (consp id) (setf (caddr (si::call f)) (compress-fle id nil nil)))
     (afe (cons 'id id) f)
+    (afe (cons 'df (current-env)) f)
     f))
 
-(defun fn-get (fn prop)
-  (cdr (assoc prop (car (fn-env fn)))))
+;; (defun fn-get (fn prop)
+;;   (cdr (assoc prop (car (fn-env fn)))))
 
-(defun funid-to-fn (funid)
-  (or (local-fun-fn funid) (gethash funid *fn-src-fn*) (setf (gethash funid *fn-src-fn*) (mf funid))))
+(defun funid-to-fn (funid &aux fun)
+  (cond ((setq fun (local-fun-p funid)) (fun-fn fun))
+;	((gethash funid *fn-src-fn*))
+;	((setf (gethash funid *fn-src-fn*) (mf funid)))
+	((symbolp funid) (or (gethash funid *fn-src-fn*) (setf (gethash funid *fn-src-fn*) (mf funid))))
+	((mf funid))
+	))
+
+;; (defun funid-to-fn (funid)
+;;   (or (local-fun-fn funid) (gethash funid *fn-src-fn*) (setf (gethash funid *fn-src-fn*) (mf funid))))
 
 
-(defun c1function (args &optional (provisional *provisional-inline*) b f)
+(defun c1function (args &optional (b 'cb) f &aux fd)
 
   (when (endp args) (too-few-args 'function 1 0))
   (unless (endp (cdr args)) (too-many-args 'function 1 (length args)))
   
   (let* ((funid (si::funid (car args)))
-	 (fn (funid-to-fn funid))
+	 (fn (afe (cons 'ce (current-env)) (funid-to-fn funid)))
 	 (tp (if fn (object-type fn) #tfunction))
 	 (info (make-info :type tp)))
-    (cond ((and provisional (not (when (symbolp funid) (not (local-fun-p funid)))));FIXME
-	   (let* ((df (fun-def-env fn))
-		  (ce (current-env))
-		  (res (list 'provfn info args (list ce df))))
-	     (afe (cons 'ce ce) fn)
-	     (afe (cons 'df df) fn)
-	     (afe (cons 'prov res) fn)
-	     res))
-	  ((symbolp funid)
-	   (let ((fd (c1local-fun funid t)))
-	     (unless fd
-	       (setf (info-sp-change info) (if (null (get funid 'no-sp-change)) 1 0)))
-	     (list 'function info (or fd (list 'call-global info funid)))))
+    (cond ((setq fd (c1local-fun funid t))
+	   (add-info info (cadr fd))
+	   `(function ,info ,fd))
+	  ((symbolp funid) 
+	   (setf (info-sp-change info) (if (null (get funid 'no-sp-change)) 1 0))
+	   `(function ,info (call-global ,info ,funid)))
+	  ((setq fd (process-local-fun b (or f (make-fun :name 'lambda :src funid :c1cb t :fn fn :info (make-info :type '*))) funid tp))
+	   (add-info info (cadadr fd))
+	   `(function ,info ,fd)))))
 
-	  ((let ((r (process-local-fun (or b 'cb) (or f (make-fun :name 'lambda :src funid :info (make-info :type '*))) funid tp)))
-	     (add-info info (cadadr r))
-	     (setf (info-flags info) (logandc2 (info-flags info) (iflags side-effects)))
-	     `(function ,info ,r))))))
+;; (defun c1function (args &optional (provisional *provisional-inline*) b f)
+
+;;   (when (endp args) (too-few-args 'function 1 0))
+;;   (unless (endp (cdr args)) (too-many-args 'function 1 (length args)))
+  
+;;   (let* ((funid (si::funid (car args)))
+;; 	 (fn (funid-to-fn funid))
+;; 	 (tp (if fn (object-type fn) #tfunction))
+;; 	 (info (make-info :type tp)))
+;;     (cond ((and provisional (not (when (symbolp funid) (not (local-fun-p funid)))));FIXME
+;; 	   (let* ((df (fun-def-env fn))
+;; 		  (ce (current-env))
+;; 		  (res (list 'provfn info args (list ce df))))
+;; 	     (afe (cons 'ce ce) fn)
+;; 	     (afe (cons 'df df) fn)
+;; 	     (afe (cons 'prov res) fn)
+;; 	     res))
+;; 	  ((symbolp funid)
+;; 	   (let ((fd (c1local-fun funid t)))
+;; 	     (unless fd
+;; 	       (setf (info-sp-change info) (if (null (get funid 'no-sp-change)) 1 0)))
+;; 	     (list 'function info (or fd (list 'call-global info funid)))))
+
+;; 	  ((let ((r (process-local-fun (or b 'cb) (or f (make-fun :name 'lambda :src funid :info (make-info :type '*))) funid tp)))
+;; 	     (add-info info (cadadr r))
+;; 	     (setf (info-flags info) (logandc2 (info-flags info) (iflags side-effects)))
+;; 	     `(function ,info ,r))))))
 
 ;; (defun c1function (args &optional (provisional *provisional-inline*) b f)
 
@@ -364,31 +399,27 @@
         (call-global
          (unwind-exit (list 'symbol-function (add-symbol (caddr funob)))))
         (call-local
-	 (let* ((funob (caddr funob))
-		(fun (pop funob)))
-	   (if (car funob)
-	       (unwind-exit (list 'ccb-vs (fun-ref-ccb fun)))
-	     (unwind-exit (list 'vs* (fun-ref fun))))))
+	 (let* ((funob (caddr funob))(fun (pop funob)))
+	   (unwind-exit (if (cadr funob) (list 'ccb-vs (fun-ref-ccb fun)) (list 'vs* (fun-ref fun))))))
         (otherwise
 	 (let* ((fun (pop funob))
-		(funob (car funob))
+		(lam (car funob))
 		(cl (fun-call fun))
-		(sig (pop cl))
-		(cle (pop cl))
+		(sig (car cl))
 		(at (car sig))
 		(rt (cadr sig))
-		(ha (mapcar (lambda (x) `',x) (cons sig (cons cle cl))))
+		(ha (mapcar (lambda (x) `',x) (export-call cl)))
 		(clc `(let ((si::f #'(lambda nil nil)))
 			(si::add-hash si::f ,@ha)
 			(si::call si::f))))
 	   
-	   (pushnew (list 'closure (if (null *clink*) nil (cons 0 0)) *ccb-vs* fun funob)
+	   (pushnew (list 'closure (if (null *clink*) nil (cons 0 0)) *ccb-vs* fun lam)
 		    *local-funs* :key 'fourth)
 	   
 	   (cond (*clink*
 		  (unwind-exit (list 'make-cclosure (fun-cfun fun) (fun-name fun) 
 				     (or (fun-vv fun) (1+ *next-vv*))
-				     (new-proclaimed-argd at rt) (argsizes at rt (xa funob))
+				     (new-proclaimed-argd at rt) (argsizes at rt (xa lam))
 				     *clink*))
 		  (unless (fun-vv fun)
 		    (push-data-incf nil)
@@ -404,8 +435,56 @@
 				  ,clc
 				  ,(add-address (c-function-name "&LC" (fun-cfun fun) (fun-name fun)))
 				  nil nil
-				  -1 ,(new-proclaimed-argd at rt) ,(argsizes at rt (xa funob)))) t))
+				  -1 ,(new-proclaimed-argd at rt) ,(argsizes at rt (xa lam)))) t))
 		  (unwind-exit (list 'vv (fun-vv fun)))))))))
+
+;; (defun c2function (funob);FIXME
+;;   (case (car funob)
+;;         (call-global
+;;          (unwind-exit (list 'symbol-function (add-symbol (caddr funob)))))
+;;         (call-local
+;; 	 (let* ((funob (caddr funob))
+;; 		(fun (pop funob)))
+;; 	   (if (car funob)
+;; 	       (unwind-exit (list 'ccb-vs (fun-ref-ccb fun)))
+;; 	     (unwind-exit (list 'vs* (fun-ref fun))))))
+;;         (otherwise
+;; 	 (let* ((fun (pop funob))
+;; 		(funob (car funob))
+;; 		(cl (fun-call fun))
+;; 		(sig (pop cl))
+;; 		(cle (pop cl))
+;; 		(at (car sig))
+;; 		(rt (cadr sig))
+;; 		(ha (mapcar (lambda (x) `',x) (cons sig (cons cle cl))))
+;; 		(clc `(let ((si::f #'(lambda nil nil)))
+;; 			(si::add-hash si::f ,@ha)
+;; 			(si::call si::f))))
+	   
+;; 	   (pushnew (list 'closure (if (null *clink*) nil (cons 0 0)) *ccb-vs* fun funob)
+;; 		    *local-funs* :key 'fourth)
+	   
+;; 	   (cond (*clink*
+;; 		  (unwind-exit (list 'make-cclosure (fun-cfun fun) (fun-name fun) 
+;; 				     (or (fun-vv fun) (1+ *next-vv*))
+;; 				     (new-proclaimed-argd at rt) (argsizes at rt (xa funob))
+;; 				     *clink*))
+;; 		  (unless (fun-vv fun)
+;; 		    (push-data-incf nil)
+;; 		    (setf (fun-vv fun) *next-vv*)
+;; 		    (add-init `(si::setvv ,(fun-vv fun) ,clc) t)))
+;; 		 (t  
+;; 		  (unless (fun-vv fun)
+;; 		    (push-data-incf nil)
+;; 		    (setf (fun-vv fun) *next-vv*)
+;; 		    (add-init
+;; 		     `(si::setvv ,(fun-vv fun)
+;; 				 (si::init-function 
+;; 				  ,clc
+;; 				  ,(add-address (c-function-name "&LC" (fun-cfun fun) (fun-name fun)))
+;; 				  nil nil
+;; 				  -1 ,(new-proclaimed-argd at rt) ,(argsizes at rt (xa funob)))) t))
+;; 		  (unwind-exit (list 'vv (fun-vv fun)))))))))
 
 (si:putprop 'symbol-function 'wt-symbol-function 'wt-loc)
 (si:putprop 'make-cclosure 'wt-make-cclosure 'wt-loc)

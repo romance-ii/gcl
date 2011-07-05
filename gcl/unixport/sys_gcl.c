@@ -144,7 +144,6 @@ gcl_init_system(object no_init)
   ar_check_init(gcl_cmpfun,no_init);
   ar_check_init(gcl_cmpif,no_init);
   ar_check_init(gcl_cmplabel,no_init);
-  ar_check_init(gcl_cmplam,no_init);
   ar_check_init(gcl_cmploc,no_init);
   ar_check_init(gcl_cmpmap,no_init);
   ar_check_init(gcl_cmpmulti,no_init);
@@ -152,6 +151,7 @@ gcl_init_system(object no_init)
   ar_check_init(gcl_cmptag,no_init);
   ar_check_init(gcl_cmpeval,no_init);
   ar_check_init(gcl_cmptop,no_init);
+  ar_check_init(gcl_cmplam,no_init);
   ar_check_init(gcl_cmplet,no_init);
   ar_check_init(gcl_cmpvs,no_init);
   ar_check_init(gcl_cmpwt,no_init);

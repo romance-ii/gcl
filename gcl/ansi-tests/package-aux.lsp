@@ -79,7 +79,7 @@
 		     (unless (or (not (member access
 					      (quote ,(copy-list symbol-types))))
 				 (gethash sym ,cht-var))
-		       (format t "Symbol not found: ~S~%" sym)
+		       (format t "Symbol not found: ~S ~S ~S ~S ~S~%" sym p sym2 access (quote ,(copy-list symbol-types)))
 		       (incf fail-count)
 		       (return-from fail nil))))))
 	 (or (zerop fail-count) fail-count))))

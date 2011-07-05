@@ -482,9 +482,9 @@
       (setq s (nreverse s))
       (let ((tmp start))
 	(setq start (if endp (- ls end) 0) end (if hls (- ls tmp) array-dimension-limit))))
-    (let* ((r (unless (and l (= start 0)) s))(rp (when (and l (> start 0)) (nthcdr (1- start) r))))
+    (let* ((r (unless (and (listp s) (= start 0)) s))(rp (when (and l (> start 0)) (nthcdr (1- start) r))));FIXME compiler aid
       (do ((i start (1+ i))(j 0)(ri start)
-	   (p (when l (if rp (cdr rp) s)) (cdr p)))
+	   (p (when (listp s) (if rp (cdr rp) s)) (cdr p)));FIXME compiler aid
 	  ((or (>= i end) (>= j count) (when l (endp p)))
 	   (let ((r (cond (l (when rp (rplacd rp p)) (or r p))
 			  ((do ((m i (1+ m))) 
@@ -574,19 +574,19 @@
 	     (,tstn (not (funcall ,tstn ,j1 ,j2)))
 	     ((eql ,j1 ,j2))))))
 
-(defmacro call-test-key (test test-not key i1 i2)
-  (let ((j1 (sgen)) (j2 (sgen))(tst (sgen))(tstn (sgen))(ky (sgen)))
-    `(let ((,ky ,key)(,j1 ,i1)(,j2 ,i2)(,tst ,test)(,tstn ,test-not))
-       (if ,ky 
-	   (call-test ,tst ,tstn (funcall ,ky ,j1) (funcall ,ky ,j2))
-	 (call-test ,tst ,tstn ,i1 ,i2)))))
+;; (defmacro call-test-key (test test-not key i1 i2)
+;;   (let ((j1 (sgen)) (j2 (sgen))(tst (sgen))(tstn (sgen))(ky (sgen)))
+;;     `(let ((,ky ,key)(,j1 ,i1)(,j2 ,i2)(,tst ,test)(,tstn ,test-not))
+;;        (if ,ky 
+;; 	   (call-test ,tst ,tstn (funcall ,ky ,j1) (funcall ,ky ,j2))
+;; 	 (call-test ,tst ,tstn ,i1 ,i2)))))
 
 
-(defun check-seq-start-end (start end)
-  (unless (and (si:fixnump start) (si:fixnump end))
-          (error "Fixnum expected."))
-  (when (> (the fixnum start) (the fixnum end))
-        (error "START is greater than END.")))
+;; (defun check-seq-start-end (start end)
+;;   (unless (and (si:fixnump start) (si:fixnump end))
+;;           (error "Fixnum expected."))
+;;   (when (> (the fixnum start) (the fixnum end))
+;;         (error "START is greater than END.")))
 
 (defun bad-seq-limit (x y)
   (declare (seqind x y))
@@ -643,8 +643,7 @@
 
 
 (defun replace (sequence1 sequence2
-	        &key start1  end1
-		     start2 end2 )
+	        &key start1 end1 start2 end2)
   (declare (optimize (safety 2)))
   (with-start-end start1 end1 sequence1
      (with-start-end start2 end2 sequence2		  
@@ -681,108 +680,111 @@
 ;;;  and the keyword arguments are automatically supplied.
 ;;; If the function has the :COUNT argument, set COUNTP T.
 
-(eval-when (eval compile)
-(defmacro defseq
-          (f args countp everywherep body
-           &aux (*macroexpand-hook* 'funcall))
-  (setq *body* body)
-  (list 'progn
-        (let* ((from-end nil)
-               (iterate-i '(i start (f+ 1 i)))
-               (iterate-i-from-end '(i (f+ -1  end) (f+ -1 i)))
-               (endp-i '(>= i end))
-               (endp-i-from-end '(< i start))
-               (iterate-i-everywhere '(i 0 (f+ 1 i)))
-               (iterate-i-everywhere-from-end '(i (f+ -1  l) (f+ -1  i)))
-               (endp-i-everywhere '(>= i l))
-               (endp-i-everywhere-from-end '(< i 0))
-               (i-in-range '(and (<= start i) (< i end)))
-               (x '(elt sequence i))
-               (keyx `(funcall key ,x))
-               (satisfies-the-test `(call-test test test-not item ,keyx))
-               (number-satisfied
-                `(n (internal-count item sequence
-                                    :from-end from-end
-                                    :test test :test-not test-not
-                                    :start start :end end
-                                    ,@(if countp '(:count count))
-                                    :key key)))
-               (within-count '(< k count))
-               (kount-0 '(k 0))
-               (kount-up '(setq k (f+ 1  k))))
-           `(defun ,f (,@args item sequence
-                       &key from-end test test-not
-                            start end
-                            ,@(if countp '(count))
-                            (key #'identity))
-       (declare (optimize (safety 2)))
-       (if (eq key nil) (setq key #'identity))
-       (with-start-end start end sequence
-	 (let (,@(when everywherep `((l (length sequence)))))	       
-	   ,@(when everywherep '((declare (fixnum l))))
-	  (let ,@(if countp
-		     '(((count
-			 (cond ((null count) most-positive-fixnum)
-			       ((< count 0) 0)
-			       ((> count most-positive-fixnum) most-positive-fixnum)
-			       (t count))))))
-              ,@(if countp '((declare (fixnum count))))
-              nil
-	      (and test test-not (error "both test and test not supplied"))
-                (if (not from-end)
-                    ,(eval-body)
-                    ,(progn (setq from-end t
-                                  iterate-i iterate-i-from-end
-                                  endp-i endp-i-from-end
-                                  iterate-i-everywhere
-                                  iterate-i-everywhere-from-end
-                                  endp-i-everywhere
-                                  endp-i-everywhere-from-end)
-                            (eval-body))))))))
-        `(defun ,(intern (si:string-concatenate (string f) "-IF")
-                         (symbol-package f))
-                (,@args predicate sequence
-                 &key from-end
-                      start end
-                      ,@(if countp '(count))
-                      (key #'identity))
-           (declare (optimize (safety 2)))
-           (if (eq key nil) (setq key #'identity))
-           (,f ,@args predicate sequence
-               :from-end from-end
-               :test #'funcall
-               :start start :end end
-               ,@(if countp '(:count count))
-               :key key))
-        `(defun ,(intern (si:string-concatenate (string f) "-IF-NOT")
-                         (symbol-package f))
-                (,@args predicate sequence
-                 &key from-end start end
-                      ,@(if countp '(count))
-                      (key #'identity))
-           (declare (optimize (safety 2)))
-	   (if (eq key nil) (setq key #'identity))
-           (,f ,@args predicate sequence
-               :from-end from-end
-               :test-not #'funcall
-               :start start :end end
-               ,@(if countp '(:count count))
-               :key key))
-        (list 'quote f)))
+;; (eval-when (eval compile)
+;; (defmacro defseq
+;;           (f args countp everywherep body
+;;            &aux (*macroexpand-hook* 'funcall))
+;;   (setq *body* body)
+;;   (list 'progn
+;;         (let* ((from-end nil)
+;;                (iterate-i '(i start (f+ 1 i)))
+;;                (iterate-i-from-end '(i (f+ -1  end) (f+ -1 i)))
+;;                (endp-i '(>= i end))
+;;                (endp-i-from-end '(< i start))
+;;                (iterate-i-everywhere '(i 0 (f+ 1 i)))
+;;                (iterate-i-everywhere-from-end '(i (f+ -1  l) (f+ -1  i)))
+;;                (endp-i-everywhere '(>= i l))
+;;                (endp-i-everywhere-from-end '(< i 0))
+;;                (i-in-range '(and (<= start i) (< i end)))
+;;                (x '(elt sequence i))
+;;                (keyx `(funcall key ,x))
+;;                (satisfies-the-test `(call-test test test-not item ,keyx))
+;;                (number-satisfied
+;;                 `(n (internal-count item sequence
+;;                                     :from-end from-end
+;;                                     :test test :test-not test-not
+;;                                     :start start :end end
+;;                                     ,@(if countp '(:count count))
+;;                                     :key key)))
+;;                (within-count '(< k count))
+;;                (kount-0 '(k 0))
+;;                (kount-up '(setq k (f+ 1  k))))
+;;            `(defun ,f (,@args item sequence
+;;                        &key from-end test test-not
+;;                             start end
+;;                             ,@(if countp '(count))
+;;                             (key #'identity))
+;;        (declare (optimize (safety 2)))
+;;        (if (eq key nil) (setq key #'identity))
+;;        (with-start-end start end sequence
+;; 	 (let (,@(when everywherep `((l (length sequence)))))	       
+;; 	   ,@(when everywherep '((declare (fixnum l))))
+;; 	  (let ,@(if countp
+;; 		     '(((count
+;; 			 (cond ((null count) most-positive-fixnum)
+;; 			       ((< count 0) 0)
+;; 			       ((> count most-positive-fixnum) most-positive-fixnum)
+;; 			       (t count))))))
+;;               ,@(if countp '((declare (fixnum count))))
+;;               nil
+;; 	      (and test test-not (error "both test and test not supplied"))
+;;                 (if (not from-end)
+;;                     ,(eval-body)
+;;                     ,(progn (setq from-end t
+;;                                   iterate-i iterate-i-from-end
+;;                                   endp-i endp-i-from-end
+;;                                   iterate-i-everywhere
+;;                                   iterate-i-everywhere-from-end
+;;                                   endp-i-everywhere
+;;                                   endp-i-everywhere-from-end)
+;;                             (eval-body))))))))
+;;         `(defun ,(intern (si:string-concatenate (string f) "-IF")
+;;                          (symbol-package f))
+;;                 (,@args predicate sequence
+;;                  &key from-end
+;;                       start end
+;;                       ,@(if countp '(count))
+;;                       (key #'identity))
+;;            (declare (optimize (safety 2)))
+;;            (if (eq key nil) (setq key #'identity))
+;;            (,f ,@args predicate sequence
+;;                :from-end from-end
+;;                :test #'funcall
+;;                :start start :end end
+;;                ,@(if countp '(:count count))
+;;                :key key))
+;;         `(defun ,(intern (si:string-concatenate (string f) "-IF-NOT")
+;;                          (symbol-package f))
+;;                 (,@args predicate sequence
+;;                  &key from-end start end
+;;                       ,@(if countp '(count))
+;;                       (key #'identity))
+;;            (declare (optimize (safety 2)))
+;; 	   (if (eq key nil) (setq key #'identity))
+;;            (,f ,@args predicate sequence
+;;                :from-end from-end
+;;                :test-not #'funcall
+;;                :start start :end end
+;;                ,@(if countp '(:count count))
+;;                :key key))
+;;         (list 'quote f)))
 
-(defmacro eval-body () *body*)
-)
+;; (defmacro eval-body () *body*)
+
+;; (defseq internal-count () t nil
+;;   `(do (,iterate-i ,kount-0)
+;;        (,endp-i k)
+;;      (declare (seqind i k))
+;;      (when (and ,within-count ,satisfies-the-test)
+;;            ,kount-up)))
+
+;; )
 
 
 
 
 
-(defseq internal-count () t nil
-  `(do (,iterate-i ,kount-0)
-       (,endp-i k)
-     (declare (seqind i k))
-     (when (and ,within-count ,satisfies-the-test)
-           ,kount-up)))
+
 
        
 

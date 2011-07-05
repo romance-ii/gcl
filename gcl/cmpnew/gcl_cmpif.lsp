@@ -287,10 +287,18 @@
 
 (defun maybe-progn-fmla (fmla args info)
   (let ((fmla (fmla-c1expr fmla))
-	(c1 (c1expr** args info)))
+	(c1 (c1expr args)))
+    (add-info (cadr fmla) info);FIXME?
     (if (ignorable-form fmla)
 	c1
       (new-c1progn fmla c1))))
+
+;; (defun maybe-progn-fmla (fmla args info)
+;;   (let ((fmla (fmla-c1expr fmla))
+;; 	(c1 (c1expr** args info)))
+;;     (if (ignorable-form fmla)
+;; 	c1
+;;       (new-c1progn fmla c1))))
 
 (defun c1if (args &aux info f)
   (when (or (endp args) (endp (cdr args)))

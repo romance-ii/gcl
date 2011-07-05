@@ -80,6 +80,23 @@ make_fun(void *addr,object data,object call,object env,ufixnum argd,ufixnum size
 
 #define GET_DATA(d_,a_) ((d_)!=Cnil ? (d_) : ((a_) && (a_)->s.s_dbind && type_of((a_)->s.s_dbind)==t_cfdata ? (a_)->s.s_dbind : 0))
 
+DEFUN_NEW("ANONYMOUS-CLOSURE",object,fSanonymous_closure,SI,0,0,NONE,OO,OO,OO,OO,(),"") {
+  object f=fcall.fun;
+  RETURN1(f->fun.fun_env[0]->c.c_car);
+}
+
+DEFUN_NEW("MAKE-ANONYMOUS-CLOSURE",object,fSmake_anonymous_closure,SI,0,0,NONE,OO,OO,OO,OO,(),"") {
+  
+  RETURN1(FFN(fSinit_function)(list(5,Cnil,Cnil,Cnil,Cnil,Cnil),(void *)fSanonymous_closure,Cnil,MMcons(MMcons(Cnil,Cnil),Cnil),-1,0,0));
+
+}
+
+DEFUN_NEW("FUNCTION-ENVIRONMENT",object,fSfunction_environment,SI,1,1,NONE,OO,OO,OO,OO,(object f),"") {
+
+  RETURN1(f->fun.fun_env[0]);
+
+}
+
 DEFUN_NEW("INIT-FUNCTION",object,fSinit_function,SI,7,7,NONE,OO,OO,OI,II, \
 	  (object sc,object addr,object data,object env,\
 	   fixnum key,fixnum argd,fixnum sizes),\

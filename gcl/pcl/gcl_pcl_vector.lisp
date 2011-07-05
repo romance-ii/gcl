@@ -879,8 +879,8 @@
      ,@(when (symbolp pv-table-symbol)
 	 `((declare (special ,pv-table-symbol))))
      ,@(progn
-	#-cmu `(,pv ,calls)
-	#+cmu `(declare (ignorable ,pv ,calls)))
+;	#-cmu `(,pv ,calls)#+cmu
+	`(declare (ignorable ,pv ,calls)))
      ,@forms))
 
 (defvar *non-variable-declarations*
@@ -982,7 +982,7 @@
       `(list* :fast-function
 	#'(lambda (.pv-cell. .next-method-call. ,@args+rest-arg)
 	    ,@outer-decls
-	    .pv-cell. .next-method-call.
+	    (declare (ignorable .pv-cell. .next-method-call. ,@(when rest-arg (list rest-arg))))
 	    (macrolet ((pv-env ((pv calls pv-table-symbol pv-parameters)
 				&rest forms)
 			 (declare (ignore pv-table-symbol pv-parameters))
@@ -990,7 +990,7 @@
 				(,calls (cdr .pv-cell.)))
 			   (declare ,(make-pv-type-declaration pv)
 			    ,(make-calls-type-declaration calls))
-			   ,pv ,calls
+			   (declare (ignorable ,pv ,calls))
 			   ,@forms)))
 	      (fast-lexical-method-functions 
 	       (,(car lmf-params) .next-method-call. ,req-args ,rest-arg

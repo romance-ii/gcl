@@ -334,7 +334,8 @@
 		car cdr caar cadr cdar cddr caaar caadr cadar cdaar caddr cdadr cddar cdddr 
 		caaaar caaadr caadar cadaar cdaaar caaddr cadadr cdaadr caddar cdadar cddaar
 		cadddr cdaddr cddadr cdddar cddddr logand lognot logior logxor c-type complex-real
-		complex-imag ratio-numerator ratio-denominator cnum-type
+		complex-imag ratio-numerator ratio-denominator cnum-type si::number-plus si::number-minus
+		si::number-times si::number-divide ;FIXME more
 		,@(mapcar (lambda (x) (cdr x)) (remove-if-not (lambda (x) (symbolp (cdr x))) +cmp-type-alist+))))
   (si::putprop l t 'c1no-side-effects))
 
@@ -556,7 +557,8 @@
 
 (si::putprop 'ldb 'co1ldb 'co1)		    
 
-(defun co1ldb (f args &aux tem (len (integer-length most-positive-fixnum))) f
+(defun co1ldb (f args &aux tem (len (integer-length most-positive-fixnum)))
+  (declare (ignore f))
   (let ((specs
 	 (cond ((and (consp (setq tem (first args)))
 		     (eq 'byte (car tem))
@@ -607,7 +609,8 @@
            (close-inline-blocks)))
   )
 
-(defun co1eql (f args) f
+(defun co1eql (f args)
+  (declare (ignore f))
   (or (and (cdr args) (not *safe-compile*))
       (return-from co1eql nil))
   (cond ((replace-constant args)
@@ -743,8 +746,9 @@
 
 (si::putprop 'typep 'co1typep 'co1)		    
 
-(defun co1schar (f args) f
-   (and (listp (car args)) (not *safe-compile*)
+(defun co1schar (f args)
+  (declare (ignore f))
+  (and (listp (car args)) (not *safe-compile*)
 	(cdr args)
 	(eq (caar args) 'symbol-name)
 	(c1expr `(aref (the string ,(second (car args)))
@@ -767,7 +771,8 @@
 	(t x))))
     	 
 
-(defun co1cons (f args) f
+(defun co1cons (f args)
+  (declare (ignore f))
   (let ((tem (and (eql (length args) 2) (cons-to-lista args))))
     (and tem (not (eq tem args))
 	 (c1expr  (if (equal '(nil) (last tem))
@@ -875,7 +880,8 @@
 	   (c1expr `(let ((,s ,(car args))) 
 		      (if (= 1 (si::get-byte-stream-nchars ,s)) ,tem ,(cons f nargs)))))))))
 
-(defun co1read-char (f args &aux tem) f
+(defun co1read-char (f args &aux tem)
+  (declare (ignore f))
   (cond ((setq tem (fast-read args 'read-char1))
 	 (let ((*space* 10))		;prevent recursion!
 	   (c1expr tem)))))    
@@ -896,14 +902,16 @@
 	     ,(cfast-write (list (car args) str) write-fun tp)))))))
 
 
-(defun co1write-byte (f args) f
+(defun co1write-byte (f args)
+  (declare (ignore f))
   (let ((tem (cfast-write args 'write-byte 'fixnum)))
     (when tem 
       (let ((*space* 10))
 	(c1expr tem)))))
 
 
-(defun co1write-char (f args) f
+(defun co1write-char (f args)
+  (declare (ignore f))
   (let* ((tem (cfast-write args 'write-char 'character)))
     (when tem 
       (let ((*space* 10))

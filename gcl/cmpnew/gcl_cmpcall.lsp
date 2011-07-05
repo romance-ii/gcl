@@ -247,8 +247,23 @@
 	 (*vars* (mapc (lambda (x) (setf (var-store x) t)) (append nv ov)))
 	 (*tags* (cons ttl-tag *tags*)))
     (c1expr `(progn
-	       (psetq ,@(mapcan (lambda (x) (list (car x) (cdr x))) s))
+	       (setq ,@(mapcan (lambda (x) (list (car x) (cdr x))) s))
 	       (go ,tag)))))
+
+;; (defun c1tail-recur (args)
+;;   (let* ((tag (pop args))
+;; 	 (s (car args))
+;; 	 (ts (or (car (member tag *ttl-tags* :key (lambda (x) (tag-name (car x))))) (baboon)))
+;; 	 (ttl-tag (pop ts))
+;; 	 (nv (mapcar (lambda (x) (car (member (cdr x) *vars* 
+;; 					      :key (lambda (x) (when (var-p x) (var-name x)))))) s))
+;; 	 (ov (mapcar (lambda (x) (car (member (car x) (car ts) 
+;; 					      :key (lambda (x) (when (var-p x) (var-name x)))))) s))
+;; 	 (*vars* (mapc (lambda (x) (setf (var-store x) t)) (append nv ov)))
+;; 	 (*tags* (cons ttl-tag *tags*)))
+;;     (c1expr `(progn
+;; 	       (psetq ,@(mapcan (lambda (x) (list (car x) (cdr x))) s))
+;; 	       (go ,tag)))))
     
 (setf (get 'tail-recur 'c1) 'c1tail-recur)
 

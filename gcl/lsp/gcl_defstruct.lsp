@@ -34,7 +34,7 @@
 (defvar *list-accessors* (make-array 2 :adjustable t))
 (defvar *vector-accessors* (make-array 2 :adjustable t))
 
-(defun record-fn (&rest l) l nil)
+(defun record-fn (&rest l) (declare (ignore l)) nil)
 
 (defun make-access-function (name conc-name no-conc type named include no-fun
 				  ;; from apply
@@ -293,7 +293,7 @@
 
 (defun get-slot-pos (leng include slot-descriptions &aux type small-types
 			  has-holes) 
-  (declare (special *standard-slot-positions*)) include
+  (declare (ignore include) (special *standard-slot-positions*)) 
   (dolist (v slot-descriptions)
 	  (when (and v (car v))
 		(setf type 

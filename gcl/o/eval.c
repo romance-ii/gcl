@@ -855,7 +855,7 @@ DEFUNOM_NEW("FUNCALL",object,fLfuncall,LISP
     UNDEFINED_FUNCTION(fun);
   
   va_start(ap,fun);
-  vs_top=(object *)fcall.valp;
+  if (fcall.valp) vs_top=(object *)fcall.valp;/*FIXME*/
   res=funcall_ap(fun,VFUN_NARGS-1,ap);
   va_end(ap);
   return res;
@@ -870,7 +870,7 @@ DEFUNOM_NEW("APPLY",object,fLapply,LISP
   va_list ap;
  
   va_start(ap,fun);
-  vs_top=(object *)fcall.valp;
+  if (fcall.valp) vs_top=(object *)fcall.valp;
   res=funcall_ap(fun,1-VFUN_NARGS,ap);
   va_end(ap);
   return res;

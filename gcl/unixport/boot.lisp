@@ -5,6 +5,8 @@
 (in-package 'compiler)
 #+pre-gcl
 (progn
+  (defun mc nil (si::make-anonymous-closure))
+;  (defun fn-env (f) (si::function-environment f))
   (defun tt3 (x) (lit :fixnum "fto(" (:object x) ")"))
   (si::putprop 'tt3 t 'cmp-inline)
   (defun tt30 (x) (lit :boolean "!fto0(" (:object x) ")"))

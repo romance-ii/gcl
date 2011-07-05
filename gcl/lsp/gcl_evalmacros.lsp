@@ -31,8 +31,8 @@
 (eval-when (eval compile) (setq si:*inhibit-macro-special* nil))
 
 
-(defmacro sgen nil
-  `(load-time-value (gensym)))
+(defmacro sgen (&optional (pref "G"))
+  `(load-time-value (gensym ,pref)))
 
 (defmacro defvar (var &optional (form nil form-sp) doc-string)
   (declare (optimize (safety 2)))
@@ -75,19 +75,19 @@
   (declare (optimize (safety 2)))
   (unless (endp forms)
     (let ((x (reverse forms)))
-      (do ((forms (cdr x) (cdr forms)) (gs (sgen))
+      (do ((forms (cdr x) (cdr forms)) (gs (sgen "OR"))
 	   (form (car x)
 		 (if (or (constantp (car forms)) (symbolp (car forms)))
 		     (let ((temp (car forms)))
 		       `(if ,temp ,temp ,form))
-		   (let ((temp gs))
-		     `(let ((,temp ,(car forms)))
-			(if ,temp ,temp ,form))))))
+		   `(let ((,gs ,(car forms)))
+		      (declare (ignorable ,gs))
+		      (if ,gs ,gs ,form)))))
                ((endp forms) form)))))
 
 (defmacro locally (&rest body)   (declare (optimize (safety 2))) `(let () ,@body))
 
-(defmacro loop (&rest body &aux (tag (sgen)))
+(defmacro loop (&rest body &aux (tag (sgen "LOOP")))
   (declare (optimize (safety 2)))
   `(block nil (tagbody ,tag (progn ,@body) (go ,tag))))
 
@@ -112,24 +112,27 @@
 	   (load-time-value (or (find-package 'setf) (make-package 'setf))))))
 
 (defmacro funid-sym (funid)
-  (let ((s (sgen)))
+  (let ((s (sgen "FUNID-SYM")))
     `(let ((,s ,funid))
+       (declare (ignorable ,s))
        (etypecase
 	,s
 	(symbol ,s)
 	((cons (member setf) (cons symbol null)) (setf-sym (cadr ,s)))))))
 
 (defmacro funid-sym-p (funid)
-  (let ((s (sgen)))
+  (let ((s (sgen  "FUNID-SYM-P")))
     `(let ((,s ,funid))
+       (declare (ignorable ,s))
        (typecase
 	,s
 	(symbol ,s)
 	((cons (member setf) (cons symbol null)) (setf-sym (cadr ,s)))))))
 
 (defmacro funid (funid)
-  (let ((s (sgen)))
+  (let ((s (sgen "FUNID")))
     `(let ((,s ,funid))
+       (declare (ignorable ,s))
        (etypecase
 	,s
 	(symbol ,s)
@@ -137,8 +140,9 @@
 	((cons (member setf) (cons symbol null)) (setf-sym (cadr ,s)))))))
 
 (defmacro funid-p (funid)
-  (let ((s (sgen)))
+  (let ((s (sgen "FUNID-P")))
     `(let ((,s ,funid))
+       (declare (ignorable ,s))
        (typecase
 	,s
 	(symbol ,s)
@@ -229,13 +233,13 @@
 
 ; sequencing
 
-(defmacro prog1 (first &rest body &aux (sym (sgen)))
+(defmacro prog1 (first &rest body &aux (sym (sgen "PROG1")))
   (declare (optimize (safety 2)))
-  `(let ((,sym ,first)) ,@body ,sym))
+  `(let ((,sym ,first)) (declare (ignorable ,sym)) ,@body ,sym))
 
-(defmacro prog2 (first second &rest body &aux (sym (sgen)))
+(defmacro prog2 (first second &rest body &aux (sym (sgen "PROG2")))
   (declare (optimize (safety 2)))
-  `(progn ,first (let ((,sym ,second)) ,@body ,sym)))
+  `(progn ,first (let ((,sym ,second)) (declare (ignorable ,sym)) ,@body ,sym)))
 
 ; multiple values
 
@@ -259,15 +263,16 @@
 (defmacro multiple-value-bind (vars form &rest body)
   (declare (optimize (safety 2)))
   (do ((vl vars (cdr vl))
-       (sym (sgen))
+       (sym (sgen "MULTIPLE-VALUE-BIND"))
        (bind nil))
       ((endp vl) `(let* ((,sym (multiple-value-list ,form)) ,@(nreverse bind))
-                        ,@body))
+		    (declare (ignorable ,sym))
+		    ,@body))
       (push `(,(car vl) (car ,sym)) bind)
       (unless (endp (cdr vl)) (push `(,sym (cdr ,sym)) bind))))
 
 (defmacro do (control (test . result) &rest body
-              &aux (decl nil) (label (sgen)) (vl nil) (step nil))
+              &aux (decl nil) (label (sgen "DO")) (vl nil) (step nil))
   (declare (optimize (safety 2)))
   (do ()
       ((or (endp body)
@@ -294,7 +299,7 @@
 		      (return (progn ,@result)))))))
 
 (defmacro do* (control (test . result) &rest body
-               &aux (decl nil) (label (sgen)) (vl nil) (step nil))
+               &aux (decl nil) (label (sgen "DO*")) (vl nil) (step nil))
   (declare (optimize (safety 2)))
   (do ()
       ((or (endp body)
@@ -320,10 +325,9 @@
 			      (go ,label))
 			  (return (progn ,@result)))))))
 
-(defmacro case (keyform &rest clauses &aux (form nil) (key (sgen)))
+(defmacro case (keyform &rest clauses &aux (form nil) (key (sgen "CASE")))
   (declare (optimize (safety 2)))
-  (dolist (clause (reverse clauses) `(let ((,key ,keyform)) ,form))
-          (declare (object clause))
+  (dolist (clause (reverse clauses) `(let ((,key ,keyform)) (declare (ignorable ,key)) ,form))
     (cond ((or (eq (car clause) 't) (eq (car clause) 'otherwise))
            (setq form `(progn ,@(cdr clause))))
           ((consp (car clause))
@@ -339,11 +343,12 @@
 (defmacro return (&optional (val nil))   (declare (optimize (safety 2))) `(return-from nil ,val))
 
 (defmacro dolist ((var form &optional (val nil)) &rest body
-                                                 &aux (temp (sgen)))
+                                                 &aux (temp (sgen "DOLIST")))
   (declare (optimize (safety 2)))
   `(do* ((,temp ,form (cdr ,temp))
 	 (,var (car ,temp) (car ,temp)))
 	((endp ,temp) ,val)
+	(declare (ignorable ,temp))
 	,@body))
 
 ;; In principle, a more complete job could be done here by trying to
@@ -364,18 +369,19 @@
     nil
     ,(cond
        ((symbolp form)
-	(let ((temp (sgen)))
+	(let ((temp (sgen "DOTIMES")))
 	  `(cond ((< ,form 0)
 		  (let ((,var 0))
 		    (declare (fixnum ,var) (ignorable ,var))
 		    ,val))
 		 ((<= ,form most-positive-fixnum)
 		  (let ((,temp ,form))
-		    (declare (fixnum ,temp))
+		    (declare (ignorable ,temp) (fixnum ,temp))
 		    (do* ((,var 0 (1+ ,var))) ((>= ,var ,temp) ,val)
 			 (declare (fixnum ,var))
 			 ,@body)))
 		 ((let ((,temp ,form))
+		    (declare (ignorable ,temp))
 		    (do* ((,var 0 (1+ ,var))) ((>= ,var ,temp) ,val)
 			 ,@body))))))
        ((constantp form)
@@ -389,15 +395,16 @@
 		     ,@body))
 	      (`(do* ((,var 0 (1+ ,var))) ((>= ,var ,form) ,val)
 		     ,@body))))
-       ((let ((temp (sgen)))
+       ((let ((temp (sgen "DOTIMES")))
 	  `(let ((,temp ,form))
+	     (declare (ignorable ,temp))
 	     (cond ((< ,temp 0)
 		    (let ((,var 0))
 		      (declare (fixnum ,var) (ignorable ,var))
 		      ,val))
 		   ((<= ,temp most-positive-fixnum)
 		    (let ((,temp ,temp))
-		      (declare (fixnum ,temp))
+		      (declare (ignorable ,temp) (fixnum ,temp))
 		      (do* ((,var 0 (1+ ,var))) ((>= ,var ,temp) ,val)
 			   (declare (fixnum ,var))
 			   ,@body)))
@@ -417,17 +424,17 @@
 (defmacro memq (a b) `(member ,a ,b :test 'eq))
 
 (defmacro background (form) 
-  (let ((x (sgen))) 
+  (let ((x (sgen "BACKGROUND"))) 
     `(let ((,x (si::fork))) 
        (if (eql 0 (car ,x)) 
 	   (progn (si::write-pointer-object ,form ,x)(bye)) 
 	 ,x))))
 
 (defmacro with-read-values ((i r b) (forms timeout) &body body)
-  (let* ((m (sgen))
-	 (j (sgen))
-	 (k (sgen))
-	 (p (sgen))
+  (let* ((m (sgen "WITH-READ-VALUES"))
+	 (j (sgen "WITH-READ-VALUES"))
+	 (k (sgen "WITH-READ-VALUES"))
+	 (p (sgen "WITH-READ-VALUES"))
 	 (pbl (length forms))
 	 (pbm (1- (ash 1 pbl))))
   `(let* ((,m ,pbm)
@@ -446,7 +453,7 @@
        (dolist (,b ,b (cdr ,b)) (si::kill ,b 0))))))
   
 (defmacro p-let (bindings &body body) 
-  (let* ((i (sgen)) (r (sgen)) (c (sgen))
+  (let* ((i (sgen "PLET")) (r (sgen "PLET")) (c (sgen "PLET"))
 	 (pb (remove-if 'atom bindings)))
   `(let* (,@(mapcar 'car pb) ,@(remove-if 'consp bindings))
      (with-read-values 
@@ -457,7 +464,7 @@
      ,@body)))
 
 (defmacro p-and (&rest forms) 
-  (let* ((i (sgen)) (r (sgen)) (c (sgen)) (top (sgen)))
+  (let* ((i (sgen "P-AND")) (r (sgen "P-AND")) (c (sgen "P-AND")) (top (sgen "P-AND")))
     `(block ,top
        (with-read-values 
 	(,i ,r ,c) (,forms -1)
@@ -467,7 +474,7 @@
        t)))
 
 (defmacro p-or (&rest forms) 
-  (let* ((i (sgen)) (r (sgen)) (c (sgen)) (top (sgen)))
+  (let* ((i (sgen "P-OR")) (r (sgen "P-OR")) (c (sgen "P-OR")) (top (sgen "P-OR")))
     `(block ,top
        (with-read-values 
 	(,i ,r ,c) (,forms -1)

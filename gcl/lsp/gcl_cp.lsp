@@ -296,6 +296,11 @@
 
 (baz)
 
+(setf (symbol-function 'si::package-internal) (symbol-function 'c::package-internal)
+      (symbol-function 'si::package-internal_size) (symbol-function 'c::package-internal_size)
+      (symbol-function 'si::package-external) (symbol-function 'c::package-external)
+      (symbol-function 'si::package-external_size) (symbol-function 'c::package-external_size));FIXME
+
 ;; (defun fboundp (funid)
 ;;   (declare (optimize (safety 1)))
 ;;   (check-type funid funid-sym)

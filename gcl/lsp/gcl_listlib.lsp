@@ -197,14 +197,14 @@
 	((atom w) (when rp (rplacd rp nil) r)))))
 
 (defun ldiff (l tl &aux (test #'eql))
-  (declare (optimize (safety 2)))
+  (declare (optimize (safety 2)) (ignorable test))
   (check-type l list)
   (do (r rp (tc (bump-test (comp-test test nil) tl)) (l l (cdr l))) 
       ((cond ((do-test test tc l tl)) ((atom l) (when rp (rplacd rp l)))) r)
       (let ((tmp (cons (car l) nil))) (collect r rp tmp))))
 
 (defun tailp (tl l &aux (test #'eql))
-  (declare (optimize (safety 2)))
+  (declare (optimize (safety 2)) (ignorable test))
   (check-type l list)
   (do (r (tc (bump-test (comp-test test nil) tl)) (l l (cdr l))) 
       ((cond ((setq r (do-test test tc l tl))) ((atom l))) r)))

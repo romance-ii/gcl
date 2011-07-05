@@ -401,6 +401,26 @@ DEFUN_NEW("PACK-HASH",fixnum,fSpack_hash,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") 
   RETURN1(pack_hash(x));
 }
 
+DEFUN_NEW("PACKAGE-INTERNAL",object,fSpackage_internal,SI,2,2,NONE,OO,IO,OO,OO,(object x,fixnum i),"") {
+  check_type_package(&x);
+  RETURN1(x->p.p_internal[i]);
+}
+
+DEFUN_NEW("PACKAGE-INTERNAL_SIZE",fixnum,fSpackage_internal_size,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {
+  check_type_package(&x);
+  RETURN1(x->p.p_internal_size);
+}
+
+DEFUN_NEW("PACKAGE-EXTERNAL",object,fSpackage_external,SI,2,2,NONE,OO,IO,OO,OO,(object x,fixnum i),"") {
+  check_type_package(&x);
+  RETURN1(x->p.p_external[i]);
+}
+
+DEFUN_NEW("PACKAGE-EXTERNAL_SIZE",fixnum,fSpackage_external_size,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {
+  check_type_package(&x);
+  RETURN1(x->p.p_external_size);
+}
+
 /*
 	Intern(st, p) interns string st in package p.
 */

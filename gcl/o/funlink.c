@@ -1148,9 +1148,9 @@ call_proc_new(object sym,ufixnum clp,ufixnum vld,void **link,ufixnum argd,object
       /* nvald=FUN_VALP ? vald : 0; */
       if (pushed)
 	fas=0;
-      /* else if (margs!=fun->fun.fun_minarg) /\*margs < fun->fun.fun_minarg*\/ */
-      /* 	fas=0; */
-      else if (/* u.f.va &&  */(nfargs<fun->fun.fun_minarg || nfargs>fun->fun.fun_maxarg))/*u.f.va -> varg, xxx*/
+      else if (margs!=fun->fun.fun_minarg) /*margs < fun->fun.fun_minarg*/
+      	fas=0;
+      else if (u.f.va &&(nfargs<fun->fun.fun_minarg || nfargs>fun->fun.fun_maxarg))/*u.f.va -> varg, xxx*/
 	fas=0;
       else if (u.f.va && VFUN_NARGS<0 && fun->fun.fun_minarg==fun->fun.fun_maxarg)/*runtime apply #arg checking omitted in reg fns*/
 	fas=0;

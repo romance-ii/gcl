@@ -40,8 +40,9 @@
 
 (defun c1multiple-value-call (args)
   (when (endp args) (too-few-args 'multiple-value-call 1 0))
-  (let* ((nargs (c1args (cdr args) (make-info)))
-	 (tps (mapcar (lambda (x) (info-type (cadr x))) nargs)))
+  (let* ((info (make-info))
+	 (nargs (c1args args info))
+	 (tps (mapcar (lambda (x) (info-type (cadr x))) (cdr nargs))))
     (cond ((endp (cdr args)) (c1funcall args))
 	  ((and (not (member-if-not 'nval tps))
 		(inline-possible 'multiple-value-bind))
@@ -57,19 +58,40 @@
 					      (dotimes (i n) (push (pop r) syms))
 					      (list (nreverse syms) y))) tps (cdr args))
 		      :from-end t :initial-value `(funcall ,(car args) ,@syms)))))
-	  ((let* ((info (make-info))
-		  (nargs (c1args args info)))
-	     (list 'multiple-value-call info (pop nargs) nargs))))))
+	  ((list 'multiple-value-call info (pop nargs) nargs)))))
 
-(defun c2multiple-value-call (funob forms &aux (*vs* *vs*) loc top sup)
+;; (defun c1multiple-value-call (args)
+;;   (when (endp args) (too-few-args 'multiple-value-call 1 0))
+;;   (let* ((nargs (c1args (cdr args) (make-info)))
+;; 	 (tps (mapcar (lambda (x) (info-type (cadr x))) nargs)))
+;;     (cond ((endp (cdr args)) (c1funcall args))
+;; 	  ((and (not (member-if-not 'nval tps))
+;; 		(inline-possible 'multiple-value-bind))
+;; 	   (let* ((n (reduce '+ (mapcar 'nval tps)))
+;; 		  (syms (mapcar (lambda (x) (declare (ignore x)) (tmpsym)) (make-list n)))
+;; 		  (r syms))
+;; 	     (c1expr
+;; 	      (reduce (lambda (x y) 
+;; 			(cond ((= 1 (length (car x)))
+;; 			       `(let ((,(caar x) ,(cadr x))) ,y))
+;; 			      (`(multiple-value-bind ,@x ,y))))
+;; 		      (mapcar (lambda (x y) (let* ((n (nval x)) syms)
+;; 					      (dotimes (i n) (push (pop r) syms))
+;; 					      (list (nreverse syms) y))) tps (cdr args))
+;; 		      :from-end t :initial-value `(funcall ,(car args) ,@syms)))))
+;; 	  ((let* ((info (make-info))
+;; 		  (nargs (c1args args info)))
+;; 	     (list 'multiple-value-call info (pop nargs) nargs))))))
+
+(defun c2multiple-value-call (funob forms &aux (*vs* *vs*) (loc (list 'vs (vs-push))) top sup)
+
+  (let ((*value-to-go* loc))
+    (c2expr* funob))
+  
   (cond ((endp (cdr forms))
-         (setq loc (save-funob funob))
-         (let ((*value-to-go* 'top)) (c2expr* (car forms)))
-         (c2funcall funob 'args-pushed loc))
-        (t
-         (setq top (cs-push t t))
+         (let ((*value-to-go* 'top)) (c2expr* (car forms))))
+        ((setq top (cs-push t t))
          (setq sup (cs-push t t))
-         (setq loc (save-funob funob))
          (base-used)
 	 ;; Add (sup .var) handling in unwind-exit -- in
 	 ;; c2multiple-value-prog1 and c2-multiple-value-call, apparently
@@ -87,9 +109,47 @@
 	     (c2expr-top* form top))
 	   (wt-nl "while(vs_base<vs_top)")
 	   (wt-nl "{V" top "[0]=vs_base[0];V" top "++;vs_base++;}"))
-         (wt-nl "vs_base=base+" *vs* ";vs_top=V" top ";sup=V" sup ";")
-         (c2funcall funob 'args-pushed loc)
-         (wt "}"))))
+         (wt-nl "vs_base=base+" *vs* ";vs_top=V" top ";sup=V" sup ";")))
+	
+  (if *compiler-push-events*
+      (wt-nl "super_funcall(" loc ");")
+    (if *super-funcall*
+	(funcall *super-funcall* loc)
+      (wt-nl "super_funcall_no_event(" loc ");")))
+  (unwind-exit 'fun-val)
+
+  (when (cdr forms)
+    (wt "}")))
+
+;; (defun c2multiple-value-call (funob forms &aux (*vs* *vs*) loc top sup)
+;;   (cond ((endp (cdr forms))
+;;          (setq loc (save-funob funob))
+;;          (let ((*value-to-go* 'top)) (c2expr* (car forms)))
+;;          (c2funcall funob 'args-pushed loc))
+;;         (t
+;;          (setq top (cs-push t t))
+;;          (setq sup (cs-push t t))
+;;          (setq loc (save-funob funob))
+;;          (base-used)
+;; 	 ;; Add (sup .var) handling in unwind-exit -- in
+;; 	 ;; c2multiple-value-prog1 and c2-multiple-value-call, apparently
+;; 	 ;; alone, c2expr-top is used to evaluate arguments, presumably to
+;; 	 ;; preserve certain states of the value stack for the purposes of
+;; 	 ;; retrieving the final results.  c2exprt-top rebinds sup, and
+;; 	 ;; vs_top in turn to the new sup, causing non-local exits to lose
+;; 	 ;; the true top of the stack vital for subsequent function
+;; 	 ;; evaluations.  We unwind this stack supremum variable change here
+;; 	 ;; when necessary.  CM 20040301
+;;          (wt-nl "{object *V" top "=base+" *vs* ",*V" sup "=sup;")
+;; 	 (dolist (form forms)
+;; 	   (let ((*value-to-go* 'top)
+;; 		 (*unwind-exit* (cons (cons 'sup sup) *unwind-exit*)))
+;; 	     (c2expr-top* form top))
+;; 	   (wt-nl "while(vs_base<vs_top)")
+;; 	   (wt-nl "{V" top "[0]=vs_base[0];V" top "++;vs_base++;}"))
+;;          (wt-nl "vs_base=base+" *vs* ";vs_top=V" top ";sup=V" sup ";")
+;;          (c2funcall funob 'args-pushed loc)
+;;          (wt "}"))))
 
 (defun c1multiple-value-prog1 (args &aux (info (make-info)) form)
   (when (endp args) (too-few-args 'multiple-value-prog1 1 0))
@@ -261,9 +321,55 @@
   (add-info info (cadr body))
   (setf (info-type info) (info-type (cadr body)))
 
+  (ref-vars body vars)
   (dolist** (var vars) (check-vref var))
 
   (list 'multiple-value-bind info vars init-form body))
+
+;; (defun c1multiple-value-bind (args &aux (info (make-info))
+;;                                    (vars nil) (vnames nil) init-form
+;;                                    ss is ts body other-decls
+;;                                    (*vars* *vars*))
+;;   (when (or (endp args) (endp (cdr args)))
+;;     (too-few-args 'multiple-value-bind 2 (length args)))
+
+;;   (when (and (caar args) (not (cdar args)))
+;;     (return-from c1multiple-value-bind
+;; 		 (c1expr `(let ((,(caar args) ,(cadr args))) ,@(cddr args)))))
+
+;;   (multiple-value-setq (body ss ts is other-decls) (c1body (cddr args) nil))
+
+;;   (dolist (s (car args))
+;;     (let ((v (c1make-var s ss is ts)))
+;;       (push s vnames)
+;;       (push v vars)))
+
+;;   (c1add-globals (set-difference ss vnames))
+
+;;   (let (*c1exit*) (setq init-form (c1expr* (cadr args) info)))
+
+;;   (setq vars (nreverse vars))
+;;   (let* ((tp (info-type (second init-form)))
+;; 	 (tp (cond ((not tp) tp)
+;; 		   ((single-type-p tp) (list tp))
+;; 		   ((eq tp '*) (make-list (length vars) :initial-element t))
+;; 		   ((cdr tp)))))
+;;     (do ((v vars (cdr v)) (t1 tp (cdr t1)))
+;; 	((not v))
+;; 	(set-var-init-type (car v) (or (car t1) #tnull))))
+
+;;   (dolist* (v vars) (push v *vars*))
+
+;;   (check-vdecl vnames ts is)
+
+;;   (setq body (c1decl-body other-decls body))
+
+;;   (add-info info (cadr body))
+;;   (setf (info-type info) (info-type (cadr body)))
+
+;;   (dolist** (var vars) (check-vref var))
+
+;;   (list 'multiple-value-bind info vars init-form body))
 
 (defun max-stack-space (form)
   (cond ((atom form) 0)

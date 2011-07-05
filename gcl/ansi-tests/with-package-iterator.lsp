@@ -72,14 +72,16 @@
    program-error)
   t)
 
+(defun t-count (x) (if (eq x t) nil x))
+
 ;;; Apply to all packages
 (deftest with-package-iterator.12
   (loop
    for p in (list-all-packages) count
    (handler-case
     (progn
-      (format t "Package ~S~%" p)
-      (not (with-package-iterator-internal (list p))))
+;      (format t "Package ~S~%" p)
+      (not (eq t (with-package-iterator-internal (list p)))))
     (error (c)
 	   (format "Error ~S on package ~A~%" c p)
 	   t)))
@@ -90,8 +92,8 @@
    for p in (list-all-packages) count
    (handler-case
     (progn
-      (format t "Package ~S~%" p)
-      (not (with-package-iterator-external (list p))))
+;      (format t "Package ~S~%" p)
+      (not (eq t (with-package-iterator-external (list p)))))
     (error (c)
 	   (format "Error ~S on package ~A~%" c p)
 	   t)))
@@ -102,8 +104,8 @@
    for p in (list-all-packages) count
    (handler-case
     (progn
-      (format t "Package ~S~%" p)
-      (not (with-package-iterator-inherited (list p))))
+;      (format t "Package ~S~%" p)
+      (not (eq t (with-package-iterator-inherited (list p)))))
     (error (c)
 	   (format t "Error ~S on package ~S~%" c p)
 	   t)))

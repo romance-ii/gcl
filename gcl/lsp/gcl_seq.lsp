@@ -97,10 +97,10 @@
   (let ((sl (reduce (lambda (y x) (min y (length x))) seqs :initial-value array-dimension-limit)))
     (do* ((x (when rt (make-sequence rt sl)))(xc (consp x))(xp x)(i 0 (1+ i)))
 	 ((or (when xc (endp xp)) (>= i sl)) x)
-	(mapl (lambda (x y &aux (z (car x)))
-		(setf (car y) (if (listp z) (pop (car x)) (aref z i)))) seqs vals)
-	(let ((tmp (apply f vals)))
-	  (cond (xc (setf (car xp) tmp xp (cdr xp))) (rt (setf (aref x i) tmp)))))))
+	 (mapl (lambda (x y &aux (z (car x)))
+		 (setf (car y) (if (listp z) (pop (car x)) (aref z i)))) seqs vals)
+	 (let ((tmp (apply f vals)))
+	   (cond (xc (setf (car xp) tmp xp (cdr xp))) (rt (setf (aref x i) tmp)))))))
 
 (defun map-into (rs g &rest seqs &aux 
 		    (h rs) (lp (unless (listp rs) (array-total-size rs))) 

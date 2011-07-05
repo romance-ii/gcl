@@ -214,7 +214,8 @@
                                                (stream-name str))
    ) *stream-alist*)))))
 
-(defun newline (str ch) ch
+(defun newline (str ch)
+  (declare (ignore ch))
   (let ((in (get-instream str)))
     (setf (instream-line in) (the fixnum (f + 1 (instream-line in)))))
   ;; if the next line begins with '(', then record all cons's eg arglist )

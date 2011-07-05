@@ -131,11 +131,22 @@
   (wt-data1 x)
   (get-output-stream-string *compiler-output-data*))
 
+(defun nani-eq (x y)
+  (and (consp x) (consp y)
+       (eq (car x) 'si::nani) (eq (car y) 'si::nani)
+       (eq (cadr x) (cadr y))))
+  
 (defun add-sharp-comma (object)
-  (cond ((caar (member object *sharp-commas* :key 'cadr :test 'equal)))
+  (cond ((caar (member object *sharp-commas* :key 'cadr :test 'nani-eq)))
 	((push-data-incf nil)
 	 (push (list *next-vv* object) *sharp-commas*)
 	 *next-vv*)))
+
+;; (defun add-sharp-comma (object)
+;;   (cond ;((caar (member object *sharp-commas* :key 'cadr :test 'equal)))
+;; 	((push-data-incf nil)
+;; 	 (push (list *next-vv* object) *sharp-commas*)
+;; 	 *next-vv*)))
 
 (defun add-object (object)
   ;;; Used only during Pass 1.

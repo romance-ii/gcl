@@ -175,6 +175,7 @@
   (declare (optimize (safety 1)))
   (check-type c character)
   (let ((b #.(- (1- (integer-length (- (address #\^A) (address #\^@)))))))
+    (declare (ignorable b))
     (the unsigned-char (ash (the seqind (- (address c) (address #\^@))) b))))
 
 (defun code-char (d)
@@ -416,3 +417,8 @@
    (symbol (= 1 (c::symbol-stype x)))
    (cons (eq 'quote (car x)))
    (otherwise t)))
+
+(defun stringp (x)
+  (typecase
+   x
+   (string t)))
