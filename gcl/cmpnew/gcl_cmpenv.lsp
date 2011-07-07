@@ -44,7 +44,7 @@
   (setq *next-vv* -1)
   (setq *next-cfun* 0)
   (setq *last-label* 0)
-;  (clrhash *src-hash*)
+  (clrhash *src-hash*)
   (clrhash *fn-src-fn*)
   (clrhash *objects*)
   (clrhash *objects-rev*)

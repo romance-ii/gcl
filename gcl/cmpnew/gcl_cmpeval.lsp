@@ -893,14 +893,23 @@
 		   ((eq (car decl) 'safety) (setf (cadr decl) (this-safety-level))))))
 	  ((return nil)))))
 
-(defun c1inline (args env inls &aux (ce (current-env)))
+(defun c1inline (args env inls)
   (let* ((cl (pop args))
 	 (fm (pop args))
-	 (nargs (under-env env (c1let-* (cdr fm) t ce inls)))
+	 (nargs (under-env env (c1let-* (cdr fm) t inls)))
 	 (nm (car cl))
 	 (nm (if (symbolp nm) nm (tmpsym))))
     (assert (and (eq (car fm) 'let*) (not args)))
     (list 'inline (copy-info (cadr nargs)) nm (with-output-to-string (s) (princ cl s)) nargs)))
+
+;; (defun c1inline (args env inls &aux (ce (current-env)))
+;;   (let* ((cl (pop args))
+;; 	 (fm (pop args))
+;; 	 (nargs (under-env env (c1let-* (cdr fm) t ce inls)))
+;; 	 (nm (car cl))
+;; 	 (nm (if (symbolp nm) nm (tmpsym))))
+;;     (assert (and (eq (car fm) 'let*) (not args)))
+;;     (list 'inline (copy-info (cadr nargs)) nm (with-output-to-string (s) (princ cl s)) nargs)))
 
 ;; (defun c1inline (args)
 ;;   (let* ((nargs (c1expr (cadr args)))
@@ -1148,7 +1157,19 @@
 				(when (eq n s) (eq k :external))))
        (or (local-fun-src n)
 	   (let ((fn (when (fboundp n) (symbol-function n))))
-	     (when (functionp fn) (values (function-lambda-expression fn)))))))
+	     (when (functionp fn) (values (or (gethash fn *src-hash*) (setf (gethash fn *src-hash*) (function-lambda-expression fn)))))))))
+
+;; (defun inline-sym-src (n)
+;;   (and (inline-possible n)
+;;        (or (inline-asserted n)
+;; 	   (eq (symbol-package n) (load-time-value (find-package 'c)))
+;; 	   (eq (symbol-package n) (load-time-value (find-package "libm")))
+;; 	   (eq (symbol-package n) (load-time-value (find-package "libc")))
+;; 	   (multiple-value-bind (s k) (find-symbol (symbol-name n) 'lisp) 
+;; 				(when (eq n s) (eq k :external))))
+;;        (or (local-fun-src n)
+;; 	   (let ((fn (when (fboundp n) (symbol-function n))))
+;; 	     (when (functionp fn) (values (function-lambda-expression fn)))))))
 
 ;; (defun inline-sym-src (n)
 ;;   (and (inline-possible n)
@@ -1334,7 +1355,17 @@
 ;;   (if ce e l))
 
 (defun mod-env (ce e l);FIXME
-  (if ce (append (remove-if-not (lambda (x) (or (symbolp x) (is-fun-var x))) (ldiff l e)) e) l))
+  (if ce 
+      (progn 
+	(dolist (l l) (pushnew l *outer-env*))
+	(append (remove-if-not (lambda (x) (or (symbolp x) (is-fun-var x))) (ldiff l e)) e))
+    l))
+
+;; (defun mod-env (ce e l);FIXME
+;;   (if ce (append (remove-if-not (lambda (x) (or (symbolp x) (is-fun-var x))) (ldiff l e)) e) l))
+
+;; (defun mod-env (ce e l);FIXME
+;;   (if ce (append (remove-if (lambda (x) (or (symbolp x) (is-fun-var x))) e) l) l))
 
 
 ;; (defun mod-env (ce e l);FIXME
@@ -1346,13 +1377,24 @@
 ;; ;    (unless (equal or ol) (print ol) (print or))
 ;;     r))
 
+(defvar *outer-env* nil)
+
 (defmacro under-env (env &rest forms &aux (e (tmpsym)))
   `(let* ((,e ,env)
+	  (*outer-env* *outer-env*)
 	  (*vars*   (mod-env ,e (pop ,e) *vars*))
 	  (*blocks* (mod-env ,e (pop ,e) *blocks*))
 	  (*tags*   (mod-env ,e (pop ,e) *tags*))
 	  (*funs*   (mod-env ,e (pop ,e) *funs*)))
      ,@forms))
+
+;; (defmacro under-env (env &rest forms &aux (e (tmpsym)))
+;;   `(let* ((,e ,env)
+;; 	  (*vars*   (mod-env ,e (pop ,e) *vars*))
+;; 	  (*blocks* (mod-env ,e (pop ,e) *blocks*))
+;; 	  (*tags*   (mod-env ,e (pop ,e) *tags*))
+;; 	  (*funs*   (mod-env ,e (pop ,e) *funs*)))
+;;      ,@forms))
 
 ;; (defmacro under-env (env form &aux (e (tmpsym)))
 ;;   `(let* ((,e ,env)
@@ -1480,10 +1522,17 @@
 
 (defun make-ordinary (fn)
   (let* ((s (tmpsym))(g (tmpsym))
-	 (e (c1let-* `(((,s ,g)) (etypecase ,s (symbol (fsf ,s)) (function ,s))) t nil (list (cons g fn))))
+	 (e (c1let-* `(((,s ,g)) (etypecase ,s (symbol (fsf ,s)) (function ,s))) t (list (cons g fn))))
 	 (info (make-info)))
     (add-info info (cadr e))
     (list 'ordinary info e)))
+
+;; (defun make-ordinary (fn)
+;;   (let* ((s (tmpsym))(g (tmpsym))
+;; 	 (e (c1let-* `(((,s ,g)) (etypecase ,s (symbol (fsf ,s)) (function ,s))) t nil (list (cons g fn))))
+;; 	 (info (make-info)))
+;;     (add-info info (cadr e))
+;;     (list 'ordinary info e)))
 
 ;; (defun make-ordinary (fn)
 ;;   (let* ((s (tmpsym))(g (tmpsym))

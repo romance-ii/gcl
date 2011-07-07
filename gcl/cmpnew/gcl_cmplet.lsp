@@ -157,7 +157,7 @@
 ;; 	      (when star (push v *vars*))
 ;; 	      (cons v fm))) args))
 
-(defun c1let-* (args &optional star env inls
+(defun c1let-* (args &optional star inls
 		     &aux (nm (if star 'let* 'let))
 		     (ov *vars*) (*vars* *vars*) (setjmps *setjmps*)
 		     ss is ts body other-decls
@@ -186,22 +186,66 @@
 
     (dolist (var vars) (setf (var-type var) (var-mt var)));FIXME?
  
-    (let* ((*vars* ov))
-      (under-env
-       env
-       (let* ((z (trim-vars vars forms body star))
-	      (vars (pop z))
-	      (fms (pop z))
-	      (body (car z)))
+    (let* ((*vars* ov)
+	   (z (trim-vars vars forms body star))
+	   (vars (pop z))
+	   (fms (pop z))
+	   (body (car z)))
+      
+      (dolist (fm fms) (add-info info (cadr fm)))
+      (add-info info (cadr body))
+      
+      (setf (info-type info) (info-type (cadr body)))
+      (unless (eq setjmps *setjmps*) (setf (info-volatile info) 1))
+      
+      (if vars (list nm info vars fms body) 
+	(list* (car body) info (cddr body))))))
+
+;; (defun c1let-* (args &optional star env inls
+;; 		     &aux (nm (if star 'let* 'let))
+;; 		     (ov *vars*) (*vars* *vars*) (setjmps *setjmps*)
+;; 		     ss is ts body other-decls
+;; 		     (info (make-info)))
+
+;;   (when (endp args) (too-few-args nm 1 0))
+
+;;   (multiple-value-setq (body ss ts is other-decls) (c1body (cdr args) nil))
+
+;;   (let* ((vs (nreverse (mvars (car args) ss is ts star inls)))
+;; 	 (vars (mapcar 'car vs))
+;; 	 (forms (mapcar 'cdr vs))
+;; 	 (vnames (mapcar 'var-name vars))
+;; 	 (*vars* (if star *vars* (append vars *vars*))))
+
+;;     (c1add-globals (set-difference ss vnames))
+;;     (check-vdecl vnames ts is)
+;;     (setq body (c1decl-body other-decls body))
+
+;;     (unless (single-type-p (info-type (cadr body))) 
+;;       (let ((mv (car (member-if 'is-mv-var vars))))
+;; 	(when mv
+;; 	  (ref-vars (c1var (var-name mv)) (list mv)))))
+
+;;     (ref-vars body vars)
+
+;;     (dolist (var vars) (setf (var-type var) (var-mt var)));FIXME?
+ 
+;;     (let* ((*vars* ov))
+;;       (under-env
+;;        env
+;;        (let* ((z (trim-vars vars forms body star))
+;; 	      (vars (pop z))
+;; 	      (fms (pop z))
+;; 	      (body (car z)))
 	 
-	 (dolist (fm fms) (add-info info (cadr fm)))
-	 (add-info info (cadr body))
+;; 	 (dolist (fm fms) (add-info info (cadr fm)))
+;; 	 (add-info info (cadr body))
 	 
-	 (setf (info-type info) (info-type (cadr body)))
-	 (unless (eq setjmps *setjmps*) (setf (info-volatile info) 1))
+;; 	 (setf (info-type info) (info-type (cadr body)))
+;; 	 (unless (eq setjmps *setjmps*) (setf (info-volatile info) 1))
 	 
-	 (if vars (list nm info vars fms body) 
-	   (list* (car body) info (cddr body))))))))
+;; 	 (if vars (list nm info vars fms body) 
+;; 	   (list* (car body) info (cddr body))))))))
 
 ;; (defun c1let-* (args &optional star 
 ;; 		     &aux (nm (if star 'let* 'let))

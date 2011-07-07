@@ -1,12 +1,8 @@
-;(si::use-fast-links nil)
-;(setq compiler::*space* 3)
-
 #+pre-gcl(unless (fboundp 'logandc2) (defun logandc2 (x y) (boole boole-andc2 x y)))
 (in-package 'compiler)
 #+pre-gcl
 (progn
   (defun mc nil (si::make-anonymous-closure))
-;  (defun fn-env (f) (si::function-environment f))
   (defun tt3 (x) (lit :fixnum "fto(" (:object x) ")"))
   (si::putprop 'tt3 t 'cmp-inline)
   (defun tt30 (x) (lit :boolean "!fto0(" (:object x) ")"))
@@ -29,8 +25,8 @@
 	       :c-file t :h-file t :data-file t :system-p t))))
 
 (dolist (l '(cmptype cmpeval cmpvar cmpwt cmpif cmplet cmptag cmpinline cmpenv cmplam cmptop
-		     cmpbind cmpblock cmpcall cmpcatch cmpflet cmpfun  cmplabel cmploc cmpmap 
-		     cmpmulti cmpspecial cmputil  cmpvs cmpmain))
+		     cmpbind cmpblock cmpcall cmpcatch cmpflet cmpfun cmplabel cmploc cmpmap 
+		     cmpmulti cmpspecial cmputil cmpvs cmpmain))
   (time (load (compile-file
 	       (concatenate 'string "../cmpnew/gcl_" (string-downcase (string l)) ".lsp")
 	       :c-file t :h-file t :data-file t :system-p t))))
@@ -42,7 +38,6 @@
 	 (concatenate 'string "../lsp/gcl_" (string-downcase (string l)) ".lsp")
 	 :c-file t :h-file t :data-file t :system-p t)))
 
-(declaim (optimize (safety 0)))
 (dolist (l '(mnum))
   (time (compile-file
 	 (concatenate 'string "../lsp/gcl_" (string-downcase (string l)) ".lsp")

@@ -140,7 +140,7 @@
     ;closures almost always called anonymously which will be slow unless argd is 0
     (when (fun-c1cb fun) (setf (car (fun-call fun)) (bump-closure-lam-sig lam)))
 
-    (ref-environment)
+    (ref-environment);FIXME?
     (setf (fun-cfun fun) (next-cfun))
     (add-info (fun-info fun) (cadr lam));FIXME copy-info?
     (setf (info-type (fun-info fun)) (cadar (fun-call fun)))
@@ -167,35 +167,44 @@
 ;;     res))
 
 
-(defun ref-funs1 (form funs &aux (i (cadr form)))
-  (dolist (fun funs)
-    (when (member fun (info-fref-ccb i))
-      (setf (fun-ref-ccb fun) t))
-    (when (member fun (info-fref i))
-      (setf (fun-ref fun) t))))
+(defun ref-funs (form funs)
+  (ref-obs form funs 
+	   (lambda (x) (setf (fun-ref-ccb x) t))
+	   (lambda (x))
+	   (lambda (x) (setf (fun-ref x) t))
+	   'fun-name
+	   "Fun"
+	   (lambda (x &aux (y (pop x))) (when (eq y 'call-local) (butlast (cadr x))))))
 
-(defun ref-funs (form funs &optional l)
-  (cond ((not l) 
-	 (cond (*fast-ref* (ref-funs1 form funs))
-	       ((let* ((l (list (info-fref (cadr form)) (info-fref-ccb (cadr form))))
-		       (l (mapcar (lambda (x) (intersection x funs)) l))
-		       (l (mapcar (lambda (y) (mapcar (lambda (x) (cons x nil)) y)) l)))
-		  (ref-funs form funs l)
-		  (let* (y (x (member-if (lambda (x) (setq y (member nil x :key 'cdr))) l)))
-		    (when y
-		      (cmpwarn "~s Fun ~s reffed in info but not in form" (length (ldiff l x)) (var-name (caar y)))))))))
-	((atom form))
-	((eq (car form) 'call-local)
-	 (let* ((fref (caddr form))
-		(f (pop fref))
-		(ccb (car fref)))
-	   (when (member f funs)
-	     (if ccb (setf (fun-ref-ccb f) t) (setf (fun-ref f) t))
-	     (let* ((x (if ccb (cadr l) (car l)))(x (assoc f x)))
-	       (if x (rplacd x t) (cmpwarn "~a Fun ~s reffed in form but not in info" (if ccb "ccb" "nil") (fun-name f))))
-	     (keyed-cmpnote (list 'fun-ref (fun-name f)) "Fun ~s is referred with barrier ~s" (fun-name f) (when ccb 'cb)))
-	   (ref-funs (cdddr form) funs l)))
-	(t (ref-funs (car form) funs l) (ref-funs (cdr form) funs l))))
+;; (defun ref-funs1 (form funs &aux (i (cadr form)))
+;;   (dolist (fun funs)
+;;     (when (member fun (info-fref-ccb i))
+;;       (setf (fun-ref-ccb fun) t))
+;;     (when (member fun (info-fref i))
+;;       (setf (fun-ref fun) t))))
+
+;; (defun ref-funs (form funs &optional l)
+;;   (cond ((not l) 
+;; 	 (cond (*fast-ref* (ref-funs1 form funs))
+;; 	       ((let* ((l (list (info-fref (cadr form)) (info-fref-ccb (cadr form))))
+;; 		       (l (mapcar (lambda (x) (intersection x funs)) l))
+;; 		       (l (mapcar (lambda (y) (mapcar (lambda (x) (cons x nil)) y)) l)))
+;; 		  (ref-funs form funs l)
+;; 		  (let* (y (x (member-if (lambda (x) (setq y (member nil x :key 'cdr))) l)))
+;; 		    (when y
+;; 		      (cmpwarn "~s Fun ~s reffed in info but not in form" (length (ldiff l x)) (var-name (caar y)))))))))
+;; 	((atom form))
+;; 	((eq (car form) 'call-local)
+;; 	 (let* ((fref (caddr form))
+;; 		(f (pop fref))
+;; 		(ccb (car fref)))
+;; 	   (when (member f funs)
+;; 	     (if ccb (setf (fun-ref-ccb f) t) (setf (fun-ref f) t))
+;; 	     (let* ((x (if ccb (cadr l) (car l)))(x (assoc f x)))
+;; 	       (if x (rplacd x t) (cmpwarn "~a Fun ~s reffed in form but not in info" (if ccb "ccb" "nil") (fun-name f))))
+;; 	     (keyed-cmpnote (list 'fun-ref (fun-name f)) "Fun ~s is referred with barrier ~s" (fun-name f) (when ccb 'cb)))
+;; 	   (ref-funs (cdddr form) funs l)))
+;; 	(t (ref-funs (car form) funs l) (ref-funs (cdr form) funs l))))
 
 (defun c1flet-labels (labels args &aux body ss ts is other-decl (info (make-info))
 			     defs1 fnames (ofuns *funs*) (*funs* *funs*))
@@ -471,10 +480,71 @@
 ;; 		 (setf (fun-c1 fun) (unfoo (fun-prov fun) (if ccb 'cb 'lb) fun)))))
 ;; 	   (setf (info-type (fun-info fun)) (cadar (fun-call fun)))
 ;; 	   (return (list 'call-local (fun-info fun) (list fun ccb)))))))
-(defmacro make-local-fun (c1 b f env)
-  `(progn
-     (unless (,c1 ,f) (setf (,c1 ,f) t (,c1 ,f) (under-env ,env (c1function (list (fun-src ,f)) ',b ,f))))
-     (when (listp (,c1 ,f)) (,c1 ,f))))
+
+;; (defun make-fun-c1 (fun b env &optional osig)
+;;   (let* ((res (under-env env (c1function (list (fun-src fun) b fun))))
+;; 	 (sig (car (fun-call fun))))
+;;     (if (and (is-referred fun (cadr res)) (not (eq (cadr osig) (cadr sig))))
+;; 	(make-fun-c1 fun b env sig))
+;;     res))
+
+;; (defmacro make-local-fun (c1 b f env)
+;;   `(progn
+;;      (unless (,c1 ,f) (setf (,c1 ,f) t (,c1 ,f) (make-fun-c1 ,f ',b ,env)))
+;;      (when (listp (,c1 ,f)) (,c1 ,f))))
+
+(defun make-fun-c1 (fun ccb env &optional osig &aux (c1 (if ccb (fun-c1cb fun) (fun-c1 fun))))
+
+  (labels ((set                 (fun val)          (if ccb (setf (fun-c1cb fun) val) (setf (fun-c1 fun) val)))
+	   (ifunp               (key pred l)       (member-if (lambda (x) (when (fun-p x) (funcall pred x (funcall key x)))) l))
+	   (ifunm               (pred i)           (or  (ifunp 'fun-c1 pred (info-ref i)) (ifunp 'fun-c1cb pred (info-ref-ccb i))))
+	   (calls-blocked-fun-p (fun i)            (ifunm (lambda (x y) (unless (eq x fun) (eq y t))) i))
+	   (recursive-p         (fun i)            (ifunm (lambda (x y) (or (not y) (eq x fun))) i)))
+
+	  (cond ((eq c1 t) 
+		 (keyed-cmpnote (list (fun-name fun) 'recursion) "recursive call to local fun ~s" (fun-name fun))
+		 nil)
+		((unless osig c1) c1)
+		((let* ((c1 (or c1 (set fun t)))
+			(res (under-env env (c1function (list (fun-src fun)) (if ccb 'cb 'lb) fun)))
+			(i (cadr res))
+			(sig (car (fun-call fun))))
+		   (declare (ignore c1));FIXME
+		   (cond ((calls-blocked-fun-p fun i) 
+			  (keyed-cmpnote (list (fun-name fun) 'recursion) "local fun ~s calls unfinalized funs" (fun-name fun))
+			  (set fun nil))
+			 ((when (recursive-p fun i) (not (eq (cadr osig) (cadr sig))));FIXME bump?
+			  (set fun res)
+			  (keyed-cmpnote (list (fun-name fun) 'recursion) "reprocessing recursive local fun ~s: ~s ~s" (fun-name fun) osig sig)
+			  (make-fun-c1 fun ccb env sig))
+			 ((set fun res))))))))
+
+;; (defun make-fun-c1 (fun ccb env &optional osig &aux (c1 (if ccb (fun-c1cb fun) (fun-c1 fun))))
+
+;;   (labels ((set                 (fun val)          (if ccb (setf (fun-c1cb fun) val) (setf (fun-c1 fun) val)))
+;; 	   (ifunp               (key pred fun l)   (member-if (lambda (x) (when (fun-p x) (funcall pred x (funcall key x) fun))) l))
+;; 	   (ifunm               (pred fun i)       (or  (ifunp 'fun-c1 pred fun (info-ref i)) (ifunp 'fun-c1cb pred fun (info-ref-ccb i))))
+;; ;	   (calls-blocked-fun-p (fun i)            (ifunm (lambda (x y) (unless (eq x fun) (eq y t))) i)) FIXME
+;; 	   (calls-blocked-fun-p (fun i)            (ifunm (lambda (x y z) (unless (eq x z) (eq y t))) fun i))
+;; 	   (recursive-p         (fun i)            (ifunm (lambda (x y z) (or (not y) (eq x z))) fun i)))
+
+;; 	  (cond ((eq c1 t) 
+;; 		 (keyed-cmpnote (list (fun-name fun) 'recursion) "recursive call to local fun ~s" (fun-name fun))
+;; 		 nil)
+;; 		((unless osig c1) c1)
+;; 		((let* ((c1 (or c1 (set fun t)))
+;; 			(res (under-env env (c1function (list (fun-src fun)) (if ccb 'cb 'lb) fun)))
+;; 			(i (cadr res))
+;; 			(sig (car (fun-call fun))))
+;; 		   (declare (ignore c1));FIXME
+;; 		   (cond ((calls-blocked-fun-p fun i) 
+;; 			  (keyed-cmpnote (list (fun-name fun) 'recursion) "local fun ~s calls unfinalized funs" (fun-name fun))
+;; 			  (set fun nil))
+;; 			 ((when (recursive-p fun i) (not (eq (cadr osig) (cadr sig))));FIXME bump?
+;; 			  (set fun res)
+;; 			  (keyed-cmpnote (list (fun-name fun) 'recursion) "reprocessing recursive local fun ~s: ~s ~s" (fun-name fun) osig sig)
+;; 			  (make-fun-c1 fun ccb env sig))
+;; 			 ((set fun res))))))))
 
 (defun c1local-fun (fname &optional cl &aux ccb inner)
   (dolist (fun *funs*)
@@ -482,14 +552,44 @@
 	  ((eq (fun-name fun) fname)
 	   (let* ((cl (or ccb cl))
 		  (env (fn-get (fun-fn fun) 'df))
-		  (fm (if cl (make-local-fun fun-c1cb cb fun env) (make-local-fun fun-c1 lb fun env)))
+		  (fm (make-fun-c1 fun cl env))
 		  (lam (cadr (caddr fm)))
 		  (info (if lam (copy-info (cadr lam)) (make-info)))
 		  (c1fv (when ccb (c1inner-fun-var))));FIXME fm
 	     (setf (info-type info) (cadar (fun-call fun)));FIXME
-	     (if cl (pushnew fun (info-fref-ccb info)) (pushnew fun (info-fref info)))
+	     (if cl (pushnew fun (info-ref-ccb info)) (pushnew fun (info-ref info)))
 	     (when c1fv (add-info info (cadr c1fv)))
 	     (return (list 'call-local info (list fun cl ccb) c1fv lam)))))))
+
+;; (defun c1local-fun (fname &optional cl &aux ccb inner)
+;;   (dolist (fun *funs*)
+;;     (cond ((not (fun-p fun)) (setq ccb (or (eq fun 'cb) ccb) inner (or inner fun)))
+;; 	  ((eq (fun-name fun) fname)
+;; 	   (let* ((cl (or ccb cl))
+;; 		  (env (fn-get (fun-fn fun) 'df))
+;; 		  (fm (if cl (make-local-fun fun-c1cb cb fun env) (make-local-fun fun-c1 lb fun env)))
+;; 		  (lam (cadr (caddr fm)))
+;; 		  (info (if lam (copy-info (cadr lam)) (make-info)))
+;; 		  (c1fv (when ccb (c1inner-fun-var))));FIXME fm
+;; 	     (setf (info-type info) (cadar (fun-call fun)));FIXME
+;; 	     (if cl (pushnew fun (info-ref-ccb info)) (pushnew fun (info-ref info)))
+;; 	     (when c1fv (add-info info (cadr c1fv)))
+;; 	     (return (list 'call-local info (list fun cl ccb) c1fv lam)))))))
+
+;; (defun c1local-fun (fname &optional cl &aux ccb inner)
+;;   (dolist (fun *funs*)
+;;     (cond ((not (fun-p fun)) (setq ccb (or (eq fun 'cb) ccb) inner (or inner fun)))
+;; 	  ((eq (fun-name fun) fname)
+;; 	   (let* ((cl (or ccb cl))
+;; 		  (env (fn-get (fun-fn fun) 'df))
+;; 		  (fm (if cl (make-local-fun fun-c1cb cb fun env) (make-local-fun fun-c1 lb fun env)))
+;; 		  (lam (cadr (caddr fm)))
+;; 		  (info (if lam (copy-info (cadr lam)) (make-info)))
+;; 		  (c1fv (when ccb (c1inner-fun-var))));FIXME fm
+;; 	     (setf (info-type info) (cadar (fun-call fun)));FIXME
+;; 	     (if cl (pushnew fun (info-fref-ccb info)) (pushnew fun (info-fref info)))
+;; 	     (when c1fv (add-info info (cadr c1fv)))
+;; 	     (return (list 'call-local info (list fun cl ccb) c1fv lam)))))))
 
 ;; (defun c1local-fun (fname &optional cl &aux ccb inner)
 ;;   (macrolet ((pf (fun ref c1 b) 

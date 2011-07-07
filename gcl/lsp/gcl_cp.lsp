@@ -223,53 +223,6 @@
   (typecase x
    (new-compiled-function (c::function-env x 0))))
 
-;; (let ((a (lit :fixnum "(fixnum)" (:object x) "->fun.fun_env")))
-;;   (unless (= 0 a)
-;;     )
-
-;; (defun c::& (x y)
-;;   (declare (optimize (safety 1)))
-;;   (check-type x fixnum)
-;;   (check-type y fixnum)
-;;   (lit :fixnum "(" (:fixnum x) "&" (:fixnum y) ")"))
-
-;; (defun c::\| (x y)
-;;   (declare (optimize (safety 1)))
-;;   (check-type x fixnum)
-;;   (check-type y fixnum)
-;;   (lit :fixnum "(" (:fixnum x) "\|" (:fixnum y) ")"))
-
-;; (defun c::^ (x y)
-;;   (declare (optimize (safety 1)))
-;;   (check-type x fixnum)
-;;   (check-type y fixnum)
-;;   (lit :fixnum "(" (:fixnum x) "^" (:fixnum y) ")"))
-
-;; (defun c::~ (x)
-;;   (declare (optimize (safety 1)))
-;;   (check-type x fixnum)
-;;   (lit :fixnum "(~" (:fixnum x) ")"))
-
-;; (defun c::<< (x y)
-;;   (declare (optimize (safety 1)))
-;;   (check-type x fixnum)
-;;   (check-type y fixnum)
-;;   (lit :fixnum "(" (:fixnum x) "<<" (:fixnum y) ")"))
-
-;; (defun c::>> (x y)
-;;   (declare (optimize (safety 1)))
-;;   (check-type x fixnum)
-;;   (check-type y fixnum)
-;;   (lit :fixnum "(" (:fixnum x) ">>" (:fixnum y) ")"))
-
-;; (defun c::== (x y)
-;;   (declare (optimize (safety 1)))
-;;   (lit :boolean "(" (:object x) "==" (:object y) ")"))
-
-;; (defun c::!= (x y)
-;;   (declare (optimize (safety 1)))
-;;   (lit :boolean "(" (:object x) "==" (:object y) ")"))
-
 (eval-when
  (compile)
  (defmacro baz (&aux res)
@@ -300,42 +253,3 @@
       (symbol-function 'si::package-internal_size) (symbol-function 'c::package-internal_size)
       (symbol-function 'si::package-external) (symbol-function 'c::package-external)
       (symbol-function 'si::package-external_size) (symbol-function 'c::package-external_size));FIXME
-
-;; (defun fboundp (funid)
-;;   (declare (optimize (safety 1)))
-;;   (check-type funid funid-sym)
-;;   (let ((sym (funid-sym funid)))
-;;     (or (special-form-p sym)
-;; 	(/= 0 (si::address (c::symbol-gfdef sym))))))
-;; (deftype fbound nil `(and symbol (satisfies fboundp)))
-;; (setf (get 'fbound 'si::type-predicate) 'fboundp)
-;; (setf (get 'fboundp 'si::predicate-type) 'fbound)
-
-
-;; (defun special-form-p (sym)
-;;   (declare (optimize (safety 1)))
-;;   (check-type sym symbol)
-;;   (/= (si::address nil) (c::symbol-sfdef sym)))
-;; (deftype special-form nil `(satisfies special-form-p))
-
-;; (defun global-macro-p (sym)
-;;   (declare (optimize (safety 1)))
-;;   (check-type sym symbol)
-;;   (/= 0 (c::symbol-mflag sym)))
-;; (deftype global-macro nil `(satisfies global-macro-p))
-
-;; (defun symbol-function1 (s)
-;;   (declare (optimize (safety 1)))
-;;   (check-type s symbol)
-;;   (typecase
-;;    s
-;;    (special-form (cons 'special (c::symbol-sfdef s)))
-;;    (global-macro (cons 'macro   (c::symbol-gfdef s)))
-;;    (otherwise (unless (fboundp s) (error 'undefined-function s)) (c::symbol-gfdef s))))
-		 
-;;   (or (let ((x (c::symbol-sfdef s)))
-;; 	(unless (= x (si::address nil)) (cons 'special x)))
-;;       (let ((x (c::symbol-gfdef s)))
-;; 	(when (= 0 (si::address x))
-;; 	  (error 'undefined-function s))
-;; 	(if (= (c::symbol-mflag s) 0) x (cons 'macro x)))))

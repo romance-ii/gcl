@@ -583,7 +583,7 @@
   (dolist (l decls (list (nreverse ad) (nreverse dd)))
     (dolist (bb (cdr l))
       (let ((b (if (eq (car bb) 'type) (cdr bb) bb)))
-	(cond ((eq (car b) 'optimize) (push `(declare ,b) dd))
+	(cond ((eq (car b) 'optimize) (push `(declare ,b) ad))
 	      ((eq (car b) 'class)
 	       (unless (<= (length b) 3)
 		 (cmperr "Unknown class declaration: ~s" b))
@@ -596,6 +596,24 @@
 		    (push `(declare (,@z ,@tt)) ad))
 		  (when q
 		    (push `(declare (,@z ,@q)) dd))))))))))
+
+;; (defun split-decls (auxs decls &aux ad dd)
+;;   (dolist (l decls (list (nreverse ad) (nreverse dd)))
+;;     (dolist (bb (cdr l))
+;;       (let ((b (if (eq (car bb) 'type) (cdr bb) bb)))
+;; 	(cond ((eq (car b) 'optimize) (push `(declare ,b) dd))
+;; 	      ((eq (car b) 'class)
+;; 	       (unless (<= (length b) 3)
+;; 		 (cmperr "Unknown class declaration: ~s" b))
+;; 	       (if (member (cadr b) auxs) (push `(declare ,b) ad) (push `(declare ,b) dd)))
+;; 	      ((multiple-value-bind
+;; 		(tt q)
+;; 		(list-split (cdr b) auxs)
+;; 		(let ((z (if (eq b bb) (list (car bb)) (list (car bb) (cadr bb)))))
+;; 		  (when tt
+;; 		    (push `(declare (,@z ,@tt)) ad))
+;; 		  (when q
+;; 		    (push `(declare (,@z ,@q)) dd))))))))))
 
 ;; (defun split-decls (auxs decls &aux ad dd)
 ;;   (dolist (l decls (list (nreverse ad) (nreverse dd)))
@@ -1702,6 +1720,31 @@
 	    (add-init `(si::debugger ',fname ',locals) )
 	    ))
       ))))
+
+
+(defun if1 (f)
+  (flet ((tbp (l) (member-if (lambda (x) (or (tag-p x) (blk-p x))) l)))
+	(not (or (info-ch f) 
+		 (tbp (info-ref     f))
+		 (tbp (info-ref-ccb f))
+		 (tbp (info-ref-clb f))
+		 (iflag-p (info-flags f) side-effects)))))
+
+;; (defun if1 (f)
+;;   (not (or (info-ch f) (info-blocks f) (info-tags f)
+;; 	   (iflag-p (info-flags f) side-effects))))
+  
+(defun ignorable-form-old (f)
+  (cond ((> (changed-length (cadr f)) 0) nil)
+	((side-effects-p f) nil)
+	(t)))
+
+(defun ignorable-form (f)
+  (or (eq (car f) 'function)
+      (if1 (cadr f))))
+
+;; (defun ignorable-form (f)
+;;   (if1 (cadr f)))
 
 
 ;;Checks the register slots of variables, and finds which
