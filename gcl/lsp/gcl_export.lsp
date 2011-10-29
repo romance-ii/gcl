@@ -506,3 +506,19 @@
     (use-package   :common-lisp l)))
 
 ;(delete-package-internal :old-lisp)
+
+(make-package :COMPILER :use '(:lisp :si))
+
+;FIXME bootstrap code
+
+(fset 'intersection #'intersection-eq)
+(fset 'union #'union-eq)
+(fset 'set-difference #'set-difference-eq)
+(fset 'nunion #'nunion-eq)
+
+(*make-special '*pahl*)
+(setq *pahl* nil)
+(defun do-recompile (&rest r) nil)
+(defun add-hash (&rest r)
+  (setq *pahl* (cons (cons 'add-hash (mapcar #'(lambda (x) `',x) r)) *pahl*)))
+

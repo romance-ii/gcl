@@ -209,19 +209,20 @@
 ;;; Common Lisp BUG:
 ;;;    Common Lisp should have destructuring-bind.
 ;;;    
-;#-gcl
 ; FIXME use regular destructuring-bind
-(defmacro pcl-destructuring-bind (pattern form &body body)
-  (multiple-value-bind (ignore declares body)
-      (extract-declarations body)
-    (declare (ignore ignore))
-    (multiple-value-bind (setqs binds)
-	(destructure pattern form)
-      `(let ,binds
-	 ,@declares
-	 ,@setqs
-	 (progn .destructure-form.)
-	 . ,body))))
+;; #+gcl(setf (macro-function 'pcl-destructuring-bind) (macro-function 'destructuring-bind))
+;; #-gcl
+;; (defmacro pcl-destructuring-bind (pattern form &body body)
+;;   (multiple-value-bind (ignore declares body)
+;;       (extract-declarations body)
+;;     (declare (ignore ignore))
+;;     (multiple-value-bind (setqs binds)
+;; 	(destructure pattern form)
+;;       `(let ,binds
+;; 	 ,@declares
+;; 	 ,@setqs
+;; 	 (progn .destructure-form.)
+;; 	 . ,body))))
 
 (eval-when (compile load eval)
 (defun destructure (pattern form)
@@ -487,9 +488,8 @@
 
 ; Use this definition in any CL implementation supporting 
 ; both define-compiler-macro and load-time-value.
-#+cmu ; Note that in CMU, lisp:find-class /= pcl:find-class
-(define-compiler-macro find-class (&whole form
-				   symbol &optional (errorp t) environment)
+#+(or gcl cmu) ; Note that in CMU, lisp:find-class /= pcl:find-class
+(define-compiler-macro find-class (&whole form symbol &optional (errorp t) environment)
   (declare (ignore environment))
   (if (and (constantp symbol) 
 	   (legal-class-name-p (eval symbol))

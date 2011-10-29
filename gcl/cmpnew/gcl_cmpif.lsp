@@ -488,12 +488,14 @@
 
 (defun co1or (fn args)
   (declare (ignore fn))
-  (let* ((tp (when (and args (eq (last *c1exit*) +fmla+)) #t(member t)))
-	 (arg (pop args))
-	 (tp (or tp (info-type (cadr (c1expr arg)))))
-	 (atp (atomic-tp (type-and tp #t(not null)))))
-    (when (atomic-type-constant-value atp)
-      (c1expr `(if ,arg ',(car atp) (or ,@args))))))
+  (with-restore-vars
+   (let* ((tp (when (and args (eq (last *c1exit*) +fmla+)) #t(member t)))
+	  (arg (pop args))
+	  (tp (or tp (info-type (cadr (c1expr arg)))))
+	  (atp (atomic-tp (type-and tp #t(not null)))))
+     (when (atomic-type-constant-value atp)
+       (keep-vars)
+       (c1expr `(if ,arg ',(car atp) (or ,@args)))))))
 (setf (get 'or 'co1special) 'co1or)
 
 (defun c1fmla (fmla info &aux (*c1exit* +fmla+))

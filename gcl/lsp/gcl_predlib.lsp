@@ -1093,12 +1093,12 @@
  (compile eval)
  (defmacro clh nil
   `(progn
-     ,@(mapcar (lambda (x &aux (f (when (eq x 'find-class) `(nil))) (z (intern (string-concatenate "SI-" (symbol-name x)))))
-		 `(defun ,z (o &aux e)
+     ,@(mapcar (lambda (x &aux (f (when (eq x 'find-class) `(&optional ep))) (z (intern (string-concatenate "SI-" (symbol-name x)))))
+		 `(defun ,z (o ,@f &aux e)
 		    (cond ((fboundp ',x)
-			   (prog1 (funcall ',x o ,@f)
+			   (prog1 (funcall ',x o ,@(cdr f))
 			     (setf (symbol-function ',z) (symbol-function ',x))))
-			  ((setq e (get ',z 'early)) (values (funcall e o ,@f))))))
+			  ((setq e (get ',z 'early)) (values (funcall e o ,@(cdr f)))))))
 	       '(classp class-precedence-list find-class class-name class-of class-direct-subclasses)))))
 (clh)
 
@@ -1122,7 +1122,7 @@
 (defun find-standard-class (object)
   (and (symbolp object)
        (is-standard-class-symbol object)
-       (si-find-class object)))
+       (si-find-class object nil)))
 
 (defun coerce-to-standard-class (object)
   (cond ((and (si-classp object)
@@ -1157,7 +1157,7 @@
 	      (not (negate (cadr x))))))
 
 (defun standard-recon (x)
-  (let ((z (or (si-find-class (car x)) (car x))))
+  (let ((z (or (si-find-class (car x) nil) (car x))))
     (cond ((eq (cadr x) t) z)
 	  ((and (consp (cadr x)) (eq (caadr x) 'not)) `(and ,z ,(cadr x)))
 	  ((cadr x)))))
@@ -1493,7 +1493,7 @@
 	((typep object 'standard-object)
 	 (let* ((c (si-class-of object))
 		(n (si-class-name c)))
-	     (if (and n (eq c (si-find-class n))) n c)))
+	     (if (and n (eq c (si-find-class n nil))) n c)))
 	((let ((tp (type-of-c object)))
 	   (cond ((member tp '(vector array));FIXME
 		  `(,tp ,(upgraded-array-element-type (array-element-type object))))
