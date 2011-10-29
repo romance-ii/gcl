@@ -1,9 +1,9 @@
 ;; -*-Lisp-*-
-(in-package 'lisp)
+(in-package :lisp)
 (export
  '(float realpart imagpart numerator denominator))
 
-(in-package 'si)
+(in-package :si)
 
 (defun cnum-type (x)
   (let ((y (c-type x)))

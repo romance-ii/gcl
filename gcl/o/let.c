@@ -280,19 +280,19 @@ FFN(Flabels)(object args)
 	      type_of(MMcar(def)) != t_symbol)
 	    FEerror("~S~%\
 is an illegal function definition in LABELS.",1, def);
-		top[0] = MMcons(lex[2], def);
-		top[0] = MMcons(Cnil, top[0]);
-		top[1] = MMcons(top[0], top[1]);
-		top[0] = MMcons(lex[0], top[0]);
-		top[0] = MMcons(sLlambda_block_closure, top[0]);
-		{
-		  object x=alloc_object(t_ifun);
-		  x->ifn.ifn_self=top[0];
-		  x->ifn.ifn_name=x->ifn.ifn_call=Cnil;
-		  top[0]=x;
-		}
-		lex_fun_bind(MMcar(def), top[0]);
-		def_list = MMcdr(def_list);
+	  top[0] = MMcons(lex[2], def); 
+	  top[0] = MMcons(Cnil, top[0]);
+	  top[1] = MMcons(top[0], top[1]);
+	  top[0] = MMcons(lex[0], top[0]);
+	  top[0] = MMcons(sLlambda_block_closure, top[0]);
+	  {
+	    object x=alloc_object(t_ifun);
+	    x->ifn.ifn_self=top[0];
+	    x->ifn.ifn_name=x->ifn.ifn_call=Cnil;
+	    top[0]=x;
+	  }
+	  lex_fun_bind(MMcar(def), top[0]);
+	  def_list = MMcdr(def_list);
 	}
 	closure_list = top[1];
 	while (!endp(closure_list)) {
@@ -355,7 +355,7 @@ gcl_init_let(void)
 	make_special_form("LET", Flet);
 	make_special_form("LET*", FletA);
 	make_special_form("MULTIPLE-VALUE-BIND", Fmultiple_value_bind);
-	make_special_form("COMPILER-LET", Fcompiler_let);
+	make_si_function("COMPILER-LET", Fcompiler_let);
 	make_special_form("FLET",Fflet);
 	make_special_form("LABELS",Flabels);
 	make_special_form("MACROLET",Fmacrolet);

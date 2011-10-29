@@ -23,20 +23,21 @@
 ;;;;                                setf routines
 
 
-(in-package 'lisp)
+;; (in-package 'lisp)
 
 
-(export '(setf psetf shiftf rotatef
-          define-modify-macro defsetf
-          getf remf incf decf push pushnew pop
-          define-setf-method
-	  define-setf-expander
-	  get-setf-method
-	  get-setf-expansion
-	  get-setf-method-multiple-value))
+;; (export '(setf psetf shiftf rotatef
+;;           define-modify-macro defsetf
+;;           getf remf incf decf push pushnew pop
+;; ;         define-setf-method
+;; 	  define-setf-expander
+;; ;	  get-setf-method
+;; 	  get-setf-expansion
+;; ;	  get-setf-method-multiple-value
+;; 	  ))
 
 
-(in-package 'system)
+(in-package :system)
 
 
 ;(eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))
@@ -401,6 +402,7 @@
       (get-setf-method place env)
     (declare (ignore access-form))
     `(let* ,(join (append vars stores) (append vals (list newvalue)))
+       (declare (ignorable ,@vars))
        ,store-form)))
 
 (defun setf-structure-access (struct type index newvalue)
@@ -450,7 +452,7 @@
 	      (store-forms nil))
 	     ((endp r)
 	      `(let* ,pairs
-		 ,@(nreverse store-forms)
+		 ,@(nreverse store-forms);FIXME put in ignorable decl here
 		 nil))
 	   (when (endp (cdr r)) (error "~S is an illegal PSETF form." rest))
 	   (multiple-value-bind (vars vals stores store-form access-form)
@@ -550,6 +552,7 @@
 	   (get-setf-method reference env)
          (list 'let*
 	       (join (append vars stores) (append vals (list ,update-form)))
+	       (list 'declare (cons 'ignorable vars))
 	       store-form)))))
 
 
@@ -606,6 +609,7 @@
     (multiple-value-bind (vars vals stores store-form access-form)
 			 (get-setf-method place env)
 			 `(let* ,(join (append (list myitem) vars stores) (append (list   item) vals (list (list 'cons myitem access-form))))
+			    (declare (ignorable ,@vars))
 			    ,store-form))))
 
 (defmacro pushnew (&environment env item place &rest rest)
@@ -618,6 +622,7 @@
 			 (get-setf-method place env)
 			 `(let* ,(join (append (list myitem) vars stores) 
 				       (append (list item) vals  (list (list* 'adjoin myitem access-form rest))))
+			    (declare (ignorable ,@vars))
 			    ,store-form))))
 
 (defmacro pop (&environment env place)
@@ -631,6 +636,7 @@
   (multiple-value-bind (vars vals stores store-form access-form)
       (get-setf-method place env)
     `(let* ,(join (append vars stores) (append vals (list (list 'cdr access-form))))
+       (declare (ignorable ,@vars))
        (prog1 (car ,access-form)
               ,store-form))))
 

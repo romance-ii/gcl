@@ -453,7 +453,8 @@ typedef struct {
   uhfixnum J(b_,pad:HM7BITS);   /*  pad  */			\
   uhfixnum J(b_,adjustable:1);  /*  adjustable flag  */		\
   uhfixnum J(b_,elttype:4);     /*  element type  */		\
-  uhfixnum J(b_,pad1:HM5BITS);  /*  pad  */			\
+  uhfixnum J(b_,eltsize:4);     /*  element size  */		\
+  uhfixnum J(b_,pad1:HM9BITS);  /*  pad  */			\
   a_      *J(b_,self);          /*  pointer to the array  */	\
   ufixnum *J(b_,dims);          /*  table of dimensions  */	\
   ufixnum  J(b_,pad2:4);        /*  pad  */			\
@@ -476,7 +477,8 @@ typedef struct {
   uhfixnum J(b_,pad:HM7BITS);   /*  pad  */				\
   uhfixnum J(b_,adjustable:1);  /*  adjustable flag  */		\
   uhfixnum J(b_,elttype:4);     /*  element type  */			\
-  uhfixnum J(b_,pad1:HM5BITS);  /*  pad  */				\
+  uhfixnum J(b_,eltsize:4);     /*  element size  */		\
+  uhfixnum J(b_,pad1:HM9BITS);  /*  pad  */			\
   a_      *J(b_,self);          /*  pointer to the vector  */	\
   ufixnum  J(b_,pad2:4);        /*  pad  */				\
   ufixnum  J(b_,fillp:LM4BITS); /*  fill pointer  */			\

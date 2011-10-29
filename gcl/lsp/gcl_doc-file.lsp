@@ -14,7 +14,7 @@
 	for w in-package v
 	when  (setq doc (documentation w 'function))
 	do (format st "F~a~%~ain ~a package:~a" w
-		   (cond ((special-form-p w) "Special Form ")
+		   (cond ((special-operator-p w) "Special Form ")
 			 ((functionp w) "Function ")
 			 ((macro-function w) "Macro ")
 			 (t ""))

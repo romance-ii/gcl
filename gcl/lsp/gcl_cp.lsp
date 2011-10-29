@@ -1,4 +1,4 @@
-(in-package 'compiler)
+(in-package :compiler)
 
 (eval-when
  (compile) 
@@ -92,7 +92,7 @@
 		(ns (intern (string-upcase (compiler::strcat "set-" n)) 'c))
 		(zz (if (member z '(:integer :real :plist :pack :string :structure :keyword :direl :symbol)) :object z))
 		(ss (concatenate 'string "->"  (string sn) "." (string e) (if s "[" "")))
-		(f `(compiler::lit ,zz (:object c::x) ,ss ,@(when s `((:fixnum c::i) "]"))));FIXME
+		(f `(si::lit ,zz (:object c::x) ,ss ,@(when s `((:fixnum c::i) "]"))));FIXME
 		(fp f)
 		(i (third x))
 		(tt1 (when i (if y `(integer 0 (,(ash 1 i)))
@@ -100,12 +100,11 @@
 		(tt1 (or tt1 (get z 'compiler::lisp-type)))
 		(f (if tt1 `(the ,tt1 ,f) f))
 		(fs (sublis
-		     (list (cons fp (append `(compiler::lit ,zz "(") (cddr fp) `("=" (,zz c::y) ")")))) f))
+		     (list (cons fp (append `(si::lit ,zz "(") (cddr fp) `("=" (,zz c::y) ")")))) f))
 		(v (member e '("FIXVAL" "LFVAL" "SFVAL" "CODE") :test 'equal))
 		(fs (unless v fs));could be an immediate fixnum, unsettable
 		(f (if v `c::x f)));use default coersion
-	   `(progn (eval-when (compile load eval) (remprop ',n 'compiler::lfun))
-		   (defun ,n (c::x ,@s) 
+	   `(progn (defun ,n (c::x ,@s) 
 		     (declare (optimize (safety 1)))
 		     ,@(when s `((declare (seqind c::i))))
 		     (check-type c::x ,b)
@@ -137,7 +136,7 @@
  
 (bar)
 
-(in-package 'compiler)
+(in-package :compiler)
 
 (defun c::hashtable-self (x i)
   (declare (optimize (safety 1)))
@@ -189,17 +188,6 @@
   (check-type x fixnum)
   (lit :object "((struct htent *)" (:fixnum x) ")->hte_key=" (:object y)))
 
-
-(defun sf (s)
-  (declare (optimize (safety 1)))
-  (check-type s symbol)
-  (or (let ((x (c::symbol-sfdef s)))
-	(unless (= x (si::address nil)) (cons 'special x)))
-      (let ((x (c::symbol-gfdef s)))
-	(when (= 0 (si::address x))
-	  (error 'undefined-function s))
-	(if (= (c::symbol-mflag s) 0) x (cons 'macro x)))))
-
 (defun funcallable-symbol-p (s)
   (and (symbolp s)
        (/= (si::address (c::symbol-gfdef s)) 0)
@@ -228,12 +216,12 @@
  (defmacro baz (&aux res)
    `(progn
       ,@(mapcan (lambda (l &aux (s (intern (cadar l) 'c)) (w (cddr l)) (k1 (cadr l)) (k2 (car (last l))))
-		  `((defun ,s (,@(when w `(x)) y)
+		  `((defun ,s (,@(when w `(x)) z)
 		      (declare (optimize (safety 1)))
 		      ,@(when w `((check-type x ,(export-type (get k1 'lisp-type)))))
-		      (check-type y ,(export-type (get k2 'lisp-type)))
-		      (lit ,(caar l) ,@(when w `((,k1 x))) ,(cadar l) (,k2 y)))
-		    (export ',s 'c)))
+		      (check-type z ,(export-type (get k2 'lisp-type)))
+		      (lit ,(caar l) ,@(when w `((,k1 x))) ,(cadar l) (,k2 z)))
+		    (export ',s :c)))
 		'(((:fixnum   "&")  :fixnum :fixnum)
 		  ((:fixnum  "\|")  :fixnum :fixnum)
 		  ((:fixnum   "^")  :fixnum :fixnum)

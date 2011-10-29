@@ -1,5 +1,5 @@
 ;; -*-Lisp-*-
-(in-package "SI"  )
+(in-package :SI)
 
 (eval-when (compile eval)
 (defmacro while (test &body body)

@@ -20,7 +20,7 @@
 ;; Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-(in-package 'compiler)
+(in-package :compiler)
 
 (defun push-changed-vars (locs funob &aux (locs1 nil) (forms (list funob)))
   (dolist (loc locs (reverse locs1))

@@ -20,7 +20,7 @@
 ;; Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-(in-package 'compiler)
+(in-package :compiler)
 
 ;;; Pass 1 generates the internal form
 ;;;	( id  info-object . rest )
@@ -135,6 +135,10 @@
      (do-ht (,v (info-ref-ccb ,info)) (when (var-p ,v) ,@body))
      (do-ht (,v (info-ref-clb ,info)) (when (var-p ,v) ,@body))
      (do-ht (,v (info-ref     ,info)) (when (var-p ,v) ,@body))))
+;; (defmacro do-referred-cb ((v info) &rest body)
+;;   `(progn 
+;;      (do-ht (,v (info-ref-ccb ,info)) (when (var-p ,v) ,@body))
+;;      (do-ht (,v (info-ref-clb ,info)) (when (var-p ,v) ,@body))))
 ;; (defmacro do-referred ((v info) &rest body)
 ;;   `(do-ht (,v (info-ref ,info)) ,@body))
 (defmacro do-changed ((v info) &rest body)

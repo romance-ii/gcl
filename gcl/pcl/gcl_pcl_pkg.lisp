@@ -199,7 +199,7 @@
 	*the-pcl-package*)
 
 
-(shadow 'documentation)
+#-gcl(shadow 'documentation)
 
 
 ;;;						

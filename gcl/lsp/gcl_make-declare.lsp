@@ -2,7 +2,7 @@
 ;; By W. Schelter
 ;; Usage: (si::proclaim-file "foo.lsp") (compile-file "foo.lsp")
 
-(in-package 'si)
+(in-package :si)
 
 ;; You may wish to adjust the following to output the proclamations
 ;; for inclusion in a file.  All fixed arg functions should be proclaimed

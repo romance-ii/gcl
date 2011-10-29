@@ -114,7 +114,7 @@
     (setf (plist-value object 'documentation) documentation)))
 
 (defmethod documentation (object &optional doc-type)
-  (lisp:documentation object doc-type))
+  (real-documentation object doc-type))
 
 (defmethod (setf documentation) (new-value object &optional doc-type)
   (si::set-documentation object doc-type new-value))

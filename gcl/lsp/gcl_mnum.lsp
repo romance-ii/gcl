@@ -1,9 +1,9 @@
 ;; -*-Lisp-*-
-(in-package 'lisp)
+;; (in-package 'lisp)
 
-(export 'abs)
+;; (export 'abs)
 
-(in-package 'si)
+(in-package :si)
 
 (import 'compiler::defdlfun 'si)
 (import 'compiler::strcat 'si)

@@ -174,6 +174,6 @@ LFD(Lsave)()
 void
 gcl_init_unixsave(void)
 {
-	make_function("SAVE", Lsave);
+	make_si_function("SAVE", Lsave);
 }
 

@@ -1,5 +1,5 @@
 
-(in-package "CONDITIONS")
+(in-package :CONDITIONS)
 
 (import '(with-simple-restart abort continue compute-restarts
 	  *debug-level* *debug-restarts* *number-of-debug-restarts*
@@ -9,7 +9,7 @@
 	  read-evaluated-form restart-case muffle-warning)
 	"SYSTEM")
 
-(in-package "SYSTEM")
+(in-package :SYSTEM)
 
 (defvar *abort-restarts* nil)
 

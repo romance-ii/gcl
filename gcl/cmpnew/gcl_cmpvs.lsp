@@ -20,7 +20,7 @@
 ;; Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-(in-package 'compiler)
+(in-package :compiler)
 
 (si:putprop 'vs 'set-vs 'set-loc)
 (si:putprop 'vs* 'wt-vs* 'wt-loc)

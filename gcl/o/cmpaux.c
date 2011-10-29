@@ -87,7 +87,7 @@ DEFUN_NEW("RATIO-DENOMINATOR",object,fSratio_denominator,SI,1,1,NONE,OO,OO,OO,OO
 DEFUN_NEW("C-TYPE",object,fSc_type,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
   RETURN1(make_fixnum(type_of(x)));
 }
-DEFCONST("C-TYPE-MAX", sSc_type_max,LISP, make_fixnum(t_end-1),"");
+DEFCONST("C-TYPE-MAX", sSc_type_max,SI,make_fixnum(t_end-1),"");
 
 DEF_ORDINARY("DEBUGGER",sSdebugger,SI,"");
 
@@ -573,7 +573,8 @@ do_init(object *statVV)
 
   /* switch SPinit to point to a vector of function addresses */
      
-  fasl_vec->v.v_elttype = aet_fix;
+  fasl_vec->v.tt=fasl_vec->v.v_elttype = aet_fix;
+  fasl_vec->v.v_eltsize = elt_size(aet_fix);
   fasl_vec->v.v_defrank=1;
   fasl_vec->v.v_dim *= (sizeof(object)/sizeof(fixnum));
   fasl_vec->v.v_fillp *= (sizeof(object)/sizeof(fixnum));

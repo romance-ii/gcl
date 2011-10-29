@@ -20,7 +20,7 @@
 ;; Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-(in-package 'compiler)
+(in-package :compiler)
 
 (defvar *ifuncall* nil)
 
@@ -143,18 +143,6 @@
     (close-inline-blocks)))
 
 
-(defun check-fname-args (fname args)
-  (let ((a (get fname 'arg-types t)))
-    (and (eq t a) (get fname 'si::structure-access)
-	 (setq a '(t)))
-    (cond ((and (listp a)
-		(listp args)
-		(not (member '* a)))
-	   (or (eql (length a) (length args))
-		   (cmpwarn "Wrong number of args for ~s: ~a instead of ~a."
-			    fname
-			    (length args) (length a)))))))
-
 (defun save-avma (fd)
   (when (and (not *restore-avma*)
 	     (setq *restore-avma*
@@ -268,7 +256,7 @@
 (setf (get 'tail-recur 'c1) 'c1tail-recur)
 
 (defun c2call-global (fname args loc return-type &optional lastp &aux fd (*vs* *vs*))
-  (assert (not (special-form-p fname)))
+  (assert (not (special-operator-p fname)))
   (assert (not (macro-function fname)))
   (assert (listp args))
   (assert (null loc))

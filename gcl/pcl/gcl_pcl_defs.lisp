@@ -1026,7 +1026,10 @@
 	((setq tem (gethash x *find-class*))
 	 (early-class-precedence-list (car tem)))))
 
-(setf (symbol-function 'si::find-class) (symbol-function 'early-find-class-symbol))
-(setf (symbol-function 'si::class-precedence-list) (symbol-function 'early-class-precedence-list-symbol))
-(setf (symbol-function 'si::class-of) (symbol-function 'early-class-name-of))
+(setf (get 'si::si-find-class 'si::early) 'early-find-class-symbol)
+(setf (get 'si::si-class-precedence-list 'si::early) 'early-class-precedence-list-symbol)
+(setf (get 'si::si-class-of 'si::early) 'early-class-name-of)
+;(setf (symbol-function 'si::find-class) (symbol-function 'early-find-class-symbol))
+;(setf (symbol-function 'si::class-precedence-list) (symbol-function 'early-class-precedence-list-symbol))
+;(setf (symbol-function 'si::class-of) (symbol-function 'early-class-name-of))
 ;(setf (symbol-function 'si::class-direct-subclasses) (symbol-function 'early-class-direct-subclasses)) ;FIXME need class-name here

@@ -89,5 +89,5 @@ DEFUN_NEW("GETPID",object,fSgetpid,SI,0,0,NONE,OO,OO,OO,OO,(void),
 void
 gcl_init_unixsys(void)
 {
-	make_function("SYSTEM", Lsystem);
+	make_si_function("SYSTEM", Lsystem);
 }

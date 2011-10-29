@@ -1,6 +1,6 @@
 ;;; -*- Mode: Lisp; Syntax: Common-Lisp; Package: "CONDITIONS"; Base: 10 -*-
 
-(IN-PACKAGE "CONDITIONS")
+(IN-PACKAGE :CONDITIONS)
 
 (eval-when (compile load eval)
 	   (pushnew :clos-conditions *features*))

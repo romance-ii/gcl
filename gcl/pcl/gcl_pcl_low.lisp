@@ -399,13 +399,13 @@
 
 ;Functions on arbitrary objects
 
-(defvar *structure-table* (make-hash-table :test 'eq))
+;(defvar *structure-table* (make-hash-table :test 'eq))
 
 (defun declare-structure (name included-name slot-description-list)
   (setf (gethash name *structure-table*)
 	(cons included-name slot-description-list)))
 
-(unless (fboundp 'structure-functions-exist-p)
+#-gcl(unless (fboundp 'structure-functions-exist-p)
   (setf (symbol-function 'structure-functions-exist-p) 
 	#'(lambda () nil)))
 

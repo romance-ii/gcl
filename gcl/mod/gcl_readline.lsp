@@ -1,4 +1,4 @@
-(in-package "SI"  )
+(in-package :SI)
 (defun init-readline () 
 					; init Readline word completion list for Gcl
   (if (fboundp 'si::readline-init)

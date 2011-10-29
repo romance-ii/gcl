@@ -23,39 +23,39 @@
 ;;;;        The IO library.
 
 
-(in-package 'lisp)
+;; (in-package 'lisp)
 
-(export '(with-open-stream with-input-from-string with-output-to-string parse-integer))
-(export '(read-from-string))
-(export '(write-to-string prin1-to-string princ-to-string))
-(export 'file-string-length)
-(export 'with-open-file)
-(export '(y-or-n-p yes-or-no-p))
-(export 'dribble)
-(export 'with-standard-io-syntax)
-(export 'logical-pathname-translations)
-(export 'load-logical-pathname-translations)
-(export 'formatter)
-(export 'pprint-dispatch)
-(export 'set-pprint-dispatch)
-(export 'copy-pprint-dispatch)
-(export 'ensure-directories-exist) ; from ECLS
-(export 'print-unreadable-object) ; from ECLS
-(export 'with-compilation-unit)
-(export '(concatenated-stream-streams 
-	  broadcast-stream-streams 
-	  two-way-stream-input-stream
-	  echo-stream-input-stream
-	  two-way-stream-output-stream
-	  echo-stream-output-stream
-	  synonym-stream-symbol
-	  read-byte
-	  write-byte
-	  read-sequence
-	  write-sequence
-	  open))
+;; (export '(with-open-stream with-input-from-string with-output-to-string parse-integer))
+;; (export '(read-from-string))
+;; (export '(write-to-string prin1-to-string princ-to-string))
+;; (export 'file-string-length)
+;; (export 'with-open-file)
+;; (export '(y-or-n-p yes-or-no-p))
+;; (export 'dribble)
+;; (export 'with-standard-io-syntax)
+;; (export 'logical-pathname-translations)
+;; (export 'load-logical-pathname-translations)
+;; (export 'formatter)
+;; (export 'pprint-dispatch)
+;; (export 'set-pprint-dispatch)
+;; (export 'copy-pprint-dispatch)
+;; (export 'ensure-directories-exist) ; from ECLS
+;; (export 'print-unreadable-object) ; from ECLS
+;; (export 'with-compilation-unit)
+;; (export '(concatenated-stream-streams 
+;; 	  broadcast-stream-streams 
+;; 	  two-way-stream-input-stream
+;; 	  echo-stream-input-stream
+;; 	  two-way-stream-output-stream
+;; 	  echo-stream-output-stream
+;; 	  synonym-stream-symbol
+;; 	  read-byte
+;; 	  write-byte
+;; 	  read-sequence
+;; 	  write-sequence
+;; 	  open))
 
-(in-package 'system)
+(in-package :system)
 
 (defun concatenated-stream-streams (stream)
   (declare (optimize (safety 2)))

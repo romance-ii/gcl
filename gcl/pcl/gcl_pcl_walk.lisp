@@ -52,6 +52,7 @@
 ;;; 
 
 (in-package :walker)
+#+gcl(import 'si::macro)
 
 ;;;
 ;;; The user entry points are walk-form and nested-walked-form.  In addition,
@@ -61,6 +62,7 @@
 ;;; out for themselves.
 ;;; 
 (export '(define-walker-template
+	  #+gcl macro
 	  walk-form
 	  walk-form-expand-macros-p
 	  nested-walk-form
@@ -1367,7 +1369,7 @@
 			 #+cmu17
 			 (special-operator-p fn)
 			 #-cmu17
-			 (special-form-p fn))
+			 (special-operator-p fn))
 		    (error
 		     "~S is a special form, not defined in the CommonLisp.~%~
 		      manual This code walker doesn't know how to walk it.~%~

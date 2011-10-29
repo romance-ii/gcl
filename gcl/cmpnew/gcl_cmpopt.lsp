@@ -1,5 +1,5 @@
 ;; -*-Lisp-*-
-(in-package 'compiler)
+(in-package :compiler)
 
 ;; The optimizers have been redone to allow more flags
 ;; The old style optimizations  correspond to the first 2
@@ -664,8 +664,8 @@
    (get 'length 'inline-always))
 
 ;;CMP-VEC-LENGTH
-(push '((t) seqind #.(flags rfa)"(#0)->v.v_fillp")
-   (get 'cmp-vec-length 'inline-always))
+;; (push '((t) seqind #.(flags rfa)"(#0)->v.v_fillp")
+;;    (get 'cmp-vec-length 'inline-always))
 ;;si::VEC-LENGTH
 (push '((t) seqind #.(flags rfa)"(#0)->v.v_fillp")
    (get 'si::vec-length 'inline-always))
@@ -1073,7 +1073,7 @@
 	     (:float*     nil                    nil             (array short-float) "->sfa.sfa_self")
 	     (:double*    nil                    nil             (array long-float)  "->lfa.lfa_self")
 	     (:long*      nil                    nil             (array fixnum)      "->fixa.fixa_self")
-	     (:void*      nil                    nil             (or array symbol character)   "->v.v_self")))
+	     (:void*      nil                    nil             (or array symbol character) "->v.v_self")))
   (setf (get (car l) 'lisp-type) (if (cadr l) (caddr l) (cadddr l)))
   (when (cadr l)
     (push `(((member ,(car l)) opaque) t #.(flags rfa) ,(strcat (cadr l) "(#1)")) 

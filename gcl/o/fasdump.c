@@ -1103,16 +1103,17 @@ DEFUN_NEW("FIND-SHARING-TOP",object,fSfind_sharing_top,SI
      /* I am not sure if saving vs_top,vs_base is necessary */
 static object 
 lisp_eval(object x)
-{  object *b,*t;
+{  /* object *b,*t; */
    SAVE_CURRENT_FASD;
-   b=vs_base;
-   t=vs_top;
-   vs_base=vs_top;
-   vs_push(x);
-   Leval(); 
-   x=vs_base[0];
-   vs_base=b;
-   vs_top=t;
+   x=fLeval(x);/*FIXME FFN*/
+   /* b=vs_base; */
+   /* t=vs_top; */
+   /* vs_base=vs_top; */
+   /* vs_push(x); */
+   /* Leval();  */
+   /* x=vs_base[0]; */
+   /* vs_base=b; */
+   /* vs_top=t; */
    RESTORE_FASD;
    return x;
  }
@@ -1384,6 +1385,7 @@ read_fasd1(int i, object *loc)
 	 object x=alloc_object(t_vector);
 	 GET4(leng);
 	 x->v.tt=x->v.v_elttype = GETD("v_elttype=%d");
+	 x->v.v_eltsize=elt_size(x->v.v_elttype);
 	 x->v.v_defrank=1;
 	 x->v.v_dim=x->v.v_fillp=leng;
 	 x->v.v_self=0;
@@ -1407,7 +1409,8 @@ read_fasd1(int i, object *loc)
 	 object x=alloc_object(t_array);
 	 GET4(leng);
 
-	 x->a.a_elttype = GETD("a_elttype=%d");
+	 x->a.tt=x->a.a_elttype = GETD("a_elttype=%d");
+	 x->a.a_eltsize = elt_size(x->a.a_elttype);
 	 x->a.a_dim=leng;
 	 x->a.a_hasfillp=0;
 	 x->a.a_rank= GETD("a_rank=%d");

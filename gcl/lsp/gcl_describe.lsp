@@ -23,12 +23,12 @@
 ;;;;                           DESCRIBE and INSPECT
 
 
-(in-package 'lisp)
+;; (in-package 'lisp)
 
-(export '(describe inspect))
+;; (export '(describe inspect))
 
 
-(in-package 'system)
+(in-package :system)
 
 
 (defvar *inspect-level* 0)
@@ -355,7 +355,7 @@
                (find-package "SYSTEM")
                *package*)))
 
-    (cond ((special-form-p symbol)
+    (cond ((special-operator-p symbol)
            (doc1 (or (documentation symbol 'function) "")
                  (if (macro-function symbol)
                      "[Special form and Macro]"

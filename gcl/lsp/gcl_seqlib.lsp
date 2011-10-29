@@ -23,24 +23,24 @@
 ;;;;                           sequence routines
 
 
-(in-package 'lisp)
+;; (in-package 'lisp)
 
 
-(export '(copy-seq reduce fill replace length elt every some notevery notany
-          remove remove-if remove-if-not
-          delete delete-if delete-if-not
-          count count-if count-if-not
-          substitute substitute-if substitute-if-not
-          nsubstitute nsubstitute-if nsubstitute-if-not
-          find find-if find-if-not
-          position position-if position-if-not
-          remove-duplicates delete-duplicates
-          mismatch search
-	  with-hash-table-iterator
-          sort stable-sort merge))
+;; (export '(copy-seq reduce fill replace length elt every some notevery notany
+;;           remove remove-if remove-if-not
+;;           delete delete-if delete-if-not
+;;           count count-if count-if-not
+;;           substitute substitute-if substitute-if-not
+;;           nsubstitute nsubstitute-if nsubstitute-if-not
+;;           find find-if find-if-not
+;;           position position-if position-if-not
+;;           remove-duplicates delete-duplicates
+;;           mismatch search
+;; 	  with-hash-table-iterator
+;;           sort stable-sort merge))
 
 
-(in-package 'system)
+(in-package :system)
 
 
 (eval-when (compile eval)
@@ -152,17 +152,19 @@
 						(declare ((array ,(car x)) ,a ,@(unless (eq a b) `(,b))))
 						(setf (aref ,a ,i)(aref ,b ,j))))) +grouped-array-types+))))
 	   
+	   (defmacro mrotatef (a b &aux (s (sgen "MRF-S"))) `(let ((,s ,a)) (setf ,a ,b ,b ,s)))
+
 	   (defmacro rotate-same-array (n a i b j)
 	     `(case ,n
 		    ,@(let ((k -1)) 
 			(mapcar (lambda (x) 
 				  `(,(incf k) (let ((,a ,a),@(unless (eq a b) `((,b ,b))))
 						(declare ((array ,(car x)) ,a ,@(unless (eq a b) `(,b))))
-						(rotatef (aref ,a ,i)(aref ,b ,j))))) +grouped-array-types+))))
+						(mrotatef (aref ,a ,i)(aref ,b ,j))))) +grouped-array-types+))))
 	   
 	   (defmacro raref (a seq n i j l) 
 	     `(if ,l 
-		  (rotatef (car (aref ,a ,i)) (car (aref ,a ,j)))
+		  (mrotatef (car (aref ,a ,i)) (car (aref ,a ,j)))
 		(rotate-same-array ,n ,seq ,i ,seq ,j)))
 
 	   (defmacro garef (a seq i l) `(if ,l (car (aref ,a ,i)) (aref ,seq ,i)))
@@ -252,26 +254,43 @@
 	   (aref r n))
 	  ((error 'type-error :datum n :expected-type `(integer 0 (,q)))))))
 
-(defun nreverse (s)
-  (declare (optimize (safety 2)))
+(defun nreverse (s &aux (n 0))
+  (declare (optimize (safety 1)))
   (check-type s proper-sequence)
-  (cond ((listp s) (do ((p)(cdp)(pp s)) ((endp pp) p)
-		       (setq cdp (cdr pp) p (rplacd pp p) pp cdp)))
-	((let ((ls (length s))(n (comp-array (array-element-type s))))
-	   (do ((i 0 (1+ i))(j (1- ls) (1- j))) ((>= i j) s)
-	       (rotate-same-array n s i s j))))))
+  (labels ((lr (tl &optional hd) (if tl (lr (cdr tl) (rplacd tl hd)) hd))
+	   (la (i j) (cond ((< i j) (rotate-same-array n s i s j) (la (1+ i) (1- j))) (s))))
+	  (cond ((listp s) (lr s)) ((setq n (comp-array (array-element-type s))) (la 0 (1- (length s)))))))
 
-(defun reverse (s)
+
+(defun reverse (s &aux (n 0) aet (ls 0) r)
   (declare (optimize (safety 2)))
-  (check-type s sequence)
-  (cond ((listp s) (do ((r)(p s (cdr p))) ((endp p) r)
-		       (setq r (cons (car p) r))))
-	((let* ((ls (length s))
-		(aet (array-element-type s))
-		(r (make-array ls :element-type aet))
-		(n (comp-array aet)))
-	   (do ((i 0 (1+ i))(j (1- ls) (1- j))) ((or (>= i ls) (< j 0)) r)
-	       (set-same-array n r i s j))))))
+  (check-type s sequence);FIXME
+  (labels ((lr (tl &optional hd) (if tl (lr (cdr tl) (cons (car tl) hd)) hd))
+	   (la (i j) (cond ((< i ls) (set-same-array n r i s j) (la (1+ i) (1- j))) (r))))
+	  (cond ((listp s) (lr s))
+		((setq aet (array-element-type s) n (comp-array aet) ls (length s) r (make-array ls :element-type aet))
+		 (la 0 (1- ls))))))
+
+;; (defun nreverse (s)
+;;   (declare (optimize (safety 1)))
+;;   (check-type s proper-sequence)
+;;   (cond ((listp s) (do ((p)(cdp)(pp s)) ((endp pp) p)
+;;   		       (setq cdp (cdr pp) p (rplacd pp p) pp cdp)))
+;;   	((let ((ls (length s))(n (comp-array (array-element-type s))))
+;;   	   (do ((i 0 (1+ i))(j (1- ls) (1- j))) ((>= i j) s)
+;;   	       (rotate-same-array n s i s j))))))
+
+;; (defun reverse (s)
+;;   (declare (optimize (safety 2)))
+;;   (check-type s sequence)
+;;   (cond ((listp s) (do ((r)(p s (cdr p))) ((endp p) r)
+;; 		       (setq r (cons (car p) r))))
+;; 	((let* ((ls (length s))
+;; 		(aet (array-element-type s))
+;; 		(r (make-array ls :element-type aet))
+;; 		(n (comp-array aet)))
+;; 	   (do ((i 0 (1+ i))(j (1- ls) (1- j))) ((or (>= i ls) (< j 0)) r)
+;; 	       (set-same-array n r i s j))))))
 
 (defun subseq (s start &optional end)
   (declare (optimize (safety 1)))
@@ -633,7 +652,7 @@
 	(t (error 'type-error :datum x :expected-type '(or null seqind)))))
   
 
-(defun fill (sequence item &key start end )
+(defun fill (sequence item &key start end );FIXME
   (declare (optimize (safety 2)))
   (with-start-end start end sequence
 		  (do ((i start (f+ 1 i)))

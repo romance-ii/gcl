@@ -460,7 +460,7 @@ DEFUN_NEW("SYMBOL-PLIST",object,fLsymbol_plist,LISP,1,1,NONE,OO,OO,OO,OO,(object
 	@(return Cnil Cnil Cnil)
 @)
 
-DEFUN_NEW("SYMBOL-STRING",object,fSsymbol_string,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+DEFUN_NEW("SYMBOL-STRING",object,fSsymbol_string,SI,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
   object y=alloc_simple_string(sym->st.st_fillp);
   y->st.st_self=sym->st.st_self;
   RETURN1(y);

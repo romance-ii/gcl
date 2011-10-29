@@ -23,12 +23,12 @@
 ;;;;                            module routines
 
 
-(in-package 'lisp)
+;; (in-package 'lisp)
 
-(export '(*modules* provide require))
-(export '(documentation variable function structure type setf compiler-macro))
+;; (export '(*modules* provide require))
+;; (export '(documentation variable function structure type setf compiler-macro))
 
-(in-package 'system)
+(in-package :system)
 
 
 (defvar *modules* nil)

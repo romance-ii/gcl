@@ -1185,7 +1185,7 @@ DEFUNO_NEW("FACTORIAL",object,fSfactorial,SI,1,1,NONE,OI,OO,OO,OO,void,siLfactor
 
   if (x<0) {
     object y=make_fixnum(x);
-    TYPE_ERROR(y,sLnon_negative_fixnum);
+    TYPE_ERROR(y,sSnon_negative_fixnum);
     x=fix(y);
   }
   r=new_bignum();

@@ -357,7 +357,7 @@
        (printing-random-thing-internal ,thing ,stream)
        (format ,stream ">"))))
 
-(defun printing-random-thing-internal (thing stream)
+#-gcl(defun printing-random-thing-internal (thing stream)
   (declare (ignore thing stream))
   nil)
 
@@ -390,7 +390,7 @@
 ;(warn "****** Things will go faster if you fix define-compiler-macro")
 )
 
-#-cmu
+#-(or cmu gcl)
 (defmacro define-compiler-macro (name arglist &body body)
   #+(or lucid kcl)
   `(#+lucid lcl:def-compiler-macro #+kcl si::define-compiler-macro
@@ -444,6 +444,13 @@
 
 (defvar *create-classes-from-internal-structure-definitions-p* t)
 
+#+gcl(defvar *structure-table* (make-hash-table :test 'eq))
+#+gcl(defun structure-type-p (type)
+       (or (not (null (gethash type *structure-table*)))
+	   (let ((s-data nil))
+	     (and (symbolp type)
+		  (setq s-data (get type 'si::s-data))
+		  (null (si::s-data-type s-data))))))
 
 (defun find-class-from-cell (symbol cell &optional (errorp t))
   (or (find-class-cell-class cell)

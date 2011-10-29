@@ -23,7 +23,9 @@
 
 
 ;;; Go into LISP.
-(in-package 'lisp)
+(in-package :si)
+
+(export '(clines defentry defcfun defla))
 
 ;(defconstant +keyword-package+ (find-package 'keyword))
 ;(defvar *features*)
@@ -172,12 +174,12 @@
 ;;; Allocator.
 
 (import 'si::allocate)
-(export '(allocate
+;(export '(allocate
 	  ;allocated-pages maximum-allocatable-pages
           ;allocate-contiguous-pages
           ;allocated-contiguous-pages maximum-contiguous-pages
           ;allocate-relocatable-pages allocated-relocatable-pages 
-          spice structure))
+;          spice structure))
 
 ;(defvar type-character-alist
 ;             '((cons . #\.)
@@ -250,7 +252,7 @@
 
 ;;; Help.
 
-(export '(help help*))
+;(export '(help help*))
 
 (defun help (&optional (symbol nil s))
   (if s (si::print-doc symbol)
@@ -353,7 +355,7 @@ Good luck!				 The GCL Development Team")
 (setf (get 'with-output-to-string 'si:pretty-print-format) 1)
 
 
-(in-package 'si)
+(in-package :si)
 
 (defvar *lib-directory* (namestring (truename "../")))
 

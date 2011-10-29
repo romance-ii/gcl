@@ -3,7 +3,7 @@
 (eval-when (load eval)
 	   (make-package "tk-primitives" :nicknames '(tkpr) :use '(lisp)))
 (eval-when (compile)
-	   (in-package "tk-primitives"))
+	   (in-package :tk-primitives))
 
 (clines "#include <tcl.h>")
 (clines "#include <tk.h>")

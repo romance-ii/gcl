@@ -1,6 +1,6 @@
 ;;; -*- Mode: Lisp; Syntax: Common-Lisp; Package: "CONDITIONS"; Base: 10 -*-
 
-(in-package "CONDITIONS")
+(in-package :CONDITIONS)
 
 (defun compile-file (file &rest args)
   (let (warnings failures)

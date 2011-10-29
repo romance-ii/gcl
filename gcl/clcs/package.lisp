@@ -15,7 +15,7 @@
 (unless (find-package "CONDITIONS")
   (MAKE-PACKAGE "CONDITIONS" :USE '("LISP")))
 
-(IN-PACKAGE "CONDITIONS" :USE '("LISP"))
+(IN-PACKAGE :CONDITIONS)
 
 (SHADOW '())
 

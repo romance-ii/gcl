@@ -1908,3 +1908,5 @@ get_mmap(FILE *,void **);
 int
 un_mmap(void *,void *);
 
+fixnum
+elt_size(fixnum);

@@ -20,7 +20,7 @@
 ;; Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-(in-package 'compiler)
+(in-package :compiler)
 
 (defvar *last-label* 0)
 (defvar *exit*)
@@ -82,8 +82,8 @@
     ((consp ue)
      (cond ((eq ue *exit*)
 	    (unless (and (consp *value-to-go*)
-			(or (eq (car *value-to-go*) 'jump-true)
-			    (eq (car *value-to-go*) 'jump-false)))
+			 (or (eq (car *value-to-go*) 'jump-true)
+			     (eq (car *value-to-go*) 'jump-false)))
 	      (set-loc loc))
 	    (unwind-frames-bds frames bds-cvar bds-bind)
 	    (when jump-p

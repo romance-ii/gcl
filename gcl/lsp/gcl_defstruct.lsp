@@ -23,11 +23,11 @@
 ;;;;        The structure routines.
 
 
-(in-package 'lisp)
-(export 'defstruct)
+;; (in-package 'lisp)
+;; (export 'defstruct)
 
 
-(in-package 'system)
+(in-package :system)
 
 
 (defvar *accessors* (make-array 10 :adjustable t))
@@ -236,7 +236,7 @@
                             sds))
 	       ;; If
 	       (setf (caddr (car sds))
-		     (best-array-element-type (caddr (car sds))))
+		     (upgraded-array-element-type (caddr (car sds))))
 	       (when (not  (equal (normalize-type (or (caddr (car sds)) t))
 				 (normalize-type (or (caddr (car olds)) t))))
 		     (error "Type mismmatch for included slot ~a" (car sds)))
@@ -259,7 +259,7 @@
 (defun make-t-type (n include slot-descriptions &aux i)
   (let ((res  (make-array n :element-type 'unsigned-char :static t)))
     (when include
-	  (let ((tem (get include 's-data))raw)
+	  (let ((tem (get include 's-data)) raw)
 	    (or tem (error "Included structure undefined ~a" include))
 	    (setq raw (s-data-raw tem))
 	  (dotimes (i (min n (length raw)))
@@ -297,7 +297,7 @@
   (dolist (v slot-descriptions)
 	  (when (and v (car v))
 		(setf type 
-		      (or (best-array-element-type (caddr v)) t)
+		      (or (upgraded-array-element-type (caddr v)) t)
 		      (caddr v) type)
 		(let ((val (second v)))
 		  (unless (typep val type)
@@ -421,6 +421,9 @@
   nil)
 
 		  
+(defun str-ref (x y z) (declare (ignore y)) (structure-ref1 x z))
+(export 'str-ref)
+
 (defmacro defstruct (name &rest slots)
   (declare (optimize (safety 2)))
   (let ((slot-descriptions slots)
@@ -661,7 +664,6 @@
 			   (the ,(or (not st) st)
 				,(ecase tp
 					((nil) `(str-ref x ',name ,offset))
-;					((nil) `(structure-ref1 x ,offset))
 					(list `(list-nth ,offset x))
 					(vector `(aref x ,offset)))))))
 		   slot-descriptions)

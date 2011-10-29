@@ -20,7 +20,7 @@
 ;; Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-(in-package 'compiler)
+(in-package :compiler)
 
 (si:putprop 'if 'c1if 'c1special)
 (si:putprop 'if 'c2if 'c2)
@@ -801,7 +801,7 @@
 	    (push `(error "The key ~a for ECASE was not found in cases ~a"
 			  ,(car args) ',keys)
 		  body)))
-    `(block ,sym (si::switch ,(car args) ,@(nreverse body)))))
+    `(block ,sym (switch ,(car args) ,@(nreverse body)))))
 	    
 		  
 

@@ -20,7 +20,7 @@
 ;; Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-(in-package 'compiler)
+(in-package :compiler)
 (eval-when (compile)
   (or (fboundp 'write-block-open) (load "cmplet.lsp")))
 
@@ -609,8 +609,7 @@
 (defmacro stack-let (&rest x) (cons `let x))
 
 (defun c1stack-let (args &aux npairs nums)
-  (let ((pairs (car args))
-	)
+  (let ((pairs (car args)))
     (dolist (v pairs)
 	    (push
 	     (cond ((atom v) v)

@@ -242,7 +242,7 @@ DEFUNO_NEW("MAKE-STRUCTURE",object,fSmake_structure,SI,1,63,NONE,OO,OO,OO,OO,voi
 
 }
 
-DEFUN_NEW("COPY-STRUCTURE",object,fScopy_structure,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN_NEW("COPY-STRUCTURE",object,fLcopy_structure,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
   object y;
   struct s_data *def;

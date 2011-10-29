@@ -120,9 +120,9 @@ gcl_init_lex(void)
 {
 /* 	sLfunction = make_ordinary("FUNCTION"); */
 /* 	enter_mark_origin(&sLfunction); */
-	sLmacro = make_ordinary("MACRO");
+	sLmacro = make_si_ordinary("MACRO");
 	enter_mark_origin(&sLmacro);
-	sLtag = make_ordinary("TAG");
+	sLtag = make_si_ordinary("TAG");
 	enter_mark_origin(&sLtag);
 	sLblock =  make_ordinary("BLOCK");
 	enter_mark_origin(&sLblock);

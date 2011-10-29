@@ -1377,7 +1377,7 @@ DEFUN_NEW("MV-REF",object,fSmv_ref,SI,1,1,NONE,OI,OO,OO,OO,(ufixnum i),"") {
 #include "xdrfuns.c"
 
 DEF_ORDINARY("CDEFN",sScdefn,SI,"");
-DEFVAR("*LINK-ARRAY*",sLAlink_arrayA,LISP,Cnil,"");
+DEFVAR("*LINK-ARRAY*",sLAlink_arrayA,SI,Cnil,"");
 
 void
 gcl_init_links(void) {	

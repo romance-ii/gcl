@@ -348,11 +348,11 @@ DEFUN_NEW("TYPE-OF-C",object,siLtype_of_c,SI,1,1,NONE,OO,OO,OO,OO,(object x),"")
   switch (type_of(x)) {
   case t_fixnum:
     i=fix(x);
-    RETURN1(!i || i==1 ? sLbit : (i>0 ? sLnon_negative_fixnum : sLfixnum));
+    RETURN1(!i || i==1 ? sLbit : (i>0 ? sSnon_negative_fixnum : sLfixnum));
     break;
 
   case t_bignum:
-    x = big_sign(x)<0 ? sLbignum : sLnon_negative_bignum;
+    x = big_sign(x)<0 ? sLbignum : sSnon_negative_bignum;
     break;
     
   case t_ratio:
@@ -496,7 +496,7 @@ DEF_ORDINARY("CEILING",sLceiling,LISP,"");
 DEF_ORDINARY("TRUNCATE",sLtruncate,LISP,"");
 DEF_ORDINARY("EXP",sLexp,LISP,"");
 DEF_ORDINARY("/",sLD,LISP,"");
-DEF_ORDINARY("COMMON",sLcommon,LISP,"");
+DEF_ORDINARY("COMMON",sScommon,SI,"");
 DEF_ORDINARY("NULL",sLnull,LISP,"");
 DEF_ORDINARY("CONS",sLcons,LISP,"");
 DEF_ORDINARY("LIST",sLlist,LISP,"");
@@ -512,7 +512,7 @@ DEF_ORDINARY("SIMPLE-VECTOR",sLsimple_vector,LISP,"");
 DEF_ORDINARY("SIMPLE-BIT-VECTOR",sLsimple_bit_vector,LISP,"");
 DEF_ORDINARY("SIMPLE-STRING",sLsimple_string,LISP,"");
 DEF_ORDINARY("FUNCTION",sLfunction,LISP,"");
-DEF_ORDINARY("FUNCTION-IDENTIFIER",sLfunction_identifier,LISP,"");
+DEF_ORDINARY("FUNCTION-IDENTIFIER",sLfunction_identifier,SI,"");
 DEF_ORDINARY("COMPILED-FUNCTION",sLcompiled_function,LISP,"");
 DEF_ORDINARY("INTERPRETED-FUNCTION",siLinterpreted_function,SI,"");
 DEF_ORDINARY("PATHNAME",sLpathname,LISP,"");
@@ -527,39 +527,39 @@ DEF_ORDINARY("SHORT-FLOAT",sLshort_float,LISP,"");
 DEF_ORDINARY("STANDARD-CHAR",sLstandard_char,LISP,"");
 DEF_ORDINARY("BOOLEAN",sLboolean,LISP,"");
 
-DEF_ORDINARY("SEQIND",sLseqind,LISP,"");
-DEF_ORDINARY("RNKIND",sLrnkind,LISP,"");
+DEF_ORDINARY("SEQIND",sSseqind,SI,"");
+DEF_ORDINARY("RNKIND",sSrnkind,SI,"");
 
 DEF_ORDINARY("CHAR",sLchar,LISP,"");
-DEF_ORDINARY("NON-NEGATIVE-CHAR",sLnon_negative_char,LISP,"");
-DEF_ORDINARY("NEGATIVE-CHAR",sLnegative_char,LISP,"");
-DEF_ORDINARY("SIGNED-CHAR",sLsigned_char,LISP,"");
-DEF_ORDINARY("UNSIGNED-CHAR",sLunsigned_char,LISP,"");
+DEF_ORDINARY("NON-NEGATIVE-CHAR",sSnon_negative_char,SI,"");
+DEF_ORDINARY("NEGATIVE-CHAR",sSnegative_char,SI,"");
+DEF_ORDINARY("SIGNED-CHAR",sSsigned_char,SI,"");
+DEF_ORDINARY("UNSIGNED-CHAR",sSunsigned_char,SI,"");
 
-DEF_ORDINARY("SHORT",sLshort,LISP,"");
-DEF_ORDINARY("NON-NEGATIVE-SHORT",sLnon_negative_short,LISP,"");
-DEF_ORDINARY("NEGATIVE-SHORT",sLnegative_short,LISP,"");
-DEF_ORDINARY("SIGNED-SHORT",sLsigned_short,LISP,"");
-DEF_ORDINARY("UNSIGNED-SHORT",sLunsigned_short,LISP,"");
+DEF_ORDINARY("SHORT",sSshort,SI,"");
+DEF_ORDINARY("NON-NEGATIVE-SHORT",sSnon_negative_short,SI,"");
+DEF_ORDINARY("NEGATIVE-SHORT",sSnegative_short,SI,"");
+DEF_ORDINARY("SIGNED-SHORT",sSsigned_short,SI,"");
+DEF_ORDINARY("UNSIGNED-SHORT",sSunsigned_short,SI,"");
 
-DEF_ORDINARY("NON-NEGATIVE-INT",sLnon_negative_int,LISP,"");
-DEF_ORDINARY("NEGATIVE-INT",sLnegative_int,LISP,"");
-DEF_ORDINARY("SIGNED-INT",sLsigned_int,LISP,"");
-DEF_ORDINARY("UNSIGNED-INT",sLunsigned_int,LISP,"");
+DEF_ORDINARY("NON-NEGATIVE-INT",sSnon_negative_int,SI,"");
+DEF_ORDINARY("NEGATIVE-INT",sSnegative_int,SI,"");
+DEF_ORDINARY("SIGNED-INT",sSsigned_int,SI,"");
+DEF_ORDINARY("UNSIGNED-INT",sSunsigned_int,SI,"");
 
 DEF_ORDINARY("FIXNUM",sLfixnum,LISP,"");
-DEF_ORDINARY("NON-NEGATIVE-FIXNUM",sLnon_negative_fixnum,LISP,"");
-DEF_ORDINARY("NEGATIVE-FIXNUM",sLnegative_fixnum,LISP,"");
-DEF_ORDINARY("NON-NEGATIVE-BIGNUM",sLnon_negative_bignum,LISP,"");
-DEF_ORDINARY("NEGATIVE-BIGNUM",sLnegative_bignum,LISP,"");
-DEF_ORDINARY("SIGNED-FIXNUM",sLsigned_fixnum,LISP,"");
-DEF_ORDINARY("UNSIGNED-FIXNUM",sLunsigned_fixnum,LISP,"");
+DEF_ORDINARY("NON-NEGATIVE-FIXNUM",sSnon_negative_fixnum,SI,"");
+DEF_ORDINARY("NEGATIVE-FIXNUM",sSnegative_fixnum,SI,"");
+DEF_ORDINARY("NON-NEGATIVE-BIGNUM",sSnon_negative_bignum,SI,"");
+DEF_ORDINARY("NEGATIVE-BIGNUM",sSnegative_bignum,SI,"");
+DEF_ORDINARY("SIGNED-FIXNUM",sSsigned_fixnum,SI,"");
+DEF_ORDINARY("UNSIGNED-FIXNUM",sSunsigned_fixnum,SI,"");
 
-DEF_ORDINARY("LFIXNUM",sLlfixnum,LISP,"");
-DEF_ORDINARY("NON-NEGATIVE-LFIXNUM",sLnon_negative_lfixnum,LISP,"");
-DEF_ORDINARY("NEGATIVE-LFIXNUM",sLnegative_lfixnum,LISP,"");
-DEF_ORDINARY("SIGNED-LFIXNUM",sLsigned_lfixnum,LISP,"");
-DEF_ORDINARY("UNSIGNED-LFIXNUM",sLunsigned_lfixnum,LISP,"");
+DEF_ORDINARY("LFIXNUM",sSlfixnum,SI,"");
+DEF_ORDINARY("NON-NEGATIVE-LFIXNUM",sSnon_negative_lfixnum,SI,"");
+DEF_ORDINARY("NEGATIVE-LFIXNUM",sSnegative_lfixnum,SI,"");
+DEF_ORDINARY("SIGNED-LFIXNUM",sSsigned_lfixnum,SI,"");
+DEF_ORDINARY("UNSIGNED-LFIXNUM",sSunsigned_lfixnum,SI,"");
 
 DEF_ORDINARY("COMPLEX",sLcomplex,LISP,"");
 DEF_ORDINARY("SINGLE-FLOAT",sLsingle_float,LISP,"");
@@ -583,8 +583,6 @@ DEF_ORDINARY("VALUES",sLvalues,LISP,"");
 DEF_ORDINARY("MOD",sLmod,LISP,"");
 DEF_ORDINARY("SIGNED-BYTE",sLsigned_byte,LISP,"");
 DEF_ORDINARY("UNSIGNED-BYTE",sLunsigned_byte,LISP,"");
-DEF_ORDINARY("SIGNED-SHORT",sLsigned_short,LISP,"");
-DEF_ORDINARY("UNSIGNED-SHORT",sLunsigned_short,LISP,"");
 DEF_ORDINARY("*",sLA,LISP,"");
 DEF_ORDINARY("PLUSP",sLplusp,LISP,"");
 DEF_ORDINARY("FILE-STREAM",sLfile_stream,LISP,"");
@@ -645,7 +643,7 @@ DEF_ORDINARY("PARSE-ERROR",sLparse_error,LISP,"");
 DEF_ORDINARY("PRINT-NOT-READABLE",sLprint_not_readable,LISP,"");
 
 DEF_ORDINARY("READER-ERROR",sLreader_error,LISP,"");
-DEF_ORDINARY("PATHNAME-ERROR",sLpathname_error,LISP,"");
+DEF_ORDINARY("PATHNAME-ERROR",sLpathname_error,SI,"");
 
 DEF_ORDINARY("STORAGE-CONDITION",sLstorage_condition,LISP,"");
 

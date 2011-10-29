@@ -1,18 +1,18 @@
 ;to-do fast link defentry, sig propagation
 
-(in-package 'lisp)
-(export '(string char schar string= string/= string> string>= 
-		 string< string<= string-equal string-not-equal
-		 string-greaterp string-not-lessp string-lessp
-		 string-not-greaterp  char-code  code-char  char-upcase
-		 char-downcase  char=  char/=  char>  char>=  char<
-		 char<=  char-equal  char-not-equal  char-greaterp
-		 char-lessp  char-not-greaterp  char-not-lessp
-		 upper-case-p  lower-case-p  both-case-p
-		 string-upcase string-downcase nstring-upcase nstring-downcase
-		 string-trim string-left-trim string-right-trim))
+;; (in-package 'lisp)
+;; (export '(string char schar string= string/= string> string>= 
+;; 		 string< string<= string-equal string-not-equal
+;; 		 string-greaterp string-not-lessp string-lessp
+;; 		 string-not-greaterp  char-code  code-char  char-upcase
+;; 		 char-downcase  char=  char/=  char>  char>=  char<
+;; 		 char<=  char-equal  char-not-equal  char-greaterp
+;; 		 char-lessp  char-not-greaterp  char-not-lessp
+;; 		 upper-case-p  lower-case-p  both-case-p
+;; 		 string-upcase string-downcase nstring-upcase nstring-downcase
+;; 		 string-trim string-left-trim string-right-trim))
 
-(in-package 'si)
+(in-package :si)
 
 (defun character-designator-p (s)
   (or (typep s 'fixnum)

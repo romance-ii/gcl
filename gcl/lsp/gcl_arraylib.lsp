@@ -23,26 +23,26 @@
 ;;;;                            array routines
 
 
-(in-package 'lisp)
+;; (in-package :lisp)
 
 
-(export '(make-array array-displacement vector
-          array-element-type array-rank array-dimension
-          array-dimensions
-          array-in-bounds-p array-row-major-index
-          adjustable-array-p
-          bit sbit 
-          bit-and bit-ior bit-xor bit-eqv bit-nand bit-nor
-          bit-andc1 bit-andc2 bit-orc1 bit-orc2 bit-not
-          array-has-fill-pointer-p fill-pointer
-          vector-push vector-push-extend vector-pop
-          adjust-array))
+;; (export '(make-array array-displacement vector
+;;           array-element-type array-rank array-dimension
+;;           array-dimensions
+;;           array-in-bounds-p array-row-major-index
+;;           adjustable-array-p
+;;           bit sbit 
+;;           bit-and bit-ior bit-xor bit-eqv bit-nand bit-nor
+;;           bit-andc1 bit-andc2 bit-orc1 bit-orc2 bit-not
+;;           array-has-fill-pointer-p fill-pointer
+;;           vector-push vector-push-extend vector-pop
+;;           adjust-array))
 
-(in-package 'system)
+(in-package :system)
 
-
-(defun best-array-element-type (type)
-  (cond ((not type) nil)
+(defun upgraded-array-element-type (type &optional environment)
+  (declare (ignore environment) (optimize (safety 1)))
+  (cond ((not type))
 	((eq type '*) '*)
 	((car (member type +array-types+)))
 	((car (member type +array-types+ :test 'subtypep1)))
@@ -62,7 +62,7 @@
 			displaced-to (displaced-index-offset 0)
 			static)
   (when (integerp dimensions) (setq dimensions (list dimensions)))
-  (setq element-type (or (best-array-element-type element-type) 'character))
+  (setq element-type (or (upgraded-array-element-type element-type) 'character))
   (cond ((= (length dimensions) 1)
 	 (let ((x (si:make-vector element-type (car dimensions)
 	                          adjustable fill-pointer

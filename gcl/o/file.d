@@ -822,7 +822,8 @@ int line_length;
 	strng = alloc_object(t_string);
 	strng->st.st_hasfillp = TRUE;
 	strng->st.st_adjustable = TRUE;
-	strng->st.st_elttype = aet_ch;
+	strng->st.tt=strng->st.st_elttype = aet_ch;
+	strng->st.st_eltsize = elt_size(aet_ch);
 	strng->st.st_defrank = 1;
 	strng->st.st_displaced = Cnil;
 	strng->st.st_dim = line_length;
@@ -1301,7 +1302,7 @@ object strm;
 /* 	    else */
 /* 		    istart = FIX_CHECK(start); */
 /* 	    if (istart < 0) */
-/* 		    FEwrong_type_argument(sLnon_negative_fixnum,start); */
+/* 		    FEwrong_type_argument(sSnon_negative_fixnum,start); */
 	
 /* 	    if ((end==Cnil) && */
 /* 	        (consp(arr))) */
@@ -1317,7 +1318,7 @@ object strm;
 /* 	    else */
 /* 		    iend = FIX_CHECK(end); */
 /* 	    if (iend < 0) */
-/* 		    FEwrong_type_argument(sLnon_negative_fixnum,end); */
+/* 		    FEwrong_type_argument(sSnon_negative_fixnum,end); */
 
 /* 	    ipos=read_sequence_stream(arr,str,istart,iend); */
 /* 	    start = make_fixnum(ipos); */
@@ -1404,7 +1405,7 @@ object strm;
 /* 	    else */
 /* 		    istart = FIX_CHECK(start); */
 /* 	    if (istart < 0) */
-/* 		    FEwrong_type_argument(sLnon_negative_fixnum,start); */
+/* 		    FEwrong_type_argument(sSnon_negative_fixnum,start); */
 	
 /* 	    if ((end==Cnil) && */
 /* 	        (consp(arr))) */
@@ -1420,7 +1421,7 @@ object strm;
 /* 	    else */
 /* 		    iend = FIX_CHECK(end); */
 /* 	    if (iend < 0) */
-/* 		    FEwrong_type_argument(sLnon_negative_fixnum,end); */
+/* 		    FEwrong_type_argument(sSnon_negative_fixnum,end); */
 
 /* 	    ipos=write_sequence_stream(arr,str,istart,iend); */
 /* 	    if (ipos == iend) */
@@ -3492,7 +3493,7 @@ gcl_init_file_function()
 /* 	make_function("READ-SEQUENCE", Lread_sequence); */
 /* 	make_function("WRITE-SEQUENCE", Lwrite_sequence); */
 
-	make_function("LOAD1", Lload1);
+	make_si_function("LOAD1", Lload1);
 
 	make_si_function("GET-STRING-INPUT-STREAM-INDEX",
 			 siLget_string_input_stream_index);

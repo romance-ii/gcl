@@ -21,14 +21,14 @@
 ;;;;    assert.lsp
 
 
-(in-package 'lisp)
+;; (in-package 'lisp)
 
 
-(export '(check-type assert
-          ecase ccase typecase etypecase ctypecase))
+;; (export '(check-type assert
+;;           ecase ccase typecase etypecase ctypecase))
 
 
-(in-package 'system)
+(in-package :system)
 
 
 (defun check-type-symbol (symbol value typespec &optional s)

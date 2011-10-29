@@ -145,7 +145,7 @@ funcall_cs(object fun,ufixnum n,object *b) {
   object *base;
   object *vals=(object *)fcall.valp;
   
-  vs_base=vs_top;
+  vs_base=vs_top; 
 
   for (;n--;)
     vs_push(*b++);
@@ -360,7 +360,7 @@ funcall(object fun) {
       c = FALSE;
       fun = fun->c.c_cdr;
       
-    }else if (x == sLlambda_block) {
+    } else if (x == sLlambda_block) {
       b = TRUE;
       c = FALSE;
       if(sSlambda_block_expanded->s.s_dbind)
@@ -843,43 +843,53 @@ call_applyhook(object fun)
 	super_funcall(ah);
 }
 
-DEFUNOM_NEW("FUNCALL",object,fLfuncall,LISP
-	    ,1,MAX_ARGS,NONE,OO,OO,OO,OO,void,Lfuncall,
-	    (object fun,...),"") { 
+static object
+funcall_apply(object fun,fixnum nargs,va_list ap) {
 
-  va_list ap;
-  register object res;
+  object res,*vals=(object *)fcall.valp;
 
   if (type_of(fun)==t_symbol && 
       (fun->s.s_mflag || fun->s.s_sfdef!=NOT_SPECIAL))
     UNDEFINED_FUNCTION(fun);
   
-  va_start(ap,fun);
-  if (fcall.valp) vs_top=(object *)fcall.valp;/*FIXME*/
-  res=funcall_ap(fun,VFUN_NARGS-1,ap);
-  va_end(ap);
+  res=funcall_ap(fun,nargs,ap);
+
+  if (type_of(fun)==t_function && !fun->fun.fun_neval && vals)
+    vs_top=vals;
+
   return res;
 
 }
 
-DEFUNOM_NEW("APPLY",object,fLapply,LISP
-	    ,1,MAX_ARGS,NONE,OO,OO,OO,OO,void,Lapply,
-	    (object fun,...),"") {	
-  
-  register object res;
+DEFUNM_NEW("FUNCALL",object,fLfuncall,LISP,1,MAX_ARGS,NONE,OO,OO,OO,OO,(object fun,...),"") { 
+
   va_list ap;
- 
+  object res;
+
   va_start(ap,fun);
-  if (fcall.valp) vs_top=(object *)fcall.valp;
-  res=funcall_ap(fun,1-VFUN_NARGS,ap);
+  
+  res=funcall_apply(fun,(abs(VFUN_NARGS)-1)*(VFUN_NARGS/abs(VFUN_NARGS)),ap);
   va_end(ap);
+
+  return res;
+
+}
+
+DEFUNM_NEW("APPLY",object,fLapply,LISP,1,MAX_ARGS,NONE,OO,OO,OO,OO,(object fun,...),"") {	
+  
+  va_list ap;
+  object res;
+
+  va_start(ap,fun);
+  res=funcall_apply(fun,1-VFUN_NARGS,ap);
+  va_end(ap);
+
   return res;
 
 }
 	
 
-DEFUNOM_NEW("EVAL",object,fLeval,LISP
-	    ,1,1,NONE,OO,OO,OO,OO,void,Leval,(object x0),"") {
+DEFUNM_NEW("EVAL",object,fLeval,LISP,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
 
   object *lex=lex_env,*base=vs_top;
   object *vals=(object *)fcall.valp;
@@ -892,7 +902,7 @@ DEFUNOM_NEW("EVAL",object,fLeval,LISP
 
 }
 
-LFD(Levalhook)(void)
+LFD(siLevalhook)(void)
 {
 	object env;
 	bds_ptr old_bds_top = bds_top;
@@ -922,7 +932,7 @@ LFD(Levalhook)(void)
 	bds_unwind(old_bds_top);
 }
 
-LFD(Lapplyhook)(void)
+LFD(siLapplyhook)(void)
 {
 
 	object env;
@@ -1179,15 +1189,15 @@ gcl_init_eval(void)
         make_constant("CALL-ARGUMENTS-LIMIT", make_fixnum(MAX_ARGS+1));
 
 
-	Vevalhook = make_special("*EVALHOOK*", Cnil);
-	Vapplyhook = make_special("*APPLYHOOK*", Cnil);
+	Vevalhook = make_si_special("*EVALHOOK*", Cnil);
+	Vapplyhook = make_si_special("*APPLYHOOK*", Cnil);
 
 
 	three_nils.nil3_self[0] = Cnil;
 	three_nils.nil3_self[1] = Cnil;
 	three_nils.nil3_self[2] = Cnil;
 
-	make_function("EVALHOOK", Levalhook);
-	make_function("APPLYHOOK", Lapplyhook);
+	make_si_function("EVALHOOK", siLevalhook);
+	make_si_function("APPLYHOOK", siLapplyhook);
 
 }

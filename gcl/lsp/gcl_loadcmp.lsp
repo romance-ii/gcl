@@ -1,5 +1,5 @@
 ;; -*-Lisp-*-
-(in-package 'compiler)
+(in-package :compiler)
 
 
 (format t "~%Loading the whole compiler...")

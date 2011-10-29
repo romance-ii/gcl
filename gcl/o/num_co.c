@@ -988,6 +988,7 @@ LFD(Lmod)(void)
 {
 	check_arg(2);
 	fcall.valp=(fixnum)vs_base;
+	VFUN_NARGS=2;
 	FFN(fLfloor)(vs_base[0],vs_base[1]);
 	/* Lfloor(); */
 	/* vs_base=vs_top-1; */

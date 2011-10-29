@@ -20,7 +20,7 @@
 ;; Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-(in-package 'compiler)
+(in-package :compiler)
 
 (si:putprop 'princ 'c1princ 'c1)
 (si:putprop 'princ 'c2princ 'c2)
@@ -368,35 +368,35 @@
 	  ((member test `(equal ,#'equal)) '(equal-is-eq equal-is-eq-tp))
 	  ((member test `(equalp ,#'equalp)) '(equalp-is-eq equalp-is-eq-tp)))))
 
-(defun is-eq-test-item-list (test item list rest)
-  (declare (ignore list rest))
-  (let ((tf (car (test-to-tf test))))
-    (and tf (funcall tf item))))
+;; (defun is-eq-test-item-list (test item list rest)
+;;   (declare (ignore list rest))
+;;   (let ((tf (car (test-to-tf test))))
+;;     (and tf (funcall tf item))))
 	
-(defun c1is-eq-test-item-list (args)
-  (let* ((ltf (test-to-tf (car args)))
-	 (tf (cadr ltf))
-	 (info (make-info)))
-    (if (not tf) 
-	(c1nil)
-      (let ((nargs (c1args (cdr args) info)))
-	(multiple-value-bind 
-	 (m1 f1) (funcall tf (info-type (cadar nargs)))
-	 (multiple-value-bind 
-	  (m2 f2) (list-tp-test tf (info-type (cadadr nargs)))
-	  (declare (ignore f2))
-	  (let ((m2 (or m2 
-			(let* ((ret (and (constantp (cadddr args)) (cadr (member :ret (cmp-eval (cadddr args))))))
-			       (k1  (when ret (cadr (member :k1  (cadddr args))))))
-			  (when (constantp k1)
-			    (when (constantp (caddr args)) 
-			      (let ((z (cmp-eval (caddr args))))
-				(not (member-if-not (car ltf) (if k1 (mapcar (cmp-eval k1) z) z))))))))))
-	    (cond ((or m1 m2) (c1t))
-		  (f1 (c1nil))
-		  ((let ((info (make-info))) 
-		     (list 'call-global info (car ltf) (c1args (list (cadr args)) info))))))))))))
-(si::putprop 'is-eq-test-item-list 'c1is-eq-test-item-list 'c1)
+;; (defun c1is-eq-test-item-list (args)
+;;   (let* ((ltf (test-to-tf (car args)))
+;; 	 (tf (cadr ltf))
+;; 	 (info (make-info)))
+;;     (if (not tf) 
+;; 	(c1nil)
+;;       (let ((nargs (c1args (cdr args) info)))
+;; 	(multiple-value-bind 
+;; 	 (m1 f1) (funcall tf (info-type (cadar nargs)))
+;; 	 (multiple-value-bind 
+;; 	  (m2 f2) (list-tp-test tf (info-type (cadadr nargs)))
+;; 	  (declare (ignore f2))
+;; 	  (let ((m2 (or m2 
+;; 			(let* ((ret (and (constantp (cadddr args)) (cadr (member :ret (cmp-eval (cadddr args))))))
+;; 			       (k1  (when ret (cadr (member :k1  (cadddr args))))))
+;; 			  (when (constantp k1)
+;; 			    (when (constantp (caddr args)) 
+;; 			      (let ((z (cmp-eval (caddr args))))
+;; 				(not (member-if-not (car ltf) (if k1 (mapcar (cmp-eval k1) z) z))))))))))
+;; 	    (cond ((or m1 m2) (c1t))
+;; 		  (f1 (c1nil))
+;; 		  ((let ((info (make-info))) 
+;; 		     (list 'call-global info (car ltf) (c1args (list (cadr args)) info))))))))))))
+;; (si::putprop 'is-eq-test-item-list 'c1is-eq-test-item-list 'c1)
 
 (defun do-predicate (fn args)
   (let* ((info (make-info :type #tboolean))
@@ -552,8 +552,8 @@
 ;(defun shift>> (a b) (ash a  b))
 ;(defun shift<< (a b) (ash a  b))
 ;(si:putprop 'ash '(c1ash-condition . c1ash)  'c1conditional)
-(si:putprop 'shift>> "Lash" 'lfun)
-(si:putprop 'shift<< "Lash" 'lfun)
+;; (si:putprop 'shift>> "Lash" 'lfun)
+;; (si:putprop 'shift<< "Lash" 'lfun)
 
 (si::putprop 'ldb 'co1ldb 'co1)		    
 
@@ -687,7 +687,7 @@
 		      (member (car type)
 			      #l(array vector simple-array))
 		      (equal (third type) '(*)))))
-	    (setq tem (cmp-norm-tp (si::best-array-element-type (second type))))
+	    (setq tem (cmp-norm-tp (upgraded-array-element-type (second type))))
 	    (cond ((eq tem #tcharacter) `(stringp ,x))
 		  ((eq tem #tbit) `(bit-vector-p ,x))
 		  ((setq tem (position tem +cmp-array-types+))
@@ -763,11 +763,10 @@
   (let ((tem  (last x)))
     (cond 
 	((and (consp tem)
-	     (consp (car tem))
-	     (eq (caar tem) 'cons)
-	     (eql (length (cdar tem)) 2)
-	     (cons-to-lista (append (butlast x)
-				    (cdar tem)))))
+	      (consp (car tem))
+	      (eq (caar tem) 'cons)
+	      (eql (length (cdar tem)) 2)
+	      (cons-to-lista (append (butlast x) (cdar tem)))))
 	(t x))))
     	 
 
@@ -1051,7 +1050,7 @@
 
 (defun c1list (args)
   (let* ((info (make-info))
-	(nargs (c1args args info)))
+	 (nargs (c1args args info)))
     (setf (info-type info) (cond ((not args) #tnull)
 				 ((< (length args) *cdr-limit*)
 				  (cmp-norm-tp

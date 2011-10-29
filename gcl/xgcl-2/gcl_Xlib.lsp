@@ -2192,15 +2192,6 @@
 )( void "XKillClient"))
 
 
-
-(defentry XLastKnownRequestProcessed(
-
-    fixnum		;; display 
-
-)( fixnum "XLastKnownRequestProcessed"))
-
-
-
 (defentry XLookupColor(
 
     fixnum		;; display 

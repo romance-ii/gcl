@@ -52,6 +52,7 @@ enum aelttype aet;
 	x->v.v_dim = x->v.v_fillp = l;
 	x->v.v_self = NULL;
 	x->v.tt=x->v.v_elttype = (short)aet;
+	x->v.v_eltsize = elt_size(aet);
 	x->v.v_defrank = 1;
 	return(x);
 }
@@ -69,7 +70,8 @@ int l;
 	x->bv.bv_dim = x->bv.bv_fillp = l;
 	x->bv.bv_offset = 0;
 	x->bv.bv_self = NULL;
-        x->bv.bv_elttype = aet_bit;
+        x->bv.tt=x->bv.bv_elttype = aet_bit;
+        x->bv.bv_eltsize = elt_size(aet_bit);
         x->bv.bv_defrank = 1;
 	return(x);
 }
@@ -93,7 +95,7 @@ int index;
 
 	if (index < 0) {
 	  object y=make_fixnum(index);
-	  TYPE_ERROR(y,sLnon_negative_fixnum);
+	  TYPE_ERROR(y,sSnon_negative_fixnum);
 	  index=fix(y);
 	}
 	switch (type_of(seq)) {
@@ -165,7 +167,7 @@ object val;
 
 	if (index < 0) {
 	  object y=make_fixnum(index);
-	  TYPE_ERROR(y,sLnon_negative_fixnum);
+	  TYPE_ERROR(y,sSnon_negative_fixnum);
 	  index=fix(y);
 	}
 	switch (type_of(seq)) {

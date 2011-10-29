@@ -2412,5 +2412,5 @@ gcl_init_print_function()
 	make_si_function("GET-PPRINT-DISPATCH", Lget_pprint_dispatch);
 
 	/* KCL compatibility function */
-        make_function("SET-LINE-LENGTH",Lset_line_length);
+        make_si_function("SET-LINE-LENGTH",Lset_line_length);
 }

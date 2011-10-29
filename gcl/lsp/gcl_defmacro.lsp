@@ -23,11 +23,11 @@
 ;;;;         defines SI:DEFMACRO*, the defmacro preprocessor
 
 
-(in-package 'lisp)
-(export '(lambda defvar import &whole &environment &body))
+;; (in-package :lisp)
+;; (export '(lambda defvar import &whole &environment &body))
 
 
-(in-package 'system)
+(in-package :system)
 
 
 ;;; valid lambda-list to DEFMACRO is:

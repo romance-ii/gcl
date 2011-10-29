@@ -354,9 +354,9 @@ object shift_integer();
 /*  package.d  */
 EXTER object lisp_package;
 EXTER object user_package;
-#ifdef ANSI_COMMON_LISP
-EXTER object common_lisp_package;
-#endif
+/* #ifdef ANSI_COMMON_LISP */
+/* /\* EXTER object common_lisp_package; *\/ */
+/* #endif */
 #if 0
 #ifdef HAVE_TK
 EXTER object tk_package;

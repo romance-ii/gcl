@@ -401,6 +401,12 @@ DEFUN_NEW("PACK-HASH",fixnum,fSpack_hash,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") 
   RETURN1(pack_hash(x));
 }
 
+DEFUN_NEW("SET-SYMBOL-HPACK",object,fSset_symbol_hpack,SI,2,2,NONE,OO,OO,OO,OO,(object p,object s),"") { 
+  check_type_package(&p); 
+  check_type_symbol(&s);
+  RETURN1(s->s.s_hpack=p); 
+} 
+
 DEFUN_NEW("PACKAGE-INTERNAL",object,fSpackage_internal,SI,2,2,NONE,OO,IO,OO,OO,(object x,fixnum i),"") {
   check_type_package(&x);
   RETURN1(x->p.p_internal[i]);
@@ -1219,34 +1225,34 @@ BEGIN:
 	@(return Ct)
 @)
 
-LFD(siLpackage_internal)()
-{
+/* LFD(siLpackage_internal)() */
+/* { */
 
-	int j=0;
+/* 	int j=0; */
 
-	check_arg(2);
-	check_type_package(&vs_base[0]);
-	if (type_of(vs_base[1]) != t_fixnum ||
-	    (j = fix(vs_base[1])) < 0 || j >= vs_base[0]->p.p_internal_size)
-		FEerror("~S is an illegal index to a package hashtable.",
-			1, vs_base[1]);
-	vs_base[0] = P_INTERNAL(vs_base[0],j);
-	vs_popp;
-}
+/* 	check_arg(2); */
+/* 	check_type_package(&vs_base[0]); */
+/* 	if (type_of(vs_base[1]) != t_fixnum || */
+/* 	    (j = fix(vs_base[1])) < 0 || j >= vs_base[0]->p.p_internal_size) */
+/* 		FEerror("~S is an illegal index to a package hashtable.", */
+/* 			1, vs_base[1]); */
+/* 	vs_base[0] = P_INTERNAL(vs_base[0],j); */
+/* 	vs_popp; */
+/* } */
 
-LFD(siLpackage_external)()
-{
-	int j=0;
+/* LFD(siLpackage_external)() */
+/* { */
+/* 	int j=0; */
 
-	check_arg(2);
-	check_type_package(&vs_base[0]);
-	if (type_of(vs_base[1]) != t_fixnum ||
-	    (j = fix(vs_base[1])) < 0 || j >= vs_base[0]->p.p_external_size)
-		FEerror("~S is an illegal index to a package hashtable.",
-			1, vs_base[1]);
-	vs_base[0] = P_EXTERNAL(vs_base[0],j);
-	vs_popp;
-}
+/* 	check_arg(2); */
+/* 	check_type_package(&vs_base[0]); */
+/* 	if (type_of(vs_base[1]) != t_fixnum || */
+/* 	    (j = fix(vs_base[1])) < 0 || j >= vs_base[0]->p.p_external_size) */
+/* 		FEerror("~S is an illegal index to a package hashtable.", */
+/* 			1, vs_base[1]); */
+/* 	vs_base[0] = P_EXTERNAL(vs_base[0],j); */
+/* 	vs_popp; */
+/* } */
 
 static void
 FFN(siLpackage_size)()
@@ -1279,11 +1285,11 @@ gcl_init_package()
 	= make_package(make_simple_string("USER"),
 		       Cnil,
 		       make_cons(lisp_package, Cnil),509,97);
-#ifdef ANSI_COMMON_LISP
-	common_lisp_package
-	= make_package(make_simple_string("COMMON-LISP"),
-		       Cnil, Cnil,47,509);
-#endif
+/* #ifdef ANSI_COMMON_LISP */
+/* 	common_lisp_package */
+/* 	= make_package(make_simple_string("COMMON-LISP"), */
+/* 		       Cnil, Cnil,47,509); */
+/* #endif */
 	keyword_package
 	= make_package(make_simple_string("KEYWORD"),
 		       Cnil, Cnil,11,509);
@@ -1350,6 +1356,7 @@ gcl_init_package_function()
 	make_function("UNUSE-PACKAGE", Lunuse_package);
 
 	make_si_function("PACKAGE-SIZE",siLpackage_size);
-	make_si_function("PACKAGE-INTERNAL", siLpackage_internal);
-	make_si_function("PACKAGE-EXTERNAL", siLpackage_external);
+	/* make_si_function("SET-SYMBOL-HPACK", siLset_symbol_hpack); */
+	/* make_si_function("PACKAGE-INTERNAL", siLpackage_internal); */
+	/* make_si_function("PACKAGE-EXTERNAL", siLpackage_external); */
 }

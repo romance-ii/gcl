@@ -225,6 +225,9 @@
 /* fill bits needed in certain lisp structures */
 #undef HM7BITS
 
+/* fill bits needed in certain lisp structures */
+#undef HM9BITS
+
 /* fraction of core to separate reloc and heap */
 #undef HOLEDIV
 
@@ -438,3 +441,6 @@
 
 /* short gmp3 limbs */
 #undef __SHORT_LIMB
+
+/* Define to `unsigned int' if <sys/types.h> does not define. */
+#undef size_t

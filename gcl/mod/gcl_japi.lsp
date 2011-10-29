@@ -3,7 +3,7 @@
 (eval-when (load eval)
 	   (make-package "japi-primitives" :nicknames '(jpr) :use '(lisp)))
 (eval-when (compile)
-	   (in-package "japi-primitives"))
+	   (in-package :japi-primitives))
 
 (clines "#include <japi.h>")
 

@@ -1,10 +1,11 @@
 ;; -*-Lisp-*-
 
-(in-package 'si)
+(in-package :si);FIXME this belongs in :compiler
 
 ;(*make-special '*pahl*)
 (*make-special '*boot*)
 (*make-special '*tmp-dir*)
+(export '(*split-files* *sig-discovery* *tmp-dir*))
 (eval-when (load eval)
 ;   (setq *pahl* nil)
 	   (setq *boot* nil))
@@ -41,7 +42,6 @@
 	   (when sig
 	     (unless (eq sig (call-sig h))
 	       (when (symbolp fn)
-		 (procl fn sig)
 		 (when (call-sig h)
 		   (dolist (l (get fn 'callers))
 		     (unless (eq l fn)
@@ -67,12 +67,6 @@
 		   (unless (or (eq fn fe) (not os) (eq ns os))
 		     (add-recompile fn fe os ns)
 		     (setq ar t))))))))))
-
-(defun procl (fn sig)
-  (when sig 
-    (remprop fn 'lfun)
-    (remprop fn 'arg-types)
-    (remprop fn 'return-type)))
 
 (defun break-state (sym x)
   (format t "Breaking state function ~s due to definition of ~s~%" x sym)
@@ -105,8 +99,7 @@
 	       (let ((ns (call-sig new)))
 		 (unless (eq ns (call-sig h))
 		   (dolist (l (get sym 'callers))
-		     (add-recompile l sym (call-sig h) ns)))
-		 (procl sym ns)))
+		     (add-recompile l sym (call-sig h) ns)))))
 	     (dolist (l (call-callees new)) 
 	       (pushnew sym (get l 'callers) :test 'eq)))))))
 
@@ -383,10 +376,3 @@
 	      (let* ((*split-files* 100000)
 		     (o (compile-file pn :system-p t :c-file t :h-file t :data-file t)))
 		(unless pnp (load o)))))))))
-
-
-(defun cmp-vec-length (x)
-  (declare (vector x))
-  (if (array-has-fill-pointer-p x) (fill-pointer x) (array-dimension x 0)))
-
-

@@ -1,6 +1,6 @@
 ;;; -*- Mode: Lisp; Syntax: Common-Lisp; Package: "CONDITIONS"; Base: 10 -*-
 
-(in-package "CONDITIONS")
+(in-package :CONDITIONS)
 
 (DEFVAR *DEBUG-LEVEL* 0)
 (DEFVAR *DEBUG-ABORT* NIL)

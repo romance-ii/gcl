@@ -1598,8 +1598,7 @@ mark_contblock(void *p, fixnum s) {
     set_mark_bit(x);
 }
 
-DEFUN_NEW("GBC",object,fLgbc,LISP
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
+DEFUN_NEW("GBC",object,fSgbc,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"")
 
 {
   /* 1 args */

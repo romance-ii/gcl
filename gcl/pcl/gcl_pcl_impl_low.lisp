@@ -1,11 +1,11 @@
-(in-package "SI")
+(in-package :si)
 (export '(%structure-name
           %compiled-function-name
           %set-compiled-function-name))
-(in-package 'pcl)
-(eval-when (compile eval load)
-(setq  *EVAL-WHEN-COMPILE* t)
-)
+(in-package :pcl)
+(eval-when
+ (compile eval load)
+ (setq  *EVAL-WHEN-COMPILE* t))
 
 (import '(si::memq) 'pcl)
 ;(defmacro memq (item list) `(member ,item ,list :test #'eq))
@@ -65,7 +65,8 @@
 (defmacro fmc-funcall (fn pv-cell next-method-call &rest args)
   `(funcall ,fn ,pv-cell ,next-method-call ,@args))
 
-(defun pcl::proclaim-defmethod (x y) y
+(defun pcl::proclaim-defmethod (x y)
+  (declare (ignore y))
   (and (symbolp x)
        (setf (get x 'compiler::proclaimed-closure ) t)))
 
@@ -92,6 +93,7 @@
 ;; This is the unsafe but fast version.
 ;(defentry %cclosure-env-nthcdr (fixnum object) (static object cclosure_env_nthcdr))
 
+(import 'si::seqind)
 
 (defun cclosure-env-nthcdr (n f)
   (declare (optimize (safety 1)))
@@ -324,12 +326,12 @@
     `(and (si:structurep ,x)
           (si:%structure-name ,x))))
 
-(defun structure-type-p (type)
-  (or (not (null (gethash type *structure-table*)))
-      (let (#+akcl(s-data nil))
-        (and (symbolp type)
-              (setq s-data (get type 'si::s-data))
-	      (null  (si::s-data-type s-data))))))
+;; (defun structure-type-p (type)
+;;   (or (not (null (gethash type *structure-table*)))
+;;       (let (#+akcl(s-data nil))
+;;         (and (symbolp type)
+;;               (setq s-data (get type 'si::s-data))
+;; 	      (null  (si::s-data-type s-data))))))
 
 
 (defun structure-type-included-type-name (type)

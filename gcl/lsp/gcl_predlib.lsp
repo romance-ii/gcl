@@ -22,125 +22,32 @@
 ;;;;
 ;;;;                              predicate routines
 
-(in-package 'system)
+(in-package :system)
 
-(export '(lisp::upgraded-complex-part-type lisp::type-of
-	  lisp::deftype lisp::typep lisp::subtypep 
-	  lisp::coerce lisp::upgraded-array-element-type) 'lisp)
+(export '(int void static 
+	      old-compiled-function new-compiled-function
+	      hash-table-eq hash-table-eql hash-table-equal hash-table-equalp
+	      +type-alist+ 
+	      sequencep ratiop short-float-p long-float-p
+	      eql-is-eq equal-is-eq equalp-is-eq eql-is-eq-tp equal-is-eq-tp equalp-is-eq-tp
+	      +array-types+
+	      +aet-type-object+ 
+	      returns-exactly
+	      immfix
+	      proper-sequence proper-sequencep proper-cons proper-consp
+	      fcomplex dcomplex 
+	      cnum-type
+	      subtypep1 ;FIXME
+	      resolve-type))
+
+;; (export '(lisp::upgraded-complex-part-type lisp::type-of
+;; 	  lisp::deftype lisp::typep lisp::subtypep 
+;; 	  lisp::coerce lisp::upgraded-array-element-type) 'lisp)
 
 ;;Exported functions need to be compiled with some safety to ensure
 ;;that user-supplied arguments are checked.  They should therefore
 ;;primarily be wrappers around computationally intensive internal
 ;;functions compiled with more aggressive settings. 20050718 CM
-
-(defun type-of (object)
-  (cond ((not object) 'null)
-	((eq object t) 'boolean)
-	((keywordp object) 'keyword)
-	((symbolp object) 'symbol);;to get around pcl bootstrap problems
-	((typep object 'standard-object)
-	 (let* ((c (class-of object))
-		(n (class-name c)))
-	     (if (and n (eq c (find-class n nil))) n c)))
-	((let ((tp (type-of-c object)))
-	   (cond ((member tp '(vector array));FIXME
-		  `(,tp ,(upgraded-array-element-type (array-element-type object))))
-		 ((and (symbolp tp) (string= "STD-INSTANCE" (symbol-name tp)) ;FIXME import pcl::std-instance-p
-		       (string= "PCL" (package-name (symbol-package tp))))
-		  (class-of object))
-		 (tp))))))
-
-(defun typep-int (object type &aux tp i tem)
-  (if (atom type)
-      (setq tp type i nil)
-    (setq tp (car type) i (cdr type)))
-  (when (and (eq tp 'function) i)
-    (error "Bad type to typep: ~S" type))
-  (if (eq tp 'structure-object) (setq tp 'structure))
-  (when (and (or (eq tp 'structure) (eq tp 'compiled-function)
-		 (eq tp 'old-compiled-function) (eq tp 'new-compiled-function)) 
-	     (typep-int object 'standard-object))
-    (return-from typep-int nil))
-  (let ((f (and (not i) (symbolp tp) (get tp 'type-predicate))))
-    (when f (return-from typep-int (let ((z (funcall f object))) (when z t)))))
-  (case tp
-	((values returns-exactly) (typep-int object (car i)))
-	(cons (and (consp object)
-		   (or (not i)
-		       (and (typep-int (car object) (car i))
-			    (or (endp (cdr i))
-				(typep-int (cdr object) (cadr i)))))))
-	(member (dolist (i i) (when (eql object i) (return t))));(member object i))
-	(not (not (typep-int object (car i))))
-	(or
-	 (do ((l i (cdr l)))
-	     ((null l) nil)
-	     (when (typep-int object (car l)) (return t))))
-	(and
-	 (do ((l i (cdr l)))
-	     ((null l) t)
-	     (unless (typep-int object (car l)) (return nil))))
-	(satisfies (let ((z (funcall (car i) object))) (when z t)))
-	((t) t)
-	((nil) nil)
-	(boolean (or (eq object 't) (eq object 'nil)))
-	(bignum (let ((tp (type-of-c object))) (dolist (i '(bignum non-negative-bignum negative-bignum)) (when (eql tp i) (return t)))));(member (type-of-c object) '(bignum non-negative-bignum negative-bignum)))
-	(ratio (eq (type-of-c object) 'ratio))
-	((base-char) (characterp object))
-	(integer
-	 (and (integerp object) (in-interval-p object i)))
-	(rational
-	 (and (rationalp object) (in-interval-p object i)))
-	(real
-	 (and (realp object) (in-interval-p object i)))
-	(float
-	 (and (floatp object) (in-interval-p object i)))
-	((short-float)
-	 (and (eq (type-of-c object) 'short-float) (in-interval-p object i)))
-	((single-float double-float long-float)
-	 (and (eq (type-of-c object) 'long-float) (in-interval-p object i)))
-	(complex
-	 (and (complexp object)
-	      (or (null i)
-		  (and   (typep-int (realpart object) (car i))
-			 ;;wfs--should only have to check one.
-			 ;;Illegal to mix real and imaginary types!
-			 (typep-int (imagpart object) (car i))))))
-	(sequence (or (listp object) (vectorp object)))
-	((base-string string simple-base-string simple-string) ;FIXME
-	 (and (stringp object)
-	      (or (endp i) (match-dimensions (array-dimensions object) i))))
-	((bit-vector simple-bit-vector)
-	 (and (bit-vector-p object)
-	      (or (endp i) (match-dimensions (array-dimensions object) i))))
-	((vector simple-vector)
-	 (and (vectorp object)
-	      (let ((at (upgraded-array-element-type (cond ((eq tp 'simple-vector)) (i (car i)) ('*)))))
-		(or (eq at '*) (eq at (upgraded-array-element-type (array-element-type object)))))
-	      (or (not (cdr i)) (match-dimensions (array-dimensions object) (cdr i)))))
-	((array simple-array)
-	 (and (arrayp object)
-	      (let ((at (upgraded-array-element-type (if i (car i) '*))))
-		(or (eq at '*) (eq at (upgraded-array-element-type (array-element-type object)))))
-	      (or (not (cdr i)) (eq (cadr i) '*)
-		  (if (listp (cadr i))
-		      (match-dimensions (array-dimensions object) (cadr i))
-		    (eql (array-rank object) (cadr i))))))
-	((file-stream string-stream synonym-stream concatenated-stream
-		      broadcast-stream two-way-stream echo-stream) (eq (type-of-c object) tp))
-	(t (cond 
-	    ((if (symbolp tp) (get tp 's-data) (typep-int tp 's-data))
-	     (let ((z (structure-subtype-p object tp))) (when z t)))
-	    ((setq tem (when (symbolp tp) (get tp 'deftype-definition)))
-	     (typep-int object (apply tem i)))
-	    ((classp tp)
-	     (subtypep1 (class-of object) tp))))))
-
-(defun typep (object type &optional env)
-  (declare (ignore env) (optimize (safety 2)))
-  (typep-int object type))
-(si::putprop 'typep 'compiler::co1typep 'compiler::co1)
-
 
 (defun ratiop (x)
   (and (rationalp x) (not (integerp x))))
@@ -188,10 +95,6 @@
 (defun upgraded-complex-part-type (type &optional environment) 
   (declare (ignore environment) (optimize (safety 2)))
   type)
-
-(defun upgraded-array-element-type (type &optional environment)
-  (declare (ignore environment) (optimize (safety 2)))
-  (best-array-element-type type))
 
 (defmacro check-type-eval (place type)
   `(values (assert (typep ,place ,type) (,place) 'type-error :datum ,place :expected-type ,type)));fixme
@@ -310,7 +213,7 @@
 ;;; Some DEFTYPE definitions.
 
 (deftype hash-table nil `(or hash-table-eq hash-table-eql hash-table-equal hash-table-equalp))
-(deftype funcallable-symbol nil `(satisfies funcallable-symbol-p))
+(deftype compiler::funcallable-symbol nil `(satisfies compiler::funcallable-symbol-p));FIXME
 
 (defconstant +ifb+ (- (car (last (multiple-value-list (si::heap-report))))))
 (defconstant +ifr+ (ash (- +ifb+)  -1))
@@ -1184,17 +1087,30 @@
 
 ;; CLASS HACKS
 
-(defvar *prevent-compiler-optimization* nil)
+;(defvar *prevent-compiler-optimization* nil)
 
-(defun classp (object) (declare (ignore object)) (the boolean *prevent-compiler-optimization*))
-(defun class-precedence-list (object) (declare (ignore object)) (the proper-list *prevent-compiler-optimization*))
-(defun find-class (object &optional errorp environment
-			  &aux (*prevent-compiler-optimization* (car (member object '(generic-function)))));FIXME
-  (declare (ignore errorp environment))
-  *prevent-compiler-optimization*)
-(defun class-name (class) (declare (ignore class)) (the symbol *prevent-compiler-optimization*))
-(defun class-of (object) (declare (ignore object)) *prevent-compiler-optimization*)
-(defun class-direct-subclasses (object) (declare (ignore object)) (the proper-list *prevent-compiler-optimization*))
+(eval-when
+ (compile eval)
+ (defmacro clh nil
+  `(progn
+     ,@(mapcar (lambda (x &aux (f (when (eq x 'find-class) `(nil))) (z (intern (string-concatenate "SI-" (symbol-name x)))))
+		 `(defun ,z (o &aux e)
+		    (cond ((fboundp ',x)
+			   (prog1 (funcall ',x o ,@f)
+			     (setf (symbol-function ',z) (symbol-function ',x))))
+			  ((setq e (get ',z 'early)) (values (funcall e o ,@f))))))
+	       '(classp class-precedence-list find-class class-name class-of class-direct-subclasses)))))
+(clh)
+
+;; (defun classp (object) (declare (ignore object)) (the boolean *prevent-compiler-optimization*))
+;; (defun class-precedence-list (object) (declare (ignore object)) (the proper-list *prevent-compiler-optimization*))
+;; (defun find-class (object &optional errorp environment
+;; 			  &aux (*prevent-compiler-optimization* (car (member object '(generic-function)))));FIXME
+;;   (declare (ignore errorp environment))
+;;   *prevent-compiler-optimization*)
+;; (defun class-name (class) (declare (ignore class)) (the symbol *prevent-compiler-optimization*))
+;; (defun class-of (object) (declare (ignore object)) *prevent-compiler-optimization*)
+;; (defun class-direct-subclasses (object) (declare (ignore object)) (the proper-list *prevent-compiler-optimization*))
 
 (defun is-standard-class-symbol (sym) ;FIXME
   (or (eq sym 'generic-function)
@@ -1206,11 +1122,11 @@
 (defun find-standard-class (object)
   (and (symbolp object)
        (is-standard-class-symbol object)
-       (find-class object nil)))
+       (si-find-class object)))
 
 (defun coerce-to-standard-class (object)
-  (cond ((and (classp object)
-	      (is-standard-class-symbol (class-name object)))
+  (cond ((and (si-classp object)
+	      (is-standard-class-symbol (si-class-name object)))
 	 object)
 	((find-standard-class object))))
 
@@ -1229,10 +1145,10 @@
 	 (let ((q (lremove-if-not (lambda (z) (typep-int z y)) (cdr x))))
 	   (when q `(member ,@q))))
 	((and (consp y) (eq (car y) 'member)) (standard^ y x))
-	((member y (class-precedence-list x)) x)
-	((member x (class-precedence-list y)) y)
+	((member y (si-class-precedence-list x)) x)
+	((member x (si-class-precedence-list y)) y)
 	((reduce (lambda (&rest xy) (when xy (standard^ (car xy) (cadr xy))))
-		 (ordered-intersection-eq (class-direct-subclasses x) (class-direct-subclasses y))))))
+		 (ordered-intersection-eq (si-class-direct-subclasses x) (si-class-direct-subclasses y))))))
 
 (defun standard-op (op x y)
   (setf (cadr x)
@@ -1241,7 +1157,7 @@
 	      (not (negate (cadr x))))))
 
 (defun standard-recon (x)
-  (let ((z (or (find-class (car x)) (car x))))
+  (let ((z (or (si-find-class (car x)) (car x))))
     (cond ((eq (cadr x) t) z)
 	  ((and (consp (cadr x)) (eq (caadr x) 'not)) `(and ,z ,(cadr x)))
 	  ((cadr x)))))
@@ -1331,7 +1247,7 @@
 		(cdrn (if (eq cdrn def) cdrn (normalize-type-int cdrn ar))))
 	   (if (and (not (cdddr type)) (eq car carn) (eq cdr cdrn)) type `(,(car type) ,carn ,cdrn))))
 	((setq tem (coerce-to-standard-class (car type))) (if (eq (car type) tem) type `(,tem ,@(cdr type))))
-	((classp (car type)) (normalize-type-int `(,(class-name (car type)) ,@(cdr type)) ar))
+	((si-classp (car type)) (normalize-type-int `(,(si-class-name (car type)) ,@(cdr type)) ar))
 	((and (not (cdr type)) (member (car type) +singleton-types+)) type)
 	((and (eq (car type) 'satisfies) 
 	      (setq tem (get (cadr type) 'predicate-type))
@@ -1567,6 +1483,115 @@
 	   (mt (when (cadr rt) (resolve-type `(and (type-max ,t1) ,(negate `(type-min ,t2))))))
 	   (rt (if (or (not (cadr rt)) (car mt)) rt `(nil nil))))
       (values (not (car rt))  (not (cadr rt))))))
+
+
+(defun type-of (object)
+  (cond ((not object) 'null)
+	((eq object t) 'boolean)
+	((keywordp object) 'keyword)
+	((symbolp object) 'symbol);;to get around pcl bootstrap problems
+	((typep object 'standard-object)
+	 (let* ((c (si-class-of object))
+		(n (si-class-name c)))
+	     (if (and n (eq c (si-find-class n))) n c)))
+	((let ((tp (type-of-c object)))
+	   (cond ((member tp '(vector array));FIXME
+		  `(,tp ,(upgraded-array-element-type (array-element-type object))))
+		 ((and (symbolp tp) (string= "STD-INSTANCE" (symbol-name tp)) ;FIXME import pcl::std-instance-p
+		       (string= "PCL" (package-name (symbol-package tp))))
+		  (si-class-of object))
+		 (tp))))))
+
+(defun typep-int (object type &aux tp i tem)
+  (if (atom type)
+      (setq tp type i nil)
+    (setq tp (car type) i (cdr type)))
+  (when (and (eq tp 'function) i)
+    (error "Bad type to typep: ~S" type))
+  (if (eq tp 'structure-object) (setq tp 'structure))
+  (when (and (or (eq tp 'structure) (eq tp 'compiled-function)
+		 (eq tp 'old-compiled-function) (eq tp 'new-compiled-function)) 
+	     (typep-int object 'standard-object))
+    (return-from typep-int nil))
+  (let ((f (and (not i) (symbolp tp) (get tp 'type-predicate))))
+    (when f (return-from typep-int (let ((z (funcall f object))) (when z t)))))
+  (case tp
+	((values returns-exactly) (typep-int object (car i)))
+	(cons (and (consp object)
+		   (or (not i)
+		       (and (typep-int (car object) (car i))
+			    (or (endp (cdr i))
+				(typep-int (cdr object) (cadr i)))))))
+	(member (dolist (i i) (when (eql object i) (return t))));(member object i))
+	(not (not (typep-int object (car i))))
+	(or
+	 (do ((l i (cdr l)))
+	     ((null l) nil)
+	     (when (typep-int object (car l)) (return t))))
+	(and
+	 (do ((l i (cdr l)))
+	     ((null l) t)
+	     (unless (typep-int object (car l)) (return nil))))
+	(satisfies (let ((z (funcall (car i) object))) (when z t)))
+	((t) t)
+	((nil) nil)
+	(boolean (or (eq object 't) (eq object 'nil)))
+	(bignum (let ((tp (type-of-c object))) (dolist (i '(bignum non-negative-bignum negative-bignum)) (when (eql tp i) (return t)))));(member (type-of-c object) '(bignum non-negative-bignum negative-bignum)))
+	(ratio (eq (type-of-c object) 'ratio))
+	((base-char) (characterp object))
+	(integer
+	 (and (integerp object) (in-interval-p object i)))
+	(rational
+	 (and (rationalp object) (in-interval-p object i)))
+	(real
+	 (and (realp object) (in-interval-p object i)))
+	(float
+	 (and (floatp object) (in-interval-p object i)))
+	((short-float)
+	 (and (eq (type-of-c object) 'short-float) (in-interval-p object i)))
+	((single-float double-float long-float)
+	 (and (eq (type-of-c object) 'long-float) (in-interval-p object i)))
+	(complex
+	 (and (complexp object)
+	      (or (null i)
+		  (and   (typep-int (realpart object) (car i))
+			 ;;wfs--should only have to check one.
+			 ;;Illegal to mix real and imaginary types!
+			 (typep-int (imagpart object) (car i))))))
+	(sequence (or (listp object) (vectorp object)))
+	((base-string string simple-base-string simple-string) ;FIXME
+	 (and (stringp object)
+	      (or (endp i) (match-dimensions (array-dimensions object) i))))
+	((bit-vector simple-bit-vector)
+	 (and (bit-vector-p object)
+	      (or (endp i) (match-dimensions (array-dimensions object) i))))
+	((vector simple-vector)
+	 (and (vectorp object)
+	      (let ((at (upgraded-array-element-type (cond ((eq tp 'simple-vector)) (i (car i)) ('*)))))
+		(or (eq at '*) (eq at (upgraded-array-element-type (array-element-type object)))))
+	      (or (not (cdr i)) (match-dimensions (array-dimensions object) (cdr i)))))
+	((array simple-array)
+	 (and (arrayp object)
+	      (let ((at (upgraded-array-element-type (if i (car i) '*))))
+		(or (eq at '*) (eq at (upgraded-array-element-type (array-element-type object)))))
+	      (or (not (cdr i)) (eq (cadr i) '*)
+		  (if (listp (cadr i))
+		      (match-dimensions (array-dimensions object) (cadr i))
+		    (eql (array-rank object) (cadr i))))))
+	((file-stream string-stream synonym-stream concatenated-stream
+		      broadcast-stream two-way-stream echo-stream) (eq (type-of-c object) tp))
+	(t (cond 
+	    ((if (symbolp tp) (get tp 's-data) (typep-int tp 's-data))
+	     (let ((z (structure-subtype-p object tp))) (when z t)))
+	    ((setq tem (when (symbolp tp) (get tp 'deftype-definition)))
+	     (typep-int object (apply tem i)))
+	    ((si-classp tp)
+	     (subtypep1 (si-class-of object) tp))))))
+
+(defun typep (object type &optional env)
+  (declare (ignore env) (optimize (safety 2)))
+  (typep-int object type))
+(si::putprop 'typep 'compiler::co1typep 'compiler::co1)
 
 (defun sequence-type-length-type-int (type)
     (case (car type)

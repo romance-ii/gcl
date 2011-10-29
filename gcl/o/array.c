@@ -29,26 +29,26 @@ static char zero[4*SIZEOF_LONG];/*FIXME*/
 aet_type_struct aet_types[] = {
   {" ",&sLcharacter,sizeof(char)},
   {zero,&sLbit,sizeof(char)},
-  {zero,&sLnon_negative_char,sizeof(char)},
-  {zero,&sLsigned_char,sizeof(char)},
-  {zero,&sLunsigned_char,sizeof(char)},
-  {zero,&sLnon_negative_short,sizeof(short)},
-  {zero,&sLsigned_short,sizeof(short)},
-  {zero,&sLunsigned_short,sizeof(short)},
+  {zero,&sSnon_negative_char,sizeof(char)},
+  {zero,&sSsigned_char,sizeof(char)},
+  {zero,&sSunsigned_char,sizeof(char)},
+  {zero,&sSnon_negative_short,sizeof(short)},
+  {zero,&sSsigned_short,sizeof(short)},
+  {zero,&sSunsigned_short,sizeof(short)},
 #if SIZEOF_LONG != SIZEOF_INT
-  {zero,&sLnon_negative_int,sizeof(int)},
-  {zero,&sLsigned_int,sizeof(int)},
-  {zero,&sLunsigned_int,sizeof(int)},
+  {zero,&sSnon_negative_int,sizeof(int)},
+  {zero,&sSsigned_int,sizeof(int)},
+  {zero,&sSunsigned_int,sizeof(int)},
 #endif
-  {zero,&sLnon_negative_fixnum,sizeof(fixnum)},
+  {zero,&sSnon_negative_fixnum,sizeof(fixnum)},
   {zero,&sLfixnum,sizeof(fixnum)},
   {zero,&sLshort_float,sizeof(float)},
   {zero,&sLlong_float,sizeof(double)},
   {Cnil,&Iname_t,sizeof(object)}
 #if SIZEOF_LONG == SIZEOF_INT
-  ,{zero,&sLnon_negative_int,sizeof(int)},
-  {zero,&sLsigned_int,sizeof(int)},
-  {zero,&sLunsigned_int,sizeof(int)}
+  ,{zero,&sSnon_negative_int,sizeof(int)},
+  {zero,&sSsigned_int,sizeof(int)},
+  {zero,&sSunsigned_int,sizeof(int)}
 #endif
 };
 
@@ -324,6 +324,39 @@ DEFUNO_NEW("SVSET", object, fSsvset, SI, 3, 3, NONE, OO, IO, OO,
   return x->v.v_self[i] = val;
 }
   
+fixnum
+elt_size(fixnum elt_type) {
+  switch (elt_type) {
+  case aet_bit:         /*  bit  */
+    return 0;
+  case aet_ch:          /*  character  */
+  case aet_nnchar:      /*  non-neg char */
+  case aet_char:        /*  signed char */
+  case aet_uchar:       /*  unsigned char */
+    return sizeof(char);
+  case aet_nnshort:     /*  non-neg short   */
+  case aet_short:       /*  signed short */
+  case aet_ushort:      /*  unsigned short   */
+    return sizeof(short);
+    break;
+  case aet_nnint:       /*  non-neg int   */
+  case aet_int:         /*  signed int */
+  case aet_uint:        /*  unsigned int   */
+    return sizeof(int);
+    break;
+  case aet_nnfix:       /*  non-neg fixnum  */
+  case aet_fix:         /*  fixnum  */
+  case aet_object:      /*  t  */
+    return sizeof(fixnum);
+  case aet_sf:          /*  short-float  */
+    return sizeof(float);
+  case aet_lf:          /*  plong-float  */
+    return sizeof(double);
+  default:
+    FEerror("Bad elt type",0);
+    return -1;
+  }
+}
 
 DEFUN_NEW("MAKE-VECTOR1",object,fSmake_vector1,SI,3,8,NONE,OI,
 	  IO,OO,OO,(fixnum n,fixnum elt_type,object staticp,...),"") { 
@@ -337,25 +370,25 @@ DEFUN_NEW("MAKE-VECTOR1",object,fSmake_vector1,SI,3,8,NONE,OI,
   switch(elt_type) {
   case aet_ch:
     x = alloc_object(t_string);
-    x->ust.ust_elttype = elt_type;
-    x->ust.ust_defrank=1;
-    x->ust.ust_adjustable=1;
-    goto a_string;
+    /* x->ust.ust_elttype = elt_type; */
+    /* x->ust.ust_defrank=1; */
+    /* x->ust.ust_adjustable=1; */
+    /* goto a_string; */
     break;
   case aet_bit:
     x = alloc_object(t_bitvector);
-    x->v.v_elttype = elt_type;
-    x->v.v_defrank=1;
-    x->v.v_adjustable=1;
+    /* x->v.v_elttype = elt_type; */
+    /* x->v.v_defrank=1; */
+    /* x->v.v_adjustable=1; */
     break;
   default:
     x = alloc_object(t_vector);
-    x->v.tt=elt_type;
   }
-  x->v.v_elttype = elt_type;
+  x->v.tt=x->v.v_elttype = elt_type;
+  x->v.v_eltsize=elt_size(elt_type);
   x->v.v_defrank=1;
   x->v.v_adjustable=1;
- a_string:
+ /* a_string: */
   x->v.v_dim = n;
   x->v.v_self = 0;
   x->v.v_displaced = Cnil;
@@ -425,17 +458,17 @@ DEFUN_NEW("GET-AELTTYPE",object,fSget_aelttype,SI,1,1,NONE,OO,OO,OO,OO,(object x
       return make_fixnum((enum aelttype) i);
   if (x == sLsingle_float || x == sLdouble_float)
     return make_fixnum(aet_lf);
-  if (x==sLnegative_char)
+  if (x==sSnegative_char)
     return make_fixnum(aet_char);
-  if (x==sLnegative_short)
+  if (x==sSnegative_short)
     return make_fixnum(aet_short);
-  if (x==sLnegative_int)
+  if (x==sSnegative_int)
 #if SIZEOF_LONG != SIZEOF_INT
     return make_fixnum(aet_int);
 #else
     return make_fixnum(aet_fix);
 #endif
-  if (x==sLnegative_fixnum || x==sLsigned_fixnum)
+  if (x==sSnegative_fixnum || x==sSsigned_fixnum)
     return make_fixnum(aet_fix);
   return make_fixnum(aet_object);
 }
@@ -503,7 +536,8 @@ DEFUN_NEW("MAKE-ARRAY1",object,fSmake_array1,SI,6,6,
     int dim =1,i; 
     BEGIN_NO_INTERRUPT;
     x = alloc_object(t_array);
-    x->a.a_elttype = elt_type;
+    x->a.tt=x->a.a_elttype = elt_type;
+    x->a.a_eltsize=elt_size(elt_type);
     x->a.a_self = 0;
     x->a.a_hasfillp = 0;
     x->a.a_rank = rank;

@@ -27,7 +27,7 @@
 	  si::undef-compiler-macro
           si::define-inline-function) 'system)
 
-(in-package 'compiler)
+(in-package :compiler)
 
 (si:putprop 'progn 'c1progn 'c1special)
 (si:putprop 'progn 'c2progn 'c2)
@@ -37,8 +37,6 @@
 (si:putprop 'structure-ref 'wt-structure-ref 'wt-loc)
 (si:putprop 'si:structure-set 'c1structure-set 'c1)
 (si:putprop 'structure-set 'c2structure-set 'c2)
-
-(defun str-ref (x y z) (declare (ignore y)) (si::structure-ref1 x z))
 
 (defun c1expr* (form info)
   (setq form (c1expr form))
@@ -252,8 +250,7 @@
 				
 
 (defun result-type-from-args (f args)
-  (when (and (or (not *compiler-new-safety*) (member f '(unbox box)));FIXME 
-	     (not (eq '* (get f 'return-type)))) ;;FIXME  make sure return-type and proclaimed-return-type are in sync
+  (when (and (or (not *compiler-new-safety*) (member f '(unbox box))));FIXME 
     (let* ((be (get f 'type-propagator))
 	   (ba (and be ;(si::dt-apply be (cons f (mapcar 'coerce-to-one-valuea args))))));FIXME
 		    (apply be (cons f (mapcar 'coerce-to-one-value args))))));FIXME
@@ -729,8 +726,8 @@
 			       (,#tratio  . ,(c-type 1/2))
 			       (,#tshort-float . ,(c-type 0.0s0))
 			       (,#tlong-float  . ,(c-type 0.0))
-			       (,#tfcomplex  . ,(1+ c-type-max))
-			       (,#tdcomplex  . ,(+ 2 c-type-max))
+			       (,#tfcomplex  . ,(1+ si::c-type-max))
+			       (,#tdcomplex  . ,(+ 2 si::c-type-max))
 			       (,#t(complex rational) . ,(c-type #c(0 1)))))
 
 (defun typecase-compiler-macro (form env)
@@ -1150,14 +1147,16 @@
 (defun inline-sym-src (n)
   (and (inline-possible n)
        (or (inline-asserted n)
-	   (eq (symbol-package n) (load-time-value (find-package 'c)))
-	   (eq (symbol-package n) (load-time-value (find-package "libm")))
-	   (eq (symbol-package n) (load-time-value (find-package "libc")))
-	   (multiple-value-bind (s k) (find-symbol (symbol-name n) 'lisp) 
+	   (eq (symbol-package n) (load-time-value (find-package :c)))
+	   (eq (symbol-package n) (load-time-value (find-package :libm)))
+	   (eq (symbol-package n) (load-time-value (find-package :libc)))
+	   (multiple-value-bind (s k) (find-symbol (symbol-name n) :cl) 
 				(when (eq n s) (eq k :external))))
        (or (local-fun-src n)
 	   (let ((fn (when (fboundp n) (symbol-function n))))
-	     (when (functionp fn) (values (or (gethash fn *src-hash*) (setf (gethash fn *src-hash*) (function-lambda-expression fn)))))))))
+	     (when (functionp fn) 
+	       (unless (typep fn 'generic-function)
+		 (values (or (gethash fn *src-hash*) (setf (gethash fn *src-hash*) (function-lambda-expression fn))))))))))
 
 ;; (defun inline-sym-src (n)
 ;;   (and (inline-possible n)
@@ -2443,10 +2442,6 @@
 
 ;;New C ffi
 ;
-(defun strcat (&rest r)
-  (declare (:dynamic-extent r))
-  (apply 'concatenate 'string (mapcar 'string-downcase r)))
-
 (defmacro defdlfun ((crt name &optional (lib "")) &rest tps)
   (flet ((cc (x) (if (consp x) (car x) x)))
   (let* ((sym  (mdlsym name lib))

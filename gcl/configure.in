@@ -1208,6 +1208,18 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[
 	    unsigned long c;
 	    int i;
 	    for (i=0,c=1;c;c<<=1,i++);
+	    fprintf(fp,"%d",(i>>1)-9);
+	    return 0;]])],[size=`cat conftest1`
+  AC_DEFINE_UNQUOTED(HM9BITS,$size,[fill bits needed in certain lisp structures])],
+  [AC_MSG_ERROR([Cannot find fill bits])])
+
+AC_RUN_IFELSE([AC_LANG_PROGRAM([[
+	#include <stdio.h>
+	]],[[
+	    FILE *fp=fopen("conftest1","w");
+	    unsigned long c;
+	    int i;
+	    for (i=0,c=1;c;c<<=1,i++);
 	    fprintf(fp,"%d",(i>>1)-5);
 	    return 0;]])],[size=`cat conftest1`
   AC_DEFINE_UNQUOTED(HM5BITS,$size,[fill bits needed in certain lisp structures])],
@@ -1669,11 +1681,11 @@ if ! test -x `which ldd` && ! test -d /proc/self ; then
    heap_ceiling=0x0
 else
 if test -d /proc/self ; then
-   heap_ceiling=0x`/bin/cat /proc/self/maps | grep "/lib/ld" | cut -f1 -d- | head -1`
+   heap_ceiling=0x`/bin/cat /proc/self/maps | egrep "/lib/([[^/]]*/)?ld" | cut -f1 -d- | head -1`
 else
 #echo -e "#include <stdio.h>\n int main() {printf(\"foo\");return 0;}" >foo.c
 #$CC foo.c -o foo
-   AAWK=`which awk`
+   AAWK=`which $AWK`
 # | grep -v ld-kfreebsd needed on some strange bsd amd64 boxes
    heap_ceiling=`ldd $AAWK | tail -n 1 | $AWK '{print $NF}' | tr -d '()'`
 fi

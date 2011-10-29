@@ -364,7 +364,7 @@ static object fLbackquote_reader(object x0, object x1)
 #define MAKE_AFUN(addr,n) fSinit_function(Cnil,(object)addr,Cnil,Cnil,-1,0,2|(2<<6))
 
 
-DEF_ORDINARY("Y",sSY,SI,"");
+/* DEF_ORDINARY("Y",sSY,SI,""); */
 DEF_ORDINARY("YB",sSYB,SI,"");
 
 DEF_ORDINARY("YZ",sSYZ,SI,"");

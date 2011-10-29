@@ -19,8 +19,8 @@
 
  (load (concatenate 'string si::*system-directory* "../gcl-tk/tk-package.lsp"))
 
- (or lisp::*link-array*
-     (setq lisp::*link-array*
+ (or si::*link-array*
+     (setq si::*link-array*
 	   (make-array (ash 1 11)  :element-type 'character :fill-pointer 0)))
  (si::use-fast-links t)
  
@@ -57,10 +57,10 @@
  (setq compiler::*default-system-p* nil)
  (setq compiler::*keep-gaz* nil)
  
- (unintern 'system)
- (unintern 'lisp)
- (unintern 'compiler)
- (unintern 'user)
+ ;; (unintern 'system)
+ ;; (unintern 'lisp)
+ ;; (unintern 'compiler)
+ ;; (unintern 'user)
  (when (fboundp 'si::init-cmp-anon) (fmakunbound 'si::init-cmp-anon))
  
  (eval-when (load)

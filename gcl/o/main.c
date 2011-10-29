@@ -713,18 +713,18 @@ initlisp(void) {
 	import(Ct, lisp_package);
 	export(Ct, lisp_package);
 
-#ifdef ANSI_COMMON_LISP
-	import(Cnil, common_lisp_package);
-	export(Cnil, common_lisp_package);
+/* #ifdef ANSI_COMMON_LISP */
+/* 	import(Cnil, common_lisp_package); */
+/* 	export(Cnil, common_lisp_package); */
 
-	import(Ct, common_lisp_package);
-	export(Ct, common_lisp_package);
-#endif
+/* 	import(Ct, common_lisp_package); */
+/* 	export(Ct, common_lisp_package); */
+/* #endif */
 
 	sLlambda = make_ordinary("LAMBDA");
-	sLlambda_block = make_ordinary("LAMBDA-BLOCK");
-	sLlambda_closure = make_ordinary("LAMBDA-CLOSURE");
-	sLlambda_block_closure = make_ordinary("LAMBDA-BLOCK-CLOSURE");
+	sLlambda_block = make_si_ordinary("LAMBDA-BLOCK");
+	sLlambda_closure = make_si_ordinary("LAMBDA-CLOSURE");
+	sLlambda_block_closure = make_si_ordinary("LAMBDA-BLOCK-CLOSURE");
 	sLspecial = make_ordinary("SPECIAL");
 
 	
@@ -873,8 +873,8 @@ segmentation_catcher(int i, long code, void *scp, char *addr) {
 
 }
 
-DEFUNO_NEW("BYE",object,fLbye,LISP
-	   ,0,1,NONE,OI,OO,OO,OO,void,Lby,(ufixnum exit_code,...),"") {
+/* DEFUNO_NEW("BYE",object,fSbye,SI,0,1,NONE,OI,OO,OO,OO,void,Lby,(ufixnum exit_code,...),"") { */
+DEFUN_NEW("BYE",object,fSbye,SI,0,1,NONE,OI,OO,OO,OO,(ufixnum exit_code,...),"") {
 
   fixnum n=INIT_NARGS(0);
   object l=Cnil,f=(object)(exit_code+1);
@@ -892,9 +892,8 @@ DEFUNO_NEW("BYE",object,fLbye,LISP
 
 }
 
-DEFUN_NEW("QUIT",object,fLquit,LISP
-       ,0,1,NONE,OI,OO,OO,OO,(fixnum exitc),"") {
-  return FFN(fLbye)(exitc); 
+DEFUN_NEW("QUIT",object,fSquit,SI,0,1,NONE,OI,OO,OO,OO,(fixnum exitc),"") {
+  return FFN(fSbye)(exitc); 
 }
  
 
@@ -1173,7 +1172,7 @@ DEFVAR("*COMMAND-ARGS*",sSAcommand_argsA,SI,sLnil,"");
 static void
 init_main(void) {
 
-  make_function("BY", Lby);
+  /* make_function("BY", Lby); */
   make_si_function("ARGC", siLargc);
   make_si_function("ARGV", siLargv);
   

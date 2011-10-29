@@ -20,7 +20,7 @@
 ;; Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-(in-package 'compiler)
+(in-package :compiler)
 
 (si:putprop 'var 'c2var 'c2)
 (si:putprop 'location 'c2location 'c2)
@@ -64,7 +64,7 @@
   tag           ;;; Inner tag (to binding) being analyzed if any
   (register 0 :type unsigned-char)  ;;; If greater than specified am't this goes into register.
   (dynamic  0 :type unsigned-char)  ;;; If variable is declared dynamic-extent
-  (space    0  :type char)          ;;; If variable is declared as an object array of this size
+  (space    0 :type char)           ;;; If variable is declared as an object array of this size
   (known-init -1 :type char)        ;;; Number of above known to be implicitly initialized
   store         ;;; keep kind in hashed c1forms
   aliases
@@ -191,7 +191,7 @@
   (let* ((info (make-info))
 	 (vref (c1vref name))
 	 (c1fv (when (cadr vref) (c1inner-fun-var))))
-    (setf (info-type info) (if (var-cb (car vref)) (var-dt (car vref)) (var-type (car vref))))
+    (setf (info-type info) (if (or (cadr vref) (caddr vref)) (var-dt (car vref)) (var-type (car vref))))
     (add-vref vref info)
     (when c1fv
       (add-info info (cadr c1fv)))

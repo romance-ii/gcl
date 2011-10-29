@@ -20,7 +20,7 @@
 ;; Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-(in-package 'compiler)
+(in-package :compiler)
 
 (si:putprop 'multiple-value-call 'c1multiple-value-call 'c1special)
 (si:putprop 'multiple-value-call 'c2multiple-value-call 'c2)
@@ -28,8 +28,6 @@
 (si:putprop 'multiple-value-prog1 'c2multiple-value-prog1 'c2)
 (si:putprop 'values 'c1values 'c1)
 (si:putprop 'values 'c2values 'c2)
-(si:putprop 'multiple-value-setq 'c1multiple-value-setq 'c1)
-(si:putprop 'multiple-value-setq 'c2multiple-value-setq 'c2)
 (si:putprop 'multiple-value-bind 'c1multiple-value-bind 'c1)
 (si:putprop 'multiple-value-bind 'c2multiple-value-bind 'c2)
 
@@ -268,9 +266,6 @@
 ;;     (base-used)))
 ;;   (unwind-exit 'fun-val nil (cons 'values (length forms))))
 
-
-(defun c1multiple-value-setq (args)
-  (c1expr (apply 'multiple-value-setq-expander args)))
 
 (defun multiple-value-check (vrefs form)
   (and (cdr vrefs)

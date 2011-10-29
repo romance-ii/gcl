@@ -2,7 +2,7 @@
 ;;Copyright William F. Schelter 1990, All Rights Reserved 
 
 
-(In-package "SYSTEM")
+(In-package :SYSTEM)
 (import 'sloop::sloop)
 
 (defmacro f (op &rest args)
@@ -625,7 +625,7 @@
        (mv-values nil j))
     (let
 	((na  (ihs-fname j)))
-      (cond ((special-form-p na))
+      (cond ((special-operator-p na))
 	    ((get na 'dbl-invisible))
 	    ((fboundp na)(return (mv-values na j)))))))
 
@@ -677,7 +677,7 @@
 					(vs (1+ k))
 					(vs (+ k 2)))
 				  )))))))
-	 ((special-form-p na) nil)
+	 ((special-operator-p na) nil)
 	 ((get na 'dbl-invisible))
 	 ((fboundp na)
 	  (mv-values i na nil nil

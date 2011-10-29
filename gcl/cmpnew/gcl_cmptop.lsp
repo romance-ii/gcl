@@ -20,7 +20,7 @@
 ;; Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-(in-package 'compiler)
+(in-package :compiler)
 
 (defvar *objects* (make-hash-table :test 'equal))
 (defvar *objects-rev* (make-hash-table :test 'equal))
@@ -511,7 +511,7 @@
 		`(,(car form) 
 		  ,(mapcar (lambda (x) (if (atom x) x `(,(car x) ,@(portable-source (cdr x) t)))) (cadr form))
 		  ,@(let* ((r (delete-if (lambda (x) (or (not (si::specialp x)) (is-declared-special x (cddr form))))
-					 (mapcar (lambda (x) (if (atom x) x (car x))) (cadr form)))))
+					 (mapcar (lambda (x) (if (atom x) x (car x))) (cadr form)))));FIXME key name
 		      (when r `((declare (special ,@r)))))
 		  ,@(ndbctxt (portable-source (cddr form) t))))
 	       ((quote function) form)
@@ -532,7 +532,6 @@
 		      (when t;(eq (car form) 'macrolet)
 			(dolist (l (cadr form)) (push (car l) *mlts*)))
 		      (ndbctxt (portable-source (cddr form) t)))))
-	       (multiple-value-setq (portable-source (apply 'multiple-value-setq-expander (cdr form))))
 	       (multiple-value-bind `(,(car form) ,(cadr form) ,(portable-source (caddr form))
 				      ,@(let ((r (remove-if (lambda (x) (or (not (si::specialp x)) 
 									    (is-declared-special x (cdddr form)))) (cadr form))))
@@ -562,28 +561,23 @@
    (let* ((nal (do (r (y ll)) ((or (not y) (eq (car y) '&aux)) (nreverse r)) (push (pop y) r)))
 	  (al (cdr (member '&aux ll)))
 	  (ax (mapcar (lambda (x) (if (atom x) x (car x))) al))
-	  (dd (split-decls ax decls))
+	  (dd (split-decls ax decls t))
 	  (cc (split-ctps  ax ctps)))
      (portable-source `(lambda ,nal
 			 ,@(when doc `(,doc))
-			 ,@(let ((r (nreverse (cadr dd)))(s (this-safety-level)))
-			     ;; (unless (or (> (decl-safety r) 0)
-			     ;; 		 (= s 0))
-			     ;;   (push `(declare (optimize (safety ,s))) r))
-			     (nconc r (cadr cc)))
+			 ,@(nconc (nreverse (cadr dd)) (cadr cc))
 			 ,@(let* ((r args)
 				  (r (if (eq fname (blocked-body-name r)) (cddar r) r))
-				  (r (if (or al (car dd)) `((let* ,al ,@(append (car dd) (car cc)) ,@r)) r))
-				  (r `((block ,fname ,@r))))
-			     r))))))
+				  (r (if (or al (car dd)) `((let* ,al ,@(append (car dd) (car cc)) ,@r)) r)))
+			     `((block ,fname ,@r))))))))
 
 (defvar *recursion-detected* nil)
 
-(defun split-decls (auxs decls &aux ad dd)
+(defun split-decls (auxs decls &optional ro  &aux ad dd)
   (dolist (l decls (list (nreverse ad) (nreverse dd)))
     (dolist (bb (cdr l))
       (let ((b (if (eq (car bb) 'type) (cdr bb) bb)))
-	(cond ((eq (car b) 'optimize) (push `(declare ,b) ad))
+	(cond ((eq (car b) 'optimize) (if ro (push `(declare ,b) dd) (push `(declare ,b) ad)))
 	      ((eq (car b) 'class)
 	       (unless (<= (length b) 3)
 		 (cmperr "Unknown class declaration: ~s" b))
@@ -746,7 +740,7 @@
   (cond (cxp (if (or (not y) (eq cx (car y))) y (list-split x (cdr y) iy niy cx)))
 	((not x) (values iy niy))
 	(t (let* ((cx (car x))
-		(v (list-split x y iy niy cx))) 
+		  (v (list-split x y iy niy cx))) 
 	   (if v (push cx iy) (push cx niy))
 	   (list-split (cdr x) y iy niy)))))
 
@@ -780,7 +774,7 @@
 	    (oc (append (when s rc) (car oc)))
 	    (rc (mapcar (lambda (x) `(declare (,@(when s `(hint)) ,(caddr x) ,(cadr x)))) rc))
 	    (rc (cons `(declare (optimize (safety ,dl))) rc))
-	    (narg (when opts +nargs+))
+	    (narg (when opts +nargs+));FIXME (cdr opts)
 	    (nr (length regs))
 	    (regs (or regs (when narg (list +first+))))
 	    (m (min 63 (mll ll)))
@@ -1082,13 +1076,18 @@
 ;; 	   (do-l1-fun name src e))
 ;; 	  (t (output-warning-note-stack) l))))
 
-(defun get-clv (l &aux r)
-  (do-referred 
-   (v (cadr l)) 
-   (unless (member v (caaddr l));FIXME not in info referred?
-     (when (and (var-p v) (var-cb v)) 
-       (push (list (var-name v) (car (atomic-tp (var-type v)))) r))))
-  (nreverse r))
+;   (unless (member v (caaddr l));FIXME not in info referred?
+;     (when (and (var-p v) (var-cb v)) 
+;       )))
+
+(defun get-clv (l &aux (i (cadr l)))
+  (mapcan
+   (lambda (v) (when (var-p v) (list (list (var-name v) (car (atomic-tp (var-type v)))))))
+   (append (info-ref-ccb i) (info-ref-clb i))))
+
+;; (defun get-clv (l &aux r)
+;;   (do-referred-cb (v (cadr l)) (push (list (var-name v) (car (atomic-tp (var-type v)))) r))
+;;   (nreverse r))
 
 (defun do-fun (name src e vis b)
   (let* ((*vars*   (when b (cons b *vars*)))
@@ -1105,7 +1104,7 @@
 	 (clv (get-clv l)))
     (setf (car e) (export-sig (car e))
 	  (third e) (list src clv name)
-	  (fourth e) (unless *compiler-compile* (namestring (pathname *compiler-input*)))
+	  (fourth e) (unless *compiler-compile* (namestring (truename (pathname *compiler-input*))))
 	  (fifth e) (if (= (length clv) 0) 1 0))
     l))
 
@@ -1250,37 +1249,9 @@
 	(ans type (logior ans (ash type i))))
        ((or (>= i 32) (null args)) ans)))
 
-(defun proclaimed-argd (args return)
-  (let* ((ans (length args))
-	 (i 8)
-	 (type (the fixnum (f-type return)))
-	 (type (if (single-type-p return) type (+ 4 type)));fixme rationalize
-	 (begin t))
-    (declare (fixnum ans i))
-    (loop
-     (if (not (eql 0 type))
-	 (setq ans (the fixnum (+ ans
-				  (the fixnum (ash (the fixnum type)
-						   (the (integer 0 30)
-							i)))))))
-     (when  begin (setq i 10) (setq begin nil))
-     (if (null args) (return ans))
-     (setq i (the fixnum (+ i 2)))
-     (setq type (f-type (pop args))))))
-    
 (defun type-f (x)
   (declare (fixnum x))
   (if (zerop x) t (nth (1- x) +c-global-arg-types+)))
-
-;FIXME obsolete
-(defun proclaim-from-argd (argd)
-  (declare (fixnum argd))
-  (let* ((n (logand argd (1- (ash 1 8))))
-	 (argd (ash argd -8))
-	 (ret (logand argd (1- (ash 1 2))))
-	 (argd (ash argd -4))
-	 (args (let (r) (dotimes (i n) (push (logand argd (1- (ash 1 2))) r) (setq argd (ash argd -2))) (nreverse r))))
-    (list (mapcar 'type-f args) (type-f ret))))
 
 (defun argsizes (args return &optional max pushed)
   (let* ((x (vald return))
@@ -2019,7 +1990,7 @@
     (cond ((stringp s) (push s body))
           ((consp s)
            (cond ((symbolp (car s))
-                  (cmpck (special-form-p (car s))
+                  (cmpck (special-operator-p (car s))
                          "Special form ~s is not allowed in defCfun." (car s))
                   (push (list (cons (car s) (parse-cvspecs (cdr s)))) body))
                  ((and (consp (car s)) (symbolp (caar s))
@@ -2028,7 +1999,7 @@
                                     (not (endp (cddar s)))
                                     (endp (cdr s))
                                     (not (endp (cddr s))))
-			      (special-form-p (caar s)))))
+			      (special-operator-p (caar s)))))
                   (push (cons (cons (caar s)
                                     (if (eq (caar s) 'quote)
                                         (list (add-object (cadar s)))

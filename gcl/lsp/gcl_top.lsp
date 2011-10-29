@@ -25,24 +25,14 @@
 ;;;;  Revised on July 11, by Carl Hoffman.
 
 
-(in-package "LISP")
-;(export 'lisp)
-(export '(+ ++ +++ - * ** *** / // ///))
-;(export '(break warn))
-(export '*break-on-warnings*)
-(export '*break-enable*)
+(in-package :system)
 
-(in-package 'system)
+(export '(loc *debug-print-level* *break-readtable* *break-enable* vs ihs-vs ihs-fun frs-vs frs-bds frs-ihs bds-var bds-val super-go))
 
-(export '*break-readtable*)
-(export '(loc *debug-print-level*))
-
-(export '(vs ihs-vs ihs-fun frs-vs frs-bds frs-ihs bds-var bds-val super-go))
-
-(eval-when (compile) ;(proclaim '(optimize (safety 2) (space 3))
-		;	       )
-	   (defvar *command-args* nil)
-	   )
+;FIXME ?
+(eval-when 
+ (compile)
+ (defvar *command-args* nil))
 
 (defvar +)
 (defvar ++)
@@ -569,7 +559,7 @@
                      (lambda-block-closure (cddddr fun))
                      (t (cond
 			 ((and (symbolp (car fun))
-			       (or (special-form-p(car fun))
+			       (or (special-operator-p (car fun))
 				   (fboundp (car fun))))
 			  (car fun))
 			 (t '(:zombi))))))
@@ -630,7 +620,7 @@
              (lambda-block-closure (cadr (cdddr fun)))
              (lambda-closure 'lambda-closure)
              (t (if (and (symbolp (car fun))
-			 (or (special-form-p (car fun))
+			 (or (special-operator-p (car fun))
 			     (fboundp (car fun))))
 		    (car fun) :zombi)
 		    )))

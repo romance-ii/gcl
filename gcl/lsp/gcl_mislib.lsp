@@ -21,16 +21,18 @@
 ;;;; This file is IMPLEMENTATION-DEPENDENT.
 
 
-(in-package 'lisp)
+;(in-package 'lisp)
 
 
-(export 'time)
-(export '(reset-sys-paths decode-universal-time
-	  encode-universal-time compile-file-pathname complement constantly))
+;(export 'time)
+;(export '(reset-sys-paths
+;	  decode-universal-time
+;	  encode-universal-time compile-file-pathname complement constantly))
 
 
-(in-package 'system)
+(in-package :system)
 
+(export '(funcallable-symbol-function));FIXME fsf
 
 (defmacro time (form)
   (declare (optimize (safety 2)))

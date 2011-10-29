@@ -23,13 +23,56 @@
 ;;;;                    package routines
 
 
-(in-package 'lisp)
+;; (in-package 'lisp)
 
 
-(export '(find-all-symbols do-symbols do-external-symbols do-all-symbols with-package-iterator))
-(export '(apropos apropos-list))
+;; (export '(find-all-symbols do-symbols do-external-symbols do-all-symbols with-package-iterator))
+;; (export '(apropos apropos-list))
 
-(in-package 'system)
+(in-package :system)
+
+;;
+;; This slightly slower version uses less invocation history stack space
+;;
+;; (defmacro with-package-iterator ((name packlist key &rest keys) &rest body
+;; 				 &aux (*gensym-counter* 0)
+;; 				 (pl (sgen "WPI-PL")) (ql (sgen "WPI-QL"))
+;; 				 (ilim (sgen "WPI-ILIM")) (elim (sgen "WPI-ELIM"))
+;; 				 (p (sgen "WPI-P")) (q (sgen "WPI-Q")) (l (sgen "WPI-L"))
+;; 				 (a (sgen "WPI-A")) (x (sgen "WPI-X")) (y (sgen "WPI-Y")))
+;;   (declare (optimize (safety 2)))
+;;   (let (int ext inh)
+;;     (dolist (key (cons key keys))
+;;       (ecase key
+;; 	     (:internal  (setq int t))
+;; 	     (:external  (setq ext t))
+;; 	     (:inherited (setq inh t))))
+;;     `(let* ((,pl ,packlist) ,p ,q ,ql (,x 0) (,y 0) (,ilim 0) (,elim 0) ,l ,a)
+;;        (declare ((integer 0 1048573) ,x ,y ,ilim ,elim) (ignorable ,x ,y ,ilim ,elim))
+;;        (labels 
+;; 	((match (s l) (member-if (lambda (x) (declare (symbol x)) (string= s x)) l))
+;; 	 (iematch (s p h) (or (match s (package-internal p (mod h (package-internal_size p))))
+;; 			      (match s (package-external p (mod h (package-external_size p))))))
+;; 	 (next-var nil 
+;; 		   (tagbody 
+;; 		    :top
+;; 		    (cond ,@(when (or int ext) `(((when (eq ,q ,p) ,l) (return-from next-var (prog1 ,l (pop ,l))))))
+;; 			  ,@(when inh `(((unless (eq ,q ,p) ,l) 
+;; 					 (let* ((v (prog1 ,l (pop ,l))) (s (symbol-name (car v))) (h (pack-hash s)))
+;; 					   (when (iematch s ,p h) (go :top))
+;; 					   (return-from next-var (progn (setq ,a :inherited) v))))))
+;; 			  ,@(when int `(((and (eq ,q ,p) (< ,x ,ilim)) (setq ,l (package-internal ,q ,x) ,a :internal ,x (1+ ,x)) (go :top))))
+;; 			  ,@(when (or ext inh) `(((< ,y ,elim) (setq ,l (package-external ,q ,y) ,a :external ,y (1+ ,y)) (go :top))))
+;; 			  (,ql 
+;; 			   (setq ,x 0 ,y 0 ,q (if (listp ,ql) (pop ,ql) (prog1 ,ql (setq ,ql nil))))
+;; 			   (multiple-value-setq (,elim ,ilim) (package-size ,q))
+;; 			   (go :top))
+;; 			  (,pl 
+;; 			   (setq ,p (coerce-to-package (if (listp ,pl) (pop ,pl) (prog1 ,pl (setq ,pl nil))))
+;; 				 ,ql ,(if inh `(cons ,p (package-use-list ,p)) p))
+;; 			   (go :top)))))
+;; 	 (,name nil (let ((f (next-var))) (values f (car f) ,a ,p))))
+;; 	,@body))))
 
 (defmacro with-package-iterator ((name packlist key &rest keys) &rest body
 				 &aux (*gensym-counter* 0)
@@ -67,6 +110,45 @@
 			  (next-var))))
 	 (,name nil (let ((f (next-var))) (values f (car f) ,a ,p))))
 	,@body))))
+
+;; (defmacro with-package-iterator ((name packlist key &rest keys) &rest body
+;; 				 &aux (*gensym-counter* 0)
+;; 				 (pl (sgen "WPI-PL")) (ql (sgen "WPI-QL"))
+;; 				 (ilim (sgen "WPI-ILIM")) (elim (sgen "WPI-ELIM"))
+;; 				 (p (sgen "WPI-P")) (q (sgen "WPI-Q")) (l (sgen "WPI-L"))
+;; 				 (a (sgen "WPI-A")) (x (sgen "WPI-X")) (y (sgen "WPI-Y")))
+;;   (declare (optimize (safety 2)))
+;;   (let (int ext inh)
+;;     (dolist (key (cons key keys))
+;;       (ecase key
+;; 	     (:internal  (setq int t))
+;; 	     (:external  (setq ext t))
+;; 	     (:inherited (setq inh t))))
+;;     `(let* ((,pl ,packlist) ,p ,q ,ql (,x 0) (,y 0) (,ilim 0) (,elim 0) ,l ,a)
+;;        (declare ((integer 0 1048573) ,x ,y ,ilim ,elim) (ignorable ,x ,y ,ilim ,elim))
+;;        (labels 
+;; 	((match (s l) (member-if (lambda (x) (declare (symbol x)) (string= s x)) l))
+;; 	 (inh-match (&aux (v (prog1 ,l (pop ,l))) (s (symbol-name (car v))) (h (pack-hash s)))
+;; 		    (cond ((match s (package-internal ,p (mod h (package-internal_size ,p)))) (next-var))
+;; 			  ((match s (package-external ,p (mod h (package-external_size ,p)))) (next-var))
+;; 			  ((setq ,a :inherited) v)))
+;; 	 (next-var nil 
+;; 		   (tagbody
+;; 		    :top
+;; 		    (cond ,@(when (or int ext) `(((when (eq ,q ,p) ,l) (return-from next-var (prog1 ,l (pop ,l))))))
+;; 			  ,@(when inh `(((unless (eq ,q ,p) ,l) (return-from next-var (inh-match)))))
+;; 			  ,@(when int `(((and (eq ,q ,p) (< ,x ,ilim)) (setq ,l (package-internal ,q ,x) ,a :internal ,x (1+ ,x)) (go :top))))
+;; 			  ,@(when (or ext inh) `(((< ,y ,elim) (setq ,l (package-external ,q ,y) ,a :external ,y (1+ ,y)) (go :top))))
+;; 			  (,ql 
+;; 			   (setq ,x 0 ,y 0 ,q (if (listp ,ql) (pop ,ql) (prog1 ,ql (setq ,ql nil))))
+;; 			   (multiple-value-setq (,elim ,ilim) (package-size ,q))
+;; 			   (go :top))
+;; 			  (,pl 
+;; 			   (setq ,p (coerce-to-package (if (listp ,pl) (pop ,pl) (prog1 ,pl (setq ,pl nil))))
+;; 				 ,ql ,(if inh `(cons ,p (package-use-list ,p)) p))
+;; 			   (go :top)))))
+;; 	 (,name nil (let ((f (next-var))) (values f (car f) ,a ,p))))
+;; 	,@body))))
 
 
 
@@ -119,7 +201,7 @@
 (defun print-symbol-apropos (symbol)
   (prin1 symbol)
   (when (fboundp symbol)
-        (if (special-form-p symbol)
+        (if (special-operator-p symbol)
             (princ "  Special form")
             (if (macro-function symbol)
                 (princ "  Macro")

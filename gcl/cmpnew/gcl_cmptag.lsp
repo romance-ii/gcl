@@ -20,7 +20,7 @@
 ;; Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-(in-package 'compiler)
+(in-package :compiler)
 
 
 (si:putprop 'tagbody 'c1tagbody 'c1special)
@@ -481,7 +481,7 @@
                        (*value-to-go* 'trash))
                   (c2expr (car l))
                   (wt-label *exit*))
-                (unless (eq (caar l) 'go) (unwind-exit nil)))))
+                (unless (type>= #tnil (info-type (cadar l))) (unwind-exit nil)))));(eq (caar l) 'go)
     (cond (written (setq written nil))
           ((typep (car l) 'tag)
 	   (wt-switch-case (tag-switch (car l)))
@@ -864,7 +864,7 @@
      (go t)
      ,@ body
      ,@ (if (member t body) nil '(t))
-     switch-finish-label ))
+     switch-finish-label))
 
 (defmacro switch-finish nil '(go switch-finish-label))
 

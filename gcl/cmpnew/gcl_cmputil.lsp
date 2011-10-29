@@ -20,7 +20,7 @@
 ;; Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-(in-package 'compiler)
+(in-package :compiler)
 
 (export '(*suppress-compiler-warnings*
           *suppress-compiler-notes*
@@ -280,7 +280,7 @@
                  si::*break-hidden-packages*)))
          (si:error-set form)))
 
-(dolist (v '(si::cdefn lfun inline-safe inline-unsafe
+(dolist (v '(si::cdefn inline-safe inline-unsafe
 		       inline-always c1conditional c2 c1 c1+ co1
 		       si::structure-access co1special
 		       top-level-macro t3 t2 t1 package-operation))

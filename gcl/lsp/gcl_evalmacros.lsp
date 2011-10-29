@@ -21,15 +21,18 @@
 ;;;;	evalmacros.lsp
 
 
-(in-package "LISP")
+;; (in-package "LISP")
 
-(export '(defvar defparameter defconstant memq define-symbol-macro import delete-package))
+;; (export '(defvar defparameter defconstant define-symbol-macro import delete-package))
 
-(in-package "SYSTEM")
+(in-package :SYSTEM)
 
+(export '(lit))
 
 (eval-when (eval compile) (setq si:*inhibit-macro-special* nil))
 
+(defun lit (&rest r)
+  (error "lit called with args ~s~%" r))
 
 (defmacro sgen (&optional (pref "G"))
   `(load-time-value (gensym ,pref)))
@@ -247,13 +250,10 @@
   (declare (optimize (safety 2)))
   `(multiple-value-call 'list ,form))
 
-(defun multiple-value-setq-expander (vars form)
-  (let ((syms (mapcar (lambda (x) (declare (ignore x)) (gensym)) (or vars (list nil)))))
-    `(multiple-value-bind ,syms ,form (setq ,@(mapcan 'list vars syms)) ,(car syms))))
-
 (defmacro multiple-value-setq (vars form)
   (declare (optimize (safety 2)))
-  (multiple-value-setq-expander vars form))
+  (let ((syms (mapcar (lambda (x) (declare (ignore x)) (gensym)) (or vars (list nil)))))
+    `(multiple-value-bind ,syms ,form (setq ,@(mapcan 'list vars syms)) ,(car syms))))
 ;;   (do ((vl vars (cdr vl))
 ;;        (sym (sgen))
 ;;        (forms nil))

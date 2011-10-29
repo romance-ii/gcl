@@ -111,6 +111,7 @@ work during bootstrapping.
 
 )
 
+(setf (symbol-function 'real-documentation) (symbol-function 'documentation))
 
 ;;;
 ;;; *generic-function-fixups* is used by fix-early-generic-functions to
@@ -122,6 +123,10 @@ work during bootstrapping.
 	((generic-function method)		        ;lambda-list
 	 (standard-generic-function method)	        ;specializers
 	 real-add-method))			        ;method-function
+      (documentation
+       ((slotd &optional doc-type)
+	(t t)
+	real-documentation))
       (remove-method
 	((generic-function method)
 	 (standard-generic-function method)
@@ -2125,7 +2130,7 @@ work during bootstrapping.
 			(if (and y (eq (cadr y) (variable-lexical-p nf env))) (walker::macroexpand-all (caddr y) env) nf))))
 	     (if (eq nf (cadr form)) form
 	       `(,(car form) ,nf ,@(cddr form)))))
-	  ((and (not (eq (car form) 'symbol-macrolet)) (eq 'lisp::macro (cadar (assoc (car form) env :key 'car))))
+	  ((and (not (eq (car form) 'symbol-macrolet)) (eq 'si::macro (cadar (assoc (car form) env :key 'car))))
 	   (let ((kind (car form)))
 	     (labels ((scan-setf (tail)
 				 (when tail

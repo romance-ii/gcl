@@ -42,8 +42,8 @@
 
  (in-package "USER")
 
- (or lisp::*link-array*
-     (setq lisp::*link-array*
+ (or si::*link-array*
+     (setq si::*link-array*
 	   (make-array (ash 1 11)  :element-type 'character :fill-pointer 0)))
  (si::use-fast-links t)
 

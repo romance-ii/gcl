@@ -20,7 +20,7 @@
 ;; Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-(in-package 'compiler)
+(in-package :compiler)
 
 (si:putprop 'bds-bind 'set-bds-bind 'set-loc)
 
@@ -43,15 +43,9 @@
          (wt ");")
          (push 'bds-bind *unwind-exit*))
         (t
-	 (cond ((eq (var-kind var) #tinteger)
-		(wt-nl "SETQ_IO(V" (var-loc var)","
-		       "V" (var-loc var)"alloc,")
-		(wt "(") (wt-vs (var-ref var)) (wt "),")
-		(wt (bignum-expansion-storage) ");"))
-	       (t 
-		(wt-nl "V" (var-loc var) "=")
-		(wt (or (cdr (assoc (var-kind var) +to-c-var-alist+)) (baboon)))
-		(wt "(") (wt-vs (var-ref var)) (wt ");"))))))
+	 (wt-nl "V" (var-loc var) "=")
+	 (wt (or (cdr (assoc (var-kind var) +to-c-var-alist+)) (baboon)))
+	 (wt "(") (wt-vs (var-ref var)) (wt ");"))))
 
 (defun c2bind-loc (var loc)
   (case (var-kind var)
@@ -67,19 +61,11 @@
          (wt-nl "bds_bind(" (vv-str (var-loc var)) "," loc ");")
          (push 'bds-bind *unwind-exit*))
         (t
-	 (cond ((eq (var-kind var) #tinteger)
-		(let ((*inline-blocks* 0) (*restore-avma* *restore-avma*))
-		  (save-avma '(nil integer))
-		  (wt-nl "V" (var-loc var) "= ")
-		  (wt-integer-loc loc)
-		  (wt ";")
-		  (close-inline-blocks)))
-	       (t
-		(wt-nl "V" (var-loc var) "= ")
-		(let ((wtf (cdr (assoc (var-kind var) +wt-loc-alist+))))
-		  (unless wtf (baboon))
-		  (funcall wtf loc))
-		(wt ";"))))))
+	 (wt-nl "V" (var-loc var) "= ")
+	 (let ((wtf (cdr (assoc (var-kind var) +wt-loc-alist+))))
+	   (unless wtf (baboon))
+	   (funcall wtf loc))
+	 (wt ";"))))
 
 (defun c2bind-init (var init)
   (case (var-kind var)
@@ -90,26 +76,16 @@
 		  (c2expr* init))
                 (clink (var-ref var))
                 (setf (var-ref-ccb var) (ccb-vs-push)))
-               (t
-                (let ((*value-to-go* (list 'vs (var-ref var))))
+               ((let ((*value-to-go* (list 'vs (var-ref var))))
                      (c2expr* init)))))
         (SPECIAL
          (let ((*value-to-go* (list 'bds-bind (var-loc var))))
-              (c2expr* init))
+	   (c2expr* init))
          (push 'bds-bind *unwind-exit*))
-	(t 
-	 (unless (assoc (var-kind var) +wt-loc-alist+)
-	   (baboon))
-	 (cond ((eq (car init) 'inline)
-		(let* ((type (var-kind var))
-		       (nv (make-var :type type :loc (cs-push type t)
-				     :kind (or (car (member (promoted-c-type type) +c-local-var-types+)) 'object))))
-		  (wt-nl "{" (rep-type type) "V" (var-loc nv) ";")
-		  (let ((*value-to-go* (list 'var nv nil)))
-		    (c2expr* init))
-		  (wt-nl "V" (var-loc var) "=V" (var-loc nv) ";}")))
-	       ((let ((*value-to-go* (list 'var var nil)))
-		  (c2expr* init)))))))
+	(t
+	 (let ((*value-to-go* (list 'var var nil)))
+	   (unless (assoc (var-kind var) +wt-loc-alist+) (baboon));FIXME???
+	   (c2expr* init)))))
 
 
 (defun set-bds-bind (loc vv)

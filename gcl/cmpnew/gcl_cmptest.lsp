@@ -20,7 +20,7 @@
 ;; Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-(in-package 'compiler)
+(in-package :compiler)
 
 (defun self-compile ()
  (with-open-file (log "lsplog" :direction :output)
@@ -235,7 +235,7 @@
 (defun make-cmpopt (&aux (eof (cons nil nil)))
   (with-open-file (in "cmpopt.db")
     (with-open-file (out "cmpopt.lsp" :direction :output)
-      (print '(in-package 'compiler) out)
+      (print '(in-package :compiler) out)
       (terpri out) (terpri out)
       (do ((x (read in nil eof) (read in nil eof)))
           ((eq x eof))

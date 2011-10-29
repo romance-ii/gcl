@@ -400,8 +400,7 @@ DEFUNO_NEW("INTERPRETED-FUNCTION-P",object,fSinterpreted_function_p,SI
 		x0 = Cnil;
 RETURN1(x0);}
 
-DEFUNO_NEW("COMMONP",object,fLcommonp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Lcommonp,(object x0),"")
+DEFUN_NEW("COMMONP",object,fScommonp,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"")
 
 {
 	/* 1 args */;
