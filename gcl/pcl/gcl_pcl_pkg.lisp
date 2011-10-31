@@ -72,6 +72,11 @@
 
 (in-package :pcl)
 
+(defvar *the-pcl-package* (find-package :pcl))
+(defun load-truename (&optional errorp)
+  (declare (ignore errorp))
+  *load-pathname*)
+
 ;;;
 ;;; Some CommonLisps have more symbols in the Lisp package than the ones that
 ;;; are explicitly specified in CLtL.  This causes trouble. Any Lisp that has

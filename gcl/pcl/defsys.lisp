@@ -84,7 +84,7 @@
 ;;; about order of export and all that stuff, we can't put it in PKG before
 ;;; we want to use it.
 ;;; 
-(defvar *the-pcl-package* (find-package :pcl))
+#-gcl(defvar *the-pcl-package* (find-package :pcl))
 
 (defvar *pcl-system-date* "September 16 92 PCL (g)")
 
@@ -670,7 +670,7 @@ and load your system with:
 ;;;
 ;;; ***                                                                   ***
 
-(defun load-truename (&optional (errorp nil))
+#-gcl(defun load-truename (&optional (errorp nil))
   #+cmu (declare (ignore errorp))
   (flet (#+(or Lispm Xerox LUCID)
 	 (bad-time ()

@@ -910,7 +910,7 @@
 (defmacro can-allocate-on-stack ()
   `(and (consp *value-to-go*)
 	(eq (car *value-to-go*) 'var)
-	(/= (var-dynamic (second *value-to-go*)) 0)))
+	(var-dynamic (second *value-to-go*))))
 
 (defun wt-stack-list* (x l &optional n (st "Cnil") (lst "Cnil"))
   (let ((z (or n (length x))))

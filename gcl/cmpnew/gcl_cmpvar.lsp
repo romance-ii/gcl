@@ -63,7 +63,7 @@
   (mt t)	;;; Maximum type of the life of this binding
   tag           ;;; Inner tag (to binding) being analyzed if any
   (register 0 :type unsigned-char)  ;;; If greater than specified am't this goes into register.
-  (dynamic  0 :type unsigned-char)  ;;; If variable is declared dynamic-extent
+  (flags    0 :type unsigned-char)  ;;; If variable is declared dynamic-extent
   (space    0 :type char)           ;;; If variable is declared as an object array of this size
   (known-init -1 :type char)        ;;; Number of above known to be implicitly initialized
   store         ;;; keep kind in hashed c1forms
@@ -71,6 +71,15 @@
   )
 
 (si::freeze-defstruct 'var)
+
+(defun var-dynamic (v)
+  (/= 0 (logand 1 (var-flags v))))
+(defun var-reffed (v)
+  (/= 0 (logand 2 (var-flags v))))
+(defun set-var-dynamic (v)
+  (setf (var-flags v) (logior 1 (var-flags v))))
+(defun set-var-reffed (v)
+  (setf (var-flags v) (logior 2 (var-flags v))))
 
 
 ;;; A special binding creates a var object with the kind field SPECIAL,
@@ -112,7 +121,7 @@
 	(case (cdr v)
 	      (object (setf (var-loc var) 'object))
 	      (register (setf (var-register var) (+ (var-register var) 100)))
-	      (dynamic-extent #+dynamic-extent (setf (var-dynamic var) 1))
+	      (dynamic-extent #+dynamic-extent (set-var-dynamic var))
 	      (t (unless (and (not (get (var-name var) 'tmp));FIXME
 			      *compiler-new-safety*) 
 		   (setf (var-type var) (nil-to-t (type-and (var-type var) (cdr v)))))))))
@@ -140,8 +149,8 @@
 (defun check-vref (var)
   (unless *in-inline*
     (when (and (eq (var-kind var) 'LEXICAL)
-	       (not (var-ref var)) ;;; This field may be IGNORE.
-	       (not (var-ref-ccb var)))
+	       (not (var-reffed var))
+	       (not (var-ref var)));;; This field may be IGNORE or IGNORABLE here.
       (cmpwarn "The variable ~s is not used." (var-name var)))))
 
 (defun var-cb (v)
@@ -282,6 +291,7 @@
       (cond ((eq var 'cb) (setq ccb t))
             ((eq var 'lb) (setq clb t))
             ((eq (var-name var) name)
+	     (set-var-reffed var)
 	     (keyed-cmpnote (list 'var-ref (var-name var))
 			    "Making variable ~s reference with barrier ~s" (var-name var) (if ccb 'cb (if clb 'lb)))
              (return-from c1vref (list var ccb clb))))))

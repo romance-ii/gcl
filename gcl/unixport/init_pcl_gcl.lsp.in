@@ -10,11 +10,6 @@
 
 @LI-PCL-PACKAGE@
 
-(in-package :pcl)
-(defvar *the-pcl-package* (find-package :pcl))
-(defun load-truename (&optional (errorp nil))
-  (flet () *load-pathname* nil))
-
 @LI-CLCS-PACKAGE@
 
 (in-package "SYSTEM")
