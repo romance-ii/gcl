@@ -64,16 +64,16 @@
 ;; 	((side-effects-p f) nil)
 ;; 	(t)))
 
-(defun have-provfn (form);FIXME provisional flag
-  (cond ((atom form) (eq form 'provfn))
-	((or (have-provfn (car form)) (have-provfn (cdr form))))))
+;; (defun have-provfn (form);FIXME provisional flag
+;;   (cond ((atom form) (eq form 'provfn))
+;; 	((or (have-provfn (car form)) (have-provfn (cdr form))))))
 
-(defun provisional-block-trim (n bp fs star)
-  (declare (ignorable n))
-  (when *provisional-inline*
-    (or bp
-	(when star
-	  (have-provfn (cdr fs))))))
+;; (defun provisional-block-trim (n bp fs star)
+;;   (declare (ignorable n))
+;;   (when *provisional-inline*
+;;     (or bp
+;; 	(when star
+;; 	  (have-provfn (cdr fs))))))
 
 (defun trim-vars (vars forms body &optional star)
 

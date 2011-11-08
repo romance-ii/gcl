@@ -156,9 +156,11 @@
 (defun data-symbol (x)
 ;  (or (setf-function-base-symbol x)
   (when (and *compiler-compile* (symbolp x))
-    (unless (symbol-package x)
+    (unless (let ((p (symbol-package x))) (and p (package-name p)));FIXME delete-package leaves nil package name hpack
       (setq *tmp-pack* (or *tmp-pack* (make-package (symbol-name (tmpsym)))))
-      (unless (find-symbol (symbol-name x) *tmp-pack*) (import x *tmp-pack*))
+      (let ((s (find-symbol (symbol-name x) *tmp-pack*)))
+	(when s (unintern s *tmp-pack*)))
+      (import x *tmp-pack*)
       x)))
 
 (defun push-data-incf (x)

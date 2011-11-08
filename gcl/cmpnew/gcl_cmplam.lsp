@@ -80,7 +80,7 @@
 	       (decls-from-procls (cdr ll) (cdr procls) body)))))
 	 
 (defun c1lambda-expr (args &aux (regs (pop args)) requireds tv
-			   doc body ss is ts other-decls
+			   doc body ss is ts other-decls (ovars *vars*)
 			   (*vars* *vars*) narg (info (make-info)) ctps)
 
 
@@ -101,11 +101,39 @@
   (dolist (v requireds)
     (when (var-p v)
       (setf (var-type v) (var-mt v))));FIXME?
-  (add-info info (cadr body))
+  (let ((*vars* ovars)) (add-info info (cadr body)))
   (dolist (l tv) 
     (setf (var-type l) (type-and (var-type l) (nil-to-t (cdr (assoc (var-name l) ctps))))));FIXME?
   
   `(lambda ,info ,(list (nreverse requireds) narg) ,doc ,body))
+
+;; (defun c1lambda-expr (args &aux (regs (pop args)) requireds tv
+;; 			   doc body ss is ts other-decls
+;; 			   (*vars* *vars*) narg (info (make-info)) ctps)
+
+
+;;   (multiple-value-setq (body ss ts is other-decls doc ctps) (c1body args t));FIXME parse-body-header
+  
+;;   (mapc (lambda (x &aux (y (c1make-var x ss is ts))) (push y *vars*) (push y requireds)) regs)
+;;   (when (member +nargs+ ts :key 'car)
+;;     (setq narg (list (c1make-var +nargs+ ss is ts))))
+;;   (setq tv (append narg requireds))
+
+;;   (c1add-globals ss)
+;;   (check-vdecl (mapcar 'var-name tv) ts is)
+  
+;;   (setq body (c1decl-body other-decls body))
+;;   (ref-vars body requireds)
+;;   (dolist (var requireds) (check-vref var))
+  
+;;   (dolist (v requireds)
+;;     (when (var-p v)
+;;       (setf (var-type v) (var-mt v))));FIXME?
+;;   (add-info info (cadr body))
+;;   (dolist (l tv) 
+;;     (setf (var-type l) (type-and (var-type l) (nil-to-t (cdr (assoc (var-name l) ctps))))));FIXME?
+  
+;;   `(lambda ,info ,(list (nreverse requireds) narg) ,doc ,body))
 
 ;; (defun c1lambda-expr (lambda-expr
 ;;                       &optional (block-name nil block-it)

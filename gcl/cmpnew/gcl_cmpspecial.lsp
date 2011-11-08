@@ -240,7 +240,7 @@
   (let* ((f (mc)))
 ;    (when (consp id) (setf (caddr (si::call f)) (compress-fle id nil nil)))
     (afe (cons 'id id) f)
-    (afe (cons 'df (current-env)) f)
+;    (afe (cons 'df (current-env)) f)
     f))
 
 ;; (defun fn-get (fn prop)

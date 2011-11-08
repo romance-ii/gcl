@@ -1054,6 +1054,12 @@
   (let ((a (member '&aux ll)))
     (ldiff ll a)))
 
+(defun suppress-unfinalized-local-fun-warnings (name b l)
+  (let ((fun (local-fun-p name)))
+    (when fun
+      (member-if (lambda (x) (when (fun-p x) (unless (eq x fun) (not (consp (if (eq b 'cb) (fun-c1cb x) (fun-c1 x)))))))
+		 (append (info-ref (cadr l)) (info-ref-ccb (cadr l)))))))
+
 (defun do-l1-fun (name src e &aux *callees* *recursion-detected* *warning-note-stack*)
 
   (let* ((l (c1lambda-expr src))
@@ -1061,9 +1067,20 @@
 	 (sig (lam-e-to-sig l))
 	 (sig (if *recursion-detected* (list (car sig) (bbump-tp (cadr sig))) sig)))
     (setf (car e) sig (cadr e) *callees*)
-    (cond ((and *recursion-detected* (not (eq (cadr osig) (cadr sig))))
-	   (do-l1-fun name src e))
-	  (t (output-warning-note-stack) l))))
+    (if (and *recursion-detected* (not (eq (cadr osig) (cadr sig))))
+	(do-l1-fun name src e)
+      l)))
+
+;; (defun do-l1-fun (name src e &aux *callees* *recursion-detected* *warning-note-stack*)
+
+;;   (let* ((l (c1lambda-expr src))
+;; 	 (osig (car e))
+;; 	 (sig (lam-e-to-sig l))
+;; 	 (sig (if *recursion-detected* (list (car sig) (bbump-tp (cadr sig))) sig)))
+;;     (setf (car e) sig (cadr e) *callees*)
+;;     (cond ((and *recursion-detected* (not (eq (cadr osig) (cadr sig))))
+;; 	   (do-l1-fun name src e))
+;; 	  (t (output-warning-note-stack) l))))
 
 ;; (defun do-l1-fun (name src e &aux *callees* *recursion-detected* *warning-note-stack*)
 
@@ -1097,7 +1114,6 @@
 	 (tag (tmpsym))
 	 (*prev-sri* (append *src-inline-recursion* *prev-sri*))
 	 (*src-inline-recursion* (when vis (list (list (list (sir-name name)) tag (ttl-ll (cadr src))))))
-	 *provisional-inline*
 	 (*c1exit* (list name))
 	 (*current-form* `(defun ,name))
 	 (l (do-l1-fun name (cdr (new-defun-args src tag)) e))
@@ -1106,7 +1122,28 @@
 	  (third e) (list src clv name)
 	  (fourth e) (unless *compiler-compile* (namestring (truename (pathname *compiler-input*))))
 	  (fifth e) (if (= (length clv) 0) 1 0))
+    (if (suppress-unfinalized-local-fun-warnings name b l)
+      (output-warning-note-stack))
     l))
+
+;; (defun do-fun (name src e vis b)
+;;   (let* ((*vars*   (when b (cons b *vars*)))
+;; 	 (*funs*   (when b (cons b *funs*)))
+;; 	 (*blocks* (when b (cons b *blocks*)))
+;; 	 (*tags*   (when b (cons b *tags*)))
+;; 	 (tag (tmpsym))
+;; 	 (*prev-sri* (append *src-inline-recursion* *prev-sri*))
+;; 	 (*src-inline-recursion* (when vis (list (list (list (sir-name name)) tag (ttl-ll (cadr src))))))
+;; 	 *provisional-inline*
+;; 	 (*c1exit* (list name))
+;; 	 (*current-form* `(defun ,name))
+;; 	 (l (do-l1-fun name (cdr (new-defun-args src tag)) e))
+;; 	 (clv (get-clv l)))
+;;     (setf (car e) (export-sig (car e))
+;; 	  (third e) (list src clv name)
+;; 	  (fourth e) (unless *compiler-compile* (namestring (truename (pathname *compiler-input*))))
+;; 	  (fifth e) (if (= (length clv) 0) 1 0))
+;;     l))
 
 ;; (defun do-fun (name src e vis b)
 ;;   (let* ((*vars*   (when b (cons b *vars*)))

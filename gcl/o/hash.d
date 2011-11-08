@@ -152,7 +152,7 @@ ihash_equal1(object x,int depth) {
   enum type tx;
   unsigned long h = 0;
   long i;
-  char *s;
+  char *s,*se;
   
   cs_check(x);
 
@@ -169,9 +169,12 @@ BEGIN:
       {
 	long len=x->st.st_fillp;
 	s=x->st.st_self;
-	len=len>sizeof(len) ? sizeof(len) : len;
-	for (s+=len-1;len--;s--)
-	  h+= *s << CHAR_SIZE*len;
+	se=s+len;
+	for (len=sizeof(len);len-- && s!=se;)
+	  h+=(len&1 ? *s++ : *--se)<< CHAR_SIZE*len;
+	/* len=len>sizeof(len) ? sizeof(len) : len; */
+	/* for (s+=len-1;len--;s--) */
+	/*   h+= *s << CHAR_SIZE*len; */
       }
       break;
 

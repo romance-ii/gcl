@@ -377,8 +377,8 @@
   (cond ((eq fname 'funcall));FIXME
 	((eq fname 'apply));FIXME
 	((not (or *compiler-push-events*
-	   (member fname *notinline*)
-	   (get fname 'cmp-notinline))))))
+		  (member fname *notinline*)
+		  (get fname 'cmp-notinline))))))
 
 ;; (defun inline-possible (fname)
 ;;   (not (or *compiler-push-events*

@@ -223,7 +223,7 @@
       (push (list fun (cdr def)) defs1)))
   
   (let ((*funs* (if labels *funs* ofuns)))
-    (mapc (lambda (x &aux (x (car x))) (setf (fun-fn x) (mf (fun-name x)))) defs1))
+    (mapc (lambda (x &aux (x (car x))) (setf (fun-fn x) (afe (cons 'df (current-env)) (mf (fun-name x))))) defs1))
 
   (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
   
@@ -493,31 +493,63 @@
 ;;      (unless (,c1 ,f) (setf (,c1 ,f) t (,c1 ,f) (make-fun-c1 ,f ',b ,env)))
 ;;      (when (listp (,c1 ,f)) (,c1 ,f))))
 
-(defun make-fun-c1 (fun ccb env &optional osig &aux (c1 (if ccb (fun-c1cb fun) (fun-c1 fun))))
+(defvar *force-fun-c1* nil)
+(defun make-fun-c1 (fun ccb env &optional osig &aux (c1 (if ccb (fun-c1cb fun) (fun-c1 fun))) tmp)
 
   (labels ((set                 (fun val)          (if ccb (setf (fun-c1cb fun) val) (setf (fun-c1 fun) val)))
-	   (ifunp               (key pred l)       (member-if (lambda (x) (when (fun-p x) (funcall pred x (funcall key x)))) l))
+	   (ifunp               (key pred l)       (car (member-if (lambda (x) (when (fun-p x) (funcall pred x (funcall key x)))) l)))
 	   (ifunm               (pred i)           (or  (ifunp 'fun-c1 pred (info-ref i)) (ifunp 'fun-c1cb pred (info-ref-ccb i))))
 	   (calls-blocked-fun-p (fun i)            (ifunm (lambda (x y) (unless (eq x fun) (eq y t))) i))
-	   (recursive-p         (fun i)            (ifunm (lambda (x y) (or (not y) (eq x fun))) i)))
+	   (unfinished-p        (fun i)            (ifunm (lambda (x y) (not y)) i))
+	   (recursive-p         (fun i)            (ifunm (lambda (x y) (if y (eq x fun) t)) i)))
 
 	  (cond ((eq c1 t) 
 		 (keyed-cmpnote (list (fun-name fun) 'recursion) "recursive call to local fun ~s" (fun-name fun))
 		 nil)
 		((unless osig c1) c1)
-		((let* ((c1 (or c1 (set fun t)))
+		((let* ((c1 (or c1 (set fun t))) ws
 			(res (under-env env (c1function (list (fun-src fun)) (if ccb 'cb 'lb) fun)))
 			(i (cadr res))
 			(sig (car (fun-call fun))))
 		   (declare (ignore c1));FIXME
-		   (cond ((calls-blocked-fun-p fun i) 
-			  (keyed-cmpnote (list (fun-name fun) 'recursion) "local fun ~s calls unfinalized funs" (fun-name fun))
+		   (cond (*force-fun-c1* (set fun res))
+			 ((unless *force-fun-c1* (setq tmp (calls-blocked-fun-p fun i)))
+			  (keyed-cmpnote (list (fun-name fun) 'recursion) "local fun ~s calls unfinalized funs ~s" (fun-name fun) tmp)
 			  (set fun nil))
 			 ((when (recursive-p fun i) (not (eq (cadr osig) (cadr sig))));FIXME bump?
 			  (set fun res)
 			  (keyed-cmpnote (list (fun-name fun) 'recursion) "reprocessing recursive local fun ~s: ~s ~s" (fun-name fun) osig sig)
 			  (make-fun-c1 fun ccb env sig))
+			 ((unfinished-p fun i)
+			  (let ((*force-fun-c1* t))
+			    (make-fun-c1 fun ccb env sig)))
 			 ((set fun res))))))))
+
+;; (defun make-fun-c1 (fun ccb env &optional osig &aux (c1 (if ccb (fun-c1cb fun) (fun-c1 fun))))
+
+;;   (labels ((set                 (fun val)          (if ccb (setf (fun-c1cb fun) val) (setf (fun-c1 fun) val)))
+;; 	   (ifunp               (key pred l)       (member-if (lambda (x) (when (fun-p x) (funcall pred x (funcall key x)))) l))
+;; 	   (ifunm               (pred i)           (or  (ifunp 'fun-c1 pred (info-ref i)) (ifunp 'fun-c1cb pred (info-ref-ccb i))))
+;; 	   (calls-blocked-fun-p (fun i)            (ifunm (lambda (x y) (unless (eq x fun) (eq y t))) i))
+;; 	   (recursive-p         (fun i)            (ifunm (lambda (x y) (or (not y) (eq x fun))) i)))
+
+;; 	  (cond ((eq c1 t) 
+;; 		 (keyed-cmpnote (list (fun-name fun) 'recursion) "recursive call to local fun ~s" (fun-name fun))
+;; 		 nil)
+;; 		((unless osig c1) c1)
+;; 		((let* ((c1 (or c1 (set fun t)))
+;; 			(res (under-env env (c1function (list (fun-src fun)) (if ccb 'cb 'lb) fun)))
+;; 			(i (cadr res))
+;; 			(sig (car (fun-call fun))))
+;; 		   (declare (ignore c1));FIXME
+;; 		   (cond ((calls-blocked-fun-p fun i) 
+;; 			  (keyed-cmpnote (list (fun-name fun) 'recursion) "local fun ~s calls unfinalized funs" (fun-name fun))
+;; 			  (set fun nil))
+;; 			 ((when (recursive-p fun i) (not (eq (cadr osig) (cadr sig))));FIXME bump?
+;; 			  (set fun res)
+;; 			  (keyed-cmpnote (list (fun-name fun) 'recursion) "reprocessing recursive local fun ~s: ~s ~s" (fun-name fun) osig sig)
+;; 			  (make-fun-c1 fun ccb env sig))
+;; 			 ((set fun res))))))))
 
 ;; (defun make-fun-c1 (fun ccb env &optional osig &aux (c1 (if ccb (fun-c1cb fun) (fun-c1 fun))))
 
