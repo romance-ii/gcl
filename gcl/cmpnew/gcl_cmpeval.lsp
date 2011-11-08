@@ -1952,12 +1952,12 @@
 		      (characterp tem)))
 	     (setq found t) (setf (car v) tem)))))
 
-(defun remove-doc-string (body)
-  (nconc (do (d doc) ((or (not body) (if (stringp (car body)) 
-					 (or (endp (cdr body)) doc)
-				       (or (not (consp (car body))) (not (eq 'declare (caar body))))))
-		      (nreverse d))
-	     (let ((x (pop body))) (if (stringp x) (unless doc (push x doc)) (push x d)))) body))
+;; (defun remove-doc-string (body)
+;;   (nconc (do (d doc) ((or (not body) (if (stringp (car body)) 
+;; 					 (or (endp (cdr body)) doc)
+;; 				       (or (not (consp (car body))) (not (eq 'declare (caar body))))))
+;; 		      (nreverse d))
+;; 	     (let ((x (pop body))) (if (stringp x) (unless doc (push x doc)) (push x d)))) body))
 
 
 (defun blla (l a last body &optional n nr f
@@ -2048,7 +2048,7 @@
 	 (when post (post))
 	 (when keb (push `(declare (ignore ,ke)) decls))
 	 `(let* ,(nreverse r) 
-	    ,@(when doc (list doc))
+;	    ,@(when doc (list doc))
 	    ,@decls
 	    ,@ctps
 	    ,@body)))
