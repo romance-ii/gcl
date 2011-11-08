@@ -435,7 +435,7 @@
 ;Functions on symbols naming structures
 
 ; Excludes structures types created with the :type option
-(defun structure-type-p (symbol)
+#-gcl(defun structure-type-p (symbol)
   (not (null (gethash symbol *structure-table*))))
 
 (defun structure-type-included-type-name (symbol)
