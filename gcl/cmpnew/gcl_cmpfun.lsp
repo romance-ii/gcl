@@ -59,9 +59,9 @@
 ;(si:putprop 'nth '(c1nth-condition . c1nth) 'c1conditional)
 ;(si:putprop 'nthcdr '(c1nthcdr-condition . c1nthcdr) 'c1conditional)
 ;(si:putprop 'cmp-nthcdr '(c1nthcdr-condition . c1nthcdr) 'c1conditional)
-(si:putprop 'si:rplaca-nthcdr 'c1rplaca-nthcdr 'c1)
-(si:putprop 'si:list-nth 'c1list-nth 'c1)
-(si:putprop 'list-nth-immediate 'c2list-nth-immediate 'c2)
+;(si:putprop 'si:rplaca-nthcdr 'c1rplaca-nthcdr 'c1)
+;(si:putprop 'si:list-nth 'c1list-nth 'c1)
+;(si:putprop 'list-nth-immediate 'c2list-nth-immediate 'c2)
 
 (defvar *princ-string-limit* 80)
 
@@ -171,7 +171,7 @@
           case 3: if (_l==Cnil) {_n=-1;break;} _x2=_l->c.c_car;_l=_l->c.c_cdr;
           case 2: if (_l==Cnil) {_n=-1;break;} _x1=_l->c.c_car;_l=_l->c.c_cdr;
           case 1: if (_l==Cnil) {_n=-1;break;} _x0=_l->c.c_car;_l=_l->c.c_cdr;
-          case 0: VFUN_NARGS-=_n;
+          case 0: if (_n+_m==_f->fun.fun_maxarg && _l!=Cnil) _n=-1; else VFUN_NARGS-=_n;
           default: break;
         }
         switch (_n) {
@@ -820,20 +820,20 @@
                      (7 (list 'cdddr (cons 'cddddr (cdr args))))
                      )))
 
-(defun c1rplaca-nthcdr (args &aux (info (make-info)))
-  (when (or (endp args) (endp (cdr args)) (endp (cddr args)))
-        (too-few-args 'si:rplaca-nthcdr 3 (length args)))
-  (unless (endp (cdddr args))
-          (too-few-args 'si:rplaca-nthcdr 3 (length args)))
-  (if (and (numberp (cadr args)) (<= 0 (cadr args) 10))
-      (let  ((x (tmpsym))(y (tmpsym)))
-	(c1expr
-	 `(let ((,x ,(car args))
-		(,y ,(third args)))
-	    (setf ,x (nthcdr ,(cadr args) ,x))
-	    (setf (car ,x) ,y)
-	    ,y)))
-      (list 'call-global info 'si:rplaca-nthcdr (c1args args info))))
+;; (defun c1rplaca-nthcdr (args &aux (info (make-info)))
+;;   (when (or (endp args) (endp (cdr args)) (endp (cddr args)))
+;;         (too-few-args 'si:rplaca-nthcdr 3 (length args)))
+;;   (unless (endp (cdddr args))
+;;           (too-few-args 'si:rplaca-nthcdr 3 (length args)))
+;;   (if (and (numberp (cadr args)) (<= 0 (cadr args) 10))
+;;       (let  ((x (tmpsym))(y (tmpsym)))
+;; 	(c1expr
+;; 	 `(let ((,x ,(car args))
+;; 		(,y ,(third args)))
+;; 	    (setf ,x (nthcdr ,(cadr args) ,x))
+;; 	    (setf (car ,x) ,y)
+;; 	    ,y)))
+;;       (list 'call-global info 'si:rplaca-nthcdr (c1args args info))))
 
 
 ;; Facilities for faster reading and writing from file streams.
@@ -1079,34 +1079,34 @@
     (list 'call-global info 'append nargs)))
 (si::putprop 'append 'c1append 'c1)
       
-(defun c1list-nth (args &aux (info (make-info)))
-  (when (or (endp args) (endp (cdr args)))
-        (too-few-args 'si:rplaca-nthcdr 2 (length args)))
-  (unless (endp (cddr args))
-          (too-few-args 'si:rplaca-nthcdr 2 (length args)))
-  (if (and (numberp (car args)) (<= 0 (car args) 10))
-      (list 'list-nth-immediate info
-            (car args)
-            (c1args (list (cadr args)) info))
-      (list 'call-global info 'si:list-nth (c1args args info))))
+;; (defun c1list-nth (args &aux (info (make-info)))
+;;   (when (or (endp args) (endp (cdr args)))
+;;         (too-few-args 'si:rplaca-nthcdr 2 (length args)))
+;;   (unless (endp (cddr args))
+;;           (too-few-args 'si:rplaca-nthcdr 2 (length args)))
+;;   (if (and (numberp (car args)) (<= 0 (car args) 10))
+;;       (list 'list-nth-immediate info
+;;             (car args)
+;;             (c1args (list (cadr args)) info))
+;;       (list 'call-global info 'si:list-nth (c1args args info))))
 
-(defun c2list-nth-immediate (index args &aux (l (cs-push t t))
-                                             (*vs* *vs*) (*inline-blocks* 0))
-  (setq args (inline-args args '(t t)))
-  (wt-nl "{object V" l "= ")
-  (if *safe-compile*
-      (progn
-       (dotimes** (i index) (wt "cdr("))
-       (wt (car args))
-       (dotimes** (i index) (wt ")"))
-       (wt ";")
-       (wt-nl "if((!consp(V" l ")) && (" (car args) "!= Cnil))")
-       (wt-nl " FEwrong_type_argument(Scons,V" l ");")
-       )
-      (progn
-       (wt-nl (car args))
-       (dotimes** (i index) (wt-nl "->c.c_cdr"))
-       (wt ";")))
-  (unwind-exit (list 'CAR l))
-  (wt "}")
-  (close-inline-blocks))
+;; (defun c2list-nth-immediate (index args &aux (l (cs-push t t))
+;;                                              (*vs* *vs*) (*inline-blocks* 0))
+;;   (setq args (inline-args args '(t t)))
+;;   (wt-nl "{object V" l "= ")
+;;   (if *safe-compile*
+;;       (progn
+;;        (dotimes** (i index) (wt "cdr("))
+;;        (wt (car args))
+;;        (dotimes** (i index) (wt ")"))
+;;        (wt ";")
+;;        (wt-nl "if((!consp(V" l ")) && (" (car args) "!= Cnil))")
+;;        (wt-nl " FEwrong_type_argument(Scons,V" l ");")
+;;        )
+;;       (progn
+;;        (wt-nl (car args))
+;;        (dotimes** (i index) (wt-nl "->c.c_cdr"))
+;;        (wt ";")))
+;;   (unwind-exit (list 'CAR l))
+;;   (wt "}")
+;;   (close-inline-blocks))

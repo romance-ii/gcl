@@ -370,6 +370,7 @@ make_fcomplex(fcomplex x) {
   y=alloc_object(t_complex);
   y->cmp.cmp_real=r;
   y->cmp.cmp_imag=i;
+  y->cmp.tt=2;/*FIXME centralize*/
   return y;
 }
 
@@ -407,6 +408,7 @@ make_dcomplex(dcomplex x) {
   y=alloc_object(t_complex);
   y->cmp.cmp_real=r;
   y->cmp.cmp_imag=i;
+  y->cmp.tt=3;/*FIXME centralize*/
   return y;
 }
 

@@ -82,7 +82,7 @@
 			       &aux (ihs *current-ihs*)
 			       (base  (ihs-vs ihs))
 			       (*print-level* *debug-print-level*)
-			       *print-circle*
+			       (*print-circle* t)
 			       (*print-length* *debug-print-level*)
 			       (current-ihs *current-ihs*)
 			       (fun (ihs-fun ihs)) name args)

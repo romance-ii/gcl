@@ -26,7 +26,7 @@
   (rt:disable-note :assume-no-simple-streams)
   (rt:disable-note :assume-no-gray-streams))
 
-#+gcl(si::use-fast-links nil)
+;#+gcl(si::use-fast-links nil)
 
 (in-package :cl-test)
 

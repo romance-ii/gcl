@@ -411,7 +411,7 @@
 	   (or tem (setf (get name 's-data) def)))
 	  (tem 
 	   (check-s-data tem def name))
-	  ((null type) (setf (get name 's-data) def)))
+	  (t (setf (get name 's-data) def)));(null type)
     (when documentation
 	  (setf (get name 'structure-documentation) documentation))
     (when (and (null type) predicate)
@@ -478,7 +478,7 @@
 		 (:copier (setq copier v))
 		 (:static (setq static v))
 		 (:predicate
-		   (setq predicate v)
+		   (setq predicate (or v (gensym)))
 		   (setq predicate-specified t))
 		 (:include
 		   (setq include (cdar os))
@@ -664,7 +664,7 @@
 			   (the ,(or (not st) st)
 				,(ecase tp
 					((nil) `(str-ref x ',name ,offset))
-					(list `(list-nth ,offset x))
+					(list `(let ((c (nthcdr ,offset x))) (check-type c cons) (car c)));(list-nth ,offset x))
 					(vector `(aref x ,offset)))))))
 		   slot-descriptions)
 	 ,@(mapcar (lambda (y) 
@@ -680,7 +680,7 @@
 			      ((nil) `(structure-subtype-p x ',name))
 			      (list
 			       (unless named (error "The structure should be named."))
-			       `(let ((x (nthcdr ,name-offset x))) (when x (eq (car x) ',name))))
+			       `(let ((x (when (listp x) (nthcdr ,name-offset x)))) (when x (eq (car x) ',name))))
 			      (vector
 			       (unless named (error "The structure should be named."))
 			       `(and (typep x '(vector t))

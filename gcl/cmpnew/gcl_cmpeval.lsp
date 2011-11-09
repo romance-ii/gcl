@@ -1797,17 +1797,18 @@
 	 ;;continue
 	 ((setq fd (macro-function fname))
 	  (c1expr (cmp-expand-macro-w fd whole)))
-	 ((and (setq fd (get fname 'si::structure-access))
-	       (inline-possible fname)
-              ;;; Structure hack.
-	       (consp fd)
-	       (si:fixnump (cdr fd))
-	       (not (endp args))
-	       (endp (cdr args)))
-	  (case (car fd)
-		(vector (c1expr `(elt ,(car args) ,(cdr fd))))
-		(list (c1expr `(si:list-nth ,(cdr fd) ,(car args))))
-		(t (c1structure-ref1 (car args) (car fd) (cdr fd)))))
+;; 	 ((and nil (setq fd (get fname 'si::structure-access))
+;; 	       (inline-possible fname)
+;;               ;;; Structure hack.
+;; 	       (consp fd)
+;; 	       (si:fixnump (cdr fd))
+;; 	       (not (endp args))
+;; 	       (endp (cdr args)))
+;; 	  (case (car fd)
+;; 		(vector (c1expr `(elt ,(car args) ,(cdr fd))))
+;; ;		(list (c1expr `(si:list-nth ,(cdr fd) ,(car args))))
+;; 		(list (c1expr `(let ((c (nthcdr ,(cdr fd) ,(car args)))) (check-type c cons) (car c))))
+;; 		(t (c1structure-ref1 (car args) (car fd) (cdr fd)))))
 	 ((eq fname 'si:|#,|)
 	  (cmperr "Sharp-comma-macro was found in a bad place."))
 	 ((mi1 fname args)))))
@@ -1960,7 +1961,7 @@
 ;; 	     (let ((x (pop body))) (if (stringp x) (unless doc (push x doc)) (push x d)))) body))
 
 
-(defun blla (l a last body &optional n nr f
+(defun blla (l a last body &optional n nr f kbb
 	       &aux r k lvp np negp ff rr ke tmp nkys post aok bk wv rv keb
 	       (l (let ((s (last l))) (if (cdr s) (append (butlast l) (list (car s) '&rest (cdr s))) l)))
 	       (l (subst '&rest '&body l))
@@ -1997,16 +1998,26 @@
 	      (ln (if lc (pop l) l)) (ld (when lc (pop l))) (lp (when lc (car l)))
 	      (lc (when (eq k '&key) (consp ln))) (lnn (if lc (pop ln) ln)) (lb (if lc (car ln) ln)))
 	   (values lnn lb ld lp))
-    (kbind (k m &optional v)
-	   `(let* ((k ,k) (v (if ,m ,v (if ,(la nil t) ,(la nil 'done) ,(nokv 'k))))) (case k ,@nkys)))
+    ;; (kbind (k m &optional v)
+    ;; 	   `(let* ((k ,k) (v (if ,m ,v (if ,(la nil t) ,(la nil 'done) ,(nokv 'k))))) (case k ,@nkys)))
     (post nil
-	  (setq nkys (nreverse nkys))
-	  (bind bk
-		`(progn
-		   ,@(do (k r (ex a)) ((not ex) (nreverse r))
-			 (push (kbind (pop ex) (when ex t) (pop ex)) r))
-		   (do nil ((not ,(la nil t)) ,bk) ,(kbind (la nil 'done) nil))))
+	  (setq nkys (nreverse nkys) kbb (tmpsym))
+	  (do (k r (ex a)) ((not ex));FIXME  this is fragile as the binding must be visible to mvars/inls
+	      (bind 'k (pop ex))
+	      (bind 'v (if ex (pop ex) `(if ,(la nil t) ,(la nil 'done) ,(nokv 'k))))
+	      (bind kbb `(case k ,@nkys)))
+	  (bind kbb `(do (k v) ((not ,(la nil t))) 
+			 (setq k ,(la nil 'done) v (if ,(la nil t) ,(la nil 'done) ,(nokv 'k)))
+			 (case k ,@nkys)))
 	  (dolist (l (nreverse post)) (apply #'bind l)))
+    ;; (post nil
+    ;; 	  (setq nkys (nreverse nkys))
+    ;; 	  (bind bk
+    ;; 		`(progn
+    ;; 		   ,@(do (k r (ex a)) ((not ex) (nreverse r))
+    ;; 			 (push (kbind (pop ex) (when ex t) (pop ex)) r))
+    ;; 		   (do nil ((not ,(la nil t)) ,bk) ,(kbind (la nil 'done) nil))))
+    ;; 	  (dolist (l (nreverse post)) (apply #'bind l)))
     (lvp (&optional rv)
 	 (cond 
 	  (rv (lvp) (when np (bind lvp (rpop rv))))
@@ -2047,8 +2058,8 @@
 	 (unless rr (when np (push `(declare (:dynamic-extent ,lvp)) decls)))
 	 (when post (post))
 	 (when keb (push `(declare (ignore ,ke)) decls))
+	 (when kbb (push `(declare (ignore ,kbb)) decls))
 	 `(let* ,(nreverse r) 
-;	    ,@(when doc (list doc))
 	    ,@decls
 	    ,@ctps
 	    ,@body)))
@@ -2704,7 +2715,8 @@
 
 (defun co1structure-predicate (f args &aux tem)
   (cond ((and (symbolp f)
-	      (setq tem (get f 'si::struct-predicate)))
+	      (setq tem (get f 'si::struct-predicate))
+	      args (not (cdr args)))
 	 (c1expr `(typep ,(car args) ',tem)))))
 
 
