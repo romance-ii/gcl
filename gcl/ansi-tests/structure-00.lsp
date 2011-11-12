@@ -325,7 +325,8 @@ do the defstruct."
 	     do
 	     (setf inits
 		   (list* (intern (string slot-name) "KEYWORD")
-			  (list 'quote initval)
+;			  (list 'quote initval)
+			  initval
 			  inits))
 	     (push `(and 
 		     (eqlt (quote ,initval)
@@ -333,7 +334,8 @@ do the defstruct."
 		     (eqlt (quote ,initval)
 			   (funcall #',field-fn ,var)))
 		   tests))
-	    `(let ((,var (,make-fn . ,inits)))
+;	    `(let ((,var (,make-fn . ,inits)))
+	    `(let ((,var (apply ',make-fn  ',inits)))
 	       (and ,@tests t)))
 	 t)
 
@@ -412,13 +414,13 @@ do the defstruct."
 	       ,(let* ((var 'XTEMP-9)
 		       (var2 'YTEMP-9)
 		       (var3 'ZTEMP-9))	       
-		  `(let ((,var (,make-fn
-				,@(loop
+		  `(let ((,var (apply ',make-fn
+				'(,@(loop
 				   for (slot-name . initval)
 				   in initial-value-alist
 				   nconc (list (intern (string slot-name)
 						       "KEYWORD")
-					       `(quote ,initval))))))
+					       initval))))))
 		     (let ((,var2 (,copy-fn ,var))
 			   (,var3 (funcall #',copy-fn ,var)))
 		       (and
@@ -532,13 +534,13 @@ do the defstruct."
 	   `((deftest ,(make-struct-test-name name 20)
 	       ,(let* ((var 'XTEMP-20)
 		       (var2 'YTEMP-20))
-		  `(let ((,var (,make-fn
-				,@(loop
+		  `(let ((,var (apply ',make-fn
+				'(,@(loop
 				   for (slot-name . initval)
 				   in initial-value-alist
 				   nconc (list (intern (string slot-name)
 						       "KEYWORD")
-					       `(quote ,initval))))))
+					       initval))))))
 		     (let ((,var2 (copy-structure ,var)))
 		       (and
 			(not (eqlt ,var ,var2))

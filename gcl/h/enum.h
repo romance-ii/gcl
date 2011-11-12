@@ -25,8 +25,8 @@ enum type {
   t_stream,
   t_random,
   t_readtable,
-  t_ifun,
-  t_cfun,
+  /* t_ifun, */
+  /* t_cfun, */
   t_function,
   t_cfdata,
   t_spice,

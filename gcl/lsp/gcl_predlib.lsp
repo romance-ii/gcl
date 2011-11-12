@@ -25,7 +25,8 @@
 (in-package :system)
 
 (export '(int void static 
-	      old-compiled-function new-compiled-function
+;	      old-compiled-function 
+	      new-compiled-function
 	      hash-table-eq hash-table-eql hash-table-equal hash-table-equalp
 	      +type-alist+ 
 	      sequencep ratiop short-float-p long-float-p
@@ -361,10 +362,11 @@
 (deftype atom () `(not cons))
 (deftype function (&optional as vs) 
   (declare (ignore as vs)) 
-  `(or interpreted-function compiled-function))
+;  `(or interpreted-function compiled-function))
+  `compiled-function)
 (deftype compiled-function (&optional as vs) 
   (declare (ignore as vs)) 
-  `(or new-compiled-function old-compiled-function))
+  `new-compiled-function);(or  old-compiled-function)
 (deftype new-compiled-function nil `(or generic-function non-generic-new-compiled-function))
 (deftype generic-function nil nil);Overwritten by pcl check ;FIXME
 
@@ -485,7 +487,7 @@
 	  (non-keyword-symbol . non-keyword-symbol-p)
 	  (standard-char . standard-charp)
 	  (non-standard-base-char . non-standard-base-char-p)
-	  (interpreted-function . interpreted-function-p)
+;	  (interpreted-function . interpreted-function-p)
 	  (real . realp)
 	  (float . floatp)
 	  (short-float . short-float-p)
@@ -520,7 +522,7 @@
           (random-state . random-state-p)
           (structure . structurep)
           (function . functionp)
-          (old-compiled-function . old-compiled-function-p)
+;          (old-compiled-function . old-compiled-function-p)
           (new-compiled-function . new-compiled-function-p)
           (non-generic-new-compiled-function . non-generic-new-compiled-function-p)
           (common . commonp)))
@@ -541,9 +543,10 @@
 				      readtable 
 				      hash-table-eq hash-table-eql hash-table-equal hash-table-equalp
 				      random-state standard-object structure 
-				      interpreted-function
+;				      interpreted-function
 				      non-generic-new-compiled-function
-				      old-compiled-function))
+;				      old-compiled-function
+				      ))
 
 
 (defconstant +range-types+ `(integer ratio short-float long-float))
@@ -1510,7 +1513,8 @@
     (error "Bad type to typep: ~S" type))
   (if (eq tp 'structure-object) (setq tp 'structure))
   (when (and (or (eq tp 'structure) (eq tp 'compiled-function)
-		 (eq tp 'old-compiled-function) (eq tp 'new-compiled-function)) 
+;		 (eq tp 'old-compiled-function)
+		 (eq tp 'new-compiled-function)) 
 	     (typep-int object 'standard-object))
     (return-from typep-int nil))
   (let ((f (and (not i) (symbolp tp) (get tp 'type-predicate))))

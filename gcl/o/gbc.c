@@ -656,11 +656,11 @@ mark_object(object x) {
     mark_object(x->pn.pn_version);
     break;
     
-  case t_cfun:
-    mark_object(x->cf.cf_name);
-    mark_object(x->cf.cf_call);
-    mark_object(x->cf.cf_data);
-    break;
+  /* case t_cfun: */
+  /*   mark_object(x->cf.cf_name); */
+  /*   mark_object(x->cf.cf_call); */
+  /*   mark_object(x->cf.cf_data); */
+  /*   break; */
 
   case t_function:	
     mark_object(x->fun.fun_data);
@@ -677,11 +677,11 @@ mark_object(object x) {
     break;
 
 
-  case t_ifun:
-    mark_object(x->ifn.ifn_name);
-    mark_object(x->ifn.ifn_call);
-    mark_object(x->ifn.ifn_self);
-    break;
+  /* case t_ifun: */
+  /*   mark_object(x->ifn.ifn_name); */
+  /*   mark_object(x->ifn.ifn_call); */
+  /*   mark_object(x->ifn.ifn_self); */
+  /*   break; */
 
   case t_cfdata:
     

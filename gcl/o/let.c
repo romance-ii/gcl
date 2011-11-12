@@ -236,11 +236,14 @@ is an illegal function definition in FLET.",
 		top[0] = MMcons(lex[0], top[0]);
 		top[0] = MMcons(sLlambda_block_closure, top[0]);
 		{
-		  object x=alloc_object(t_ifun);
-		  x->ifn.ifn_self=top[0];
-		  x->ifn.ifn_name=x->ifn.ifn_call=Cnil;
-		  top[0]=x;
+		  top[0]=fSfset_in(Cnil,top[0]);
 		}
+		/* { */
+		/*   object x=alloc_object(t_ifun); */
+		/*   x->ifn.ifn_self=top[0]; */
+		/*   x->ifn.ifn_name=x->ifn.ifn_call=Cnil; */
+		/*   top[0]=x; */
+		/* } */
 		lex_fun_bind(MMcar(def), top[0]);
 		def_list = MMcdr(def_list);
 	}
@@ -286,11 +289,14 @@ is an illegal function definition in LABELS.",1, def);
 	  top[0] = MMcons(lex[0], top[0]);
 	  top[0] = MMcons(sLlambda_block_closure, top[0]);
 	  {
-	    object x=alloc_object(t_ifun);
-	    x->ifn.ifn_self=top[0];
-	    x->ifn.ifn_name=x->ifn.ifn_call=Cnil;
-	    top[0]=x;
+	    top[0]=fSfset_in(Cnil,top[0]);
 	  }
+	  /* { */
+	  /*   object x=alloc_object(t_ifun); */
+	  /*   x->ifn.ifn_self=top[0]; */
+	  /*   x->ifn.ifn_name=x->ifn.ifn_call=Cnil; */
+	  /*   top[0]=x; */
+	  /* } */
 	  lex_fun_bind(MMcar(def), top[0]);
 	  def_list = MMcdr(def_list);
 	}
@@ -336,11 +342,14 @@ is an illegal macro definition in MACROFLET.",
 				   MMcadr(def),
 				   MMcddr(def));
 		{
-		  object x=alloc_object(t_ifun);
-		  x->ifn.ifn_self=top[0];
-		  x->ifn.ifn_name=x->ifn.ifn_call=Cnil;
-		  top[0]=x;
+		  top[0]=fSfset_in(Cnil,top[0]);
 		}
+		/* { */
+		/*   object x=alloc_object(t_ifun); */
+		/*   x->ifn.ifn_self=top[0]; */
+		/*   x->ifn.ifn_name=x->ifn.ifn_call=Cnil; */
+		/*   top[0]=x; */
+		/* } */
 		lex_macro_bind(MMcar(def), top[0]);
 		def_list = MMcdr(def_list);
 	}

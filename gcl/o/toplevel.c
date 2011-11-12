@@ -76,15 +76,17 @@ FFN(Fdefun)(object args)
 	  vs_base[0] = MMcons(lex_env[0], vs_base[0]);
 	  vs_base[0] = MMcons(sLlambda_block_closure, vs_base[0]);
 	}
-	{object fname;
-	object x=alloc_object(t_ifun);
-	x->ifn.ifn_self=vs_base[0];
-	x->ifn.ifn_name=name;
-	x->ifn.ifn_call=Cnil;
-	vs_base[0]=x;
-	fname =  clear_compiler_properties(name,vs_base[0]);
-	fname->s.s_gfdef = vs_base[0];
-	fname->s.s_mflag = FALSE;}
+	{/* object fname; */
+	  vs_base[0]=fSfset_in(name,vs_base[0]);
+	/* object x=alloc_object(t_ifun); */
+	/* x->ifn.ifn_self=vs_base[0]; */
+	/* x->ifn.ifn_name=name; */
+	/* x->ifn.ifn_call=Cnil; */
+	/* vs_base[0]=x; */
+	/* fname =  clear_compiler_properties(name,vs_base[0]); */
+	/* fname->s.s_gfdef = vs_base[0]; */
+	/* fname->s.s_mflag = FALSE; */
+	}
 	vs_base[0] = oname;
 	for (body = MMcddr(args);  !endp(body);  body = body->c.c_cdr) {
 	  form = macro_expand(body->c.c_car);

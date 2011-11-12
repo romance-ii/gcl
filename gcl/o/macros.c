@@ -104,11 +104,14 @@ FFN(Fdefmacro)(object form)
 	}
 
 	{
-	  object x=alloc_object(t_ifun);
-	  x->ifn.ifn_self=top[0];
-	  x->ifn.ifn_name=x->ifn.ifn_call=Cnil;
-	  top[0]=x;
+	  top[0]=fSfset_in(Cnil,top[0]);
 	}
+	/* { */
+	/*   object x=alloc_object(t_ifun); */
+	/*   x->ifn.ifn_self=top[0]; */
+	/*   x->ifn.ifn_name=x->ifn.ifn_call=Cnil; */
+	/*   top[0]=x; */
+	/* } */
 	
 	clear_compiler_properties(name,top[0]);
 	if (name->s.s_hpack == lisp_package &&

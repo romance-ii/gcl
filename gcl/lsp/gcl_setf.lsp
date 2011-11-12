@@ -254,17 +254,26 @@
 (defsetf gethash (k h &optional d) (v) `(si:hash-set ,k ,h ,v))
 (defsetf row-major-aref si::aset1)
 (defsetf readtable-case si::set-readtable-case)
-(defsetf documentation (s d) (v)
-  `(case ,d
-     (variable (si:putprop ,s ,v 'variable-documentation))
-     (function (si:putprop ,s ,v 'function-documentation))
-     (structure (si:putprop ,s ,v 'structure-documentation))
-     (type (si:putprop ,s ,v 'type-documentation))
-     (setf (si:putprop ,s ,v 'setf-documentation))
-     (compiler-macro (si:putprop ,s ,v 'compiler-macro-documentation))
-     (method-combination (si:putprop ,s ,v 'method-combination-documentation))
-     (t (error "~S is an illegal documentation type." ,d))))
 
+(defun set-documentation (s d v)
+  (let ((x (typecase s
+		      (function (function-name s))
+		      (package (find-symbol (package-name s) :keyword))
+		      ((cons (member setf) (cons symbol nil)) (setf-sym s))
+		      (symbol s)))
+	(p (ecase d
+	       (variable 'variable-documentation)
+	       (function 'function-documentation)
+	       (structure 'structure-documentation)
+	       (type 'type-documentation)
+	       (setf 'setf-documentation)
+	       (compiler-macro 'compiler-macro-documentation)
+	       (method-combination 'method-combination-documentation)
+	       ((t) 'package-documentation))))
+    (if x (putprop x v p) v)))
+
+(defsetf documentation (s d) (v)
+  `(set-documentation ,s ,d ,v))
 
 (define-setf-method getf (&environment env place indicator &optional default)
   (multiple-value-bind (vars vals stores store-form access-form)

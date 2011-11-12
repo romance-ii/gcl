@@ -367,7 +367,7 @@ DEFUNO_NEW("COMPILED-FUNCTION-P",object,fLcompiled_function_p,LISP
 {
 	/* 1 args */;
 
-	if (type_of(x0) == t_cfun ||
+	if (/* type_of(x0) == t_cfun || */
 	    type_of(x0) == t_function)
 		x0 = Ct;
 	else
@@ -381,24 +381,24 @@ DEFUN_NEW("NEW-COMPILED-FUNCTION-P",object,fSnew_compiled_function_p,SI
 
 }
 
-DEFUN_NEW("OLD-COMPILED-FUNCTION-P",object,fSold_compiled_function_p,SI
-   ,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+/* DEFUN_NEW("OLD-COMPILED-FUNCTION-P",object,fSold_compiled_function_p,SI */
+/*    ,1,1,NONE,OO,OO,OO,OO,(object x0),"") { */
 
-  RETURN1(type_of(x0) == t_cfun ? Ct : Cnil);
+/*   RETURN1(type_of(x0) == t_cfun ? Ct : Cnil); */
 
-}
+/* } */
 
-DEFUNO_NEW("INTERPRETED-FUNCTION-P",object,fSinterpreted_function_p,SI
-   ,1,1,NONE,OO,OO,OO,OO,void,siLinterpreted_function_p,(object x0),"")
+/* DEFUNO_NEW("INTERPRETED-FUNCTION-P",object,fSinterpreted_function_p,SI */
+/*    ,1,1,NONE,OO,OO,OO,OO,void,siLinterpreted_function_p,(object x0),"") */
 
-{
-	/* 1 args */;
+/* { */
+/* 	/\* 1 args *\/; */
 
-	if (type_of(x0) == t_ifun)
-		x0 = Ct;
-	else
-		x0 = Cnil;
-RETURN1(x0);}
+/* 	if (type_of(x0) == t_ifun) */
+/* 		x0 = Ct; */
+/* 	else */
+/* 		x0 = Cnil; */
+/* RETURN1(x0);} */
 
 DEFUN_NEW("COMMONP",object,fScommonp,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"")
 

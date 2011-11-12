@@ -146,17 +146,17 @@ DEFUNO_NEW("FUNCTION-NAME",object,fSfunction_name,SI
   case t_function: 
     x=Cnil;
     break;
-  case t_cfun:
-    x=x->cf.cf_name;
-    break;
-  case t_ifun:
-    x=x->ifn.ifn_self;
-    x=consp(x) ? 
-      (x->c.c_car==sLlambda_block ?
-       x->c.c_cdr->c.c_car :
-       (x->c.c_car==sLlambda_block_closure ? 
-	x->c.c_cdr->c.c_cdr->c.c_cdr->c.c_cdr->c.c_car : Cnil)) : Cnil;
-    break;
+  /* case t_cfun: */
+  /*   x=x->cf.cf_name; */
+  /*   break; */
+  /* case t_ifun: */
+  /*   x=x->ifn.ifn_self; */
+  /*   x=consp(x) ?  */
+  /*     (x->c.c_car==sLlambda_block ? */
+  /*      x->c.c_cdr->c.c_car : */
+  /*      (x->c.c_car==sLlambda_block_closure ?  */
+  /* 	x->c.c_cdr->c.c_cdr->c.c_cdr->c.c_cdr->c.c_car : Cnil)) : Cnil; */
+  /*   break; */
   default:
     TYPE_ERROR(x,sLfunction);
     x=Cnil;
@@ -200,8 +200,8 @@ DEFUNO_NEW("FSET",object,fSfset,SI
 		ifuncall2(sLwarn,make_simple_string("~S is being redefined."),
 			 sym);
 	sym = clear_compiler_properties(sym,function);
-	if (type_of(function) == t_cfun ||
-	    type_of(function) == t_ifun ||
+	if (/* type_of(function) == t_cfun || */
+	    /* type_of(function) == t_ifun || */
 	    type_of(function) == t_function) {
 		sym->s.s_gfdef = function;
 		sym->s.s_mflag = FALSE;

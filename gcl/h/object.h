@@ -757,18 +757,18 @@ struct function {
 
 };
 
-struct cfun {        /*  compiled function header  */
+/* struct cfun {        /\*  compiled function header  *\/ */
 
-  FIRSTWORD;
+/*   FIRSTWORD; */
 
-  symbol cf_name;    /*  compiled function name  */
-  vfunc  cf_self;    /*  entry address  */
-  object cf_call;
-  object cf_data;    /*  data the function uses  */
-                     /*  for GBC  */
-  SPAD;
+/*   symbol cf_name;    /\*  compiled function name  *\/ */
+/*   vfunc  cf_self;    /\*  entry address  *\/ */
+/*   object cf_call; */
+/*   object cf_data;    /\*  data the function uses  *\/ */
+/*                      /\*  for GBC  *\/ */
+/*   SPAD; */
 
-};
+/* }; */
 
 struct closure {
 
@@ -785,15 +785,15 @@ struct closure {
 
 };
 
-struct ifun {
+/* struct ifun { */
 
-  FIRSTWORD; 
+/*   FIRSTWORD;  */
 
-  symbol  ifn_name;
-  plist   ifn_self;       /* list def */
-  object  ifn_call;
+/*   symbol  ifn_name; */
+/*   plist   ifn_self;       /\* list def *\/ */
+/*   object  ifn_call; */
 
-};
+/* }; */
 
 #define CMVFUNP(x_) ({enum type _t=type_of(x_);((_t==t_sfun || _t==t_vfun || _t==t_gfun) && x_->sfn.sfn_argd&MVRET_BIT);})
 
@@ -855,10 +855,10 @@ union lispunion {
  struct random            rnd; /*  random-states  */
  struct readtable          rt; /*  read table  */
  struct pathname           pn; /*  path name  */
- struct cfun               cf; /*  compiled function  uses value stack] */
+ /* struct cfun               cf; /\*  compiled function  uses value stack] *\/ */
  struct closure            cl; /*  compiled closure  uses c stack */
  struct function          fun; /*  compiled closure  uses c stack */
- struct ifun              ifn; /*  interpreted function */
+ /* struct ifun              ifn; /\*  interpreted function *\/ */
  struct cfdata            cfd; /* compiled fun data */
  struct spice             spc; /*  spice  */
 
@@ -942,8 +942,10 @@ C predicates
 #define stringp(a_)    SPP(a_,string)
 #define fixnump(a_)    SPP(a_,fixnum)
 #define readtablep(a_) SPP(a_,readtable)
-#define functionp(a_)  ({enum type _t=type_of(a_);(_t>=t_ifun && _t<=t_function);})
-#define compiled_functionp(a_)  ({enum type _t=type_of(a_);(_t>=t_cfun && _t<=t_function);})
+/* #define functionp(a_)  ({enum type _t=type_of(a_);(_t>=t_cfun && _t<=t_function);}) */
+#define functionp(a_)  (type_of(a_)==t_function)
+/* #define compiled_functionp(a_)  ({enum type _t=type_of(a_);(_t>=t_cfun && _t<=t_function);}) */
+#define compiled_functionp(a_)  functionp(a_)
 
 extern int big_sign(object);
 #define integerp(a_) ({enum type _tp=type_of(a_); _tp >= t_fixnum     && _tp <= t_bignum;})

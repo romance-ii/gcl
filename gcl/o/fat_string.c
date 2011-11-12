@@ -61,10 +61,10 @@ DEFUN_NEW("PROFILE",object,fSprofile,SI
 DEFUN_NEW("FUNCTION-START",object,fSfunction_start,SI
        ,1,1,NONE,OO,OO,OO,OO,(object funobj),"")
 {/* 1 args */
- if(type_of(funobj)!=t_cfun
-    && type_of(funobj)!=t_function)
+ if(/* type_of(funobj)!=t_cfun */
+    /* &&  */type_of(funobj)!=t_function)
     FEerror("not compiled function",0);
- funobj=make_fixnum((long) (funobj->cf.cf_self));
+ funobj=make_fixnum((long) (funobj->fun.fun_self));
  RETURN1(funobj);
 }
 
@@ -102,20 +102,20 @@ cfuns_to_combined_table(unsigned int n) /* non zero n will ensure new table leng
      combined_table.alloc_length=n;}
 
  for (i = 0;  i < maxpage;  i++) {
-   if ((enum type)type_map[i]!=tm_table[(short)t_cfun].tm_type &&
+   if (/* (enum type)type_map[i]!=tm_table[(short)t_cfun].tm_type && */
        (enum type)type_map[i]!=tm_table[(short)t_function].tm_type)
      continue;
    tm = tm_of((enum type)type_map[i]);
    p = pagetochar(i);
    for (j = tm->tm_nppage; j > 0; --j, p += tm->tm_size) {
      x = (object)p;
-     if (type_of(x)!=t_cfun &&
+     if (/* type_of(x)!=t_cfun && */
 	 type_of(x)!=t_function) 
        continue;
-     if (is_free(x) || x->cf.cf_self == NULL)
+     if (is_free(x) || x->fun.fun_self == NULL)
        continue;
 	/* the cdefn things are the proclaimed call types. */
-     cf_addr=(char * ) ((unsigned long)(x->cf.cf_self));
+     cf_addr=(char * ) ((unsigned long)(x->fun.fun_self));
 	
      SYM_ADDRESS(combined_table,ii)=(unsigned long)cf_addr;
      SYM_STRING(combined_table,ii)= (char *)(CF_FLAG | (unsigned long)x) ;
@@ -292,7 +292,7 @@ DEFUN_NEW("DISPLAY-PROFILE",object,fSdisplay_profile,SI
 	    printf("\n%6.2f%% (%5d): ",(100.0*count)/total, count);
 	    fflush(stdout);
 	    if (CF_FLAG & uname)
-	      {if (~CF_FLAG & uname) prin1( ((object) (~CF_FLAG & uname))->cf.cf_name,Cnil);}
+	      ;/*{ if (~CF_FLAG & uname) prin1( ((object) (~CF_FLAG & uname))->cf.cf_name,Cnil);} *//*FIXME*/
 	     else if (name ) printf("%s",name);};
 	  if (upto==dim) goto TOTALS ;
 	  

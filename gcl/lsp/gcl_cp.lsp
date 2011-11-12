@@ -188,6 +188,9 @@
   (check-type x fixnum)
   (lit :object "((struct htent *)" (:fixnum x) ")->hte_key=" (:object y)))
 
+(defun c::make-string-output-stream nil
+  (lit :object "make_string_output_stream(64)"))
+
 (defun funcallable-symbol-p (s)
   (and (symbolp s)
        (/= (si::address (c::symbol-gfdef s)) 0)

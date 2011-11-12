@@ -161,9 +161,8 @@
 	    '* #.(flags ans set svt) 
 	    "({fixnum _v=(fixnum)#v;object _z,_f=(#0),_l=(#1),_ll=_l;
         object _x4=Cnil,_x3=Cnil,_x2=Cnil,_x1=Cnil,_x0=Cnil;
-        enum type _tp=type_of(_f);
         char _m=(#n-2),_q=_f->fun.fun_minarg>_m ? _f->fun.fun_minarg-_m : 0;
-        char _n=Rset && _tp==t_function && !_f->fun.fun_argd ? _q : -1;
+        char _n=Rset && !_f->fun.fun_argd ? _q : -1;
         fcall.fun=_f;FUN_VALP=_v;VFUN_NARGS=-(#n-1);
         switch (_n) {
           case 5: if (_l==Cnil) {_n=-1;break;} _x4=_l->c.c_car;_l=_l->c.c_cdr;
@@ -183,7 +182,7 @@
           case 0:  _z=_f->fun.fun_self(#*_l);break;
           default: _z=call_proc_cs2(#*_ll);break;
         }
-        if (_tp==t_function && !(_f)->fun.fun_neval) vs_top=_v ? (object *)_v : sup;_z;})")
+        if (!(_f)->fun.fun_neval) vs_top=_v ? (object *)_v : sup;_z;})")
       (list* (car all) (car (last all)) (butlast (cdr all)))))
     (close-inline-blocks)))
 

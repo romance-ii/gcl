@@ -151,8 +151,8 @@
 ;;     (setf (gethash fun *fun-id-hash*) id)
 ;;     fun))
 
-(defun portable-closure-src (fn)
-  (let* ((lam (when (si::interpreted-function-p fn) (si::interpreted-function-lambda fn)))
+(defun portable-closure-src (fn) ;FIXME
+  (let* ((lam nil); (when (si::interpreted-function-p fn) (si::interpreted-function-lambda fn)))
 	 (src (when lam (function-lambda-expression fn)))
 	 (p (car (member-if-not 
 		 (lambda (x) 

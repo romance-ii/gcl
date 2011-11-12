@@ -31,13 +31,13 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 DEFUN_NEW("CFUN-CALL",object,fScfun_call,SI,1,1,NONE,OO,OO,OO,OO,(object fun),"") {
   if (!functionp(fun))
     TYPE_ERROR(fun,sLfunction);
-  RETURN1(fun->cf.cf_call);
+  RETURN1(fun->fun.fun_plist);
 }
 
 DEFUN_NEW("SET-CFUN-CALL",object,fSset_cfun_call,SI,2,2,NONE,OO,OO,OO,OO,(object call,object fun),"") {
   if (!functionp(fun))
     TYPE_ERROR(fun,sLfunction);
-  RETURN1(fun->cf.cf_call=call);
+  RETURN1(fun->fun.fun_plist=call);
 }
 
 
@@ -179,11 +179,14 @@ FFN(Ffunction)(object form)
 		vs_base[0] = MMcons(lex_env[0], vs_base[0]);
 		vs_base[0] = MMcons(sLlambda_closure, vs_base[0]);
 		{
-		  object x=alloc_object(t_ifun);
-		  x->ifn.ifn_self=vs_base[0];
-		  x->ifn.ifn_name=x->ifn.ifn_call=Cnil;
-		  vs_base[0]=x;
+		  vs_base[0]=fSfset_in(Cnil,vs_base[0]);
 		}
+		/* { */
+		/*   object x=alloc_object(t_ifun); */
+		/*   x->ifn.ifn_self=vs_base[0]; */
+		/*   x->ifn.ifn_name=x->ifn.ifn_call=Cnil; */
+		/*   vs_base[0]=x; */
+		/* } */
 	} else {
 	        fun=ifuncall1(sSfunid_to_sym,fun);
 /* 		if (fun==Cnil) */
@@ -274,16 +277,16 @@ DEFUN_NEW("LEX-ENV",object,fSlex_env,SI,0,0,NONE,OI,OO,OO,OO,(fixnum i),"") {
 
 }
 
-DEFUNO_NEW("INTERPRETED-FUNCTION-LAMBDA",object,fSinterpreted_function_lambda,SI
-   ,1,1,NONE,OO,OO,OO,OO,void,siLinterpreted_function_lambda,(object x),"")
+/* DEFUNO_NEW("INTERPRETED-FUNCTION-LAMBDA",object,fSinterpreted_function_lambda,SI */
+/*    ,1,1,NONE,OO,OO,OO,OO,void,siLinterpreted_function_lambda,(object x),"") */
 
-{
+/* { */
 
-  if (type_of(x)!=t_ifun)
-    TYPE_ERROR(x,siLinterpreted_function);
-  return x->ifn.ifn_self;
+/*   if (type_of(x)!=t_ifun) */
+/*     TYPE_ERROR(x,siLinterpreted_function); */
+/*   return x->ifn.ifn_self; */
 
-}
+/* } */
 
 
 void

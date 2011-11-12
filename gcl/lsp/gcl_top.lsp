@@ -544,13 +544,13 @@
       (print-frs j)
       (incf j))))
 
-(defun print-ihs (i &aux (*print-level* 2) (*print-length* 4))
+(defun print-ihs (i &aux (*print-level* 2) (*print-length* 4));FIXME
   (format t "~&~:[  ~;@ ~]IHS[~d]: ~s ---> VS[~d]"
           (= i *current-ihs*)
           i
           (let ((fun (ihs-fun i)))
             (cond ((or (symbolp fun) (compiled-function-p fun)) fun)
-		  ((when (interpreted-function-p fun) (setq fun (interpreted-function-lambda fun)) nil))
+;		  ((when (interpreted-function-p fun) (setq fun (interpreted-function-lambda fun)) nil))
                   ((consp fun)
                    (case (car fun)
                      (lambda fun)

@@ -33,21 +33,34 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define PADDR(i) ((void *)(long)(sSPinit->s.s_dbind->v.v_self[fix(i)]))
 object sSPinit,sSPmemory;
 
-object
-make_cfun(void (*self)(), object name, object data, char *start, int size)
-{
-	object cf;
 
-	cf = alloc_object(t_cfun);
-	cf->cf.cf_self = self;
-	cf->cf.cf_name = name;
-	cf->cf.cf_call = Cnil;
-	cf->cf.cf_data = data;
-	if(data && type_of(data)==t_cfdata)
-	  { data->cfd.cfd_start=start; 
-	    data->cfd.cfd_size=size;}
-	  else if(size) FEerror("Bad call to make_cfun",0);
-	return(cf);
+object
+make_cfun(void (*self)(), object name, object data, char *start, int size) {
+
+   if (data && type_of(data)==t_cfdata) { 
+     data->cfd.cfd_start=start;  
+     data->cfd.cfd_size=size; 
+   } else if (size) FEerror("Bad call to make_cfun",0); 
+
+   return fSinit_function(list(6,Cnil,Cnil,make_fixnum((unsigned)self),Cnil,Cnil,name),
+			  (void *)fSeval_src,data,Cnil,-1,0,(((1<<6)-1)<<6)|(((1<<5)-1)<<12)|(1<<17)); 
+
+   /* object cf;  */
+
+   /* printf("%-*.*s\n",name->s.s_fillp,name->s.s_fillp,name->s.s_self);  */
+
+
+   /* cf = alloc_object(t_cfun);  */
+   /* cf->cf.cf_self = self;  */
+   /* cf->cf.cf_name = name;  */
+   /* cf->cf.cf_call = Cnil;  */
+   /* cf->cf.cf_data = data;  */
+   /* if(data && type_of(data)==t_cfdata)  */
+   /*   { data->cfd.cfd_start=start;   */
+   /*     data->cfd.cfd_size=size;}  */
+   /*   else if(size) FEerror("Bad call to make_cfun",0);  */
+   /* return(cf);  */
+
 }
 
 DEFUN_NEW("CFDL",object,fScfdl,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
@@ -156,11 +169,12 @@ static object MFnew(object sym, void (*self)(), object data)
 		not_a_symbol(sym);
 	if (sym->s.s_sfdef != NOT_SPECIAL && sym->s.s_mflag)
 		sym->s.s_sfdef = NOT_SPECIAL;
-	cf = alloc_object(t_cfun);
-	cf->cf.cf_self = self;
-	cf->cf.cf_name = sym;
-	cf->cf.cf_call = Cnil;
-	cf->cf.cf_data = data;
+	cf=make_cfun(self,sym,data,NULL,0);
+	/* cf = alloc_object(t_cfun); */
+	/* cf->cf.cf_self = self; */
+	/* cf->cf.cf_name = sym; */
+	/* cf->cf.cf_call = Cnil; */
+	/* cf->cf.cf_data = data; */
 	sym = clear_compiler_properties(sym,cf);
  	sym->s.s_gfdef = cf;
 	sym->s.s_mflag = FALSE;
@@ -190,13 +204,14 @@ MM(object sym, void (*self)(), char *start, int size, object data)
 
 /*  && sym->s.s_mflag) */
 /* 		sym->s.s_sfdef = NOT_SPECIAL; */
-	cf = alloc_object(t_cfun);
-	cf->cf.cf_self = self;
-	cf->cf.cf_name = sym;
-	cf->cf.cf_call = Cnil;
-	cf->cf.cf_data = data;
-	data->cfd.cfd_start=start; 
-	data->cfd.cfd_size=size;
+	cf=make_cfun(self,sym,data,start,size);
+	/* cf = alloc_object(t_cfun); */
+	/* cf->cf.cf_self = self; */
+	/* cf->cf.cf_name = sym; */
+	/* cf->cf.cf_call = Cnil; */
+	/* cf->cf.cf_data = data; */
+	/* data->cfd.cfd_start=start;  */
+	/* data->cfd.cfd_size=size; */
 	sym = 	clear_compiler_properties(sym,cf);
 	sym->s.s_gfdef = cf;
 	sym->s.s_sfdef = NOT_SPECIAL;
@@ -286,9 +301,9 @@ DEFUN_NEW("COMPILED-FUNCTION-NAME",object,fScompiled_function_name,SI
 	case t_function:
 	  fun=Cnil;
 	  break;
-	case t_cfun:
-	  fun = fun->cf.cf_name;
-	  break;
+	/* case t_cfun: */
+	/*   fun = fun->cf.cf_name; */
+	/*   break; */
 	default:
 	  FEerror("~S is not a compiled-function.", 1, fun);
 	}RETURN1(fun);

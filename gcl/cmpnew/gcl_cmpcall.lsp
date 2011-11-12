@@ -134,12 +134,12 @@
      (get-inline-loc
       (list (make-list (length all) :initial-element t)
 	    '* #.(flags ans set svt) 
-	    "({object _z;fixnum _v=(fixnum)#v;enum type _tp=type_of(#0);
+	    "({object _z;fixnum _v=(fixnum)#v;
         fcall.fun=#0;FUN_VALP=_v;VFUN_NARGS=#n-1;
-        _z=Rset && _tp==t_function && !(#0)->fun.fun_argd && 
+        _z=Rset && !(#0)->fun.fun_argd && 
         VFUN_NARGS>=(#0)->fun.fun_minarg && VFUN_NARGS<=((#0)->fun.fun_maxarg) ? 
            (#0)->fun.fun_self(#*) : call_proc_cs2(#?);
-           if (_tp==t_function && !(#0)->fun.fun_neval) vs_top=_v ? (object *)_v : sup;_z;})") all))
+           if (!(#0)->fun.fun_neval) vs_top=_v ? (object *)_v : sup;_z;})") all))
     (close-inline-blocks)))
 
 
@@ -510,31 +510,31 @@
 
 ;;For funcalling when the argument is guaranteed to be a compiled-function.
 ;;For (funcall-c he 3 4), he being a compiled function. (not a symbol)!
-(defun wt-funcall-c (args)
-  (let ((fun (car args))
-	(real-args (cdr args))
-	loc)
-    (cond ((eql (car fun) 'var)
-           (let ((fun-loc (cons (car fun) (third fun))))
-	     (when *safe-compile*
-		   (wt-nl "(type_of(")
-		   (wt-loc fun-loc)
-		   (wt ")==t_cfun)||FEinvalid_function(")
-		   (wt-loc fun-loc)(wt ");"))
-	   (push-args real-args)
-	   (wt-nl "(")  
-	   (wt-loc  fun-loc)))
-	  (t
-	   (setq loc (list 'cvar (cs-push t t)))
-	   (let ((*value-to-go* loc))
-	     (wt-nl 
-	      "{object V" (second loc) ";")
-	     (c2expr* (car args))
-	     (push-args (cdr args))
-	     (wt "(V" (second loc)))))
-    (wt ")->cf.cf_self ();")
-    (and loc (wt "}")))
-  (unwind-exit 'fun-val))
+;; (defun wt-funcall-c (args)
+;;   (let ((fun (car args))
+;; 	(real-args (cdr args))
+;; 	loc)
+;;     (cond ((eql (car fun) 'var)
+;;            (let ((fun-loc (cons (car fun) (third fun))))
+;; 	     (when *safe-compile*
+;; 		   (wt-nl "(type_of(")
+;; 		   (wt-loc fun-loc)
+;; 		   (wt ")==t_cfun)||FEinvalid_function(")
+;; 		   (wt-loc fun-loc)(wt ");"))
+;; 	   (push-args real-args)
+;; 	   (wt-nl "(")  
+;; 	   (wt-loc  fun-loc)))
+;; 	  (t
+;; 	   (setq loc (list 'cvar (cs-push t t)))
+;; 	   (let ((*value-to-go* loc))
+;; 	     (wt-nl 
+;; 	      "{object V" (second loc) ";")
+;; 	     (c2expr* (car args))
+;; 	     (push-args (cdr args))
+;; 	     (wt "(V" (second loc)))))
+;;     (wt ")->cf.cf_self ();")
+;;     (and loc (wt "}")))
+;;   (unwind-exit 'fun-val))
 
 (defun inline-proc (fname args &aux (n (length args)) res
 			  (obj (add-object fname)))

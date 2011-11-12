@@ -162,10 +162,10 @@ is supplied and FLAG is nil, then this function is deleted from the fast links")
        RETURN1(Cnil);
 
      switch(type_of(fun)) {
-     case t_cfun:
-       if (flag==Cnil)
-	 delete_link(fun->cf.cf_self,link_ar);
-       break;
+     /* case t_cfun: */
+     /*   if (flag==Cnil) */
+     /* 	 delete_link(fun->cf.cf_self,link_ar); */
+     /*   break; */
      case t_function:	
        if (flag==Cnil)
 	 delete_link(fun->fun.fun_self,link_ar);
@@ -1179,9 +1179,9 @@ call_proc_new(object sym,ufixnum clp,ufixnum vld,void **link,ufixnum argd,object
 	      argd,fun->fun.fun_argd,
 	      vald,fun->fun.fun_neval,fun->fun.fun_vv,
 	      margs,fun->fun.fun_minarg,nargs,fun->fun.fun_maxarg,pushed);
-    if (tp==t_cfun)
-      fprintf(stderr,"Warning: arg/val mismatch in call to %-.*s (%p) prevents fast linking:is cfun\n",
-	      (int)(type_of(sym)==t_symbol ? sym->s.s_fillp : 0),sym->s.s_self,sym);
+    /* if (tp==t_cfun) */
+    /*   fprintf(stderr,"Warning: arg/val mismatch in call to %-.*s (%p) prevents fast linking:is cfun\n", */
+    /* 	      (int)(type_of(sym)==t_symbol ? sym->s.s_fillp : 0),sym->s.s_self,sym); */
 
   }
 
@@ -1330,9 +1330,9 @@ ifuncall(object sym,int n,...)
   for(i=0;i<n;i++)
     old_vs_top[i]= va_arg(ap,object);
   va_end(ap);
-  if (type_of(sym->s.s_gfdef)==t_cfun)
-    (*(sym->s.s_gfdef)->cf.cf_self)();
-  else  super_funcall(sym);
+  /* if (type_of(sym->s.s_gfdef)==t_cfun) */
+  /*   (*(sym->s.s_gfdef)->cf.cf_self)(); */
+  /* else   */super_funcall(sym);
   x = vs_base[0];
   vs_top = old_vs_top;
   vs_base = old_vs_base;

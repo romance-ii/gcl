@@ -397,13 +397,19 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 
 (defun fun-env (name)
   (let ((fun (when (fboundp name) (or (macro-function name) (symbol-function name)))))
-    (cond ((si::interpreted-function-p fun) 
-	   (multiple-value-bind
+    (multiple-value-bind
 	    (src clo blk)
 	    (function-lambda-expression fun)
 	    (declare (ignore src blk))
-	    (mapcar 'cadr clo)))
-	  ((compiled-function-p fun) (c::function-env fun 0)))))
+	    (mapcar 'cadr clo))))
+
+    ;; (cond ((si::interpreted-function-p fun) 
+    ;; 	   (multiple-value-bind
+    ;; 	    (src clo blk)
+    ;; 	    (function-lambda-expression fun)
+    ;; 	    (declare (ignore src blk))
+    ;; 	    (mapcar 'cadr clo)))
+    ;; 	  ((compiled-function-p fun) (c::function-env fun 0)))))
 
 
 (defun get-named-form (name)
@@ -418,7 +424,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	 (values (if clo 
 		     (let ((f (tmpsym))(v (tmpsym))(o (tmpsym)))
 		       `(let* (,@(mapcar (lambda (x) (list (car x) `(tmpsym))) (reverse clo))
-			       (,o (fun-env ',name))
+			       (,o (fun-env ',name));FIXME share structure
 			       (,v ,form)
 			       (,f (c::symbol-gfdef ,v)))
 			  (si::set-function-environment ,f ,o)
@@ -432,9 +438,11 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
       (remprop name l)))
 
   (cond ((not (symbolp name)) (error "Must be a name"))
-	((or (si::interpreted-function-p def) (and (consp def) (eq (car def) 'lambda)))
+	((and (consp def) (eq (car def) 'lambda));(or (si::interpreted-function-p def) );FIXME
+	 (compile nil (coerce def 'function)))
+	((functionp def)
 	 (or name (setf name 'cmp-anon))
-	 (setf (symbol-function name) (coerce def 'function))
+	 (setf (symbol-function name) def)
 	 (compile name))
 	(def (error "def not a lambda expression"))
 	 ;; FIXME -- support warnings-p and failures-p.  CM 20041119

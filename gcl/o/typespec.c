@@ -474,13 +474,13 @@ DEFUN_NEW("TYPE-OF-C",object,siLtype_of_c,SI,1,1,NONE,OO,OO,OO,OO,(object x),"")
     break;
     
   case t_function:	
-  case t_cfun:
+  /* case t_cfun: */
     x = sLcompiled_function;
     break;
     
-  case t_ifun:
-    x=siLinterpreted_function;
-    break;
+  /* case t_ifun: */
+  /*   x=siLinterpreted_function; */
+  /*   break; */
     
   default:
     error("not a lisp data object");
@@ -514,7 +514,7 @@ DEF_ORDINARY("SIMPLE-STRING",sLsimple_string,LISP,"");
 DEF_ORDINARY("FUNCTION",sLfunction,LISP,"");
 DEF_ORDINARY("FUNCTION-IDENTIFIER",sLfunction_identifier,SI,"");
 DEF_ORDINARY("COMPILED-FUNCTION",sLcompiled_function,LISP,"");
-DEF_ORDINARY("INTERPRETED-FUNCTION",siLinterpreted_function,SI,"");
+/* DEF_ORDINARY("INTERPRETED-FUNCTION",siLinterpreted_function,SI,""); */
 DEF_ORDINARY("PATHNAME",sLpathname,LISP,"");
 DEF_ORDINARY("CHARACTER",sLcharacter,LISP,"");
 DEF_ORDINARY("NUMBER",sLnumber,LISP,"");

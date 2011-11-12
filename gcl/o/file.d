@@ -2350,7 +2350,7 @@ for the string ~S.",
 @)
 
 DEFUN_NEW("MAKE-STRING-OUTPUT-STREAM",object,fLmake_string_output_stream,LISP,
-	  0,1,NONE,OO,OO,OO,OO,(object tp,...),"") {
+	  0,2,NONE,OO,OO,OO,OO,(object tp,...),"") {
 
  tp=tp;/*FIXME lintian*/
  RETURN1(make_string_output_stream(64));

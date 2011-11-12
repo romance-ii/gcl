@@ -487,8 +487,8 @@
 	       (,#trandom-state . (make-random-state)) 
 	       (,#treadtable . (si::standard-readtable)) 
 	       (,#tnew-compiled-function . (function eq)) ;FIXME old
-	       (,#told-compiled-function . (function si::file-column)) ;FIXME old
-	       (,#tinterpreted-function . (lambda nil nil)) 
+;	       (,#told-compiled-function . (function si::file-column)) ;FIXME old
+;	       (,#tinterpreted-function . (lambda nil nil)) 
 	       ,@(mapcar (lambda (x)
 			   `(,(cmp-norm-tp `(array ,x (*))) . 
 			     (make-array 1 :element-type ',x))) si::+array-types+)
@@ -533,8 +533,8 @@
 		    (,#trandom-state . (make-random-state)) 
 		    (,#treadtable . (si::standard-readtable)) 
 		    (,#tnew-compiled-function . (function eq)) ;FIXME old
-		    (,#told-compiled-function . (function si::file-column)) ;FIXME old
-		    (,#tinterpreted-function . (lambda nil nil)) 
+;		    (,#told-compiled-function . (function si::file-column)) ;FIXME old
+;		    (,#tinterpreted-function . (lambda nil nil)) 
 		    ,@(mapcar (lambda (x)
 				`(,(cmp-norm-tp `(array ,x (*))) . 
 				  (make-array 1 :element-type ',x))) si::+array-types+)

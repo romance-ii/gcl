@@ -56,7 +56,54 @@
   (check-type-predicate 'null 'null)
   nil)
 
-(defvar *cons-fns*
+#+gcl(defvar *cons-fns*
+  '(cons consp atom rplaca rplacd
+	car cdr caar cadr cdar cddr
+	caaar caadr cadar caddr
+	cdaar cdadr cddar cdddr
+	caaaar caaadr caadar caaddr
+	cadaar cadadr caddar cadddr
+	cdaaar cdaadr cdadar cdaddr
+	cddaar cddadr cdddar cddddr
+	copytree sublis nsublis
+	subst substif substifnot
+	nsubst nsubstif nsubstifnot
+	treeequal
+	copylist
+	list
+	list*
+	listlength
+	listp
+	makelist
+	first second third fourth
+	fifth sixth seventh eighth ninth tenth
+	nth
+	endp
+	null
+	nconc
+	append
+	revappend nreconc
+	butlast nbutlast
+	last ldiff tailp
+	nthcdr rest
+	member memberif memberifnot
+	mapc mapcar mapcan mapl maplist mapcon
+	acons
+	assoc associf associfnot
+	copyalist
+	pairlis
+	rassoc rassocif rassocifnot
+	getproperties
+	getf
+	intersection
+	nintersection
+	adjoin
+	setdifference nsetdifference
+	setexclusiveor nsetexclusiveor
+	subsetp
+	union nunion))
+
+#-gcl(defvar *cons-fns*
   (list 'cons 'consp 'atom 'rplaca 'rplacd
 	'car 'cdr 'caar 'cadr 'cdar 'cddr
 	'caaar 'caadr 'cadar 'caddr

@@ -820,9 +820,9 @@ int level;
 		vs_mark;
 		if (ppfun != Ct)
 		switch (type_of(ppfun)) {
-		case t_cfun:
+		/* case t_cfun: */
 		case t_function:/*FIXME*/
-		case t_ifun:
+		/* case t_ifun: */
 		case t_symbol:
 		case t_cons:
 		  call_print_function(ppfun, x, 0, 2);
@@ -1526,46 +1526,46 @@ int level;
 			vs_popp;
 		}
 		break;
-	case t_cfun:
-		write_str("#<compiled-function ");
-		if (x->cf.cf_name != Cnil)
-			write_object(x->cf.cf_name, level);
-		else
-			write_addr(x);
-		write_str(">");
-		break;
+	/* case t_cfun: */
+	/* 	write_str("#<compiled-function "); */
+	/* 	if (x->cf.cf_name != Cnil) */
+	/* 		write_object(x->cf.cf_name, level); */
+	/* 	else */
+	/* 		write_addr(x); */
+	/* 	write_str(">"); */
+	/* 	break; */
 
 	case t_function:
-		write_str("#<compiled-function ");
+		write_str("#<function ");
 		write_addr(x);
 		write_str(">");
 		break;
 
-	case t_ifun:
-	  if (PRINTcircle) {
-	    for (vp = PRINTvs_top;  vp < PRINTvs_limit;  vp += 2)
-	      if (x == *vp) {
-		if (vp[1] != Cnil) {
-		  write_ch('#');
-		  write_decimal((vp-PRINTvs_top)/2+1);
-		  write_ch('#');
-		  return;
-		} else {
-		  write_ch('#');
-		  write_decimal((vp-PRINTvs_top)/2+1);
-		  write_ch('=');
-		  vp[1] = Ct;
-		  break;
-		}
-	      }
-	  }
-	  write_str("#<interpreted-function ");
-	  if (x->ifn.ifn_self != Cnil)
-	    write_object(x->ifn.ifn_self, level);
-	  else
-	    write_addr(x);
-	  write_str(">");
-	  break;
+	/* case t_ifun: */
+	/*   if (PRINTcircle) { */
+	/*     for (vp = PRINTvs_top;  vp < PRINTvs_limit;  vp += 2) */
+	/*       if (x == *vp) { */
+	/* 	if (vp[1] != Cnil) { */
+	/* 	  write_ch('#'); */
+	/* 	  write_decimal((vp-PRINTvs_top)/2+1); */
+	/* 	  write_ch('#'); */
+	/* 	  return; */
+	/* 	} else { */
+	/* 	  write_ch('#'); */
+	/* 	  write_decimal((vp-PRINTvs_top)/2+1); */
+	/* 	  write_ch('='); */
+	/* 	  vp[1] = Ct; */
+	/* 	  break; */
+	/* 	} */
+	/*       } */
+	/*   } */
+	/*   write_str("#<interpreted-function "); */
+	/*   if (x->ifn.ifn_self != Cnil) */
+	/*     write_object(x->ifn.ifn_self, level); */
+	/*   else */
+	/*     write_addr(x); */
+	/*   write_str(">"); */
+	/*   break; */
 
 	case t_spice:
 		write_str("#<\100");
@@ -1623,11 +1623,11 @@ travel_push_new(object x) {
       for (i=0;i<x->v.v_fillp;i++)
 	travel_push_new(x->v.v_self[i]);
     break;
-  case t_ifun:
-    mark(x);
-    x=x->ifn.ifn_self;
-    goto BEGIN;
-    break;
+  /* case t_ifun: */
+  /*   mark(x); */
+  /*   x=x->ifn.ifn_self; */
+  /*   goto BEGIN; */
+  /*   break; */
   case t_structure:
     mark(x);
     for (i = 0;  i < S_DATA(x->str.str_def)->length;  i++)
@@ -1665,10 +1665,10 @@ travel_clear_new(object x) {
       for (i=0;i<x->v.v_fillp;i++)
 	travel_clear_new(x->v.v_self[i]);
     break;
-  case t_ifun:
-    x=x->ifn.ifn_self;
-    goto BEGIN;
-    break;
+  /* case t_ifun: */
+  /*   x=x->ifn.ifn_self; */
+  /*   goto BEGIN; */
+  /*   break; */
   case t_structure:
     for (i = 0;  i < S_DATA(x->str.str_def)->length;  i++)
       travel_clear_new(structure_ref(x,x->str.str_def,i));

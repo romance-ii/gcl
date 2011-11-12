@@ -2361,8 +2361,8 @@ DEFUNO_NEW("FORMAT",object,fLformat,LISP
     }
   } else
     switch (type_of(control)) {
-    case t_cfun:
-    case t_ifun:
+    /* case t_cfun: */
+    /* case t_ifun: */
     case t_function:
     case t_symbol:
     case t_cons:

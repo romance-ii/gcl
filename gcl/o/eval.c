@@ -286,9 +286,9 @@ funcall(object fun) {
   if (fun == OBJNULL)
     FEerror("Undefined function.", 0);
   switch (type_of(fun)) {
-  case t_cfun:
-    MMcall(fun);
-    CHECK_AVMA; return;
+  /* case t_cfun: */
+  /*   MMcall(fun); */
+  /*   CHECK_AVMA; return; */
     
   case t_function:
     ihs_check;ihs_push(fun);
@@ -304,13 +304,13 @@ funcall(object fun) {
 	FEundefined_function(fun);
     }
     
-  case t_ifun:
-    {
-      object x = fun->ifn.ifn_self;
-      if (x) { fun = x;  /* ihs_check;ihs_push(fun); */break;}
-      else
-	FEundefined_function(fun);
-    }
+  /* case t_ifun: */
+  /*   { */
+  /*     object x = fun->ifn.ifn_self; */
+  /*     if (x) { fun = x;  /\* ihs_check;ihs_push(fun); *\/break;} */
+  /*     else */
+  /* 	FEundefined_function(fun); */
+  /*   } */
     
   case t_cons:
     if (fun->c.c_car!=sLlambda &&
@@ -444,9 +444,9 @@ funcall_no_event(object fun) {
     if (fun == OBJNULL)
       FEerror("Undefined function.", 0);
   switch (type_of(fun)) {
-  case t_cfun:
-    (*fun->cf.cf_self)();
-    break;
+  /* case t_cfun: */
+  /*   (*fun->cf.cf_self)(); */
+  /*   break; */
     
   case t_function:
     quick_call_function(fun); return;
@@ -468,9 +468,9 @@ lispcall(object *funp, int narg) {
   if (fun == OBJNULL)
     FEerror("Undefined function.", 0);
   switch (type_of(fun)) {
-  case t_cfun:
-    MMcall(fun);
-    break;
+  /* case t_cfun: */
+  /*   MMcall(fun); */
+  /*   break; */
     
   default:
     funcall(fun);
@@ -491,9 +491,9 @@ lispcall_no_event(object *funp, int narg) {
   if (fun == OBJNULL)
     FEerror("Undefined function.", 0);
   switch (type_of(fun)) {
-  case t_cfun:
-    (*fun->cf.cf_self)();
-    break;
+  /* case t_cfun: */
+  /*   (*fun->cf.cf_self)(); */
+  /*   break; */
     
   default:
     funcall(fun);
@@ -513,9 +513,9 @@ symlispcall(object sym, object *base, int narg) {
   if (fun == OBJNULL)
     FEerror("Undefined function.", 0);
   switch (type_of(fun)) {
-  case t_cfun:
-    MMcall(fun);
-    break;
+  /* case t_cfun: */
+  /*   MMcall(fun); */
+  /*   break; */
     
   default:
     funcall(fun);
@@ -535,9 +535,9 @@ symlispcall_no_event(object sym, object *base, int narg) {
   if (fun == OBJNULL)
     FEerror("Undefined function.", 0);
   switch (type_of(fun)) {
-  case t_cfun:
-    (*fun->cf.cf_self)();
-    break;
+  /* case t_cfun: */
+  /*   (*fun->cf.cf_self)(); */
+  /*   break; */
     
   default:
     funcall(fun);
@@ -560,9 +560,9 @@ simple_lispcall(object *funp, int narg) {
   if (fun == OBJNULL)
     FEerror("Undefined function.", 0);
   switch (type_of(fun)) {
-  case t_cfun:
-    MMcall(fun);
-    break;
+  /* case t_cfun: */
+  /*   MMcall(fun); */
+  /*   break; */
     
   default:
     funcall(fun);
@@ -586,9 +586,9 @@ simple_symlispcall(object sym, object *base, int narg) {
   if (fun == OBJNULL)
     FEerror("Undefined function.", 0);
   switch (type_of(fun)) {
-  case t_cfun:
-    MMcall(fun);
-    break;
+  /* case t_cfun: */
+  /*   MMcall(fun); */
+  /*   break; */
     
   default:
     funcall(fun);
@@ -619,8 +619,8 @@ super_funcall_no_event(object fun) {
 #endif 
  TOP:
   switch (type_of(fun)) {
-  case t_cfun:
-    (*fun->cf.cf_self)();return;break;
+  /* case t_cfun: */
+  /*   (*fun->cf.cf_self)();return;break; */
   case t_function:
     quick_call_function(fun); return;break;
   case t_symbol:
@@ -800,9 +800,9 @@ EVAL_ARGS:
 	}
 	ihs_top->ihs_function = x;
 	ihs_top->ihs_base = vs_base;
-	if (type_of(x) == t_cfun) 
-	  (*(x)->cf.cf_self)();
-	else
+	/* if (type_of(x) == t_cfun)  */
+	/*   (*(x)->cf.cf_self)(); */
+	/* else */
 	  funcall_no_event(x);
 	CHECK_AVMA;
 	ihs_pop();
@@ -815,6 +815,10 @@ LAMBDA:
 		temporary = make_cons(lex_env[0], temporary);
 		x = make_cons(sLlambda_closure, temporary);
 		vs_push(x);
+		goto EVAL_ARGS;
+	}
+	if (consp(fun) && (MMcar(fun) == sLlambda_closure || MMcar(fun) == sLlambda_block || MMcar(fun) == sLlambda_block_closure)) {
+		vs_push(x=fun);
 		goto EVAL_ARGS;
 	}
 	FEinvalid_function(fun);
@@ -901,6 +905,106 @@ DEFUNM_NEW("EVAL",object,fLeval,LISP,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
   return unwind_vals(vals,base);
 
 }
+
+/* DEFUN_NEW("EVAL-SRC",object,fSeval_src,SI,0,63,NONE,OO,OO,OO,OO,(object first,...),"") { */
+
+/*   object fun=fcall.fun,f,*base=vs_top,*vals=(object *)fcall.valp; */
+/*   struct cons *p,*p1,*pp,*q,*qq; */
+/*   fixnum j,narg=VFUN_NARGS; */
+/*   va_list ap; */
+
+/*   f=fun->fun.fun_plist->c.c_cdr->c.c_cdr->c.c_car; */
+/*   princ(f->c.c_car,Cnil); */
+/*   if (f->c.c_car==sLlambda_block) {printf(" ");princ(f->c.c_cdr->c.c_car,Cnil);} */
+/*   printf("\n"); */
+/*   flush_stream(symbol_value(sLAstandard_outputA)); */
+/*   j=abs(narg)+1; */
+/*   if (narg < 0) j--; */
+/*   p=alloca((j+1)*sizeof(*p)); */
+/*   p1=p=(void *)p+((unsigned)p%sizeof(*p)); */
+/*   p->c_car=f; */
+/*   va_start(ap,first); */
+/*   for (;j--;first=NULL) { */
+/*     object x=(j || (narg < 0)) ? (first ? first : va_arg(ap,object)) : Cnil; */
+/*     if (j) { */
+/*       pp=p++; */
+/*       pp->c_cdr=(void *)p; */
+/*       p->c_car=x;/\* MMcons(sLquote,MMcons(x,Cnil)); *\/ */
+/*     } else p->c_cdr=x; */
+/*   } */
+/*   va_end(ap); */
+/*   for (j=0,p=p1;p!=(void *)Cnil;j++,p=(void *)p->c_cdr); */
+/*   q=alloca((2*j+1)*sizeof(*q)); */
+/*   q=(void *)q+((unsigned)q%sizeof(*q)); */
+/*   for (p=(void *)p1->c_cdr;p!=(void *)Cnil;p=(void *)p->c_cdr) { */
+/*     object x=p->c_car; */
+/*     p->c_car=(void *)(qq=q); */
+/*     qq->c_car=sLquote; */
+/*     qq->c_cdr=(void *)++q; */
+/*     qq=q++; */
+/*     qq->c_car=x; */
+/*     qq->c_cdr=Cnil; */
+/*   } */
+/*   eval((void *)p1); */
+/*   return unwind_vals(vals,base); */
+
+/* } */
+
+/* DEFUNM_NEW("EVAL-CFUN",object,fSeval_cfun,SI,0,63,NONE,OO,OO,OO,OO,(object first,...),"") { */
+
+/*   object fun=fcall.fun,*base=vs_top,*vals=(object *)fcall.valp; */
+/*   void (*f)(); */
+/*   fixnum i,j,narg=VFUN_NARGS; */
+/*   va_list ap; */
+
+/*   f=(void *)fix(fun->fun.fun_plist->c.c_cdr->c.c_cdr->c.c_car); */
+/*   j=abs(narg)+((narg < 0) ? 0 : 1); */
+/*   va_start(ap,first); */
+/*   vs_base=vs_top; */
+/*   for (i=1;j--;) { */
+/*     object x=(j || (narg < 0)) ? (i ? (i=0,first) : va_arg(ap,object)) : Cnil; */
+/*     if (j)  */
+/*       vs_push(x); */
+/*     else for (;x!=Cnil;x=x->c.c_cdr) vs_push(x->c.c_car); */
+/*   } */
+/*   va_end(ap); */
+/*   f(); */
+/*   return unwind_vals(vals,base); */
+
+/* } */
+
+DEFUNM_NEW("EVAL-SRC",object,fSeval_src,SI,0,63,NONE,OO,OO,OO,OO,(object first,...),"") {
+
+  object fun=fcall.fun,f,*base=vs_top,*vals=(object *)fcall.valp;
+  fixnum i,j,narg=VFUN_NARGS;
+  va_list ap;
+
+  f=fun->fun.fun_plist->c.c_cdr->c.c_cdr->c.c_car;
+  j=abs(narg)+((narg < 0) ? 0 : 1);
+  va_start(ap,first);
+  vs_base=vs_top;
+  for (i=1;j--;) {
+    object x=(j || (narg < 0)) ? (i ? (i=0,first) : va_arg(ap,object)) : Cnil;
+    if (j) 
+      vs_push(x);
+    else for (;x!=Cnil;x=x->c.c_cdr) vs_push(x->c.c_car);
+  }
+  va_end(ap);
+  if (type_of(f)==t_fixnum) ((void (*)())(fix(f)))(); else funcall(f);
+  return unwind_vals(vals,base);
+
+}
+
+DEFUN_NEW("FSET-IN",object,fSfset_in,SI,2,2,NONE,OO,OO,OO,OO,(object sym,object src),"") {
+  
+  object x;
+
+  x=fSinit_function(list(6,Cnil,Cnil,src,Cnil,Cnil,sym),(void *)fSeval_src,Cnil,Cnil,-1,0,(((1<<6)-1)<<6)|(((1<<5)-1)<<12)|(1<<17));
+  if (sym!=Cnil) fSfset(sym,x);
+  RETURN1(x);
+
+}
+
 
 LFD(siLevalhook)(void)
 {
@@ -1120,35 +1224,35 @@ fcalln1(object first,...) {
   DEBUG_AVMA
   va_start(ap,first);
   tp=fun==OBJNULL ? -1 : type_of(fun);
-  if(tp==t_cfun)
-     {object *base=vs_top,*old_base=base;
-      int i=fcall.argd;
-      vs_base=base;
-      if (i) {
-	*(base++)=first;
-	i--;
-      }
-      switch(i){
-      case 10: *(base++)=va_arg(ap,object);
-      case 9: *(base++)=va_arg(ap,object);
-      case 8: *(base++)=va_arg(ap,object);
-      case 7: *(base++)=va_arg(ap,object);
-      case 6: *(base++)=va_arg(ap,object);
-      case 5: *(base++)=va_arg(ap,object);
-      case 4: *(base++)=va_arg(ap,object);
-      case 3: *(base++)=va_arg(ap,object);
-      case 2: *(base++)=va_arg(ap,object);
-      case 1: *(base++)=va_arg(ap,object);
-      case 0: break;
-      default:
-	FEerror("bad args",0);
-      }  vs_top=base;
-      base=old_base;
-      (*fcall.fun->cf.cf_self)();
-      vs_top=base;
-      CHECK_AVMA;
-      return(vs_base[0]);
-    }
+  /* if(tp==t_cfun) */
+  /*    {object *base=vs_top,*old_base=base; */
+  /*     int i=fcall.argd; */
+  /*     vs_base=base; */
+  /*     if (i) { */
+  /* 	*(base++)=first; */
+  /* 	i--; */
+  /*     } */
+  /*     switch(i){ */
+  /*     case 10: *(base++)=va_arg(ap,object); */
+  /*     case 9: *(base++)=va_arg(ap,object); */
+  /*     case 8: *(base++)=va_arg(ap,object); */
+  /*     case 7: *(base++)=va_arg(ap,object); */
+  /*     case 6: *(base++)=va_arg(ap,object); */
+  /*     case 5: *(base++)=va_arg(ap,object); */
+  /*     case 4: *(base++)=va_arg(ap,object); */
+  /*     case 3: *(base++)=va_arg(ap,object); */
+  /*     case 2: *(base++)=va_arg(ap,object); */
+  /*     case 1: *(base++)=va_arg(ap,object); */
+  /*     case 0: break; */
+  /*     default: */
+  /* 	FEerror("bad args",0); */
+  /*     }  vs_top=base; */
+  /*     base=old_base; */
+  /*     (*fcall.fun->cf.cf_self)(); */
+  /*     vs_top=base; */
+  /*     CHECK_AVMA; */
+  /*     return(vs_base[0]); */
+  /*   } */
    return(fcalln_general(first,ap));
   va_end(ap);
  }

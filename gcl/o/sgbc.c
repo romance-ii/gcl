@@ -584,11 +584,11 @@ sgc_mark_object1(object x) {
     sgc_mark_object(x->pn.pn_version);
     break;
     
-  case t_cfun:
-    sgc_mark_object(x->cf.cf_name);
-    sgc_mark_object(x->cf.cf_data);
-    sgc_mark_object(x->cf.cf_call);
-    break;
+  /* case t_cfun: */
+  /*   sgc_mark_object(x->cf.cf_name); */
+  /*   sgc_mark_object(x->cf.cf_data); */
+  /*   sgc_mark_object(x->cf.cf_call); */
+  /*   break; */
     
   case t_function:	
     sgc_mark_object(x->fun.fun_data);
@@ -606,11 +606,11 @@ sgc_mark_object1(object x) {
     }
     break;
 
-  case t_ifun:
-    sgc_mark_object(x->ifn.ifn_name);
-    sgc_mark_object(x->ifn.ifn_self);
-    sgc_mark_object(x->ifn.ifn_call);
-    break;
+  /* case t_ifun: */
+  /*   sgc_mark_object(x->ifn.ifn_name); */
+  /*   sgc_mark_object(x->ifn.ifn_self); */
+  /*   sgc_mark_object(x->ifn.ifn_call); */
+  /*   break; */
     
   case t_cfdata:
     

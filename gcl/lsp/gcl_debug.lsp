@@ -56,7 +56,7 @@
 ;;make hack in compiler to remember the local variable names for the 
 ;;vs variables and associate it with the function name
 
-(defun search-stack (sym &aux string)
+(defun search-stack (sym &aux string);FIXME
   (setq string (cond((symbolp sym)(symbol-name sym))
 		    (t sym)))
   (sloop
@@ -66,7 +66,7 @@
      (cond ((compiled-function-p fun)
 	    (setq name (compiled-function-name fun)))
 	   ((symbolp fun ) (setq name fun))
-	   ((when (interpreted-function-p fun) (setq fun (interpreted-function-lambda fun)) nil))
+;	   ((when (interpreted-function-p fun) (setq fun (interpreted-function-lambda fun)) nil))
 	   ((and (listp fun)
 		 (member (car fun) '(lambda lambda-block)))
 	    (setq name (second fun)))
@@ -78,7 +78,7 @@
 
 (defvar *debug-print-level* 3)
 
-(defun break-locals (&optional (n 1)
+(defun break-locals (&optional (n 1) ;FIXME
 			       &aux (ihs *current-ihs*)
 			       (base  (ihs-vs ihs))
 			       (*print-level* *debug-print-level*)
@@ -95,7 +95,7 @@
 	(t
 	 (cond ((compiled-function-p fun)
 		(setq name (compiled-function-name fun)))
-	       ((when (interpreted-function-p fun) (setq fun (interpreted-function-lambda fun)) nil))
+;	       ((when (interpreted-function-p fun) (setq fun (interpreted-function-lambda fun)) nil))
 	       (t (setq name fun)))
          (if (symbolp name)(setq args (get name 'debugger)))
 	 (let ((next (ihs-vs (f + 1 *current-ihs*))))
