@@ -157,17 +157,18 @@
 			 ("Backspace" . #\Backspace)
 			 ("Newline" . #\Newline)
 			 ("Linefeed" . #\Newline)) :test 'string-equal)))
-	((with-length-aref-shadow
-	  (let ((l (length s)))
-	    (case l
-		  (1 (aref s 0))
-		  ((2 3) (when (and (char= #\^ (aref s 0)) (or (= l 2) (char= #\\ (aref s 2))))
-			   (code-char (- (char-code (aref s 1)) #.(- (char-code #\A) 1)))))
-		  (4 (when (char= #\\ (aref s 0))
-		       (code-char 
-			(+ (* 64 (- (char-code (aref s 1)) #.(char-code #\0)))
-			  (* 8 (- (char-code (aref s 2)) #.(char-code #\0)))
-			  (- (char-code (aref s 3)) #.(char-code #\0))))))))))))
+	((code-char
+	  (with-aref-shadow
+	   (let ((l (length s)))
+	     (case l
+		   (1 (aref s 0))
+		   ((2 3) (when (and (char= #\^ (aref s 0)) (or (= l 2) (char= #\\ (aref s 2))))
+			    (code-char (- (char-code (aref s 1)) #.(- (char-code #\A) 1)))))
+		   (4 (when (char= #\\ (aref s 0))
+			(code-char 
+			 (+ (* 64 (- (char-code (aref s 1)) #.(char-code #\0)))
+			    (* 8 (- (char-code (aref s 2)) #.(char-code #\0)))
+			    (- (char-code (aref s 3)) #.(char-code #\0)))))))))))))
 		
    
 (defun char-code (c)
@@ -249,7 +250,7 @@
 	   (j (- i #.(char-code #\0)))
 	   (k (- i #.(- (char-code #\a) 10)))
 	   (l (- i #.(- (char-code #\A) 10))))
-      (cond ((<=  0 j r 9) j);FIXME infer across inlines
+      (cond ((and (<=  0 j r) (<= j 9)) j);FIXME infer across inlines
 	    ((<= 10 k r 36) k)
 	    ((<= 10 l r 36) l)))))
 

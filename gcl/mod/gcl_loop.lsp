@@ -958,7 +958,7 @@ a LET-like macro, and a SETQ-like macro, which perform LOOP-style destructuring.
 
 
 (defun loop-warn (format-string &rest format-args)
-  (warn :style-warning :format-control "~?~%Current LOOP context:~{ ~S~}." :format-arguments (list format-string format-args (loop-context))))
+  (warn 'style-warning :format-control "~?~%Current LOOP context:~{ ~S~}." :format-arguments (list format-string format-args (loop-context))))
 
 
 (defun loop-check-data-type (specified-type required-type
