@@ -204,7 +204,20 @@
     (add-vref vref info)
     (when c1fv
       (add-info info (cadr c1fv)))
-    (list 'var info vref c1fv)))
+    (let ((fmla (exit-to-fmla-p)))
+      (cond ((when fmla (type>= #tnull (info-type info))) (c1nil))
+	    ((when fmla (type>= #t(member t) (info-type info))) (c1t))
+	    ((list 'var info vref c1fv))))))
+
+;; (defun c1var (name)
+;;   (let* ((info (make-info))
+;; 	 (vref (c1vref name))
+;; 	 (c1fv (when (cadr vref) (c1inner-fun-var))))
+;;     (setf (info-type info) (if (or (cadr vref) (caddr vref)) (var-dt (car vref)) (var-type (car vref))))
+;;     (add-vref vref info)
+;;     (when c1fv
+;;       (add-info info (cadr c1fv)))
+;;     (list 'var info vref c1fv)))
 
 ;; (defun c1var (name)
 ;;   (let* ((info (make-info))
@@ -470,12 +483,21 @@
   (cond ((endp args) (c1nil))
         ((endp (cdr args)) (too-few-args 'setq 2 1))
         ((endp (cddr args)) (c1setq1 (car args) (cadr args)))
-        ((do ((pairs args (cddr pairs))
-              (forms nil))
-             ((endp pairs) (c1expr (cons 'progn (reverse forms))))
-             (cmpck (endp (cdr pairs))
-                    "No form was given for the value of ~s." (car pairs))
-             (push (list 'setq (car pairs) (cadr pairs)) forms)))))
+        ((do ((pairs args) forms)
+             ((endp pairs) (c1expr (cons 'progn (nreverse forms))))
+             (cmpck (endp (cdr pairs)) "No form was given for the value of ~s." (car pairs))
+             (push (list 'setq (pop pairs) (pop pairs)) forms)))))
+
+;; (defun c1setq (args)
+;;   (cond ((endp args) (c1nil))
+;;         ((endp (cdr args)) (too-few-args 'setq 2 1))
+;;         ((endp (cddr args)) (c1setq1 (car args) (cadr args)))
+;;         ((do ((pairs args (cddr pairs))
+;;               (forms nil))
+;;              ((endp pairs) (c1expr (cons 'progn (reverse forms))))
+;;              (cmpck (endp (cdr pairs))
+;;                     "No form was given for the value of ~s." (car pairs))
+;;              (push (list 'setq (car pairs) (cadr pairs)) forms)))))
 
 
 (defun do-setq-tp (v form t1)
@@ -596,7 +618,7 @@
 ;; 		    (setf (car form) 'progn (cadr form) (cadr (fourth form)) (caddr form) 
 ;; 			  (list (fourth form)) (cdddr form) nil))))))))
 
-(defun c1setq1 (name form &aux (info (make-info)) type form1 name1 *c1exit*)
+(defun c1setq1 (name form &aux (info (make-info)) type form1 name1)
   (cmpck (not (symbolp name)) "The variable ~s is not a symbol." name)
   (cmpck (constantp name) "The constant ~s is being assigned a value." name)
   (setq name1 (c1vref name))
@@ -604,8 +626,7 @@
     (setf (info-flags info) (logior (iflags side-effects) (info-flags info))))
   (push-changed (car name1) info)
   (add-vref name1 info t)
-  (setq form1 (c1expr form))
-  (add-info info (cadr form1))
+  (setq form1 (c1arg form info))
   
   (when (eq (car form1) 'var)
     (pushnew (caaddr form1) (var-aliases (car name1))))
@@ -623,6 +644,34 @@
   (let ((c1fv (when (cadr name1) (c1inner-fun-var))))
     (when c1fv (add-info info (cadr c1fv)))
     (list 'setq info name1 form1 c1fv)))
+
+;; (defun c1setq1 (name form &aux (info (make-info)) type form1 name1 *c1exit*)
+;;   (cmpck (not (symbolp name)) "The variable ~s is not a symbol." name)
+;;   (cmpck (constantp name) "The constant ~s is being assigned a value." name)
+;;   (setq name1 (c1vref name))
+;;   (when (member (var-kind (car name1)) '(special global));FIXME
+;;     (setf (info-flags info) (logior (iflags side-effects) (info-flags info))))
+;;   (push-changed (car name1) info)
+;;   (add-vref name1 info t)
+;;   (setq form1 (c1expr form))
+;;   (add-info info (cadr form1))
+  
+;;   (when (eq (car form1) 'var)
+;;     (pushnew (caaddr form1) (var-aliases (car name1))))
+
+;;   (do-setq-tp (car name1) form (info-type (cadr form1)))
+;;   (setq type (var-type (car name1)))
+
+;;   (unless (eq type (info-type (cadr form1)))
+;;     (let ((info1 (copy-info (cadr form1))))
+;;          (setf (info-type info1) type)
+;;          (setq form1 (list* (car form1) info1 (cddr form1)))))
+
+;;   (setf (info-type info) type)
+;;   (set-form-type form1 type)
+;;   (let ((c1fv (when (cadr name1) (c1inner-fun-var))))
+;;     (when c1fv (add-info info (cadr c1fv)))
+;;     (list 'setq info name1 form1 c1fv)))
 
 ;; (defun c1setq1 (name form &aux (info (make-info)) type form1 name1 *c1exit*)
 ;;   (cmpck (not (symbolp name)) "The variable ~s is not a symbol." name)
@@ -674,46 +723,49 @@
 ;; 	       (otherwise (unwind-exit vref))))
 ;; 	((c2expr* form))))
 
-(defun c1progv (args &aux symbols values (info (make-info)))
+(defun c1progv (args &aux (info (make-info)))
   (when (or (endp args) (endp (cdr args)))
         (too-few-args 'progv 2 (length args)))
-  (setq symbols (c1expr* (car args) info))
-  (setq values (c1expr* (cadr args) info))
-  (list 'progv info symbols values (c1progn* (cddr args) info)))
+  (list 'progv info (c1arg (pop args) info) (c1arg (pop args) info) (c1progn* args info)))
+
+;; (defun c1progv (args &aux symbols values (info (make-info)))
+;;   (when (or (endp args) (endp (cdr args)))
+;;         (too-few-args 'progv 2 (length args)))
+;;   (setq symbols (c1expr* (car args) info))
+;;   (setq values (c1expr* (cadr args) info))
+;;   (list 'progv info symbols values (c1progn* (cddr args) info)))
 
 (defun c2progv (symbols values body
-                &aux (cvar (cs-push t t))
-                     (*unwind-exit* *unwind-exit*))
-
+			&aux (cvar (cs-push t t))
+			(*unwind-exit* *unwind-exit*))
+  
   (wt-nl "{object symbols,values;")
   (wt-nl "bds_ptr V" cvar "=bds_top;")
   (push cvar *unwind-exit*)
-
+  
   (let ((*vs* *vs*))
-       (let ((*value-to-go* (list 'vs (vs-push))))
-            (c2expr* symbols)
-            (wt-nl "symbols= " *value-to-go* ";"))
-
-       (let ((*value-to-go* (list 'vs (vs-push))))
-            (c2expr* values)
-            (wt-nl "values= " *value-to-go* ";"))
-
-       (wt-nl "while(!endp(symbols)){")
-       (when *safe-compile*
-             (wt-nl "if(type_of(MMcar(symbols))!=t_symbol)")
-             (wt-nl
-              "FEinvalid_variable(\"~s is not a symbol.\",MMcar(symbols));"))
-       (wt-nl "if(endp(values))bds_bind(MMcar(symbols),OBJNULL);")
-       (wt-nl "else{bds_bind(MMcar(symbols),MMcar(values));")
-       (wt-nl "values=MMcdr(values);}")
-       (wt-nl "symbols=MMcdr(symbols);}")
-       (setq *bds-used* t))
+    (let ((*value-to-go* (list 'vs (vs-push))))
+      (c2expr* symbols)
+      (wt-nl "symbols= " *value-to-go* ";"))
+    
+    (let ((*value-to-go* (list 'vs (vs-push))))
+      (c2expr* values)
+      (wt-nl "values= " *value-to-go* ";"))
+    
+    (wt-nl "while(!endp(symbols)){")
+    (when *safe-compile*
+      (wt-nl "if(type_of(MMcar(symbols))!=t_symbol)")
+      (wt-nl
+       "FEinvalid_variable(\"~s is not a symbol.\",MMcar(symbols));"))
+    (wt-nl "if(endp(values))bds_bind(MMcar(symbols),OBJNULL);")
+    (wt-nl "else{bds_bind(MMcar(symbols),MMcar(values));")
+    (wt-nl "values=MMcdr(values);}")
+    (wt-nl "symbols=MMcdr(symbols);}")
+    (setq *bds-used* t))
   (c2expr body)
-  (wt "}")
-  )
+  (wt "}"))
 
-(defun c1psetq (args &aux (vrefs nil) (forms nil) *c1exit*
-                          (info (make-info :type #tnull)))
+(defun c1psetq (args &aux vrefs forms (info (make-info :type #tnull)));FIXME to setq
   (do ((l args (cddr l)))
       ((endp l))
       (cmpck (not (symbolp (car l)))
@@ -723,7 +775,7 @@
       (cmpck (endp (cdr l))
              "No form was given for the value of ~s." (car l))
       (let* ((vref (c1vref (car l)))
-             (form (c1expr (cadr l)))
+             (form (c1arg (cadr l) info))
              (type (type-and (var-dt (car vref)) (info-type (cadr form)))))
 
 	(when (eq (car form) 'var)
@@ -742,9 +794,42 @@
 ;	    (setq form (list* (car form) info1 (cddr form)))))
 	(push vref vrefs)
 	(push form forms)
-	(push-changed (car vref) info)
-	(add-info info (cadar forms))))
+	(push-changed (car vref) info)))
   (list 'psetq info (reverse vrefs) (reverse forms)))
+
+;; (defun c1psetq (args &aux (vrefs nil) (forms nil) *c1exit*
+;;                           (info (make-info :type #tnull)))
+;;   (do ((l args (cddr l)))
+;;       ((endp l))
+;;       (cmpck (not (symbolp (car l)))
+;;              "The variable ~s is not a symbol." (car l))
+;;       (cmpck (constantp (car l))
+;;              "The constant ~s is being assigned a value." (car l))
+;;       (cmpck (endp (cdr l))
+;;              "No form was given for the value of ~s." (car l))
+;;       (let* ((vref (c1vref (car l)))
+;;              (form (c1expr (cadr l)))
+;;              (type (type-and (var-dt (car vref)) (info-type (cadr form)))))
+
+;; 	(when (eq (car form) 'var)
+;; 	  (pushnew (caaddr form) (var-aliases (car vref))))
+
+;; 	(when (member (var-kind (car vref)) '(special global));FIXME
+;; 	  (setf (info-flags info) (logior (iflags side-effects) (info-flags info))))
+
+;; 	(do-setq-tp (car vref) (cadr l) (info-type (cadr form)))
+;; 	(setq type (var-type (car vref)))
+
+;; 	(unless (equal type (info-type (cadr form)))
+;; 	  (set-form-type form type))
+;; ;	  (let ((info1 (copy-info (cadr form))))
+;; ;	    (setf (info-type info1) type)
+;; ;	    (setq form (list* (car form) info1 (cddr form)))))
+;; 	(push vref vrefs)
+;; 	(push form forms)
+;; 	(push-changed (car vref) info)
+;; 	(add-info info (cadar forms))))
+;;   (list 'psetq info (reverse vrefs) (reverse forms)))
 
 (defun c2psetq (vrefs forms &aux (*vs* *vs*) (saves nil) (blocks 0))
   (dolist (vref vrefs)

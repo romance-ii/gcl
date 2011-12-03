@@ -374,10 +374,16 @@ DEFUNO_NEW("COMPILED-FUNCTION-P",object,fLcompiled_function_p,LISP
 		x0 = Cnil;
 RETURN1(x0);}
 
-DEFUN_NEW("NEW-COMPILED-FUNCTION-P",object,fSnew_compiled_function_p,SI
+DEFUN_NEW("GENERIC-FUNCTION-P",object,fSgeneric_function_p,SI
    ,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
 
-  RETURN1(type_of(x0) == t_function ? Ct : Cnil);
+  RETURN1(type_of(x0) == t_function && x0->d.tt==1 ? Ct : Cnil);
+
+}
+DEFUN_NEW("SET-D-TT",object,fSset_d_tt_p,SI,2,2,NONE,OI,OO,OO,OO,(fixnum x,object y),"") {
+
+  y->d.tt=x;
+  RETURN1(y);
 
 }
 

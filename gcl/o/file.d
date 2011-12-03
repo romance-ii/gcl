@@ -791,7 +791,7 @@ object istrm, ostrm;
 	object strm;
 
 	strm = make_two_way_stream(istrm, ostrm);
-	strm->sm.sm_mode = (short)smm_echo;
+	strm->d.tt=strm->sm.sm_mode = (short)smm_echo;
 	return(strm);
 }
 
@@ -2349,8 +2349,7 @@ for the string ~S.",
 		3, istart, iend, strng);
 @)
 
-DEFUN_NEW("MAKE-STRING-OUTPUT-STREAM",object,fLmake_string_output_stream,LISP,
-	  0,2,NONE,OO,OO,OO,OO,(object tp,...),"") {
+DEFUN_NEW("MAKE-STRING-OUTPUT-STREAM",object,fLmake_string_output_stream,LISP,0,2,NONE,OO,OO,OO,OO,(object tp,...),"") {
 
  tp=tp;/*FIXME lintian*/
  RETURN1(make_string_output_stream(64));

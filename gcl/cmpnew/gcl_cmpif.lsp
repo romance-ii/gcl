@@ -486,10 +486,13 @@
 
 (defconstant +fmla+ (list (gensym)))
 
+(defun exit-to-fmla-p nil
+  (eq (last *c1exit*) +fmla+))
+
 (defun co1or (fn args)
   (declare (ignore fn))
   (with-restore-vars
-   (let* ((tp (when (and args (eq (last *c1exit*) +fmla+)) #t(member t)))
+   (let* ((tp (when (and args (exit-to-fmla-p)) #t(member t)))
 	  (arg (pop args))
 	  (tp (or tp (info-type (cadr (c1expr arg)))))
 	  (atp (atomic-tp (type-and tp #t(not null)))))
@@ -810,7 +813,7 @@
 (defun c1case (args &optional (default nil))
   (when (endp args) (too-few-args 'case 1 0))
   (let* ((info (make-info :type #tnil))
-         (key-form (with-restore-vars (c1expr* (car args) info)))
+         (key-form (with-restore-vars (c1arg (car args) info)))
          (clauses nil) or-list)
     (cond #+switch((unless (atomic-tp (info-type (second key-form)));FIXME
 	     (type>= #tfixnum (nil-to-t (info-type (second key-form)))))
@@ -846,6 +849,46 @@
                  (push (cons keylist body) clauses)))))
     (dolist (l or-list) (setf (var-type (car l)) (type-or1 (var-type (car l)) (cadr l))))
     (list 'case info key-form (reverse clauses) (or default (c1nil)))))
+
+;; (defun c1case (args &optional (default nil))
+;;   (when (endp args) (too-few-args 'case 1 0))
+;;   (let* ((info (make-info :type #tnil))
+;;          (key-form (with-restore-vars (c1expr* (car args) info)))
+;;          (clauses nil) or-list)
+;;     (cond #+switch((unless (atomic-tp (info-type (second key-form)));FIXME
+;; 	     (type>= #tfixnum (nil-to-t (info-type (second key-form)))))
+;; 	   (return-from c1case  (c1expr (convert-case-to-switch args default ))))
+;; 	  ((return-from c1case (c1expr (cmp-macroexpand `(,(if default 'ecase 'case) ,@args))))))
+;;     (dolist (clause (cdr args))
+;;       (cmpck (endp clause) "The CASE clause ~S is illegal." clause)
+;;       (case (car clause)
+;;             ((nil))
+;;             ((t otherwise)
+;;              (when default
+;;                    (cmperr (if (eq default 't)
+;;                                "ECASE had an OTHERWISE clause."
+;;                                "CASE had more than one OTHERWISE clauses.")))
+;;              (setq default (with-restore-vars
+;; 			    (prog1
+;; 				(c1progn (cdr clause))
+;; 			      (dolist (l *restore-vars*) (push (list (car l) (var-type (car l))) or-list)))))
+;; 	     (setf (info-type info) (type-or1 (info-type info) (info-type (cadr default))))
+;;              (add-info info (cadr default)))
+;;             (t (let* ((keylist
+;;                        (cond ((consp (car clause))
+;;                               (mapcar (lambda (key) (if (symbolp key) key (add-object key)))
+;;                                       (car clause)))
+;;                              ((symbolp (car clause)) (list (car clause)))
+;;                              (t (list (add-object (car clause))))))
+;;                       (body (with-restore-vars 
+;; 			     (prog1 
+;; 				 (c1progn (cdr clause))
+;; 			       (dolist (l *restore-vars*) (push (list (car l) (var-type (car l))) or-list))))))
+;;                  (add-info info (cadr body))
+;; 		 (setf (info-type info) (type-or1 (info-type info) (info-type (cadr body))))
+;;                  (push (cons keylist body) clauses)))))
+;;     (dolist (l or-list) (setf (var-type (car l)) (type-or1 (var-type (car l)) (cadr l))))
+;;     (list 'case info key-form (reverse clauses) (or default (c1nil)))))
 
 (defun c2case (key-form clauses default
                &aux (cvar (cs-push t t)) (*vs* *vs*) (*inline-blocks* 0))

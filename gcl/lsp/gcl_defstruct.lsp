@@ -686,7 +686,7 @@
 			       `(and (typep x '(vector t))
 				     (> (length x) ,name-offset)
 				     (eq (aref x ,name-offset) ',name))))))))
-	 ,@(when (and predicate named)
+	 ,@(when predicate ;(and predicate named);predicate;
 	     `((deftype ,name nil (list 'satisfies ',predicate))))
 	 ',name))))
 

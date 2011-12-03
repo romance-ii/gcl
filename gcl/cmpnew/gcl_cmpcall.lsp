@@ -314,7 +314,7 @@
   (vfun-wrap (ms cname "(" argstr ")") sig clp ap))
 
 (defun wrong-number-args (&rest r)
-  (error :program-error :format-control "Wrong number of arguments to anonymous function: ~a" :format-arguments (list r)))
+  (error 'program-error :format-control "Wrong number of arguments to anonymous function: ~a" :format-arguments (list r)))
 
 (defun insufficient-arg-str (fnstr nreq nsup sig st
 				   &aux (sig (if st sig (cons '(*) (cdr sig)))) 

@@ -200,7 +200,8 @@
 
 (defun fsf (s)
   (declare (optimize (safety 1)))
-  (check-type s funcallable-symbol)
+;  (check-type s funcallable-symbol); FIXME
+  (assert (funcallable-symbol-p s))
   (the function (c::symbol-gfdef s)));FIXME
 (setf (get 'fsf 'cmp-inline) t)
 
@@ -212,7 +213,7 @@
 (defun fn-env (x) ;FIXME expose pointers above, rename function type to type-spec
   (declare (optimize (safety 1)))
   (typecase x
-   (new-compiled-function (c::function-env x 0))))
+   (compiled-function (c::function-env x 0))))
 
 (eval-when
  (compile)
@@ -244,3 +245,9 @@
       (symbol-function 'si::package-internal_size) (symbol-function 'c::package-internal_size)
       (symbol-function 'si::package-external) (symbol-function 'c::package-external)
       (symbol-function 'si::package-external_size) (symbol-function 'c::package-external_size));FIXME
+
+(defun c::set-d-tt (i o);FIXME automate
+  (declare (optimize (safety 1)))
+  (check-type i (mod 16))
+  (side-effects)
+  (lit :fixnum (:object o) "->d.tt=" (:fixnum i)))

@@ -469,8 +469,7 @@
     (setq si:*pathname-logical*
 	  (si:set-pathname-lookup k si:*pathname-logical* t))
     (setq si:*pathname-logical*
-          (si:set-pathname-lookup k si:*pathname-logical* 
-          (si::map-pathname-translations k value)))
+          (si:set-pathname-lookup k si:*pathname-logical* (si::map-pathname-translations k value)))
     (cdr (si:pathname-lookup k si:*pathname-logical*))))
 
 (defsetf logical-pathname-translations si::set-logical-pathname-translations)
@@ -506,8 +505,7 @@
 (defsetf device-pathname-searchlist set-device-pathname-searchlist)
 
 (defun load-logical-pathname-translations (host)
-  (if (endp (cdr (si:pathname-lookup (string-downcase host)
-				     si:*pathname-logical*)))
+  (if (endp (cdr (si:pathname-lookup (string-downcase host) si:*pathname-logical*)))
   (let (n p) (block nil
     (setq n (concatenate 'string host "-translations"))
     (setq p (make-pathname :name n :type "lisp" :directory :current))
@@ -755,7 +753,7 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
 (defun load (f &rest args)
   (values (apply 'load1 f args)))
 
-(defun make-string-output-stream (&key element-type)
-  (declare (optimize (safety 1)))
-  (declare (ignore element-type))
-  (c::make-string-output-stream))
+;; (defun make-string-output-stream (&key element-type)
+;;   (declare (optimize (safety 1)))
+;;   (declare (ignore element-type))
+;;   (c::make-string-output-stream))

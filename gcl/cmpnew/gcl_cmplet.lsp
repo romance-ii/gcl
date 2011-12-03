@@ -131,17 +131,29 @@
 ;; 	      ((push var nv) (push form nf))))))
 
 
-(defun mvars (args ss is ts star inls &aux *c1exit*)
+(defun mvars (args ss is ts star inls)
   (mapcar (lambda (x)
 	    (let* ((n (if (atom x) x (pop x)))
 		   (f (unless (atom x) (car x)))
 		   (v (c1make-var n ss is ts))
-		   (fm (if (and inls (eq f (caar inls))) (cdr (pop inls)) (c1expr f))));FIXME check
+		   (fm (if (and inls (eq f (caar inls))) (cdr (pop inls)) (c1arg f))));FIXME check
 	      (set-var-init-type v (info-type (cadr fm)))
 	      (when (eq (car fm) 'var) (pushnew (caaddr fm) (var-aliases v)))
 	      (maybe-reverse-type-prop (var-type v) fm)
 	      (when star (push v *vars*))
 	      (cons v fm))) args))
+
+;; (defun mvars (args ss is ts star inls &aux *c1exit*)
+;;   (mapcar (lambda (x)
+;; 	    (let* ((n (if (atom x) x (pop x)))
+;; 		   (f (unless (atom x) (car x)))
+;; 		   (v (c1make-var n ss is ts))
+;; 		   (fm (if (and inls (eq f (caar inls))) (cdr (pop inls)) (c1expr f))));FIXME check
+;; 	      (set-var-init-type v (info-type (cadr fm)))
+;; 	      (when (eq (car fm) 'var) (pushnew (caaddr fm) (var-aliases v)))
+;; 	      (maybe-reverse-type-prop (var-type v) fm)
+;; 	      (when star (push v *vars*))
+;; 	      (cons v fm))) args))
 
 ;; (defun mvars (args ss is ts info star &aux *c1exit* (ov *vars*))
 ;;   (mapcar (lambda (x)

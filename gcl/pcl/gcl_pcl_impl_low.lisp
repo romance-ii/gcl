@@ -7,6 +7,11 @@
  (compile eval load)
  (setq  *EVAL-WHEN-COMPILE* t))
 
+(defun %%allocate-instance--class (&aux wrapper slots)
+  (let ((i (system:make-structure 'std-instance wrapper slots)))
+    (c::set-d-tt 1 i)
+    i))
+
 (import '(si::memq) 'pcl)
 ;(defmacro memq (item list) `(member ,item ,list :test #'eq))
 (defmacro assq (item list) `(assoc ,item ,list :test #'eq))
@@ -99,7 +104,7 @@
   (declare (optimize (safety 1)))
   (check-type n seqind)
   (typecase f
-   (compiler::new-compiled-function
+   (compiled-function
     (let ((x (compiler::lit :fixnum "(fixnum)" (:object f) "->fun.fun_env[-1]-1")));FIXME
       (when (< n x)
 	(c::function-env f n))))))
@@ -138,7 +143,7 @@
 
 ;; (defentry cclosurep (object) (static object cclosurep))
 
-(defun cclosurep (x) (typecase x (compiler::new-compiled-function t)))
+(defun cclosurep (x) (typecase x (compiled-function t)))
 (defun cclosure-env (f)
   (declare (inline c::fn-env))
   (compiler::fn-env f))
@@ -260,9 +265,9 @@
 
 (defun %set-cclosure (r v s)
   (declare (fixnum s))
-  (unless (typep r 'compiler::new-compiled-function)
+  (unless (typep r 'compiled-function)
     (error "Bad fn 1"))
-  (unless (typep v 'compiler::new-compiled-function)
+  (unless (typep v 'compiled-function)
     (error "Bad fn 1"))
   (si::use-fast-links nil r)
   (progn (compiler::side-effects) (compiler::lit :object (:object r) "->fun.fun_self=" (:object v) "->fun.fun_self"));FIXME

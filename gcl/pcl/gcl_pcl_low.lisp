@@ -112,14 +112,14 @@
 #-new-kcl-wrapper
 (progn
 
-(eval-when (compile load eval)
-	   (deftype std-instance nil `(or structure (and standard-object (not funcallable-standard-object)))))
+;(eval-when (compile load eval)
+;	   (deftype std-instance nil `(or structure (and standard-object (not funcallable-standard-object)))))
 ;(si::putprop 'std-instance '(lambda nil `(or structure (and standard-object (not (funcallable-standard-object))))) 'si::deftype-definition)
 
 #-cmu17
 (defstruct (std-instance (:predicate std-instance-p)
 			 (:conc-name %std-instance-)
-			 (:constructor %%allocate-instance--class ())
+			 (:constructor nil);(:constructor %%allocate-instance--class ())
 			 (:print-function print-std-instance))
   (wrapper nil)
   (slots nil))

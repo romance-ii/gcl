@@ -1341,6 +1341,7 @@ dbg:
     ;; (setf (%cclosure-env fin) env)
     ;; #+:turbo-closure (si:turbo-closure fin)
     (setf (funcallable-instance-marker fin) *funcallable-instance-marker*)
+    (c::set-d-tt 1 fin)
     fin))
 
 ;; (defun allocate-funcallable-instance-2 ()

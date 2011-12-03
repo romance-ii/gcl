@@ -500,7 +500,7 @@ object ihs_top_function_name(ihs_ptr h);
 #define FLOATING_POINT_INEXACT(a_,b_) Icall_error_handler(sLfloating_point_inexact,null_string,4,sKoperation,a_,sKoperands,b_)
 #define FLOATING_POINT_INVALID_OPERATION(a_,b_) Icall_error_handler(sLfloating_point_invalid_operation,null_string,4,sKoperation,a_,sKoperands,b_)
 
-#define PATHNAME_ERROR(a_,b_,c_...) Icall_error_handler(sLpathname_error,null_string,6,\
+#define PATHNAME_ERROR(a_,b_,c_...) Icall_error_handler(sLfile_error,null_string,6,\
                                                         sKpathname,(a_),\
 				   		        sKformat_control,make_simple_string(b_),\
                                                         sKformat_arguments,list(c_))

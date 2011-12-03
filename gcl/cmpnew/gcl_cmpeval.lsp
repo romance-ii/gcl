@@ -70,13 +70,8 @@
 (defun c1expr (form)
   (setq form (catch *cmperr-tag*
     (cond ((symbolp form)
-           (cond ((eq form nil) (c1nil))
-                 ((eq form t) (c1t))
-                 ((keywordp form)
-                  (list 'LOCATION (make-info :type (object-type form))
-                        (list 'VV (add-object form))))
-                 ((constantp form)
-                  (let ((val (symbol-value form)))
+           (cond ((constantp form) 
+		  (let ((val (symbol-value form)))
 		    (or 
 		     (c1constant-value val nil)
 		     `(location ,(make-info :type (object-type val)) (VV ,(add-constant form))))))
@@ -94,6 +89,34 @@
 	     (or (when (ignorable-form res) (atomic-type-constant-value atp)) res)))
           (t (c1constant-value form t)))))
   (if (eq form '*cmperr-tag*) (c1nil) form))
+
+;; (defun c1expr (form)
+;;   (setq form (catch *cmperr-tag*
+;;     (cond ((symbolp form)
+;;            (cond ((eq form nil) (c1nil))
+;;                  ((eq form t) (c1t))
+;;                  ((keywordp form)
+;;                   (list 'LOCATION (make-info :type (object-type form))
+;;                         (list 'VV (add-object form))))
+;;                  ((constantp form)
+;;                   (let ((val (symbol-value form)))
+;; 		    (or 
+;; 		     (c1constant-value val nil)
+;; 		     `(location ,(make-info :type (object-type val)) (VV ,(add-constant form))))))
+;;                  ((c1var form))))
+;;           ((consp form)
+;;            (let* ((fun (car form))
+;; 		  (res (cond ((symbolp fun)
+;; 			      (c1symbol-fun form))
+;; 			     ((and (consp fun) (eq (car fun) 'lambda))
+;; 			      (c1symbol-fun (cons 'funcall form)))
+;; 			     ((and (consp fun) (eq (car fun) 'si:|#,|))
+;; 			      (cmperr "Sharp-comma-macro was found in a bad place."))
+;; 			     (t (cmperr "The function ~s is illegal." fun))))
+;; 		  (atp (atomic-tp (info-type (cadr res)))))
+;; 	     (or (when (ignorable-form res) (atomic-type-constant-value atp)) res)))
+;;           (t (c1constant-value form t)))))
+;;   (if (eq form '*cmperr-tag*) (c1nil) form))
 
 ;; (defun c1expr (form)
 ;;   (setq form (catch *cmperr-tag*
@@ -486,7 +509,7 @@
 	       (,#tstream . *standard-input*) ;FIXME
 	       (,#trandom-state . (make-random-state)) 
 	       (,#treadtable . (si::standard-readtable)) 
-	       (,#tnew-compiled-function . (function eq)) ;FIXME old
+	       (,#tcompiled-function . (function eq)) ;FIXME old
 ;	       (,#told-compiled-function . (function si::file-column)) ;FIXME old
 ;	       (,#tinterpreted-function . (lambda nil nil)) 
 	       ,@(mapcar (lambda (x)
@@ -521,20 +544,31 @@
 		    (,#tfcomplex . #c(1.0s0 1)) 
 		    (,#tdcomplex . #c(1.0 1)) 
 		    (,#tstandard-char . #\a)
-		    (,#t(and character (not standard-char)) . #\^a)
+		    (,#tnon-standard-base-char . #\Return)
 		    (,#tstructure . (make-var)) 
-		    (,#tpathname . #p".") ;FIXME
+		    (,#tstd-structure . (set-d-tt 1 (make-var))) 
+		    (,#tnon-logical-pathname . #p".")
+		    (,#tlogical-pathname . (set-d-tt 1 #p"."))
 		    (,#thash-table-eq . (make-hash-table :test 'eq))
 		    (,#thash-table-eql . (make-hash-table :test 'eql))
 		    (,#thash-table-equal . (make-hash-table :test 'equal))
 		    (,#thash-table-equalp . (make-hash-table :test 'equalp))
 		    (,#tpackage . *package*) 
-		    (,#tstream . *standard-input*) ;FIXME
+		    (,#tfile-input-stream . ,(with-open-file (s "/dev/null" :direction :input) s))
+		    (,#tfile-output-stream . ,(with-open-file (s "/dev/null" :direction :output) s))
+		    (,#tfile-io-stream . ,(with-open-file (s "/dev/null" :direction :io) s))
+		    (,#tfile-probe-stream . ,(with-open-file (s "/dev/null" :direction :probe) s))
+		    (,#tsynonym-stream . *standard-output*)
+		    (,#tbroadcast-stream . ,(make-broadcast-stream))
+		    (,#tconcatenated-stream . ,(make-concatenated-stream))
+		    (,#ttwo-way-stream . *terminal-io*)
+		    (,#techo-stream . ,(make-echo-stream *standard-input* *standard-input*))
+		    (,#tstring-input-stream . ,(make-string-input-stream ""))
+		    (,#tstring-output-stream . ,(make-string-output-stream));FIXME user defined, socket
 		    (,#trandom-state . (make-random-state)) 
 		    (,#treadtable . (si::standard-readtable)) 
-		    (,#tnew-compiled-function . (function eq)) ;FIXME old
-;		    (,#told-compiled-function . (function si::file-column)) ;FIXME old
-;		    (,#tinterpreted-function . (lambda nil nil)) 
+		    (,#tnon-generic-compiled-function . (function eq))
+		    (,#tgeneric-function . (set-d-tt 1 (lambda nil nil)))
 		    ,@(mapcar (lambda (x)
 				`(,(cmp-norm-tp `(array ,x (*))) . 
 				  (make-array 1 :element-type ',x))) si::+array-types+)
@@ -704,6 +738,18 @@
     (add-info info ri)
     (setf (info-type info) (info-type ri))
     res))
+
+;; (defun c1infer-tp (args)
+;;   (let* ((x (car (member (pop args) *vars* :key (lambda (x) (when (var-p x) (var-name x))))))
+;; 	 (tp (type-and (var-type x) (cmp-norm-tp (pop args))))
+;; 	 (info (make-info))
+;; 	 (res (with-restore-vars
+;; 	       (do-setq-tp x nil tp)
+;; 	       (c1expr (car args))))
+;; 	 (ri (cadr res)))
+;;     (add-info info ri)
+;;     (setf (info-type info) (info-type ri))
+;;     res))
 (defun c2infer-tp (x tp fm)
   (declare (ignore x tp))
   (c2expr fm))
@@ -1285,16 +1331,28 @@
 ;; (defun bbump-tp (tp)
 ;;   (if (type>= #tseqind tp) #tseqind (bump-tp tp)))
 
-(defun prev-sir (sir &optional (s (append *src-inline-recursion* *prev-sri*)))
+(defun prev-sir (sir &optional (s (append *src-inline-recursion* *prev-sri*)) (i 0))
   (cond ;((not sp) (or (> (length s) 5) (prev-sir sir s)));FIXME
 	((atom s) nil)
 	((let* ((x (pop s))(x (car x)))
 	   (when (eq (car x) (car sir))
-	     (if (cdr x)
-		 (and (= (length (cdr x)) (length (cdr sir)));FIXME unroll strategy	       
-		      (every (lambda (x y) (type<= (bbump-tp x) (bbump-tp y))) (cdr x) (cdr sir)))
-	       (not (member-if 'atomic-tp (cdr sir)))))));FIXME all eq
-	((prev-sir sir s))))
+	     (or (> (incf i) 10)
+		 (if (cdr x)
+		     (and (= (length (cdr x)) (length (cdr sir)));FIXME unroll strategy	       
+			  (every (lambda (x y) (type<= (bbump-tp x) (bbump-tp y))) (cdr x) (cdr sir)))
+		   (not (member-if 'atomic-tp (cdr sir))))))));FIXME all eq
+	((prev-sir sir s i))))
+
+;; (defun prev-sir (sir &optional (s (append *src-inline-recursion* *prev-sri*)))
+;;   (cond ;((not sp) (or (> (length s) 5) (prev-sir sir s)));FIXME
+;; 	((atom s) nil)
+;; 	((let* ((x (pop s))(x (car x)))
+;; 	   (when (eq (car x) (car sir))
+;; 	     (if (cdr x)
+;; 		 (and (= (length (cdr x)) (length (cdr sir)));FIXME unroll strategy	       
+;; 		      (every (lambda (x y) (type<= (bbump-tp x) (bbump-tp y))) (cdr x) (cdr sir)))
+;; 	       (not (member-if 'atomic-tp (cdr sir)))))));FIXME all eq
+;; 	((prev-sir sir s))))
 
 (defun maybe-cons-sir (sir tag ttag src env &aux (id (name-sir sir)))
   (cond ((and (eq src (local-fun-src id))
@@ -1461,7 +1519,7 @@
 (defun make-c1forms (fn args last info)
   (let* ((at (get-arg-types fn))
 	 (nargs (c1args args info))
-	 (c1l (when last (c1expr last)))
+	 (c1l (when last (c1arg last info)))
 	 (nargs (if (when last (not (type>= #tnull (info-type (cadr c1l)))))
 		    (progn (add-info info (cadr c1l)) (nconc nargs (list c1l)))
 		  nargs))
@@ -1490,6 +1548,39 @@
 	 (f nargs (cdr f)))
 	((or (endp f) (endp a)) nargs)
 	(maybe-reverse-type-prop (car a) (car f)))))
+
+;; (defun make-c1forms (fn args last info)
+;;   (let* ((at (get-arg-types fn))
+;; 	 (nargs (c1args args info))
+;; 	 (c1l (when last (c1expr last)))
+;; 	 (nargs (if (when last (not (type>= #tnull (info-type (cadr c1l)))))
+;; 		    (progn (add-info info (cadr c1l)) (nconc nargs (list c1l)))
+;; 		  nargs))
+;; 	 (nat (mapcar (lambda (x) (info-type (cadr x))) nargs))
+;; 	 (ss (gethash fn *sigs*));FIXME?
+;; 	 (at (if (and ss (not (car ss))) nat at)))
+
+;;     (mapc (lambda (x) (setf (info-type (cadr x)) (coerce-to-one-value (info-type (cadr x))))) nargs)
+
+;;     (unless (or last (local-fun-p fn) (eq fn (cadr *current-form*)));FIXME
+;;       (when (do (p ;n
+;; 		 (a at (if (eq (car a) '*) a (cdr a)))
+;; 		 (r args (cdr r))
+;; 		 (f nargs (cdr f)))
+;; 		((or p (endp f) (endp a))
+;; 		 (or p f (and a (not (eq (car a) '*))))) ; (when (setq nargs (nreverse n)) nil)))
+;; 		(check-form-type (car a) (car f) (car r))
+;; 					;	      (push (and-form-type (or (car a) '*) (car f) (car r)) n)
+;; 		(setq p (when (info-type (cadar f)) (null (info-type (cadar f))))))
+;; 	(cmpwarn "inlining of ~a prevented due to argument type mismatch: ~a ~a~%" 
+;; 		 fn at nat)
+;; 	(setf (info-type info) nil)))
+
+;;     (do ((a at (if (eq '* (car a)) a (cdr a)))
+;; 	 (r args (cdr r))
+;; 	 (f nargs (cdr f)))
+;; 	((or (endp f) (endp a)) nargs)
+;; 	(maybe-reverse-type-prop (car a) (car f)))))
 
 ;; (defun make-c1forms (fn args last info &aux (*provisional-inline* t))
 ;;   (let* ((at (get-arg-types fn))
@@ -1520,12 +1611,19 @@
 ;; 	((or (endp f) (endp a)) nargs)
 ;; 	(maybe-reverse-type-prop (car a) (car f)))))
 
-(defun make-ordinary (fn)
+(defun make-ordinary (fn &aux *c1exit*);FIXME *c1exit*
   (let* ((s (tmpsym))(g (tmpsym))
-	 (e (c1let-* `(((,s ,g)) (etypecase ,s (symbol (fsf ,s)) (function ,s))) t (list (cons g fn))))
+	 (e (c1let-* `(((,s ,g)) (etypecase ,s ((and symbol (not boolean)) (fsf ,s)) (function ,s))) t (list (cons g fn))))
 	 (info (make-info)))
     (add-info info (cadr e))
     (list 'ordinary info e)))
+
+;; (defun make-ordinary (fn)
+;;   (let* ((s (tmpsym))(g (tmpsym))
+;; 	 (e (c1let-* `(((,s ,g)) (etypecase ,s (symbol (fsf ,s)) (function ,s))) t (list (cons g fn))))
+;; 	 (info (make-info)))
+;;     (add-info info (cadr e))
+;;     (list 'ordinary info e)))
 
 ;; (defun make-ordinary (fn)
 ;;   (let* ((s (tmpsym))(g (tmpsym))
@@ -1651,7 +1749,7 @@
 (defun mi1a (fun args last info &aux (*in-inline* t))
 
   (let* ((af (member fun '(apply funcall)))
-	 (ff (when af (c1expr (pop args))))
+	 (ff (when af (c1arg (pop args) info)))
 	 (fun (if ff (coerce-ff ff) fun));FIXME, e.g. when funcall
 	 (otp (info-type info))
 	 (fms (make-c1forms fun args last info))
@@ -1659,6 +1757,18 @@
 	 (tp (type-from-args fun fms last info))
 	 (inl (when (or tp (eq otp tp)) (mi2 fun args last fms (ff-env (or ff fun))))))
     (or inl (mi5 (or (when (symbolp fun) fun) ff) info fms last))))
+
+;; (defun mi1a (fun args last info &aux (*in-inline* t))
+
+;;   (let* ((af (member fun '(apply funcall)))
+;; 	 (ff (when af (c1expr (pop args))))
+;; 	 (fun (if ff (coerce-ff ff) fun));FIXME, e.g. when funcall
+;; 	 (otp (info-type info))
+;; 	 (fms (make-c1forms fun args last info))
+;; 	 (last (when (and last (nth (length args) fms)) last))
+;; 	 (tp (type-from-args fun fms last info))
+;; 	 (inl (when (or tp (eq otp tp)) (mi2 fun args last fms (ff-env (or ff fun))))))
+;;     (or inl (mi5 (or (when (symbolp fun) fun) ff) info fms last))))
 
 ;; (defun mi1a (fun args last info &aux (*in-inline* t) *provisional-inline*)
 
@@ -1722,8 +1832,22 @@
 	 (sp (if (get fn 'no-sp-change) 0 1))
 	 (info (make-info :type tp :sp-change sp))
  	 (res (mi1a fn args last info)))
-    (when tp (setf (info-type (cadr res)) (type-and (info-type info) (info-type (cadr res)))));FIXME
+    (when tp 
+      (let ((t1 (info-type (cadr res)))(t2 (info-type info)))
+	(when (exit-to-fmla-p)
+	  (labels ((tb (tp) (type-or1 (when (type-and #tnull tp) #tnull)
+				      (when (type-and #t(not null) tp) #t(member t)))))
+		  (setq t1 (tb t1) t2 (tb t2))))
+	(setf (info-type (cadr res)) (type-and t1 t2))))
     res))
+
+;; (defun mi1 (fn args &optional last)
+;;   (let* ((tp (get-return-type fn))
+;; 	 (sp (if (get fn 'no-sp-change) 0 1))
+;; 	 (info (make-info :type tp :sp-change sp))
+;;  	 (res (mi1a fn args last info)))
+;;     (when tp (setf (info-type (cadr res)) (type-and (info-type info) (info-type (cadr res)))));FIXME
+;;     res))
 
 ;; (defun mi1 (fn args &optional last)
 ;;   (let* ((tp (get-return-type fn))
@@ -2429,8 +2553,7 @@
 		   (setq rp (last (if rp (rplacd rp f) (setq r f))))
 		   (add-info info i)))
 		 (do ((forms forms (cdr forms))) ((not forms))
-		     (let* ((*c1exit* (unless (cdr forms) *c1exit*))
-			    (form (c1expr (car forms))))
+		     (let ((form (if (cdr forms) (c1arg (car forms)) (c1expr (car forms)))))
 		       (cond ((and (cdr forms) (ignorable-form form)))
 			     ((eq (car form) 'progn) (collect (third form) (cadr form)))
 			     ((collect (cons form nil) (cadr form))))))
@@ -2439,6 +2562,26 @@
 			(list 'progn info r))
 		       ((car r))
 		       ((c1nil))))))))
+
+;; (defun c1progn (forms &aux r rp)
+;;   (cond ((endp forms) (c1nil))
+;; 	((endp (cdr forms)) (c1expr (car forms)))
+;; 	((let ((info (make-info)))
+;; 	   (flet ((collect 
+;; 		   (f i) 
+;; 		   (setq rp (last (if rp (rplacd rp f) (setq r f))))
+;; 		   (add-info info i)))
+;; 		 (do ((forms forms (cdr forms))) ((not forms))
+;; 		     (let* ((*c1exit* (unless (cdr forms) *c1exit*))
+;; 			    (form (c1expr (car forms))))
+;; 		       (cond ((and (cdr forms) (ignorable-form form)))
+;; 			     ((eq (car form) 'progn) (collect (third form) (cadr form)))
+;; 			     ((collect (cons form nil) (cadr form))))))
+;; 		 (cond ((cdr r)
+;; 			(setf (info-type info) (info-type (cadar rp)))
+;; 			(list 'progn info r))
+;; 		       ((car r))
+;; 		       ((c1nil))))))))
 
 ;(defun c1progn (forms &aux (fl nil))
 ;  (let ((info (make-info)))
@@ -2467,8 +2610,14 @@
             (c2expr (car l))
             (wt-label *exit*))))
 
-(defun c1args (forms info &aux *c1exit*)
-  (mapcar (lambda (form) (c1expr* form info)) forms))
+(defun c1arg (form &optional (info (make-info)) &aux *c1exit*)
+  (c1expr* form info))
+
+(defun c1args (forms info)
+  (mapcar (lambda (form) (c1arg form info)) forms))
+
+;; (defun c1args (forms info &aux *c1exit*)
+;;   (mapcar (lambda (form) (c1expr* form info)) forms))
 
 ;;; Structures
 
@@ -2503,9 +2652,28 @@
 				      #t(vector unsigned-char)
 				      tp))
 	   (list 'structure-ref info
-		 (c1expr* form info)
+		 (c1arg form info)
 		 (add-symbol name)
 		 index sd)))))
+
+;; (defun c1structure-ref1 (form name index &aux (info (make-info)))
+;;   ;;; Explicitly called from c1expr and c1structure-ref.
+;;   (cond (*safe-compile* (c1expr `(si::structure-ref ,form ',name ,index)))
+;; 	((let* ((sd (get name 'si::s-data))
+;; 		(aet-type (aref (si::s-data-raw sd) index))
+;; 		(sym (find-symbol (si::string-concatenate
+;; 				   (or (si::s-data-conc-name sd) "")
+;; 				   (car (nth index (si::s-data-slot-descriptions sd))))))
+;; 		(tp (if sym (get-return-type sym) '*))
+;; 		(tp (type-and tp (nth aet-type +cmp-array-types+)))) 
+
+;; 	   (setf (info-type info) (if (and (eq name 'si::s-data) (= index 2));;FIXME -- this belongs somewhere else.  CM 20050106
+;; 				      #t(vector unsigned-char)
+;; 				      tp))
+;; 	   (list 'structure-ref info
+;; 		 (c1expr* form info)
+;; 		 (add-symbol name)
+;; 		 index sd)))))
 
 (defun coerce-loc-structure-ref (arg type-wanted &aux (form (cdr arg)))
   (let* ((sd (fourth form))
@@ -2584,15 +2752,35 @@
            (si:fixnump (caddr args))
            (not (endp (cdddr args)))
            (endp (cddddr args)))
-      (let ((x (c1expr (car args)))
-            (y (c1expr (cadddr args))))
-        (add-info info (cadr x))
-        (add-info info (cadr y))
+      (let ((x (c1arg (car args) info))
+            (y (c1arg (cadddr args) info)))
         (setf (info-type info) (info-type (cadr y)))
         (list 'structure-set info x
               (add-symbol (cadadr args)) ;;; remove QUOTE.
               (caddr args) y (get (cadadr args) 'si::s-data)))
       (list 'call-global info 'si:structure-set (c1args args info))))
+
+;; (defun c1structure-set (args &aux (info (make-info :flags (iflags side-effects))))
+;;   (if (and (not (endp args)) (not *safe-compile*)
+;;            (not (endp (cdr args)))
+;;            (consp (cadr args))
+;;            (eq (caadr args) 'quote)
+;;            (not (endp (cdadr args)))
+;;            (symbolp (cadadr args))
+;;            (endp (cddadr args))
+;;            (not (endp (cddr args)))
+;;            (si:fixnump (caddr args))
+;;            (not (endp (cdddr args)))
+;;            (endp (cddddr args)))
+;;       (let ((x (c1expr (car args)))
+;;             (y (c1expr (cadddr args))))
+;;         (add-info info (cadr x))
+;;         (add-info info (cadr y))
+;;         (setf (info-type info) (info-type (cadr y)))
+;;         (list 'structure-set info x
+;;               (add-symbol (cadadr args)) ;;; remove QUOTE.
+;;               (caddr args) y (get (cadadr args) 'si::s-data)))
+;;       (list 'call-global info 'si:structure-set (c1args args info))))
 
 
 ;; The following (side-effects) exists for putting at the end of an
@@ -2627,9 +2815,7 @@
 
 (defun sv-wrap (x) `(symbol-value ',x))
 
-(defun c1constant-value (val always-p); &aux (info (make-info :type (object-type val))))
-;							    :referred-array +empty-info-array+
-;							    :changed-array +empty-info-array+)))
+(defun c1constant-value (val always-p &aux (val (if (exit-to-fmla-p) (not (not val)) val)))
   (cond
    ((eq val nil) (c1nil))
    ((eq val t) (c1t))
@@ -2671,7 +2857,54 @@
    ((and (arrayp val) (not (si::staticp val)) (eq (array-element-type val) t)) ;; This must be readable
     (list 'LOCATION (make-info :type (object-type val)) (list 'VV (add-object val))))
    (always-p
-    (list 'LOCATION (make-info :type (object-type val)) (list 'VV (add-object val))))));FIXME check readability
+    (list 'LOCATION (make-info :type (object-type val)) (list 'VV (add-object val))))))
+
+;; (defun c1constant-value (val always-p); &aux (info (make-info :type (object-type val))))
+;; ;							    :referred-array +empty-info-array+
+;; ;							    :changed-array +empty-info-array+)))
+;;   (cond
+;;    ((eq val nil) (c1nil))
+;;    ((eq val t) (c1t))
+;;    ((typep val 'char)
+;;     (list 'LOCATION (make-info :type (object-type val)) (list 'CHAR-VALUE nil val)))
+;;    ((si:fixnump val)
+;;     (list 'LOCATION (make-info :type (object-type val)) (list 'FIXNUM-VALUE (unless (si::seqindp val) (add-object val)) val)))
+;;    ((characterp val)
+;;     (list 'LOCATION (make-info :type (object-type val)) (list 'CHARACTER-VALUE nil (char-code val))))
+;;    ((typep val 'long-float)
+;;     ;; We can't read in long-floats which are too big:
+;;     (let* (sc 
+;; 	   (vv 
+;; 	    (cond ((= val +inf) (add-object (cons 'si::|#,| `(symbol-value ','+inf))));This cannot be a constant list
+;; 		  ((= val -inf) (add-object (cons 'si::|#,| `(symbol-value ','-inf))))
+;; 		  ((not (isfinite val)) (add-object (cons 'si::|#,| `(symbol-value ','nan))))
+;; 		  ((> (abs val) (/ most-positive-long-float 2))
+;; 		   (add-object (cons 'si::|#,| `(* ,(/ val most-positive-long-float) most-positive-long-float))))
+;; 		  ((< 0.0 (abs val) (* least-positive-long-float 1.0d20))
+;; 		   (add-object (cons `si::|#,| `(* ,(/ val least-positive-long-float) least-positive-long-float))))
+;; 		  ((setq sc t) (add-object val)))))
+;; ;      (unless (isfinite val) (setf (info-type info) #tlong-float))
+;;       `(location ,(make-info :type (object-type val)) ,(if sc `(long-float-value ,vv ,val) `(vv ,vv)))))
+;;    ((typep val 'short-float)
+;;     (list 'LOCATION (make-info :type (object-type val))
+;;           (list 'SHORT-FLOAT-VALUE (add-object val) val)))
+;;    ((typep val #tfcomplex)
+;;     (list 'LOCATION (make-info :type (object-type val))
+;;           (list 'FCOMPLEX-VALUE (add-object val) val)))
+;;    ((typep val #tdcomplex)
+;;     (list 'LOCATION (make-info :type (object-type val))
+;;           (list 'DCOMPLEX-VALUE (add-object val) val)))
+;;    ((and (consp val) (eq (car val) 'si::|#,|))
+;; ;    (setf (info-type info) t);(object-type (cmp-eval (cdr val))))
+;;     (list 'LOCATION (make-info :type t) (list 'VV (add-object val))))
+;;    ((and *compiler-compile* (not *keep-gaz*))
+;; ;    (setf (info-type info) (object-type val))
+;;     (list 'LOCATION (make-info :type (object-type val)) (list 'VV (add-object (cons 'si::|#,| `(si::nani ,(si::address val)))))))
+;;    ((and (arrayp val) (not (si::staticp val)) (eq (array-element-type val) t)) ;; This must be readable
+;;     (list 'LOCATION (make-info :type (object-type val)) (list 'VV (add-object val))))
+;;    (always-p
+;;     (list 'LOCATION (make-info :type (object-type val)) (list 'VV (add-object val))))))
+					;FIXME check readability
 
 
 (defmacro si::define-compiler-macro (name vl &rest body)

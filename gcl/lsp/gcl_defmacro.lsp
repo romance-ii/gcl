@@ -281,16 +281,16 @@
         )))
 
 (defun dm-bad-key (key)
-       (error :program-error "Defmacro-lambda-list contains illegal use of ~s." key))
+       (error 'program-error :format-control "Defmacro-lambda-list contains illegal use of ~s." :format-arguments (list key)))
 
 (defun dm-too-few-arguments ()
-       (error :program-error "Too few arguments are supplied to defmacro-lambda-list."))
+       (error 'program-error :format-control "Too few arguments are supplied to defmacro-lambda-list."))
 
 (defun dm-too-many-arguments ()
-       (error :program-error "Too many arguments are supplied to defmacro-lambda-list."))
+       (error 'program-error :format-control "Too many arguments are supplied to defmacro-lambda-list."))
 
 (defun dm-key-not-allowed (key)
-       (error :program-error "The key ~s is not allowed." key))
+       (error 'program-error :format-control "The key ~s is not allowed." :format-arguments (list key)))
 
 (defun find-declarations (body)
   (if (endp body)

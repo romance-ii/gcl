@@ -651,7 +651,7 @@
 
 (defstruct (#-cmu17 structure-object #+cmu17 dead-beef-structure-object
 	     (:constructor |STRUCTURE-OBJECT class constructor|)))
-
+(deftype structure-object nil `(structure))
 
 (defclass standard-object (slot-object) ())
 

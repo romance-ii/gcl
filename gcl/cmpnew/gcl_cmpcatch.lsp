@@ -34,8 +34,7 @@
 (defun c1catch (args &aux (info (make-info :type #t* :sp-change 1)) tag)
   (incf *setjmps*)
   (when (endp args) (too-few-args 'catch 1 0))
-  (setq tag (c1expr (car args)))
-  (add-info info (cadr tag))
+  (setq tag (c1arg (car args) info))
   (let (vl (nt (tmpsym)))
     (dolist (v *vars*) (when (var-p v) 
 			 (push (list v (var-mt v) (var-tag v)) vl)
@@ -60,6 +59,36 @@
 
   (add-info info (cadr args))
   (list 'catch info tag args))
+
+;; (defun c1catch (args &aux (info (make-info :type #t* :sp-change 1)) tag)
+;;   (incf *setjmps*)
+;;   (when (endp args) (too-few-args 'catch 1 0))
+;;   (setq tag (c1expr (car args)))
+;;   (add-info info (cadr tag))
+;;   (let (vl (nt (tmpsym)))
+;;     (dolist (v *vars*) (when (var-p v) 
+;; 			 (push (list v (var-mt v) (var-tag v)) vl)
+;; 			 (setf (var-tag v) nt (var-mt v) (var-type v))))
+;;     (setq args
+;; 	  (unwind-protect
+;; 	      (do (nargs)
+;; 		  ((not 
+;; 		    (let* ((*catch-tags* (cons nt *catch-tags*))
+;; 			   (nv (with-restore-vars
+;; 				(catch nt
+;; 				  (setq nargs (c1progn (cdr args))) nil))))
+;; 		      (when nv
+;; 			(do nil ((not (setq nv (pop *tvc*))) t) (setf (var-type nv) (var-mt nv))))))
+;; 		   nargs))
+;; 	    (dolist (v vl) 
+;; 	      (when (caddr v)
+;; 		(unless (type>= (cadr v) (var-mt (car v)))
+;; 		  (pushnew (car v) *tvc*)))
+;; 	      (setf (var-mt (car v)) (type-or1 (var-mt (car v)) (cadr v))
+;; 		    (var-tag (car v)) (caddr v))))))
+
+;;   (add-info info (cadr args))
+;;   (list 'catch info tag args))
 
 (si:putprop 'push-catch-frame 'set-push-catch-frame 'set-loc)
 
@@ -87,11 +116,24 @@
                    (*tags* (cons 'lb *tags*))
                    (*funs* (cons 'lb *funs*))
                    (*vars* (cons 'lb *vars*)))
-                  (c1expr (car args))))
+                  (c1arg (car args))))
   (add-info info (cadr form))
   (setq args (c1progn (cdr args)))
   (add-info info (cadr args))
   (list 'unwind-protect info form args))
+
+;; (defun c1unwind-protect (args &aux (info (make-info :sp-change 1)) form)
+;;   (incf *setjmps*)
+;;   (when (endp args) (too-few-args 'unwind-protect 1 0))
+;;   (setq form (let ((*blocks* (cons 'lb *blocks*))
+;;                    (*tags* (cons 'lb *tags*))
+;;                    (*funs* (cons 'lb *funs*))
+;;                    (*vars* (cons 'lb *vars*)))
+;;                   (c1expr (car args))))
+;;   (add-info info (cadr form))
+;;   (setq args (c1progn (cdr args)))
+;;   (add-info info (cadr args))
+;;   (list 'unwind-protect info form args))
 
 (defun c2unwind-protect (form body
                          &aux (*vs* *vs*) (loc (list 'vs (vs-push)))
@@ -136,11 +178,22 @@
         (too-few-args 'throw 2 (length args)))
   (unless (endp (cddr args))
           (too-many-args 'throw 2 (length args)))
-  (setq tag (c1expr (car args)))
+  (setq tag (c1arg (car args)))
   (add-info info (cadr tag))
-  (setq args (c1expr (cadr args)))
+  (setq args (c1arg (cadr args)))
   (add-info info (cadr args))
   (list 'throw info tag args))
+
+;; (defun c1throw (args &aux (info (make-info :type #tnil :flags (iflags side-effects))) tag)
+;;   (when (or (endp args) (endp (cdr args)))
+;;         (too-few-args 'throw 2 (length args)))
+;;   (unless (endp (cddr args))
+;;           (too-many-args 'throw 2 (length args)))
+;;   (setq tag (c1expr (car args)))
+;;   (add-info info (cadr tag))
+;;   (setq args (c1expr (cadr args)))
+;;   (add-info info (cadr args))
+;;   (list 'throw info tag args))
 
 
 (defun c2throw (tag val &aux (*vs* *vs*) loc)
