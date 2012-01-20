@@ -31,39 +31,56 @@
 
 (export '(strcat))
 
-(defun make-sequence-vector (element-type size iesp initial-element)
-  (let ((sequence (si:make-vector element-type size nil nil nil nil nil)))
-    (when iesp
-      (do ((i 0 (1+ i))
-	   (size size))
-	  ((>= i size))
-	  (declare (fixnum i size))
-	  (setf (elt sequence i) initial-element)))
-    sequence))
+;; (defun make-sequence-vector (element-type size iesp initial-element)
+;;   (let ((sequence (si:make-vector element-type size nil nil nil nil nil)))
+;;     (when iesp
+;;       (do ((i 0 (1+ i))
+;; 	   (size size))
+;; 	  ((>= i size))
+;; 	  (declare (fixnum i size))
+;; 	  (setf (elt sequence i) initial-element)))
+;;     sequence))
 
-(defconstant +make-sequence-list+ '(list vector string array null cons))
+;(defconstant +make-sequence-list+ '(list vector string array null cons))
 
-(defun make-sequence (type size &key (initial-element nil iesp))
+(defun make-sequence (type size &key initial-element
+			   &aux ntype (atp (listp type)) (ctp (if atp (car type) type)) (tp (when atp (cdr type))))
+  (declare (optimize (safety 1)))
+  (let ((res
+	 (case ctp
+	       ((list cons member) (make-list size :initial-element initial-element))
+	       ((vector array) (make-vector (upgraded-array-element-type (car tp)) size nil nil nil 0 nil initial-element))
+	       (otherwise 'none))))
+    (cond ((not (eq res 'none)) (check-type-eval res type) res)
+          ((si-classp ctp) (make-sequence (si-class-name ctp) size :initial-element initial-element))
+	  ((let ((tem (get ctp 'deftype-definition)))
+	     (when tem
+	       (setq ntype (apply tem tp))
+	       (not (eq ctp (if (listp ntype) (car ntype) ntype)))))
+	   (make-sequence ntype size :initial-element initial-element))
+	  ((check-type type (member list vector))))))
 
-;  (let ((x (sequence-type-length-type type)))
-;    (when x (check-type-eval size x)))
+;; (defun make-sequence (type size &key (initial-element nil iesp))
 
-  (let* ((tp (or (car (member (if (atom type) type (car type)) +coerce-list+))
-		 (car (member type +coerce-list+ :test 'subtypep1))))
-	 (res 
-	  (case tp
-		((list cons null)
-		 (make-list size :initial-element (and iesp initial-element)))
-		(string
-		 (make-sequence-vector 'character size iesp initial-element))
-		((vector array)
-		 (let ((element-type (sequence-type-element-type type)))
-		   (when (eq element-type 'error)
-		     (check-type type (member list vector)))
-		   (make-sequence-vector element-type size iesp initial-element)))
-		(otherwise (check-type type (member list vector))))))
-    (check-type-eval res type)
-    res))
+;; ;  (let ((x (sequence-type-length-type type)))
+;; ;    (when x (check-type-eval size x)))
+
+;;   (let* ((tp (or (car (member (if (atom type) type (car type)) +coerce-list+))
+;; 		 (car (member type +coerce-list+ :test 'subtypep1))))
+;; 	 (res 
+;; 	  (case tp
+;; 		((list cons null)
+;; 		 (make-list size :initial-element (and iesp initial-element)))
+;; 		(string
+;; 		 (make-sequence-vector 'character size iesp initial-element))
+;; 		((vector array)
+;; 		 (let ((element-type (sequence-type-element-type type)))
+;; 		   (when (eq element-type 'error)
+;; 		     (check-type type (member list vector)))
+;; 		   (make-sequence-vector element-type size iesp initial-element)))
+;; 		(otherwise (check-type type (member list vector))))))
+;;     (check-type-eval res type)
+;;     res))
 
 ;; (defun string-concatenate (&rest seqs)
 ;;   (declare (optimize (safety 2)) (:dynamic-extent seqs))

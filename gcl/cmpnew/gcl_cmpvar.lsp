@@ -522,8 +522,8 @@
 	    (pushnew v *tvc*)
 	    (when (member (var-tag v) *catch-tags*) (throw (var-tag v) v))))))))
 
-(defun set-form-type (form type)
-  (sft form type))
+(defun set-form-type (form type))
+;  (sft form type))  FIXME cannot handle nil return types such as tail recursive calls
 
 (defun sft-block (form block type)
   (cond ((atom form))

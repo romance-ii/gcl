@@ -55,48 +55,82 @@
   (fill-pointer-internal x))
 
 (defun make-array (dimensions
-		   &key (element-type t)
-			(initial-element nil)
-			(initial-contents nil initial-contents-supplied-p)
+		   &key element-type
+			initial-element
+			(initial-contents nil icsp)
 			adjustable fill-pointer
 			displaced-to (displaced-index-offset 0)
-			static)
-  (when (integerp dimensions) (setq dimensions (list dimensions)))
-  (setq element-type (or (upgraded-array-element-type element-type) 'character))
-  (cond ((= (length dimensions) 1)
-	 (let ((x (si:make-vector element-type (car dimensions)
-	                          adjustable fill-pointer
-	                          displaced-to displaced-index-offset
-	                          static initial-element)))
-	   (when initial-contents-supplied-p
-		 (do ((n (car dimensions))
-		      (i 0 (1+ i)))
-		     ((>= i n))
-		   (declare (fixnum n i))
-		   (si:aset (elt initial-contents i) x i)))
-	   x))
-        (t
-	 (let ((x
-		(make-array1
-		       (the fixnum (get-aelttype element-type))
-			static initial-element 
-		       displaced-to (the fixnum displaced-index-offset)
-		       dimensions)))
-	   (if fill-pointer (error "fill pointer for 1 dimensional arrays only"))
-           (unless (member 0 dimensions)
-	   (when initial-contents-supplied-p
-		 (do ((cursor
-		       (make-list (length dimensions)
-		                  :initial-element 0)))
-		     (nil)
-		     (declare (:dynamic-extent cursor))
-		   (aset-by-cursor x
-			           (sequence-cursor initial-contents
-			                            cursor)
-				   cursor)
-		   (when (increment-cursor cursor dimensions)
-                          (return nil)))))
-            x))))
+			static
+		   &aux
+			(dimensions (if (and (listp dimensions) (not (cdr dimensions))) (car dimensions) dimensions))
+			(element-type (upgraded-array-element-type element-type)))
+  (declare (optimize (safety 1)))
+  (check-type fill-pointer (or boolean integer))
+  (check-type displaced-to (or null array))
+  (check-type displaced-index-offset integer)
+  (etypecase 
+   dimensions
+   (list
+    (let ((dimensions (dolist (d dimensions dimensions) (check-type d integer)))
+	  (x (make-array1 (get-aelttype element-type) static initial-element displaced-to displaced-index-offset dimensions)))
+      (assert (not fill-pointer))
+      (unless (member 0 dimensions)
+	(when icsp
+	  (do ((j nil t)(cursor (make-list (length dimensions) :initial-element 0)))
+	      ((when j (increment-cursor cursor dimensions)))
+	      (declare (:dynamic-extent cursor))
+	      (aset-by-cursor x (sequence-cursor initial-contents cursor) cursor))))
+      x))
+    (integer
+     (let ((x (make-vector element-type dimensions adjustable (when fill-pointer dimensions)
+			   displaced-to displaced-index-offset static initial-element)))
+       (when icsp (replace x initial-contents))
+       (when (and fill-pointer (not (eq t fill-pointer))) (setf (fill-pointer x) fill-pointer))
+       x))))
+
+;; (defun make-array (dimensions
+;; 		   &key (element-type t)
+;; 			(initial-element nil)
+;; 			(initial-contents nil initial-contents-supplied-p)
+;; 			adjustable fill-pointer
+;; 			displaced-to (displaced-index-offset 0)
+;; 			static)
+;;   (when (integerp dimensions) (setq dimensions (list dimensions)))
+;;   (setq element-type (or (upgraded-array-element-type element-type) 'character))
+;;   (cond ((= (length dimensions) 1)
+;; 	 (let ((x (si:make-vector element-type (car dimensions)
+;; 	                          adjustable fill-pointer
+;; 	                          displaced-to displaced-index-offset
+;; 	                          static initial-element)))
+;; 	   (when initial-contents-supplied-p
+;; 		 (do ((n (car dimensions))
+;; 		      (i 0 (1+ i)))
+;; 		     ((>= i n))
+;; 		   (declare (fixnum n i))
+;; 		   (si:aset (elt initial-contents i) x i)))
+;; 	   x))
+;;         (t
+;; 	 (let ((x
+;; 		(make-array1
+;; 		       (the fixnum (get-aelttype element-type))
+;; 			static initial-element 
+;; 		       displaced-to (the fixnum displaced-index-offset)
+;; 		       dimensions)))
+;; 	   (if fill-pointer (error "fill pointer for 1 dimensional arrays only"))
+;;            (unless (member 0 dimensions)
+;; 	   (when initial-contents-supplied-p
+;; 		 (do ((cursor
+;; 		       (make-list (length dimensions)
+;; 		                  :initial-element 0)))
+;; 		     (nil)
+;; 		     (declare (:dynamic-extent cursor))
+;; 		   (aset-by-cursor x
+;; 			           (sequence-cursor initial-contents
+;; 			                            cursor)
+;; 				   cursor)
+;; 		   (when (increment-cursor cursor dimensions)
+;;                           (return nil)))))
+;;             x))))
 
 
 (defun increment-cursor (cursor dimensions)

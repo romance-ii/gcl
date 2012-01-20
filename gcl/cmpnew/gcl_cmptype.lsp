@@ -1024,6 +1024,11 @@
 		      (super-range f (to-complex-tp (type-and t1 #t(real * (1))))))))
 (si::putprop 'acosh 'acosh-propagator 'type-propagator)
 
+(defun make-vector-propagator (f &rest r) (cmp-norm-tp `(vector ,(car r))))
+(si::putprop 'si::make-vector 'make-vector-propagator 'type-propagator)
+(defun make-array1-propagator (f &rest r) (cmp-norm-tp `(array ,(car r))))
+(si::putprop 'si::make-array1 'make-array1-propagator 'type-propagator)
+
 (defmacro eov (type1 l1 type2 l2)
   `(if (and (= ,l1 ,l2) 
 	    (eq (car ,type1) 'returns-exactly)

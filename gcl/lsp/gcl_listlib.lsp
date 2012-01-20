@@ -303,10 +303,10 @@
 	    ((setq st (cons tr st) cs (cons g cs) tr (car tr))))))
 
 (deflist member ((item) list t t)
-  (do ((list list (cdr list)))
-      ((endp list))
-      (when (do-test test test-comp item (do-key key key-comp (car list)))
-	(return list))))
+  (labels ((member-loop (l) (cond ((endp l) nil)
+				  ((do-test test test-comp item (do-key key key-comp (car l))) l)
+				  ((member-loop (cdr l))))))
+	  (member-loop list)))
 
 (deflist adjoin ((oitem) olist nil t)
   (do ((list olist (cdr list))(item (do-key key key-comp oitem)))

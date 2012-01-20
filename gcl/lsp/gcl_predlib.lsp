@@ -46,6 +46,8 @@
 	      subtypep1 ;FIXME
 	      resolve-type))
 
+(defconstant +array-types+ (si::aelttype-list))
+
 ;; (export '(lisp::upgraded-complex-part-type lisp::type-of
 ;; 	  lisp::deftype lisp::typep lisp::subtypep 
 ;; 	  lisp::coerce lisp::upgraded-array-element-type) 'lisp)
@@ -115,53 +117,77 @@
 	   (not (cddr tp)))))
 
 ;;; COERCE function.
-(defconstant +coerce-list+ '(list vector string array character short-float
-				  long-float float complex function null cons))
+;(defconstant +coerce-list+ '(list vector string array character short-float
+;				  long-float float complex function null cons))
 
-(defun coerce (object type)
+(defun coerce (object type &aux ntype (atp (listp type)) (ctp (if atp (car type) type)) (tp (when atp (cdr type))))
   (declare (optimize (safety 2)))
-  (check-type type (and (not null) type-spec))
+  (check-type type type-spec)
   (when (typep object type)
     (return-from coerce object))
-  (let ((tp (or (car (member (if (atom type) type (car type)) +coerce-list+))
-		(car (member type +coerce-list+ :test 'subtypep1)))))
-    (case tp
-      (function
-       (coerce 
-	(cond ((let ((object (funid-sym-p object))) 
-		 (when object 
-		   (cond ((fboundp object) (symbol-function object)) ((check-type-eval object type))))))
-	      ((and (consp object) (eq (car object) 'lambda)) (values (eval `(function ,object))))
-	      ((check-type-eval object type)))
-	type))
-       ((null cons list)
-       (let* ((l (length object))
-	      (x (sequence-type-length-type type)))
-	 (when x (check-type l x))
-	 (do ((ll nil (cons (aref object i) ll))
-	      (i (1- l) (1- i)))
-	     ((< i 0) ll))))
-      ((vector string array)
-       (let* ((l (length object))
-	      (x (sequence-type-length-type type))
-	      (v (typep object 'list)))
-	 (when x (check-type-eval l x))
-	 (do ((seq (make-sequence type l))
-	      (i 0 (1+ i))
-	      (p (and v object) (and p (cdr p))))
-	     ((>= i l) seq)
-	  (setf (aref seq i) (if p (car p) (aref object i))))));;FIXME
-      (character (character object))
-      (short-float (float object 0.0S0))
-      (long-float (float object 0.0L0))
-      (float (float object))
-      (complex
-       (if (or (atom type) (null (cdr type)) (null (cadr type)) (eq (cadr type) '*))
-	   (complex (realpart object) (imagpart object))
-	 (complex (coerce (realpart object) (cadr type))
-		  (coerce (imagpart object) (cadr type)))))
-      (otherwise (check-type-eval object type)))))
-(putprop 'coerce t 'compiler::cmp-notinline);FIXME
+  (case ctp
+	(function (if (symbolp object) (symbol-function object) (values (eval `(function ,object)))));FIXME
+	((list cons vector array member) (replace (make-sequence type (length object)) object))
+	(character (character object))
+	(short-float (float object 0.0S0))
+	(long-float (float object 0.0L0))
+	(float (float object))
+	(complex
+	 (let ((rtp (or (car tp) t)))
+	   (complex (coerce (realpart object) rtp) (coerce (imagpart object) rtp))))
+	(otherwise 
++	 (cond ((si-classp ctp) (coerce object (si-class-name ctp)))
+	       ((let ((tem (get ctp 'deftype-definition)))
+		  (when tem
+		    (setq ntype (apply tem tp))
+		    (not (eq ctp (if (listp ntype) (car ntype) ntype)))))
+		(coerce object ntype))
+	       ((check-type-eval object type))))))
+
+;; (defun coerce (object type)
+;;   (declare (optimize (safety 2)))
+;;   (check-type type (and (not null) type-spec))
+;;   (when (typep object type)
+;;     (return-from coerce object))
+;;   (let ((tp (or (car (member (if (atom type) type (car type)) +coerce-list+))
+;; 		(car (member type +coerce-list+ :test 'subtypep1)))))
+;;     (case tp
+;;       (function
+;;        (coerce 
+;; 	(cond ((let ((object (funid-sym-p object))) 
+;; 		 (when object 
+;; 		   (cond ((fboundp object) (symbol-function object)) ((check-type-eval object type))))))
+;; 	      ((and (consp object) (eq (car object) 'lambda)) (values (eval `(function ,object))))
+;; 	      ((check-type-eval object type)))
+;; 	type))
+;;        ((null cons list)
+;;        (let* ((l (length object))
+;; 	      (x (sequence-type-length-type type)))
+;; 	 (when x (check-type l x))
+;; 	 (do ((ll nil (cons (aref object i) ll))
+;; 	      (i (1- l) (1- i)))
+;; 	     ((< i 0) ll))))
+;;       ((vector string array)
+;;        (let* ((l (length object))
+;; 	      (x (sequence-type-length-type type))
+;; 	      (v (typep object 'list)))
+;; 	 (when x (check-type-eval l x))
+;; 	 (do ((seq (make-sequence type l))
+;; 	      (i 0 (1+ i))
+;; 	      (p (and v object) (and p (cdr p))))
+;; 	     ((>= i l) seq)
+;; 	  (setf (aref seq i) (if p (car p) (aref object i))))));;FIXME
+;;       (character (character object))
+;;       (short-float (float object 0.0S0))
+;;       (long-float (float object 0.0L0))
+;;       (float (float object))
+;;       (complex
+;;        (if (or (atom type) (null (cdr type)) (null (cadr type)) (eq (cadr type) '*))
+;; 	   (complex (realpart object) (imagpart object))
+;; 	 (complex (coerce (realpart object) (cadr type))
+;; 		  (coerce (imagpart object) (cadr type)))))
+;;       (otherwise (check-type-eval object type)))))
+;(putprop 'coerce t 'compiler::cmp-notinline);FIXME
 
 
 (defun maybe-clear-tp (sym)
@@ -554,7 +580,6 @@
 
 (defconstant +range-types+ `(integer ratio short-float long-float))
 
-(defconstant +array-types+ (si::aelttype-list))
 ;(defconstant +array-types+ (append '(nil) +array-types+))
 
 (deftype vector (&optional (element-type '* ep) size)

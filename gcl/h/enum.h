@@ -5,7 +5,6 @@
 enum type {
   t_cons,
   t_start = 0,
-  /* t_immfix, */
   t_fixnum,
   t_bignum,
   t_ratio,
@@ -25,8 +24,6 @@ enum type {
   t_stream,
   t_random,
   t_readtable,
-  /* t_ifun, */
-  /* t_cfun, */
   t_function,
   t_cfdata,
   t_spice,
