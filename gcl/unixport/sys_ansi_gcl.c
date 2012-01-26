@@ -200,6 +200,8 @@ gcl_init_system(object no_init)
   ar_check_init(gcl_pcl_combin,no_init);
   ar_check_init(gcl_pcl_dfun,no_init);
   ar_check_init(gcl_pcl_fast_init,no_init);
+  ar_check_init(gcl_pcl_precom1,no_init);
+  ar_check_init(gcl_pcl_precom2,no_init);
   ar_check_init(gcl_pcl_braid,no_init);
   ar_check_init(gcl_pcl_generic_functions,no_init);
   ar_check_init(gcl_pcl_slots,no_init);
@@ -213,8 +215,6 @@ gcl_init_system(object no_init)
   ar_check_init(gcl_pcl_ctypes,no_init);
   ar_check_init(gcl_pcl_env,no_init);
   ar_check_init(gcl_pcl_compat,no_init);
-  ar_check_init(gcl_pcl_precom1,no_init);
-  ar_check_init(gcl_pcl_precom2,no_init);
 
   ar_check_init(gcl_clcs_precom,no_init);
   ar_check_init(gcl_clcs_macros,no_init);

@@ -257,7 +257,8 @@
   (if type (wt "/* " (symbol-name type) " */"))
   (wt "V" cvar))
 
-(defun vv-str (vv) (si::string-concatenate "((object)VV[" (write-to-string vv) "])"))
+(defun vv-str (vv) (let ((vv (add-object2 vv))) (string-concatenate "((object)VV[" (write-to-string vv) "])")))
+;; (defun vv-str (vv) (si::string-concatenate "((object)VV[" (write-to-string vv) "])"))
 
 (defun wt-vv (vv) (wt (vv-str vv)))
 

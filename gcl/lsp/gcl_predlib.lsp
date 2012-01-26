@@ -46,7 +46,7 @@
 	      subtypep1 ;FIXME
 	      resolve-type))
 
-(defconstant +array-types+ (si::aelttype-list))
+;(defconstant +array-types+ (si::aelttype-list))
 
 ;; (export '(lisp::upgraded-complex-part-type lisp::type-of
 ;; 	  lisp::deftype lisp::typep lisp::subtypep 
@@ -136,13 +136,32 @@
 	 (let ((rtp (or (car tp) t)))
 	   (complex (coerce (realpart object) rtp) (coerce (imagpart object) rtp))))
 	(otherwise 
-+	 (cond ((si-classp ctp) (coerce object (si-class-name ctp)))
-	       ((let ((tem (get ctp 'deftype-definition)))
-		  (when tem
-		    (setq ntype (apply tem tp))
-		    (not (eq ctp (if (listp ntype) (car ntype) ntype)))))
-		(coerce object ntype))
+	 (cond ((setq ntype (expand-deftype type)) (coerce object ntype))
 	       ((check-type-eval object type))))))
+
+;; (defun coerce (object type &aux ntype (atp (listp type)) (ctp (if atp (car type) type)) (tp (when atp (cdr type))))
+;;   (declare (optimize (safety 2)))
+;;   (check-type type type-spec)
+;;   (when (typep object type)
+;;     (return-from coerce object))
+;;   (case ctp
+;; 	(function (if (symbolp object) (symbol-function object) (values (eval `(function ,object)))));FIXME
+;; 	((list cons vector array member) (replace (make-sequence type (length object)) object))
+;; 	(character (character object))
+;; 	(short-float (float object 0.0S0))
+;; 	(long-float (float object 0.0L0))
+;; 	(float (float object))
+;; 	(complex
+;; 	 (let ((rtp (or (car tp) t)))
+;; 	   (complex (coerce (realpart object) rtp) (coerce (imagpart object) rtp))))
+;; 	(otherwise 
+;; 	 (cond ((si-classp ctp) (coerce object (si-class-name ctp)))
+;; 	       ((let ((tem (get ctp 'deftype-definition)))
+;; 		  (when tem
+;; 		    (setq ntype (apply tem tp))
+;; 		    (not (eq ctp (if (listp ntype) (car ntype) ntype)))))
+;; 		(coerce object ntype))
+;; 	       ((check-type-eval object type))))))
 
 ;; (defun coerce (object type)
 ;;   (declare (optimize (safety 2)))
@@ -1559,7 +1578,9 @@
   (let ((f (and (not i) (symbolp tp) (get tp 'type-predicate))))
     (when f (return-from typep (when (fboundp f) (let ((z (funcall f object))) (when z t))))))
   (case tp
-	((values returns-exactly) 
+	(returns-exactly
+	 (when i (unless (cdr i) (typep object (car i)))))
+	(values
 	 (assert (when i (not (cdr i))))
 	 (typep object (car i)))
 	(cons (and (consp object)

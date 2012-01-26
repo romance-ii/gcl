@@ -1064,7 +1064,9 @@
 			       tag))
 			    (t x)))
 		  body))
-	   (list* 'switch info switch-op-1 (cddr (c1arg `(tagbody ,@body switch-finish-label) info))))
+	   (let ((d (c1arg `(tagbody ,@body) info)))
+	     (setf (info-type info) (info-type (cadr d)))
+	     (list* 'switch info switch-op-1 (cddr d))))
 	  ((c1expr (cmp-macroexpand-1 (cons 'switch form)))))))
 
 ;; (defun c1switch(form  &aux (*tags* *tags*) st ls)

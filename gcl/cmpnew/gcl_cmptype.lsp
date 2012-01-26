@@ -437,8 +437,8 @@
 
 
 
-(defun literalp (form)
-  (or (constantp form) (and (consp form) (eq (car form) 'load-time-value))))
+;; (defun literalp (form)
+;;   (or (constantp form) (and (consp form) (eq (car form) 'load-time-value))))
 
 (defconstant +real-contagion-list+ '(integer ratio short-float long-float))
 
@@ -1024,9 +1024,11 @@
 		      (super-range f (to-complex-tp (type-and t1 #t(real * (1))))))))
 (si::putprop 'acosh 'acosh-propagator 'type-propagator)
 
-(defun make-vector-propagator (f &rest r) (cmp-norm-tp `(vector ,(car r))))
+(defun make-vector-propagator (f et st &rest r)
+  (cmp-norm-tp `(vector ,(or (car (atomic-tp et)) '*) ,(or (car (atomic-tp st)) '*))))
 (si::putprop 'si::make-vector 'make-vector-propagator 'type-propagator)
-(defun make-array1-propagator (f &rest r) (cmp-norm-tp `(array ,(car r))))
+(defun make-array1-propagator (f &rest r)
+  (cmp-norm-tp `(array ,(or (car (atomic-tp (car r))) '*) ,(or (car (atomic-tp (sixth r))) '*))))
 (si::putprop 'si::make-array1 'make-array1-propagator 'type-propagator)
 
 (defmacro eov (type1 l1 type2 l2)
@@ -1225,3 +1227,12 @@
   ;; (let ((h *oth*))
   ;;   (maphash (lambda (x y) (when (member-type-p y) (remhash x h))) h))
   (clrhash *sigs*))
+
+
+(defun c1expand-deftype (args &aux atp);FIXME redundant with cmp-norm-tp????
+  (let* ((info (make-info :type t))
+	 (nargs (c1args args info)))
+    (cond ((setq atp (atomic-tp (info-type (cadar nargs))))
+	   (c1expr `',(cmp-eval `(si::expand-deftype ',(car atp)))));`',(cmp-norm-tp (car atp))))
+	  ((list 'call-global info 'si::expand-deftype nargs)))))
+(si::putprop 'si::expand-deftype 'c1expand-deftype 'c1)

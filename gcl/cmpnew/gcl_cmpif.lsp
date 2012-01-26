@@ -102,7 +102,10 @@
 
 (defun get-object-value (c1x)
   (when (and (eq 'location (car c1x)) (eq 'vv (caaddr c1x)))
-    (values (gethash (cadr (caddr c1x)) *objects-rev*))))
+    (cadr (caddr c1x))))
+;; (defun get-object-value (c1x)
+;;   (when (and (eq 'location (car c1x)) (eq 'vv (caaddr c1x)))
+;;     (values (gethash (cadr (caddr c1x)) *objects-rev*))))
 
 (defvar *gen-nil* (list (cons +gen+ (cons nil t))))
 (defvar *gen-t*   (list (cons +gen+ (cons t nil))))
@@ -292,13 +295,6 @@
     (if (ignorable-form fmla)
 	c1
       (new-c1progn fmla c1))))
-
-;; (defun maybe-progn-fmla (fmla args info)
-;;   (let ((fmla (fmla-c1expr fmla))
-;; 	(c1 (c1expr** args info)))
-;;     (if (ignorable-form fmla)
-;; 	c1
-;;       (new-c1progn fmla c1))))
 
 (defun c1if (args &aux info f)
   (when (or (endp args) (endp (cdr args)))

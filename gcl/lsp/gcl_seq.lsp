@@ -43,21 +43,23 @@
 
 ;(defconstant +make-sequence-list+ '(list vector string array null cons))
 
-(defun make-sequence (type size &key initial-element
-			   &aux ntype (atp (listp type)) (ctp (if atp (car type) type)) (tp (when atp (cdr type))))
+(defun expand-deftype (type &aux (atp (listp type)) (ctp (if atp (car type) type)) (tp (when atp (cdr type))))
+  (if (si-classp ctp) (si-class-name ctp)
+    (let ((tem (get ctp 'deftype-definition)))
+      (when tem
+	(let ((ntype (apply tem tp)))
+	  (unless (eq ctp (if (listp ntype) (car ntype) ntype))
+	    ntype))))))
+
+(defun make-sequence (type size &key initial-element &aux ntype (atp (listp type)))
   (declare (optimize (safety 1)))
   (let ((res
-	 (case ctp
+	 (case (if atp (car type) type)
 	       ((list cons member) (make-list size :initial-element initial-element))
-	       ((vector array) (make-vector (upgraded-array-element-type (car tp)) size nil nil nil 0 nil initial-element))
+	       ((vector array) (make-vector (upgraded-array-element-type (when atp (cadr type))) size nil nil nil 0 nil initial-element))
 	       (otherwise 'none))))
     (cond ((not (eq res 'none)) (check-type-eval res type) res)
-          ((si-classp ctp) (make-sequence (si-class-name ctp) size :initial-element initial-element))
-	  ((let ((tem (get ctp 'deftype-definition)))
-	     (when tem
-	       (setq ntype (apply tem tp))
-	       (not (eq ctp (if (listp ntype) (car ntype) ntype)))))
-	   (make-sequence ntype size :initial-element initial-element))
+	  ((setq ntype (expand-deftype type)) (make-sequence ntype size :initial-element initial-element))
 	  ((check-type type (member list vector))))))
 
 ;; (defun make-sequence (type size &key (initial-element nil iesp))

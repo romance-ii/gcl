@@ -531,14 +531,10 @@ gensym_int(object this_gensym_prefix,object this_gensym_counter) {
   case t_bignum:
     big=this_gensym_counter;
     sign=BIG_SIGN(big);
-    size = mpz_sizeinbase(MP(big),10)+2+(sign<0? 1 : 0);
-    if (!(p=ZALLOCA(size)))
-      FEerror("Cannot alloca gensym name", 0);
-    mpz_get_strp(&p,10,MP(big));
-    j=size-5;
-    j=j<0 ? 0 : j;
-    while (p[j]) j++;
-    q=p+j;
+    size = mpz_sizeinbase(MP(big),10)+(BIG_SIGN(big)<0? 1 : 0)+1;
+    massert(p=alloca(size));
+    massert(p=mpz_get_str(p,10,MP(big)));
+    q=p+strlen(p);
     break;
   case t_fixnum:
     for (size=1,f=fix(this_gensym_counter);f;f/=10,size++);

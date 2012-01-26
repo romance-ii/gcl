@@ -544,19 +544,21 @@ integer_quotient_remainder_1_ui(object x, unsigned long y, object *qp, object *r
 #define HAVE_MP_COERCE_TO_STRING
      
 object
-coerce_big_to_string(object x, int printbase)
-{ int i;
- int sign = BIG_SIGN(x);
- int ss = mpz_sizeinbase(MP(x),printbase);
-  object ans = alloc_simple_string(ss+2+(sign<0? 1: 0));
-  ans->st.st_self=alloc_relblock(ans->st.st_dim);
-  /*  if (sign < 0) *p++='-'; */
-  mpz_get_strp(&ans->st.st_self, printbase,MP(x));
-  i = ans->st.st_dim-5;
-  if (i <0 ) i=0;
-  while(ans->st.st_self[i]) { i++;}
-  ans->st.st_fillp=i;
+coerce_big_to_string(object x, int printbase) {
+
+  int ss=mpz_sizeinbase(MP(x),printbase)+(BIG_SIGN(x)<0 ? 1 : 0)+1;
+  char *p;
+  object ans;
+
+  massert(p=alloca(ss));
+  massert(p=mpz_get_str(p,printbase,MP(x)));
+  ss=strlen(p);
+  ans=alloc_simple_string(ss);
+  ans->st.st_self=alloc_relblock(ss);
+  memcpy(ans->st.st_self,p,ss);
+
   return ans;
+
 }
 
 

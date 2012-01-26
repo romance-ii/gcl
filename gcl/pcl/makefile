@@ -21,9 +21,11 @@ SETUP='(load "../clcs/package.lisp")(load "../clcs/myload1.lisp")(load "sys-pack
 	'(setq compiler::*default-system-p* t)' \
 	'(setq compiler::*keep-gaz* t compiler::*tmp-dir* "" si::*disable-recompile* t)'
 
+LISP?=../unixport/saved_mod_gcl
+
 all: $(addsuffix .c,$(AFILES)) $(addsuffix .o,$(AFILES)) 
 
-saved_gcl_pcl: ../unixport/saved_mod_gcl
+saved_gcl_pcl: $(LISP)
 	cp ../h/cmpinclude.h .
 	echo $(SETUP) '(pcl::compile-pcl)' | $< 
 	echo $(SETUP) '(pcl::load-pcl)(si::save-system "$@")' | $< $(LISPFLAGS)
@@ -33,7 +35,7 @@ $(addsuffix .c,$(AFILES)) $(addsuffix .data,$(AFILES))\
 	$(addsuffix .lisp,$(FILES))
 	rm -f *.o *gazonk*
 	cp ../h/cmpinclude.h .
-	echo ${SETUP} '(pcl::compile-pcl)' | ../unixport/saved_mod_gcl
+	echo ${SETUP} '(pcl::compile-pcl)' | $(LISP)
 	rm *gazonk*.o
 #	touch gcl_pcl_methods.c # FIXME workaround for -g -Os gcc bug
 	for i in gazonk* ; do \
@@ -56,10 +58,10 @@ remake-sys-files:
 	rm -f *.o *gazonk*
 	cp ../h/cmpinclude.h .
 	echo ${SETUP} '(load "../cmpnew/gcl_collectfn.lsp")(compiler::emit-fn t)' \
-		'(pcl::compile-pcl)' | ../unixport/saved_mod_gcl ../unixport/ $(LISPFLAGS)
+		'(pcl::compile-pcl)' | $(LISP) ../unixport/ $(LISPFLAGS)
 	echo ${SETUP} '(load "../cmpnew/gcl_collectfn.lsp") '\
 		'(pcl::load-pcl)(in-package "PCL")(renew-sys-files)' | \
-		../unixport/saved_mod_gcl ../unixport/ $(LISPFLAGS) 
+		$(LISP) ../unixport/ $(LISPFLAGS) 
 	cp sys-proclaim.lisp xxx
 	cat xxx | sed -e "s/COMPILER::CMP-ANON//g" > sys-proclaim.lisp
 	rm xxx

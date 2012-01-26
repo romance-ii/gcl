@@ -32,7 +32,7 @@
 (si:putprop 'multiple-value-bind 'c2multiple-value-bind 'c2)
 
 (defun nval (x)
-  (cond ((type>= #t(returns-exactly) x) 0)
+  (cond ;((type>= #t(returns-exactly) x) 0)
 	((single-type-p x) 1)
 	((consp x) (1- (length x)))))
 

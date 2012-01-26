@@ -522,3 +522,4 @@
 (defun add-hash (&rest r)
   (setq *pahl* (cons (cons 'add-hash (mapcar #'(lambda (x) `',x) r)) *pahl*)))
 
+(*make-constant '+array-types+ (si::aelttype-list))

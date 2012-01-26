@@ -67,7 +67,7 @@ GMP_EXTERN int jmp_gmp,gmp_relocatable;
 
 #define RF_mpz_t mpz_t
 #define RF_gmp_randstate_t gmp_randstate_t
-#define RF_gmp_char_star_star char **
+/* #define RF_gmp_char_star_star char ** */
 
 #define P1(bt_) Join(RF_,bt_) _b
 #define P2(bt_,ct_) P1(bt_),Join(RF_,ct_) _c
@@ -150,11 +150,11 @@ GMP_EXTERN int jmp_gmp,gmp_relocatable;
 #define BF(n_,b_,r_,a_...)
 #endif
 
-#undef mpz_get_strp
-#define mpz_get_strp __gmpz_get_strp
+/* #undef mpz_get_strp */
+/* #define mpz_get_strp __gmpz_get_strp */
 
-GMP_EXTERN_INLINE char *
-__gmpz_get_strp(char **a,int b,mpz_t c) {return __gmpz_get_str(*a,b,c);} /*FIXME*/
+/* GMP_EXTERN_INLINE char * */
+/* __gmpz_get_strp(char **a,int b,mpz_t c) {return __gmpz_get_str(*a,b,c);} /\*FIXME*\/ */
 
 /* GMP_WRAPPERS: the gmp library uses heap allocation in places for
    temporary storage.  This greatly complicates relocatable bignum
@@ -238,7 +238,8 @@ EXPORT_GMP_CALL(2,void,set_si,1,mpz_t,gmp_lint)
   MEM_GMP_CALL(1,double,mpz_get_d,0,mpz_t)
 EXPORT_GMP_CALL(1,gmp_lint,get_si,0,mpz_t)
 EXPORT_GMP_CALL(1,gmp_lint,get_ui,0,mpz_t)
-  MEM_GMP_CALL(3,gmp_char_star,__gmpz_get_strp,0,gmp_char_star_star,int,mpz_t)
+  /* MEM_GMP_CALL(3,gmp_char_star,__gmpz_get_strp,0,gmp_char_star_star,int,mpz_t) */
+  MEM_GMP_CALL(3,gmp_char_star,mpz_get_str,1,gmp_char_star,int,mpz_t)
 EXPORT_GMP_CALL(1,int,fits_sint_p,0,mpz_t)
 EXPORT_GMP_CALL(1,int,fits_slong_p,0,mpz_t)
 EXPORT_GMP_CALL(1,int,fits_sshort_p,0,mpz_t)
@@ -369,8 +370,8 @@ EXPORT_GMP_CALL(2,void,abs,1,mpz_t,mpz_t)
 #define __mpz_set_ui m__gmpz_set_ui
 #define __mpz_set_si m__gmpz_set_si
 #define __mpz_get_d m__gmpz_get_d
+#define __mpz_get_str m__gmpz_get_str
 #define __mpz_get_si m__gmpz_get_si
-/* #define ____gmpz_get_strp m__g__gmpz_get_strp */
 #define __mpz_fits_sint_p m__gmpz_fits_sint_p
 #define __mpz_fits_slong_p m__gmpz_fits_slong_p
 #define __mpz_popcount m__gmpz_popcount

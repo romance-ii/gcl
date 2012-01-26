@@ -524,11 +524,12 @@ DEFUNO_NEW("MAKE-VECTOR",object,fSmake_vector,SI,7,8,NONE,
 */
 
 DEFUN_NEW("MAKE-ARRAY1",object,fSmake_array1,SI,6,6,
-      NONE,OI,OO,OI,OO,
-      (fixnum elt_type,object staticp,object initial_element,object displaced_to,fixnum displaced_index_offset,
+      NONE,OO,OO,OI,OO,
+      (object x0,object staticp,object initial_element,object displaced_to,fixnum displaced_index_offset,
        object dimensions),"")
 {   
   int rank = length(dimensions);
+  fixnum elt_type=fix(fSget_aelttype(x0));
   if (rank > ARRAY_RANK_LIMIT)
     FEerror("Array rank limit exceeded.",0);
   { object x,v;

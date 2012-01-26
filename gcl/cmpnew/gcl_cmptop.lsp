@@ -22,10 +22,7 @@
 
 (in-package :compiler)
 
-(defvar *objects* (make-hash-table :test 'equal))
-(defvar *objects-rev* (make-hash-table :test 'equal))
-(defvar *constants* nil)
-(defvar *sharp-commas* nil)
+(defvar *objects* (make-hash-table :test 'eq))
 (defvar *function-links* nil)
 (defvar *c-gc* t) ;if we gc the c stack.
 
@@ -53,11 +50,6 @@
 
 
 ;;; *objects* holds ( { object vv-index }* ).
-;;; *constants* holds ( { symbol vv-index }* ).
-;;; *sharp-commas* holds ( vv-index* ), indicating that the value
-;;;  of each vv should be turned into an object from a string before
-;;;  defining the current function during loading process, so that
-;;;  sharp-comma-macros may be evaluated correctly.
 ;;; *function-links* ( {symbol vv-index} ) for function symbols needing link
 
 (defvar *global-funs* nil)
@@ -80,7 +72,6 @@
 ;;;	| ( 'CLINES'	string )
 ;;;	| ( 'DEFCFUN'	header vs-size body)
 ;;;	| ( 'DEFENTRY'	fun-name cfun cvspecs type cfun-name )
-;;;	| ( 'SHARP-COMMA' vv )
 
 (defvar *reservations* nil)
 (defvar *reservation-cmacro* nil)
@@ -137,11 +128,10 @@
 ;;; Pass 2 initializers.
 
 (si:putprop 'defun 't2defun 't2)
-(si:putprop 'mflag 't2mflag 't2)
+(si:putprop 'mflag 't3mflag 't3)
 ;(si:putprop 'defmacro 't2defmacro 't2)
-(si:putprop 'ordinary 't2ordinary 't2)
+(si:putprop 'ordinary 't3ordinary 't3)
 (si:putprop 'declare 't2declare 't2)
-(si:putprop 'sharp-comma 't2sharp-comma 't2)
 ;(si:putprop 'defentry 't2defentry 't2)
 (si:putprop 'si:putprop 't2putprop 't2)
 
@@ -1190,7 +1180,7 @@
 	 (oal (get-arg-types fname)) (ort (get-return-type fname))
 	 (osig (export-sig (list oal ort)))
 	 (e (or (gethash fname *sigs*) (setf (gethash fname *sigs*) (make-list 5))))
-	 (setjmps *setjmps*) *sharp-commas*
+	 (setjmps *setjmps*)
 	 (lambda-expr (do-fun fname args e t nil))
 	 (sig (car e))
 	 (osig (if (equal '((*) *) osig) sig osig));FIXME
@@ -1218,60 +1208,11 @@
 		  (make-inline-string cfun at fname)))
 	  *inline-functions*)
   
-    (add-load-time-sharp-comma)
     (push (list 'defun fname cfun lambda-expr doc nil) *top-level-forms*)
     (push (cons fname cfun) *global-funs*)
     
     (when *sig-discovery*
       (si::add-hash fname (car e) (cadr e) nil nil))))
-
-;; (defun t1defun (args)
-
-;;   (when (or (endp args) (endp (cdr args)))
-;;     (too-few-args 'defun 2 (length args)))
-;;   (maybe-eval nil (cons 'defun args))
-;;   (setq *non-package-operation* t)
-
-;;   (let* ((fname (car args))
-;; 	 (fname (or (function-symbol fname) (cmperr "The function name ~s is not valid." fname)))
-;; 	 (cfun (next-cfun))
-;; 	 (oal (get-arg-types fname)) (ort (get-return-type fname))
-;; 	 (osig (export-sig (list oal ort)))
-;; 	 (e (or (gethash fname *sigs*) (setf (gethash fname *sigs*) (make-list 5))))
-;; 	 (setjmps *setjmps*) *sharp-commas*
-;; 	 (lambda-expr (do-fun fname args e t nil))
-;; 	 (sig (car e))
-;; 	 (osig (if (equal '((*) *) osig) sig osig));FIXME
-;; 	 (doc (cadddr lambda-expr)))
-	 
-;;     (or (eql setjmps *setjmps*) (setf (info-volatile (cadr lambda-expr)) 1))
-;;     (keyed-cmpnote (list 'return-type fname) "~s return type ~s" fname (c1retnote lambda-expr))
-    
-;;     (unless (equal osig sig)
-;;       (cmpwarn "signature change on function ~s, ~s -> ~s~%" fname osig sig)
-;;       (setq *new-sigs-in-file* 
-;; 	    (some
-;; 	     (lambda (x) 
-;; 	       (unless (eq x fname)
-;; 		 (multiple-value-bind 
-;; 		  (s f) (gethash x *sigs*) 
-;; 		  (declare (ignore s))
-;; 		  (when f (list x fname osig sig))))) (si::callers fname))))
-    
-;;     (push (let* ((at (car sig))
-;; 		 (al (mapcar (lambda (x) (link-rt (cmp-norm-tp x) nil)) at))
-;; 		 (rt (link-rt (cmp-norm-tp (cadr sig)) nil)))
-;; 	    (list fname al rt
-;; 		  (if (single-type-p rt) (flags set ans) (flags set ans sets-vs-top))
-;; 		  (make-inline-string cfun at fname)))
-;; 	  *inline-functions*)
-  
-;;     (add-load-time-sharp-comma)
-;;     (push (list 'defun fname cfun lambda-expr doc nil) *top-level-forms*)
-;;     (push (cons fname cfun) *global-funs*)
-    
-;;     (when *sig-discovery*
-;;       (si::add-hash fname (car e) (cadr e) nil nil))))
 
 (defun make-inline-string (cfun args fname)
   (format nil "~d(~a)" (c-function-name "LI" cfun fname)
@@ -1403,33 +1344,41 @@
     (if mv (cmp-norm-tp `(,(car tp) ,tppn ,@(cddr tp))) tppn)))
 
 (defun t2defun (fname cfun lambda-expr doc sp)
-  (declare (ignore sp))
+  (declare (ignore cfun lambda-expr doc sp))
 
   (cond ((get fname 'no-global-entry)(return-from t2defun nil)))
-
-  (when doc (add-init `(si::putprop ',fname ,doc 'si::function-documentation)))
-
-  (cond ((wt-if-proclaimed fname cfun lambda-expr))
-	((numberp cfun)
-	 (let ((at (mapcar 'global-type-bump (get-arg-types fname)))
-	       (rt (global-type-bump (get-return-type fname))))
-	   (add-init `(si::init-function
-		       ',fname
-;		       ,(add-address (c-function-name "LI" (format nil "G~a" cfun) fname))
-		       ,(add-address (c-function-name "LI" (format nil "~a" cfun) fname))
-		       nil nil -1 ,(new-proclaimed-argd at rt)
-		       ,(argsizes at rt (xa lambda-expr)))))
-;         (wt-h "static void " (c-function-name "L" cfun fname) "();")
-;	 (add-init `(si::mf ',fname ,(add-address (c-function-name "L" cfun fname))))
-	 )
-        (t (baboon)(wt-h cfun "();")
-	   (add-init `(si::mf ',fname ,(add-address (c-function-name "" cfun fname))))))
-
-  (when *compiler-auto-proclaim*
-    (add-init `(si::add-hash ',fname ,@(mapcar (lambda (x) `(quote ,x)) (export-call (gethash fname *sigs*))))))
   
   (when (< *space* 2)
     (setf (get fname 'debug-prop) t)))
+
+;; (defun t2defun (fname cfun lambda-expr doc sp)
+;;   (declare (ignore sp))
+
+;;   (cond ((get fname 'no-global-entry)(return-from t2defun nil)))
+
+;;   (when doc (add-init `(si::putprop ',fname ,doc 'si::function-documentation)))
+
+;;   (cond ((wt-if-proclaimed fname cfun lambda-expr))
+;; 	((numberp cfun)
+;; 	 (let ((at (mapcar 'global-type-bump (get-arg-types fname)))
+;; 	       (rt (global-type-bump (get-return-type fname))))
+;; 	   (add-init `(si::init-function
+;; 		       ',fname
+;; ;		       ,(add-address (c-function-name "LI" (format nil "G~a" cfun) fname))
+;; 		       ,(add-address (c-function-name "LI" (format nil "~a" cfun) fname))
+;; 		       nil nil -1 ,(new-proclaimed-argd at rt)
+;; 		       ,(argsizes at rt (xa lambda-expr)))))
+;; ;         (wt-h "static void " (c-function-name "L" cfun fname) "();")
+;; ;	 (add-init `(si::mf ',fname ,(add-address (c-function-name "L" cfun fname))))
+;; 	 )
+;;         (t (baboon)(wt-h cfun "();")
+;; 	   (add-init `(si::mf ',fname ,(add-address (c-function-name "" cfun fname))))))
+
+;;   (when *compiler-auto-proclaim*
+;;     (add-init `(si::add-hash ',fname ,@(mapcar (lambda (x) `(quote ,x)) (export-call (gethash fname *sigs*))))))
+  
+;;   (when (< *space* 2)
+;;     (setf (get fname 'debug-prop) t)))
 
 
 ;; (defun t2defun (fname cfun lambda-expr doc sp)
@@ -1463,6 +1412,23 @@
 
 (defun si::add-debug (fname x)
   (si::putprop fname x  'si::debugger))
+
+(defun t3init-fun (fname cfun lambda-expr doc)
+
+  (when doc (add-init `(putprop ',fname ,doc 'function-documentation)))
+
+  (unless (wt-if-proclaimed fname cfun lambda-expr)
+    (assert (numberp cfun))
+    (let ((at (mapcar 'global-type-bump (get-arg-types fname)))
+	  (rt (global-type-bump (get-return-type fname))))
+      (add-init `(init-function
+		  ',fname
+		  ,(add-address (c-function-name "LI" (format nil "~a" cfun) fname))
+		  nil nil -1 ,(new-proclaimed-argd at rt)
+		  ,(argsizes at rt (xa lambda-expr))))))
+
+  (when *compiler-auto-proclaim*
+    (add-init `(si::add-hash ',fname ,@(mapcar (lambda (x) `(quote ,x)) (export-call (gethash fname *sigs*)))))))
 
 (defun t3defun (fname cfun lambda-expr doc sp &aux inline-info 
 		      (*current-form* (list 'defun fname))
@@ -1505,6 +1471,8 @@
 		   fname cfun lambda-expr sp inline-info))
      ((baboon)))
     
+    (t3init-fun fname cfun lambda-expr doc)
+
     (add-debug-info fname lambda-expr)))
 
 ;; (defun t3defun (fname cfun lambda-expr doc sp &aux inline-info 
@@ -1878,75 +1846,8 @@
   (maybe-eval (not (macro-function n)) (cons 'defmacro w));FIXME?
   (push `(mflag ,n) *top-level-forms*))
 
-(defun t2mflag (n)
+(defun t3mflag (n)
   (add-init `(c::set-symbol-mflag 1 ',n)))
-
-(setf (get 'mflag 't2) 't2mflag)
-
-;; (defun t1defmacro (args)
-;;   (when (or (endp args) (endp (cdr args)))
-;;         (too-few-args 'defmacro 2 (length args)))
-;;   (cmpck (not (symbolp (car args)))
-;;          "The macro name ~s is not a symbol." (car args))
-;;   (maybe-eval (not (macro-function (car args))) (cons 'defmacro args))
-;;   (setq *non-package-operation* t)
-;;   (let ((*vars* nil) (*funs* nil) (*blocks* nil) (*tags* nil)
-;;         (*sharp-commas* nil) (*special-binding* nil)
-;;         macro-lambda (cfun (next-cfun)))
-;;        (setq macro-lambda (c1dm (car args) (cadr args) (cddr args)))
-;;        (add-load-time-sharp-comma)
-;;        (push (list 'defmacro (car args) cfun (cddr macro-lambda)
-;; 		   (car macro-lambda)   ;doc
-;; 		   (cadr macro-lambda)  ; ppn
-;;                    *special-binding*)
-;;              *top-level-forms*)))
-
-
-;; (defun t2defmacro (fname cfun macro-lambda doc ppn sp)
-
-;;   (declare (ignore macro-lambda sp))
-;;   (when doc (add-init `(si::putprop ',fname ,doc 'si::function-documentation) ))
-;;   (when ppn
-;; 	(add-init `(si::putprop ',fname ',ppn 'si::pretty-print-format) ))
-;;   (let ((nm (c-function-name "L" cfun fname)))
-;;     (wt-h "static void " nm "();")
-;;     (add-init `(si::MM ',fname ,(add-address nm)))))
-
-;; (defun t3defmacro (fname cfun macro-lambda doc ppn sp
-;;                          &aux (*volatile* (if (get fname 'contains-setjmp)
-;; 					      " VOL " "")))
-;;   (declare (ignore doc ppn))
-
-;;   (let ((*compiler-check-args* *compiler-check-args*)
-;;         (*safe-compile* *safe-compile*)
-;;         (*compiler-push-events* *compiler-push-events*)
-;;         (*compiler-new-safety* *compiler-new-safety*)
-;;         (*notinline* *notinline*)
-;;         (*space* *space*)
-;;         (*debug* *debug*))
-    
-;;     (when (eq (car (cadddr macro-lambda)) 'decl-body)
-;;       (local-compile-decls (caddr (cadddr macro-lambda))))
-    
-;;     (let-pass3
-;;      ((*exit* 'return))
-;;      (wt-comment "macro definition for " fname)
-;;      (wt-nl1 "static void " (c-function-name "L" cfun fname) "()")
-;;      (wt-nl1 "{register object *" *volatile* "base=vs_base;")
-;;      (wt-nl "register object *"*volatile* "sup=base+VM" *reservation-cmacro* ";")
-;;      (wt " VC" *reservation-cmacro*)
-;;      (if *safe-compile*
-;; 	 (wt-nl "vs_reserve(VM" *reservation-cmacro* ");")
-;;        (wt-nl "vs_check;"))
-;;      (when sp (wt-nl "bds_check;"))
-;;      (when *compiler-push-events* (wt-nl "ihs_check;"))
-;;      (c2dm (car macro-lambda) (cadr macro-lambda) (caddr macro-lambda)
-;; 	   (cadddr macro-lambda))
-;;      (wt-nl1 "}")
-;;      (push (cons *reservation-cmacro* *max-vs*) *reservations*)
-;;      (wt-h "#define VC" *reservation-cmacro*)
-;;      (wt-cvars))))
-
 
 (defun c1fset (args)
   (let* ((info (make-info))
@@ -1981,22 +1882,14 @@
 	   (push (list 'ordinary `(,gen)) *top-level-forms*)))
 	(t 
 	 (maybe-eval nil form)
-	 (let (*vars* *funs* *blocks* *tags* *sharp-commas*)
+	 (let (*vars* *funs* *blocks* *tags*)
 	   (push (list 'ordinary  form) *top-level-forms*)
 	   nil))))
 
-(defun t2ordinary (form)
+(defun t3ordinary (form)
   (cond ((atom form))
 	((constantp form))
-	(t (add-init form))))
-
-(defun add-load-time-sharp-comma ()
-  (dolist* (vv (reverse *sharp-commas*))
-	   (cond ((atom vv) (wfs-error)))
-    (push (cons 'sharp-comma vv) *top-level-forms*)))
-
-(defun t2sharp-comma (vv val)
-  (add-init `(si::setvv ,vv ,val) ))
+	((add-init form))))
 
 (defun t2declare (vv)
   (declare (ignore vv))

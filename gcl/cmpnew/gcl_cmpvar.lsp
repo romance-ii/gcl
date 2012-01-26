@@ -156,8 +156,8 @@
 (defun var-cb (v)
   (or (var-ref-ccb v) (eq 'clb (var-loc v))))
 
-(defun var-cbb (v)
-  (or (var-ref-ccb v) (eq 'clb (var-loc v)) (eq (var-ref v) 'pb)))
+;; (defun var-cbb (v)
+;;   (or (var-ref-ccb v) (eq 'clb (var-loc v)) (eq (var-ref v) 'pb)))
 
 ;; (defun c1var (name)
 ;;   (let ((info (make-info :referred-array (make-array 1 :fill-pointer 0)))
@@ -522,7 +522,7 @@
 	    (pushnew v *tvc*)
 	    (when (member (var-tag v) *catch-tags*) (throw (var-tag v) v))))))))
 
-(defun set-form-type (form type))
+(defun set-form-type (form type) (setf (info-type (cadr form)) (type-and type (info-type (cadr form)))))
 ;  (sft form type))  FIXME cannot handle nil return types such as tail recursive calls
 
 (defun sft-block (form block type)
