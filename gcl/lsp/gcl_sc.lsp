@@ -16,13 +16,13 @@
 
 (defun character-designator-p (s)
   (or (typep s 'fixnum)
-     (= (c::stdesig-fillp s) 1)))
+      (= (c::stdesig-fillp s) 1)))
 
 (deftype character-designator nil `(and string-designator (satisfies character-designator-p)))
 (deftype string-designator    nil `(or string symbol character (integer 0 255)))
 
 (eval-when
- (compile)
+ (compile eval)
 
  (defmacro with-aref-shadow (&body body)
    `(labels ((lower-case-p (x) (<= #.(char-code #\a) x #.(char-code #\z)))
@@ -149,6 +149,7 @@
 (defun name-char (s)
   (declare (optimize (safety 1)))
   (check-type s string-designator)
+  (when (integerp s) (setq s (code-char s)))
   (cond ((cdr (assoc s '(("Return" . #\Return)
 			 ("Space" . #\Space)
 			 ("Rubout" . #\Rubout)

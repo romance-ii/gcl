@@ -471,7 +471,8 @@
 	       (cond ((args-info-changed-vars (caaddr form) (cdr forms))
 		      (push (wt-push-loc (cons 'var (caddr form)) type) locs))
 		     ((and (member (var-kind (caaddr form)) +c-local-var-types+)
-			   (not (eq type (var-kind (caaddr form)))))
+			   (not (type>= (var-kind (caaddr form)) type)))
+;			   (not (eq type (var-kind (caaddr form)))))
 		      (push (wt-push-loc (cons 'var (caddr form)) type) locs))
 		     ((push (coerce-loc (cons 'VAR (caddr form)) type) locs))))
               (CALL-GLOBAL
@@ -522,6 +523,71 @@
 		       ((setq forms (list* form form1 (cdr forms))
 			      types (list* type  types))))));; want (setq types (list* type type (cdr  types))) but type is first of types
               (otherwise (push (wt-push-loc form type t) locs))))))
+
+;; (defun inline-args (forms types &optional fun &aux locs ii)
+;;   (do ((forms forms (cdr forms))
+;;        (types types (cdr types)))
+;;       ((endp forms) (nreverse locs))
+;;       (let* ((form (car forms))
+;; 	     (type (car types))
+;; 	     (type (adj-cnum-tp type (info-type (cadr form)))))
+;;         (case (car form)
+;;               (LOCATION (push (coerce-loc (caddr form) type) locs))
+;;               (VAR
+;; 	       (cond ((args-info-changed-vars (caaddr form) (cdr forms))
+;; 		      (push (wt-push-loc (cons 'var (caddr form)) type) locs))
+;; 		     ((and (member (var-kind (caaddr form)) +c-local-var-types+)
+;; 			   (not (eq type (var-kind (caaddr form)))))
+;; 		      (push (wt-push-loc (cons 'var (caddr form)) type) locs))
+;; 		     ((push (coerce-loc (cons 'VAR (caddr form)) type) locs))))
+;;               (CALL-GLOBAL
+;;                (if (let ((fname (caddr form)))
+;; 		     (and (inline-possible fname)
+;; 			  (setq ii (get-inline-info
+;; 				    fname (cadddr form)
+;; 				    (info-type (cadr form)) (sixth form)))
+;; 			  (progn  (save-avma ii) t)))
+;;                    (let ((loc (get-inline-loc ii (cadddr form))))
+;; 		     (cond
+;; 		      ((or (and (flag-p (caddr ii) ans)(not *c-gc*)); returns new object
+;; 			   (and (member (cadr ii) +c-local-var-types+)
+;; 				(not (eq type (cadr ii)))))
+;; 		       (push (wt-push-loc loc type) locs))
+;; 		      ((or (need-to-protect (cdr forms) (cdr types))
+;; 			   ;;if either new form or side effect,
+;; 			   ;;we don't want double evaluation
+;; 			   (and (flag-p (caddr ii) allocates-new-storage)
+;; 				(or (null fun)
+;; 				    ;; Any fun such as list,list* which
+;; 				    ;; does not cause side effects or
+;; 				    ;; do double eval (ie not "@..")
+;; 				    ;; could go here.
+;; 				    (not (si::memq fun '(list-inline list*-inline)))))
+;; 			   (flag-p (caddr ii) is)
+;; 			   (and (flag-p (caddr ii) set) ; side-effectp
+;; 				(not (null (cdr forms)))))
+;; 		       (push (wt-push-loc loc type) locs))
+;; 		      ((push (coerce-loc loc type) locs))))
+;; 		 (push (wt-push-loc form type t) locs)))
+;; 	      (ub (push (list 'gen-loc (caddr form) 
+;; 			      (let* ((v (fourth form))(tv (third v))) 
+;; 				(if (eq (car v) 'var) (cons (car v) tv) tv))) locs))
+;;               (structure-ref (push (coerce-loc-structure-ref (cdr form) type) locs))
+;;               (SETQ
+;; 	       (let* ((vref (caddr form))
+;; 		      (form1 (cadddr form))
+;; 		      (v (car vref))
+;; 		      (vv (cons 'var vref))
+;; 		      (vt (if (or (eq t (var-ref v)) (consp (var-ref v)) (var-cb v) (eq (var-kind v) 'global)) vv *value-to-go*)))
+;; 		 (cond ((eq vt vv)
+;; 			(let ((*value-to-go* vt)) (c2expr* form1))
+;; 			(if (eq (car form1) 'LOCATION)
+;; 			    (push (coerce-loc (caddr form1) type) locs)
+;; 			  (setq forms (list* form (list 'VAR (cadr form) vref) (cdr forms))
+;; 				types (list* type  types))))
+;; 		       ((setq forms (list* form form1 (cdr forms))
+;; 			      types (list* type  types))))));; want (setq types (list* type type (cdr  types))) but type is first of types
+;;               (otherwise (push (wt-push-loc form type t) locs))))))
 
 ;; (defun inline-args (forms types &optional fun &aux locs ii)
 ;;   (do ((forms forms (cdr forms))
@@ -626,6 +692,7 @@
 ;; 		     (push (coerce-loc temp type) locs)))))))))
 
 (defun coerce-loc (loc type)
+  (when (eq 'var (when (listp loc) (car loc))) (setf (var-type (cadr loc)) type));FIXME cmp-aref
   (let ((tmp (car (rassoc (promoted-c-type type) *box-alist*))))
     (if tmp (list 'gen-loc tmp loc)
       (let ((tl (cdr (assoc (promoted-c-type type) +coersion-alist+))))
@@ -1080,8 +1147,19 @@
 	    ((and aet (consp (third at)) (= (length (third at)) 1))
 	     (wt "(" a ")->v.v_dim"))
 	    ((and (constantp i) (> i 0))
-	     (wt "(" a ")->a.a_dims[(" i ")]"))
-	    ((wt "(type_of(" a ")==t_array ? (" a ")->a.a_dims[(" i ")] : (" a ")->v.v_dim)"))))))
+	     (wt "(" a ")->a.a_dims[((unsigned)" i ")]"));FIXME
+	    ((wt "(type_of(" a ")==t_array ? (" a ")->a.a_dims[((unsigned)" i ")] : (" a ")->v.v_dim)"))))))
+
+;; (defun cmp-array-dimension-inline (a i)
+;;   (let ((at (nil-to-t (type-and #tarray (var-array-type a)))))
+;;     (let ((aet (and (consp at) (member (car at) '(array simple-array)))))
+;;       (cond ((and (not *safe-compile*) (not aet))
+;; 	     (wt "fixint(fLarray_dimension(" a "," i "))"))
+;; 	    ((and aet (consp (third at)) (= (length (third at)) 1))
+;; 	     (wt "(" a ")->v.v_dim"))
+;; 	    ((and (constantp i) (> i 0))
+;; 	     (wt "(" a ")->a.a_dims[(" i ")]"))
+;; 	    ((wt "(type_of(" a ")==t_array ? (" a ")->a.a_dims[(" i ")] : (" a ")->v.v_dim)"))))))
 
 (defun default-init (type)
   (let ((type (promoted-c-type type)))

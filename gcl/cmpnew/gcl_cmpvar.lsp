@@ -76,11 +76,14 @@
   (/= 0 (logand 1 (var-flags v))))
 (defun var-reffed (v)
   (/= 0 (logand 2 (var-flags v))))
+(defun var-noreplace (v)
+  (/= 0 (logand 4 (var-flags v))))
 (defun set-var-dynamic (v)
   (setf (var-flags v) (logior 1 (var-flags v))))
 (defun set-var-reffed (v)
   (setf (var-flags v) (logior 2 (var-flags v))))
-
+(defun set-var-noreplace (v)
+  (setf (var-flags v) (logior 4 (var-flags v))))
 
 ;;; A special binding creates a var object with the kind field SPECIAL,
 ;;; whereas a special declaration without binding creates a var object with
@@ -307,7 +310,29 @@
 	     (set-var-reffed var)
 	     (keyed-cmpnote (list 'var-ref (var-name var))
 			    "Making variable ~s reference with barrier ~s" (var-name var) (if ccb 'cb (if clb 'lb)))
-             (return-from c1vref (list var ccb clb))))))
+	     (let ((l (list var ccb clb)))
+	       (push l (var-store var))
+	       (return-from c1vref l))))))
+
+;; (defun c1vref (name &aux ccb clb)
+;;   (dolist (var *vars*
+;;                (let ((var (sch-global name)))
+;;                     (unless var
+;;                       (unless (or (si:specialp name) (constantp name)) (undefined-variable name))
+;;                       (setq var (make-var :name name
+;;                                           :kind 'GLOBAL
+;;                                           :loc (add-symbol name)
+;;                                           :type (or (get name 'cmp-type) t)
+;; 					  :ref t));FIXME
+;;                       (push var *undefined-vars*))
+;;                     (list var ccb)))
+;;       (cond ((eq var 'cb) (setq ccb t))
+;;             ((eq var 'lb) (setq clb t))
+;;             ((eq (var-name var) name)
+;; 	     (set-var-reffed var)
+;; 	     (keyed-cmpnote (list 'var-ref (var-name var))
+;; 			    "Making variable ~s reference with barrier ~s" (var-name var) (if ccb 'cb (if clb 'lb)))
+;;              (return-from c1vref (list var ccb clb))))))
 
 ;; (defun c1vref (name &optional noref &aux ccb clb inner)
 ;;   (dolist (var *vars*

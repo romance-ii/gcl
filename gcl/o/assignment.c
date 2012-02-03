@@ -208,7 +208,8 @@ DEFUNO_NEW("FSET",object,fSfset,SI
 	} else if (car(function) == sLspecial)
 		FEerror("Cannot define a special form.", 0);
 	else if (function->c.c_car == sLmacro) {
-		sym->s.s_gfdef = function->c.c_cdr;
+	  function=function->c.c_cdr;
+		sym->s.s_gfdef = function;
 		sym->s.s_mflag = TRUE;
 	} else {
 		sym->s.s_gfdef = function;
@@ -216,6 +217,8 @@ DEFUNO_NEW("FSET",object,fSfset,SI
 	}
 
 	sym->s.s_sfdef=NOT_SPECIAL;/*FIXME?*/
+	if (function->fun.fun_plist!=Cnil)
+	  function->fun.fun_plist->c.c_cdr->c.c_cdr->c.c_cdr->c.c_cdr->c.c_cdr->c.c_car=sym;/*FIXME*/
 
 	RETURN1(function);
 }

@@ -12,7 +12,7 @@
 
 (defun add-hash (fn sig callees src file &optional props &aux ar cm)
   (cond ((not (eq *boot* t))
-	 (setq *pahl* (cons `(add-hash ',fn ',sig ',callees ,src ,file) *pahl*))
+	 (setq *pahl* (cons `(add-hash ',fn ',sig ',callees ,src ,file ,props) *pahl*))
 	 (unless (or (not (and 
 			   (setq *us* (find-symbol "UNIQUE-SIGS" (find-package "COMPILER")))
 			   (fboundp *us*)))

@@ -487,6 +487,8 @@
 ;;EQ
  (push '((t t) boolean #.(flags rfa)"(#0)==(#1)")
    (get 'eq 'inline-always))
+ (push '((cnum cnum) boolean #.(flags rfa)"(#0)==(#1)")
+   (get 'eq 'inline-always))
 ;(push '((fixnum fixnum) boolean #.(flags rfa)"0")
 ;   (get 'eq 'inline-always))
 
@@ -1079,7 +1081,7 @@
     (push `(((member ,(car l)) opaque) t #.(flags rfa) ,(strcat (cadr l) "(#1)")) 
 	  (get 'box   'inline-always))
     (push `(((member ,(car l)) t) opaque #.(flags rfa) ,(if (eq (car l) :object) "(#1)" (strcat "object_to_" (car l) "(#1)")))  
-	       (get 'unbox 'inline-always)))
+	  (get 'unbox 'inline-always)))
   (when (cadddr l)
     (push `(((member ,(car l)) ,(cadddr l)) opaque
 	    #.(flags rfa) ,(if (fifth l) (strcat "(#1)" (fifth l)) (strcat "(" (car l) ")" "(#1)")))   

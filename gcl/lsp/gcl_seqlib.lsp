@@ -144,24 +144,35 @@
 		  (ecase ,r
 			 ,@(let ((k -1)) (mapcar (lambda (x) `(,x ,(incf k))) +grouped-array-types+))))))
 	   
-	   (defmacro set-same-array (n a i b j)
-	     `(case ,n
-		    ,@(let ((k -1)) 
-			(mapcar (lambda (x) 
-				  `(,(incf k) (let ((,a ,a),@(unless (eq a b) `((,b ,b))))
-						(declare ((array ,(car x)) ,a ,@(unless (eq a b) `(,b))))
-						(setf (aref ,a ,i)(aref ,b ,j))))) +grouped-array-types+))))
+	   ;; (defmacro set-same-array (n a i b j)
+	   ;;   `(case ,n
+	   ;; 	    ,@(let ((k -1)) 
+	   ;; 		(mapcar (lambda (x) 
+	   ;; 			  `(,(incf k) (let ((,a ,a),@(unless (eq a b) `((,b ,b))))
+	   ;; 					(declare ((array ,(car x)) ,a ,@(unless (eq a b) `(,b))))
+	   ;; 					(setf (aref ,a ,i)(aref ,b ,j))))) +grouped-array-types+))))
 	   
+	   (defmacro set-same-array (n a i b j)
+	     `(typecase
+	       ,a
+	       ,@(mapcar (lambda (x) `((vector ,x) (setf (aref ,a ,i) (aref ,b ,j)))) +array-types+)))
+
 	   (defmacro mrotatef (a b &aux (s (sgen "MRF-S"))) `(let ((,s ,a)) (setf ,a ,b ,b ,s)))
 
-	   (defmacro rotate-same-array (n a i b j)
-	     `(case ,n
-		    ,@(let ((k -1)) 
-			(mapcar (lambda (x) 
-				  `(,(incf k) (let ((,a ,a),@(unless (eq a b) `((,b ,b))))
-						(declare ((array ,(car x)) ,a ,@(unless (eq a b) `(,b))))
-						(mrotatef (aref ,a ,i)(aref ,b ,j))))) +grouped-array-types+))))
+	   ;; (defmacro rotate-same-array (n a i b j)
+	   ;;   `(case ,n
+	   ;; 	    ,@(let ((k -1)) 
+	   ;; 		(mapcar (lambda (x) 
+	   ;; 			  `(,(incf k) (let ((,a ,a),@(unless (eq a b) `((,b ,b))))
+	   ;; 					(declare ((array ,(car x)) ,a ,@(unless (eq a b) `(,b))))
+	   ;; 					(mrotatef (aref ,a ,i)(aref ,b ,j))))) +grouped-array-types+))))
 	   
+	   (defmacro rotate-same-array (n a i b j)
+	     `(typecase
+	       ,a
+	       ,@(mapcar (lambda (x) `((vector ,x) (mrotatef (aref ,a ,i) (aref ,b ,j)))) +array-types+)))
+
+
 	   (defmacro raref (a seq n i j l) 
 	     `(if ,l 
 		  (mrotatef (car (aref ,a ,i)) (car (aref ,a ,j)))

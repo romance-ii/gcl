@@ -325,19 +325,55 @@
 			      (go ,label))
 			  (return (progn ,@result)))))))
 
-(defmacro case (keyform &rest clauses &aux (form nil) (key (sgen "CASE")))
+(defmacro case (keyform &rest clauses &aux (key (sgen "CASE")))
   (declare (optimize (safety 2)))
-  (dolist (clause (reverse clauses) `(let ((,key ,keyform)) (declare (ignorable ,key)) ,form))
-    (cond ((or (eq (car clause) 't) (eq (car clause) 'otherwise))
-           (setq form `(progn ,@(cdr clause))))
-          ((consp (car clause))
-           (setq form `(if (or ,@(mapcar (lambda (x) `(eql ,key ',x)) (car clause)));(member ,key ',(car clause))
-                           (progn ,@(cdr clause))
-                           ,form)))
-          ((car clause)
-           (setq form `(if (eql ,key ',(car clause))
-                           (progn ,@(cdr clause))
-                           ,form))))))
+  (labels ((sw (x) `(eql ,key ',x)))
+	  `(let ((,key ,keyform))
+	     (declare (ignorable ,key))
+	     ,(reduce (lambda (c y) 
+			(let* ((aa (pop c))
+			       (ka (or (atom aa) (cdr aa)))
+			       (da (if (and (listp c) (cdr c)) (cons 'progn c) (car c)))
+			       (v (if ka aa (car aa))))
+			  (if (member aa '(t otherwise)) da 
+			    `(if ,(if (when ka (listp aa)) `(or ,@(mapcar #'sw v)) (sw v)) ,da ,y))))
+		      clauses :initial-value nil :from-end t))))
+
+(defmacro ecase (keyform &rest clauses &aux (key (sgen "ECASE")))
+  (declare (optimize (safety 2)))
+  `(let ((,key ,keyform))
+     (declare (ignorable ,key))
+     (case ,key
+	   ,@(mapcar (lambda (x) (if (member (car x) '(t otherwise)) (cons (list (car x)) (cdr x)) x)) clauses)
+	   (otherwise
+	    (error 'type-error :datum ,key
+		   :expected-type '(member ,@(apply 'append (mapcar (lambda (x &aux (x (car x))) (if (listp x) x (list x))) clauses))))))))
+
+
+(defmacro ccase (keyform &rest clauses &aux (key (sgen "CCASE")))
+  (declare (optimize (safety 2)))
+  `(let ((,key ,keyform))
+     (declare (ignorable ,key))
+     (loop
+      (case ,key
+	    ,@(mapcar (lambda (x &aux (k (pop x)))
+			`(,(if (member k '(t otherwise)) (list k) k) (return ,(if (cdr x) (cons 'progn x) (car x))))) clauses)
+	    (otherwise 
+	     (check-type ,key (member ,@(apply 'append (mapcar (lambda (x &aux (x (car x))) (if (listp x) x (list x))) clauses)))))))))
+
+;; (defmacro case (keyform &rest clauses &aux (form nil) (key (sgen "CASE")))
+;;   (declare (optimize (safety 2)))
+;;   (dolist (clause (reverse clauses) `(let ((,key ,keyform)) (declare (ignorable ,key)) ,form))
+;;     (cond ((or (eq (car clause) 't) (eq (car clause) 'otherwise))
+;;            (setq form `(progn ,@(cdr clause))))
+;;           ((consp (car clause))
+;;            (setq form `(if (or ,@(mapcar (lambda (x) `(eql ,key ',x)) (car clause)));(member ,key ',(car clause))
+;;                            (progn ,@(cdr clause))
+;;                            ,form)))
+;;           ((car clause)
+;;            (setq form `(if (eql ,key ',(car clause))
+;;                            (progn ,@(cdr clause))
+;;                            ,form))))))
 
 
 (defmacro return (&optional (val nil))   (declare (optimize (safety 2))) `(return-from nil ,val))

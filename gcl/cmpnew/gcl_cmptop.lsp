@@ -1728,8 +1728,14 @@
 	(t)))
 
 (defun ignorable-form (f)
-  (or (eq (car f) 'function)
-      (if1 (cadr f))))
+  (case (car f)
+	(function t)
+	(infer-tp nil)
+	(otherwise (if1 (cadr f)))))
+
+;; (defun ignorable-form (f)
+;;   (or (eq (car f) 'function)
+;;       (if1 (cadr f))))
 
 ;; (defun ignorable-form (f)
 ;;   (if1 (cadr f)))
@@ -2286,7 +2292,7 @@
    (wt-nl1 "}")))
 
 
-(defun wt-cvars( &aux type )
+(defun wt-cvars(&aux type )
   (let (vars)
     (dolist (v *c-vars*)
       (when (integerp (cdr v))
