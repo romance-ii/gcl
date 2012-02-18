@@ -1102,27 +1102,55 @@
 ;; (setf (get 'si::cons-car 'c1) 'c1cons-car)	 
 ;; (setf (get 'si::cons-cdr 'c1) 'c1cons-cdr)
 
+(defun narg-list-type (nargs &optional dot)
+  (let* ((y (mapcar (lambda (x &aux (atp (atomic-tp (info-type (cadr x)))))
+		     (cond ;((get-vbind x))
+			   (atp (car atp));FIXME
+			   ((get-vbind x))
+			   (+opaque+))) nargs)))
+;    (when dot (setf (cdr (last y 2)) (car (last y)))) ;FIXME bump-pcons -- get rid of pcons entirely
+    (let ((s (when dot (car (last y))))(tp (info-type (cadar (last nargs)))));FIXME
+      (cond ((when s (type>= #tproper-list tp)) #tproper-cons)
+	    ((when s (type-and #tnull tp)) #tcons)
+	    (t (when dot (setf (cdr (last y 2)) (car (last y)))) `(member ,y))))))
+
 (defun c1list (args)
   (let* ((info (make-info))
 	 (nargs (c1args args info)))
-    (setf (info-type info) (cond ((not args) #tnull)
-				 ((< (length args) *cdr-limit*)
-				  (cmp-norm-tp
-				   (reduce (lambda (y x)
-					     (declare (ignore x))
-					     `(cons t ,y)) args :initial-value 'null)))
-				 (#tproper-cons)));FIXME
-    (list 'call-global info 'list nargs)))
+    (cond ((not nargs) (c1nil))
+	  ((setf (info-type info) (narg-list-type nargs))
+	   `(call-global ,info list ,nargs)))))
+
+;; (defun c1list (args)
+;;   (let* ((info (make-info))
+;; 	 (nargs (c1args args info)))
+;;     (setf (info-type info) (cond ((not args) #tnull)
+;; 				 ((< (length args) *cdr-limit*)
+;; 				  (cmp-norm-tp
+;; 				   (reduce (lambda (y x)
+;; 					     (declare (ignore x))
+;; 					     `(cons t ,y)) args :initial-value 'null)))
+;; 				 (#tproper-cons)));FIXME
+;;     (list 'call-global info 'list nargs)))
 (si::putprop 'list 'c1list 'c1)
       
 (defun c1list* (args)
   (let* ((info (make-info))
 	 (nargs (c1args args info)))
-    (setf (info-type info) (cond ((not nargs) #tnull) ((not (cdr nargs)) (info-type (cadar nargs))) 
-				 ((type>= #tproper-list (info-type (cadar (last nargs)))) #tproper-cons)
-				 (#tcons)));FIXME
-    (list 'call-global info 'list* nargs)))
+    (cond ((not nargs) (c1nil))
+	  ((not (cdr nargs)) (car nargs))
+	  ((setf (info-type info) (narg-list-type nargs t))
+	   `(call-global ,info ,(if (cddr nargs) 'list* 'cons) ,nargs)))))
+
+;; (defun c1list* (args)
+;;   (let* ((info (make-info))
+;; 	 (nargs (c1args args info)))
+;;     (setf (info-type info) (cond ((not nargs) #tnull) ((not (cdr nargs)) (info-type (cadar nargs))) 
+;; 				 ((type>= #tproper-list (info-type (cadar (last nargs)))) #tproper-cons)
+;; 				 (#tcons)));FIXME
+;;     (list 'call-global info 'list* nargs)))
 (si::putprop 'list* 'c1list* 'c1)
+(si::putprop 'cons  'c1list* 'c1)
       
 (defun c1append (args)
   (let* ((info (make-info))

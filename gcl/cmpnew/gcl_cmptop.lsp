@@ -1070,8 +1070,19 @@
 	 (sig (if *recursion-detected* (list (car sig) (bbump-tp (cadr sig))) sig)))
     (setf (car e) sig (cadr e) *callees*)
     (if (and *recursion-detected* (not (eq (cadr osig) (cadr sig))))
-	(do-l1-fun name src e)
+	(progn (keyed-cmpnote (list name 'recursion) "Reprocessing ~s: ~s ~s" name osig sig) (do-l1-fun name src e))
       l)))
+
+;; (defun do-l1-fun (name src e &aux *callees* *recursion-detected* *warning-note-stack*)
+
+;;   (let* ((l (c1lambda-expr src))
+;; 	 (osig (car e))
+;; 	 (sig (lam-e-to-sig l))
+;; 	 (sig (if *recursion-detected* (list (car sig) (bbump-tp (cadr sig))) sig)))
+;;     (setf (car e) sig (cadr e) *callees*)
+;;     (if (and *recursion-detected* (not (eq (cadr osig) (cadr sig))))
+;; 	(do-l1-fun name src e)
+;;       l)))
 
 ;; (defun do-l1-fun (name src e &aux *callees* *recursion-detected* *warning-note-stack*)
 
@@ -1842,9 +1853,13 @@
 ;; 				(,#tdcomplex ."dcomplex ")
 ;; 				(object . "object ")))
 
-(defun rep-type (type)
+(defun rep-type (type &aux (type (if (eq type 'object) t type)))
   (let ((z (promoted-c-type type)))
     (or (cdr (assoc z +wt-c-rep-alist+)) "object ")))
+
+;; (defun rep-type (type)
+;;   (let ((z (promoted-c-type type)))
+;;     (or (cdr (assoc z +wt-c-rep-alist+)) "object ")))
 
 
 (defun t1defmacro (args &aux (w args) (n (pop args)) (ll (pop args)))

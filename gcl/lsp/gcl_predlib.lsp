@@ -1367,10 +1367,11 @@
 	 (let ((q (lremove-if-not 'proper-consp (cdr y))))
 	   (when q `(member ,@q))))
 	((eq x 'proper-cons)
-	 (cons-to-nil
-	  (cons
-	   (copy-tree (car y))
-	   (ntp-and (copy-tree (cdr y)) '(((non-keyword-symbol (member nil)) (cons proper-cons)) nil nil)))));FIXME
+	 (let* ((z '(((non-keyword-symbol (member nil)) (cons proper-cons)) nil nil))
+		(cy (copy-tree (cdr y)))
+		(ca (ntp-and cy z)))
+	   (if (equal z ca) x
+	     (cons-to-nil (cons (copy-tree (car y)) ca)))));FIXME
 	((eq y 'proper-cons)
 	 (cons^ y x))
 	((and (eq (car x) 'member) (eq (car y) 'member))
@@ -1389,6 +1390,39 @@
 	   (cons-to-nil
 	    (cons (ntp-and ax (car y))
 		  (ntp-and dx (cdr y))))))))
+
+;; (defun cons^ (x y)
+;;   (cond ((eq x t) y)
+;; 	((eq y t) x)
+;; 	((not (and x y)) nil)
+;; 	((and (eq x 'proper-cons) (eq y 'proper-cons)) x)
+;; 	((and (eq x 'proper-cons) (eq (car y) 'member))
+;; 	 (let ((q (lremove-if-not 'proper-consp (cdr y))))
+;; 	   (when q `(member ,@q))))
+;; 	((eq x 'proper-cons)
+;; 	 (let* ((z '(((non-keyword-symbol (member nil)) (cons proper-cons)) nil nil))
+;; 		(cy (copy-tree (cdr y)))
+;; 		(ca (ntp-and cy z)))
+;; 	   (if (equal z ca) x
+;; 	     (cons-to-nil (cons (copy-tree (car y)) ca)))));FIXME
+;; 	((eq y 'proper-cons)
+;; 	 (cons^ y x))
+;; 	((and (eq (car x) 'member) (eq (car y) 'member))
+;; 	 (let ((q (ordered-intersection-eq (cdr x) (cdr y))))
+;; 	   (when q `(member ,@q))))
+;; 	((eq (car x) 'member)
+;; 	 (let ((q (lremove-if-not
+;; 		   (lambda (x) 
+;; 		     (cons^ (cons (ntp-load `(member ,(car x))) 
+;; 				  (ntp-load `(member ,(cdr x)))) y)) (cdr x))))
+;; 	   (when q `(member ,@q))))
+;; 	((eq (car y) 'member) (cons^ y x))
+;; 	((and x y)
+;; 	 (let ((ax (copy-tree (car x)))
+;; 	       (dx (copy-tree (cdr x))))
+;; 	   (cons-to-nil
+;; 	    (cons (ntp-and ax (car y))
+;; 		  (ntp-and dx (cdr y))))))))
 
 (defun cons-op (op x y &aux (w (cadr x)))
   (setf (cadr x)

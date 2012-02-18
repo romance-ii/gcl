@@ -206,10 +206,12 @@
   (when (unless *compiler-new-safety* (listp fmla))
     (case (car fmla)
 	  (inline (fmla-infer-tp (fifth fmla)))
-	  ((let let*) (fmla-infer-tp (fifth fmla)))
-	  (tagbody (mapc 'fmla-infer-tp (fifth fmla)));FIXME need catch/throw here, and make this an ecase 
+	  ((let let*) (remove-if (lambda (x) (member (car x) (third fmla))) (fmla-infer-tp (fifth fmla))))
+	  (tagbody (mapc 'fmla-infer-tp (fifth fmla)) nil);FIXME need catch/throw here, and make this an ecase 
 	  (block 
-	   (let ((*infer-tags* (cons (cons (third fmla) *gen-nil*) *infer-tags*)))
+	   (let* ((tp (info-type (cadr (fourth fmla))))
+		  (gen (list (cons +gen+ (cons (when (type-and #t(not null) tp) t) (when (type-and #tnull tp) t)))))
+		  (*infer-tags* (cons (cons (third fmla) gen) *infer-tags*)))
 	     (fmla-infer-tp (fourth fmla))
 	     (cdar *infer-tags*)))
 	  (progn (fmla-infer-tp (car (last (third fmla)))))
@@ -218,7 +220,7 @@
 	   (let ((x (assoc (third fmla) *infer-tags*)))
 	     (when x (setf (cdr x) (fmla-if1 nil (cdr x) (fmla-infer-tp (seventh fmla)))))))
 	  (switch
-	   (mapc 'fmla-infer-tp (sixth fmla)))
+	   (mapc 'fmla-infer-tp (sixth fmla)) nil);FIXME
 	  (infer-tp (let ((tp (info-type (cadr (fifth fmla))))
 			  (v (car (third (third fmla)))))
 		      (cond ((type>= #tnull tp) (list (list* v nil (fourth fmla))))
@@ -250,6 +252,55 @@
 	   (cond ((consp (car fmla)) (fmla-infer-tp (car fmla)))
 		 ((type>= #tnull (info-type (cadr fmla))) *gen-nil*)
 		 ((type>= #t(not null) (info-type (cadr fmla))) *gen-t*))))))
+
+;; (defun fmla-infer-tp (fmla)
+;;   (when (unless *compiler-new-safety* (listp fmla))
+;;     (case (car fmla)
+;; 	  (inline (fmla-infer-tp (fifth fmla)))
+;; 	  ((let let*) (fmla-infer-tp (fifth fmla)))
+;; 	  (tagbody (mapc 'fmla-infer-tp (fifth fmla)));FIXME need catch/throw here, and make this an ecase 
+;; 	  (block 
+;; 	   (let ((*infer-tags* (cons (cons (third fmla) *gen-nil*) *infer-tags*)))
+;; 	     (fmla-infer-tp (fourth fmla))
+;; 	     (cdar *infer-tags*)))
+;; 	  (progn (fmla-infer-tp (car (last (third fmla)))))
+;; 	  (decl-body (fmla-infer-tp (fourth fmla)))
+;; 	  (return-from 
+;; 	   (let ((x (assoc (third fmla) *infer-tags*)))
+;; 	     (when x (setf (cdr x) (fmla-if1 nil (cdr x) (fmla-infer-tp (seventh fmla)))))))
+;; 	  (switch
+;; 	   (mapc 'fmla-infer-tp (sixth fmla)))
+;; 	  (infer-tp (let ((tp (info-type (cadr (fifth fmla))))
+;; 			  (v (car (third (third fmla)))))
+;; 		      (cond ((type>= #tnull tp) (list (list* v nil (fourth fmla))))
+;; 			    ((type>= #t(not null) tp) (list (list* v (fourth fmla) nil))))))
+;; 	  (if (apply 'fmla-if (cddr fmla)))
+;; 	  (var (when (vlp fmla) (list (cons (car (third fmla)) (cons #t(not null) #tnull)))))
+;; 	  (setq (fmla-infer-tp (fourth fmla)));FIXME set var too, and in call global
+;; 	  (call-global
+;; 	   (let* ((fn (third fmla)) (rfn (cdr (assoc fn +bool-inf-op-list+)))
+;; 		  (sfn (cdr (assoc fn +bool-inf-sop-list+)))
+;; 		  (srfn (cdr (assoc sfn +bool-inf-op-list+)))
+;; 		  (args (if (eq (car fmla) 'inline) (fourth (fifth fmla)) (fourth fmla)))
+;; 		  (l (length args))
+;; 		  (pt (get fn 'si::predicate-type)));FIXME +cmp-type-alist+
+;; 	     (cond ((and (= l 1) (vlp (first args)) pt) 
+;; 		    (list (cons (car (third (first args))) (cons (cmp-norm-tp pt) (cmp-norm-tp `(not ,pt))))))
+;; 		   ((and (= l 2) (eq fn 'typep) (vlp (first args))
+;; 			 (let ((tp (cmp-norm-tp (get-object-value (second args)))))
+;; 			   (when tp (list (cons (car (third (first args))) (cons tp (cmp-norm-tp `(not ,tp)))))))))
+;; 		   ((and (= l 2) rfn)
+;; 		    (nconc
+;; 		     (when (vlp (first args))
+;; 		       (list (cons (car (third (first args)))
+;; 				   (tppra (vl-type (first args)) (second args) fn rfn))))
+;; 		     (when (vlp (second args))
+;; 		       (list (cons (car (third (second args)))
+;; 				   (tppra (vl-type (second args)) (first args) sfn srfn)))))))))
+;; 	  (otherwise
+;; 	   (cond ((consp (car fmla)) (fmla-infer-tp (car fmla)))
+;; 		 ((type>= #tnull (info-type (cadr fmla))) *gen-nil*)
+;; 		 ((type>= #t(not null) (info-type (cadr fmla))) *gen-t*))))))
 
 ;; (defun fmla-infer-tp (fmla)
 ;;   (when (unless *compiler-new-safety* (listp fmla))
@@ -509,12 +560,75 @@
 			   (do-setq-tp (car rv) nil (type-and (car (caddr rv)) (var-type (car rv))))))
 
 		     (do (rv) ((not (setq rv (pop trv))))
-			 (do-setq-tp (car rv) nil (type-or1 (var-type (car rv)) (cadr rv))))
+			 (do-setq-tp (car rv) (list args nil) (type-or1 (var-type (car rv)) (cadr rv))))
 
 		     (list 'if info fmla tb fb))
 
 		 (dolist (l r)
 		   (setf (var-type (car l)) (cadr l))))))))))
+
+;; (defun c1if (args &aux info f)
+;;   (when (or (endp args) (endp (cdr args)))
+;;         (too-few-args 'if 2 (length args)))
+;;   (unless (or (endp (cddr args)) (endp (cdddr args)))
+;;           (too-many-args 'if 3 (length args)))
+;;   (setq f (c1fmla-constant (car args)))
+
+;;   (case f
+;;         ((t) 
+;; 	 (when (caddr args) (note-branch-elimination (car args) t (caddr args)))
+;; 	 (c1expr (cadr args)))
+;;         ((nil) 
+;; 	 (note-branch-elimination (car args) nil (cadr args))
+;; 	 (if (endp (cddr args)) (c1nil) (c1expr (caddr args))))
+;;         (otherwise
+;;          (setq info (make-info))
+;; 	 (let* ((fmla (c1fmla f info))
+;; 		(inf (delete +gen+ (fmla-infer-tp fmla) :key 'car))
+;; 		(inf (remove-if (lambda (x) (fmla-is-changed (car x) fmla)) inf))
+;; 		(fmlae (fmla-eval-const fmla))
+;; 		(fmlae (if (notevery 'cadr inf) nil fmlae))
+;; 		(fmlae (if (notevery 'cddr inf) t   fmlae)))
+;; 	   (when inf 
+;; 	     (keyed-cmpnote (list* 'type-inference (mapcar (lambda (x) (var-name (car x))) inf))
+;; 			  "inferring types on form ~s, ~s" f inf))
+;; 	   (if (not (eq fmlae 'boolean))
+
+;;  	       (cond (fmlae 
+;;   		      (when (caddr args) (note-branch-elimination (car args) t (caddr args)))
+;; 		      (maybe-progn-fmla fmla (cadr args) info))
+;;   		     (t (note-branch-elimination (car args) nil (cadr args)) 
+;; 			(maybe-progn-fmla fmla (caddr args) info)))
+	     
+;; 	     (let (r)
+;; 	       (dolist (l inf)
+;; 		 (let ((v (car l)))
+;; 		   (when v
+;; 		     (push (list v (var-type v) (cdr l)) r))))
+;; 	       (unwind-protect
+
+;; 		   (let* ((tbl (c1branch t   r args info))
+;; 			  (fbl (c1branch nil r args info))
+;; 			  (tb (car tbl))
+;; 			  (fb (car fbl))
+;; 			  (trv (append (cadr tbl) (cadr fbl))))
+
+;; 		     (setf (info-type info) (type-or1 (info-type (cadr tb)) (info-type (cadr fb))))
+
+;; 		     (do (rv) ((not (setq rv (pop r))))
+;; 			 (setf (var-type (car rv)) (cadr rv))
+;; 			 (unless (info-type (cadr tb))
+;; 			   (do-setq-tp (car rv) nil (type-and (cdr (caddr rv)) (var-type (car rv)))))
+;; 			 (unless (info-type (cadr fb))
+;; 			   (do-setq-tp (car rv) nil (type-and (car (caddr rv)) (var-type (car rv))))))
+
+;; 		     (do (rv) ((not (setq rv (pop trv))))
+;; 			 (do-setq-tp (car rv) nil (type-or1 (var-type (car rv)) (cadr rv))))
+
+;; 		     (list 'if info fmla tb fb))
+
+;; 		 (dolist (l r)
+;; 		   (setf (var-type (car l)) (cadr l))))))))))
 
 ;; (defun c1if (args &aux info f)
 ;;   (when (or (endp args) (endp (cdr args)))
@@ -707,14 +821,23 @@
 
 (defun co1or (fn args)
   (declare (ignore fn))
-  (with-restore-vars
-   (let* ((tp (when (and args (exit-to-fmla-p)) #t(member t)))
-	  (arg (pop args))
-	  (tp (or tp (info-type (cadr (c1expr arg)))))
-	  (atp (atomic-tp (type-and tp #t(not null)))))
-     (when (atomic-type-constant-value atp)
-       (keep-vars)
-       (c1expr `(if ,arg ',(car atp) (or ,@args)))))))
+  (let* ((tp (when (and args (exit-to-fmla-p)) #t(member t)))
+	 (arg (pop args))
+	 (tp (or tp (info-type (cadr (with-restore-vars (c1expr arg))))))
+	 (atp (atomic-tp (type-and tp #t(not null)))))
+    (when (atomic-type-constant-value atp);FIXME make sure this is never a binding
+      (c1expr `(if ,arg ',(car atp) ,@(when args `((or ,@args))))))))
+
+;; (defun co1or (fn args)
+;;   (declare (ignore fn))
+;;   (with-restore-vars
+;;    (let* ((tp (when (and args (exit-to-fmla-p)) #t(member t)))
+;; 	  (arg (pop args))
+;; 	  (tp (or tp (info-type (cadr (c1expr arg)))))
+;; 	  (atp (atomic-tp (type-and tp #t(not null)))))
+;;      (when (atomic-type-constant-value atp)
+;;        (keep-vars)
+;;        (c1expr `(if ,arg ',(car atp) (or ,@args)))))))
 (setf (get 'or 'co1special) 'co1or)
 
 (defun c1fmla (fmla info &aux (*c1exit* +fmla+))

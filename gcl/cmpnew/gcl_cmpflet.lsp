@@ -84,7 +84,7 @@
 ;;; is a list ( macro-name expansion-function).
 
 (defvar *restore-vars-env* nil)
-(defmacro with-restore-vars (&rest body)
+(defmacro with-restore-vars (&rest body);FIXME var-flags
   (let ((rv (tmpsym)))
     `(let (,rv)
        (declare (ignorable ,rv))
@@ -96,15 +96,37 @@
 			(when (member (car l) *restore-vars-env*)
 			  (pushnew l *restore-vars* :key 'car))))
 		     ((do (l) ((not (setq l (pop *restore-vars*)))) 
-			  (let ((v (pop l))(tp (car l)))
+			  (let ((v (pop l))(tp (pop l))(st (car l)))
 			    (keyed-cmpnote (list (var-name v) 'type-propagation 'type)
 					   "Restoring var type on ~s from ~s to ~s"
 					   (var-name v) (var-type v) tp)
-			  (setf (var-type v) tp)))))))
+			  (setf (var-type v) tp (var-store v) st)))))))
 	     (let (*restore-vars* (*restore-vars-env* *vars*))
 	       (unwind-protect 
 		   (progn ,@body)
 		 (pop-restore-vars)))))))
+
+;; (defmacro with-restore-vars (&rest body)
+;;   (let ((rv (tmpsym)))
+;;     `(let (,rv)
+;;        (declare (ignorable ,rv))
+;;        (flet ((keep-vars nil (setq ,rv *restore-vars*))
+;; 	      (pop-restore-vars 
+;; 	       nil
+;; 	       (cond (,rv
+;; 		      (dolist (l ,rv)
+;; 			(when (member (car l) *restore-vars-env*)
+;; 			  (pushnew l *restore-vars* :key 'car))))
+;; 		     ((do (l) ((not (setq l (pop *restore-vars*)))) 
+;; 			  (let ((v (pop l))(tp (car l)))
+;; 			    (keyed-cmpnote (list (var-name v) 'type-propagation 'type)
+;; 					   "Restoring var type on ~s from ~s to ~s"
+;; 					   (var-name v) (var-type v) tp)
+;; 			  (setf (var-type v) tp)))))))
+;; 	     (let (*restore-vars* (*restore-vars-env* *vars*))
+;; 	       (unwind-protect 
+;; 		   (progn ,@body)
+;; 		 (pop-restore-vars)))))))
 
 ;; (defmacro with-restore-vars (&rest body); `(progn ,@body))
 ;;   `(let (*restore-vars* (*restore-vars-env* *vars*))

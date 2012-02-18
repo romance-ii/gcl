@@ -187,11 +187,22 @@
 (defun export-sig (sig)
   (unique-sigs `((,@(mapcar 'export-type (car sig))) ,(export-type (cadr sig)))))
 
+(defun mbt (tp &aux (atp (atomic-tp tp)))
+  (if (and atp (consp (car atp)))
+      (if (cdar atp) #tcons #tproper-cons)
+    tp))
+
 (defun lam-e-to-sig (l &aux (args (caddr l)) (regs (car args)) (narg (is-narg-le l))
 		       (first (is-first-var (car regs))) (regs (if first (cdr regs) regs)))
   `((,@(mapcar 'var-type regs)
 	  ,@(when (or narg (member-if 'identity (cdr args))) `(*)))
-	,(info-type (cadar (last l)))))
+	,(mbt (info-type (cadar (last l))))))
+
+;; (defun lam-e-to-sig (l &aux (args (caddr l)) (regs (car args)) (narg (is-narg-le l))
+;; 		       (first (is-first-var (car regs))) (regs (if first (cdr regs) regs)))
+;;   `((,@(mapcar 'var-type regs)
+;; 	  ,@(when (or narg (member-if 'identity (cdr args))) `(*)))
+;; 	,(info-type (cadar (last l)))))
 
 (defun compress-fle (l y z)
   (let* ((fname (pop l))

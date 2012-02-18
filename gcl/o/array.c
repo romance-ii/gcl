@@ -358,6 +358,55 @@ elt_size(fixnum elt_type) {
   }
 }
 
+DEFUN_NEW("MAKE-VECTOR2",object,fSmake_vector2,SI,7,7,NONE,OI,II,OI,OO,
+	  (fixnum elt_type,fixnum n,fixnum fillp,object displaced_to,fixnum V9,object staticp,object initial_element),"") {
+
+  object x;
+
+  BEGIN_NO_INTERRUPT;
+
+  switch(elt_type) {
+  case aet_ch:
+    x = alloc_object(t_string);
+    break;
+  case aet_bit:
+    x = alloc_object(t_bitvector);
+    break;
+  default:
+    x = alloc_object(t_vector);
+  }
+  x->v.tt=x->v.v_elttype = elt_type;
+  x->v.v_eltsize=elt_size(elt_type);
+  x->v.v_defrank=1;
+  x->v.v_adjustable=1;
+  x->v.v_dim = n;
+  x->v.v_self = 0;
+  x->v.v_displaced = Cnil;
+  
+  if (fillp<0) {
+    x->v.v_hasfillp = 0;
+    x->v.v_fillp = n;
+  } else  {	
+    x->v.v_fillp = fillp;
+    if (x->v.v_fillp > n || x->v.v_fillp < 0) 
+      FEerror("bad fillp",0);
+    x->v.v_hasfillp = 1;
+  }
+  
+  if (displaced_to==Cnil)
+    array_allocself(x,staticp!=Cnil,initial_element);
+  else 
+    displace(x,displaced_to,V9);
+  
+  END_NO_INTERRUPT;
+  
+  return x;
+
+}
+
+
+
+
 DEFUN_NEW("MAKE-VECTOR1",object,fSmake_vector1,SI,3,8,NONE,OI,
 	  IO,OO,OO,(fixnum n,fixnum elt_type,object staticp,...),"") { 
 
@@ -488,33 +537,51 @@ fSget_aelttype(object x) {
 	displaced-index-offset 5
 	static 6 &optional initial-element)
 */
-DEFUNO_NEW("MAKE-VECTOR",object,fSmake_vector,SI,7,8,NONE,
-	   OO,OO,OO,OO,void,siLmake_vector,
-	   (object x0,object x1,object x2,object x3,object x4,object x5,object x6,...),"") {
 
- object initial_elt;
- va_list ap;
- object x,l=Cnil,f=OBJNULL;
- fixnum narg=INIT_NARGS(7);
- 
- va_start(ap,x6);
- initial_elt=NEXT_ARG(narg,ap,l,f,Cnil);
- va_end(ap);
- 
- /* 8 args */
- 
- VFUN_NARGS=7;
- x = FFN(fSmake_vector1)(Mfix(x1),  /* n */
-			 fix(fSget_aelttype(x0)), /*aelt type */
-			 x6, /* staticp */
-			 x3, /* fillp */ 
-			 initial_elt, /* initial element */
-			 x4,       /*displaced to */
-			 x5);       /* displaced-index offset */
- x0 = x;
- RETURN1(x0);
+DEFUNO_NEW("MAKE-VECTOR",object,fSmake_vector,SI,8,8,NONE,
+	   OO,IO,OO,IO,void,siLmake_vector,(object x0,fixnum x1,object x2,object x3,object x4,fixnum x5,object x6,object initial_elt),"") {
 
+  RETURN1(FFN(fSmake_vector2)(fix(fSget_aelttype(x0)),x1,
+			      x3==Cnil ? -1 : (x3==Ct ? x1 : Mfix(x3)),
+			      x4,x5,x6,initial_elt));
+ 
 }
+
+/* DEFUN_NEW("MAKE-VECTOR2",object,fSmake_vector2,SI,7,7,NONE,OI,II,OI,OO, */
+/* 	  (fixnum aet,fixnum size,fixnum fillp,object dispto,fixnum dispoff,object staticp,object init),"") { */
+
+/*   RETURN1(make_vector1(size,aet,staticp,fillp,init,dispto,dispoff)); */
+ 
+/* } */
+
+
+/* DEFUNO_NEW("MAKE-VECTOR",object,fSmake_vector,SI,7,8,NONE, */
+/* 	   OO,OO,OO,OO,void,siLmake_vector, */
+/* 	   (object x0,object x1,object x2,object x3,object x4,object x5,object x6,...),"") { */
+
+/*  object initial_elt; */
+/*  va_list ap; */
+/*  object x,l=Cnil,f=OBJNULL; */
+/*  fixnum narg=INIT_NARGS(7); */
+ 
+/*  va_start(ap,x6); */
+/*  initial_elt=NEXT_ARG(narg,ap,l,f,Cnil); */
+/*  va_end(ap); */
+ 
+/*  /\* 8 args *\/ */
+ 
+/*  VFUN_NARGS=7; */
+/*  x = FFN(fSmake_vector1)(Mfix(x1),  /\* n *\/ */
+/* 			 fix(fSget_aelttype(x0)), /\*aelt type *\/ */
+/* 			 x6, /\* staticp *\/ */
+/* 			 x3, /\* fillp *\/  */
+/* 			 initial_elt, /\* initial element *\/ */
+/* 			 x4,       /\*displaced to *\/ */
+/* 			 x5);       /\* displaced-index offset *\/ */
+/*  x0 = x; */
+/*  RETURN1(x0); */
+
+/* } */
 
 /*
 (proclaim '(ftype (function (fixnum t  *)) make-array1))

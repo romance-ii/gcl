@@ -140,8 +140,20 @@
 	      (set-var-init-type v (info-type (cadr fm)))
 	      (when (eq (car fm) 'var) (pushnew (caaddr fm) (var-aliases v)))
 	      (maybe-reverse-type-prop (var-type v) fm)
-	      (when star (push v *vars*))
+	      (when star (push-var v fm))
 	      (cons v fm))) args))
+
+;; (defun mvars (args ss is ts star inls)
+;;   (mapcar (lambda (x)
+;; 	    (let* ((n (if (atom x) x (pop x)))
+;; 		   (f (unless (atom x) (car x)))
+;; 		   (v (c1make-var n ss is ts))
+;; 		   (fm (if (and inls (eq f (caar inls))) (cdr (pop inls)) (c1arg f))));FIXME check
+;; 	      (set-var-init-type v (info-type (cadr fm)))
+;; 	      (when (eq (car fm) 'var) (pushnew (caaddr fm) (var-aliases v)))
+;; 	      (maybe-reverse-type-prop (var-type v) fm)
+;; 	      (when star (push v *vars*))
+;; 	      (cons v fm))) args))
 
 ;; (defun mvars (args ss is ts star inls &aux *c1exit*)
 ;;   (mapcar (lambda (x)
@@ -169,40 +181,40 @@
 ;; 	      (when star (push v *vars*))
 ;; 	      (cons v fm))) args))
 
-(defun fsl (sl)
-  (labels ((m (tg q &aux (v (member tg q :key 'car))) (if v (m (cdar v) (cdr v)) tg)))
-	  (mapl (lambda (x) (setf (cdar x) (m (cdar x) (cdr x)))) sl)))
+;; (defun fsl (sl)
+;;   (labels ((m (tg q &aux (v (member tg q :key 'car))) (if v (m (cdar v) (cdr v)) tg)))
+;; 	  (mapl (lambda (x) (setf (cdar x) (m (cdar x) (cdr x)))) sl)))
 
-(defun c1replace-check (sl f)
-  (cond ((atom f) (assert (not (assoc f sl))))
-	(t (c1replace-check sl (car f)) (c1replace-check sl (cdr f)))))
+;; (defun c1replace-check (sl f)
+;;   (cond ((atom f) (assert (not (assoc f sl))))
+;; 	(t (c1replace-check sl (car f)) (c1replace-check sl (cdr f)))))
 
-(defun c1replace-body (sl f);FIXME push refs to slot of var to avoid walk
-  (unless (atom f)
-    (labels ((set (v &aux (s (assoc (car v) sl))) (when s (setf (car v) (cdr s)))))
-	    (case (car f)
-		  (var (if (info-p (cadr f)) (set (third f)) (c1replace-body sl (cdr f))))
-		  (infer-tp  (set (cddr f));FIXME
-			     (c1replace-body sl (cdddr f)))
-		  (otherwise (c1replace-body sl (car f)) (c1replace-body sl (cdr f)))))))
+;; (defun c1replace-body (sl f);FIXME push refs to slot of var to avoid walk
+;;   (unless (atom f)
+;;     (labels ((set (v &aux (s (assoc (car v) sl))) (when s (setf (car v) (cdr s)))))
+;; 	    (case (car f)
+;; 		  (var (if (info-p (cadr f)) (set (third f)) (c1replace-body sl (cdr f))))
+;; 		  (infer-tp  (set (cddr f));FIXME
+;; 			     (c1replace-body sl (cdddr f)))
+;; 		  (otherwise (c1replace-body sl (car f)) (c1replace-body sl (cdr f)))))))
   
-(defun c1replace (form)
-  (let* ((nm (pop form)) (info (pop form)) (vars (pop form)) (fms (pop form))
-	 (q (mapcar 'cons vars fms))
-	 (nf (append fms form))
-	 (ch (reduce 'nunion (mapcar (lambda (x &aux (x (cadr x))) (union (info-ch x) (union (info-ref-ccb x) (info-ref-clb x)))) nf)))
-	 (sl (remove-if (lambda (x) (not (eq (cadr x) 'var))) q))
-	 (sl (mapcar (lambda (x) (cons (car x) (car (third (cdr x))))) sl))
-	 (sl (labels ((bad (x) (or (member x ch) (member (var-kind x) '(global special)))))
-		     (remove-if (lambda (x) (or (bad (car x)) (bad (cdr x)))) sl)))
-	 (sl (remove-if-not (lambda (x) (type>= (var-type (car x)) (var-type (cdr x)))) sl))
-	 (sl (fsl (nreverse sl)))
-	 (q (remove-if (lambda (x) (assoc (car x) sl)) q)))
+;; (defun c1replace (form)
+;;   (let* ((nm (pop form)) (info (pop form)) (vars (pop form)) (fms (pop form))
+;; 	 (q (mapcar 'cons vars fms))
+;; 	 (nf (append fms form))
+;; 	 (ch (reduce 'nunion (mapcar (lambda (x &aux (x (cadr x))) (union (info-ch x) (union (info-ref-ccb x) (info-ref-clb x)))) nf)))
+;; 	 (sl (remove-if (lambda (x) (not (eq (cadr x) 'var))) q))
+;; 	 (sl (mapcar (lambda (x) (cons (car x) (car (third (cdr x))))) sl))
+;; 	 (sl (labels ((bad (x) (or (member x ch) (member (var-kind x) '(global special)))))
+;; 		     (remove-if (lambda (x) (or (bad (car x)) (bad (cdr x)))) sl)))
+;; 	 (sl (remove-if-not (lambda (x) (type>= (var-type (car x)) (var-type (cdr x)))) sl))
+;; 	 (sl (fsl (nreverse sl)))
+;; 	 (q (remove-if (lambda (x) (assoc (car x) sl)) q)))
 
-    (mapc (lambda (x) (mapc (lambda (y) (setf (car y) (cdr x))(push y (var-store (cdr x)))) (var-store (car x)))) sl)
-;    (c1replace-check sl nf)
+;;     (mapc (lambda (x) (mapc (lambda (y) (setf (car y) (cdr x))(push y (var-store (cdr x)))) (var-store (car x)))) sl)
+;; ;    (c1replace-check sl nf)
      
-    (list* nm info (mapcar 'car q) (mapcar 'cdr q) form)))
+;;     (list* nm info (mapcar 'car q) (mapcar 'cdr q) form)))
 
 ;; (defun c1replace (form)
 ;;   (let* ((nm (pop form)) (info (pop form)) (vars (pop form)) (fms (pop form))
@@ -222,6 +234,10 @@
     
 ;;     (list* nm info (mapcar 'car q) (mapcar 'cdr q) form)))
 
+(defun push-var (var form)
+  (push var *vars*)
+  (push-vbind var form))
+
 (defun c1let-* (args &optional star inls
 		     &aux (nm (if star 'let* 'let))
 		     (ov *vars*) (*vars* *vars*) (setjmps *setjmps*)
@@ -235,8 +251,9 @@
   (let* ((vs (nreverse (mvars (car args) ss is ts star inls)))
 	 (vars (mapcar 'car vs))
 	 (forms (mapcar 'cdr vs))
-	 (vnames (mapcar 'var-name vars))
-	 (*vars* (if star *vars* (append vars *vars*))))
+	 (vnames (mapcar 'var-name vars)))
+
+    (unless star (mapc (lambda (x) (push-var (car x) (cdr x))) vs))
 
     (c1add-globals (set-difference ss vnames))
     (check-vdecl vnames ts is)
@@ -256,15 +273,59 @@
 	   (vars (pop z))
 	   (fms (pop z))
 	   (body (car z)))
-      
+
       (dolist (fm fms) (add-info info (cadr fm)))
       (add-info info (cadr body))
       
       (setf (info-type info) (info-type (cadr body)))
       (unless (eq setjmps *setjmps*) (setf (info-volatile info) 1))
       
-      (if vars (c1replace (list nm info vars fms body))
+      (if vars (list nm info vars fms body)
 	(list* (car body) info (cddr body))))))
+
+;; (defun c1let-* (args &optional star inls
+;; 		     &aux (nm (if star 'let* 'let))
+;; 		     (ov *vars*) (*vars* *vars*) (setjmps *setjmps*)
+;; 		     ss is ts body other-decls
+;; 		     (info (make-info)))
+
+;;   (when (endp args) (too-few-args nm 1 0))
+
+;;   (multiple-value-setq (body ss ts is other-decls) (c1body (cdr args) nil))
+
+;;   (let* ((vs (nreverse (mvars (car args) ss is ts star inls)))
+;; 	 (vars (mapcar 'car vs))
+;; 	 (forms (mapcar 'cdr vs))
+;; 	 (vnames (mapcar 'var-name vars))
+;; 	 (*vars* (if star *vars* (append vars *vars*))))
+
+;;     (c1add-globals (set-difference ss vnames))
+;;     (check-vdecl vnames ts is)
+;;     (setq body (c1decl-body other-decls body))
+
+;;     (unless (single-type-p (info-type (cadr body))) 
+;;       (let ((mv (car (member-if 'is-mv-var vars))))
+;; 	(when mv
+;; 	  (ref-vars (c1var (var-name mv)) (list mv)))))
+
+;;     (ref-vars body vars)
+
+;;     (dolist (var vars) (setf (var-type var) (var-mt var)));FIXME?
+ 
+;;     (let* ((*vars* ov)
+;; 	   (z (trim-vars vars forms body star))
+;; 	   (vars (pop z))
+;; 	   (fms (pop z))
+;; 	   (body (car z)))
+      
+;;       (dolist (fm fms) (add-info info (cadr fm)))
+;;       (add-info info (cadr body))
+      
+;;       (setf (info-type info) (info-type (cadr body)))
+;;       (unless (eq setjmps *setjmps*) (setf (info-volatile info) 1))
+      
+;;       (if vars (c1replace (list nm info vars fms body))
+;; 	(list* (car body) info (cddr body))))))
 
 ;; (defun c1let-* (args &optional star inls
 ;; 		     &aux (nm (if star 'let* 'let))

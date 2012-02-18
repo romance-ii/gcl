@@ -55,7 +55,19 @@
     (typecase 
      a
      ((or function cons array))
-     (otherwise (c1constant-value a (when (symbolp a) (symbol-package a)))))))
+     (otherwise 
+      (unless (eq a +opaque+)
+	(if (when (symbolp a) (get a 'tmp)) ;FIXME cdr
+	    (let ((a (get-var a)))
+	      (when a (c1var a)))
+	  (c1constant-value a (when (symbolp a) (symbol-package a)))))))))
+
+;; (defun atomic-type-constant-value (atp &aux (a (car atp)))
+;;   (when atp
+;;     (typecase 
+;;      a
+;;      ((or function cons array))
+;;      (otherwise (c1constant-value a (when (symbolp a) (symbol-package a)))))))
 
 (defun c1expr-avct (res &aux (atp (atomic-tp (info-type (cadr res)))))
   (or (when (ignorable-form res) (atomic-type-constant-value atp)) res))
@@ -68,8 +80,8 @@
 		    (or 
 		     (c1constant-value val nil)
 		     `(location ,(make-info :type (object-type val)) (VV ,(add-constant form))))))
-                 ((c1var form))))
-;                 ((c1expr-avct (c1var form))))) ;FIXME pcl
+;                 ((c1var form))))
+                 ((c1expr-avct (c1var form))))) ;FIXME pcl
           ((consp form)
            (let ((fun (car form)))
 	     (c1expr-avct (cond ((symbolp fun)
@@ -81,6 +93,28 @@
 				(t (cmperr "The function ~s is illegal." fun))))))
           (t (c1constant-value form t)))))
   (if (eq form '*cmperr-tag*) (c1nil) form))
+
+;; (defun c1expr (form)
+;;   (setq form (catch *cmperr-tag*
+;;     (cond ((symbolp form)
+;;            (cond ((constantp form) 
+;; 		  (let ((val (symbol-value form)))
+;; 		    (or 
+;; 		     (c1constant-value val nil)
+;; 		     `(location ,(make-info :type (object-type val)) (VV ,(add-constant form))))))
+;;                  ((c1var form))))
+;; ;                 ((c1expr-avct (c1var form))))) ;FIXME pcl
+;;           ((consp form)
+;;            (let ((fun (car form)))
+;; 	     (c1expr-avct (cond ((symbolp fun)
+;; 				 (c1symbol-fun form))
+;; 				((and (consp fun) (eq (car fun) 'lambda))
+;; 				 (c1symbol-fun (cons 'funcall form)))
+;; 				((and (consp fun) (eq (car fun) 'si:|#,|))
+;; 				 (cmperr "Sharp-comma-macro was found in a bad place."))
+;; 				(t (cmperr "The function ~s is illegal." fun))))))
+;;           (t (c1constant-value form t)))))
+;;   (if (eq form '*cmperr-tag*) (c1nil) form))
 
 ;; (defun c1expr (form)
 ;;   (setq form (catch *cmperr-tag*
@@ -541,6 +575,20 @@
 
 ;(assert (null (duplicates (mapcar 'cadr *rep-lst1*))))
 
+(defvar *hs* nil)
+
+(defun memoize1 (fn tst)
+  (let ((h (cdar (push (cons fn (make-hash-table :test tst)) *hs*)))
+	(o (symbol-function fn)))
+    (setf (get fn 'unmemoize) o)
+    (setf (symbol-function fn)
+	  (lambda (x) (or (gethash x h) (setf (gethash x h) (funcall o x)))))))
+
+(defun unmemoize1 (fn)
+  (setf (symbol-function fn) (get fn 'unmemoize))
+  (remprop fn 'unmemoize)
+  (setq *hs* (remove fn *hs* :key 'car)))
+
 (defun ints-tt3 (ints &aux (ints (if (listp ints) ints (list ints))))
   (reduce 'type-or1
 	  ints :key (lambda (x) (car (rassoc x *rep-lst1* :key 'car))) :initial-value nil))
@@ -577,7 +625,7 @@
 	 (t3 (mapcar 'tt3-ints tps))
 	 (dups (mapcar (lambda (x y) (remove y x :key 'ints-tt3 :test 'type>=)) t3 tps))
 	 (dups (reduce 'union dups :initial-value nil))
-	 (ttf (mapcar 'list* t3 ff))
+	 (ttf (mapcar 'list* t3 tps (mapcar 'cdr ff)))
 	 (df (mapcan (lambda (x) (make-branch f (list x) ttf)) dups))
 	 (rf (mapcan (lambda (x) (make-branch f (set-difference (car x) dups) (list x))) ttf))
 	 (af (nconc df rf))
@@ -589,6 +637,37 @@
     (when (= (length (reduce 'union t3 :initial-value nil)) (length *rep-lst1*))
       (setf (caar (last af)) 'otherwise))
     res))
+
+;; (defun typecase-compiler-macro2 (form env)
+;;   (declare (ignore env))
+;;   (let* ((x (cadr form))
+;; 	 (bind (unless (symbolp x) (list (tmpsym) x)))
+;; 	 (f (or (car bind) x))
+;; 	 (ff (cddr form))
+;; 	 (o (member-if (lambda (x) (or (eq (car x) t) (eq (car x) 'otherwise))) ff))
+;; 	 (ff (if o (ldiff ff o) ff))
+;; 	 (o (when o (list (cons t (cdar o)))))
+;; 					;		(o (list (cons t (cdar o))))
+;; 	 (ff (nconc ff o))
+;; 	 (tps (mapcar 'cmp-norm-tp (mapcar 'car ff)))
+;; 	 (tps (let (z) (mapcar (lambda (x)
+;; 				 (prog1 (type-and x (cmp-norm-tp `(not ,z)))
+;; 				   (setq z (type-or1 x z)))) tps)))
+;; 	 (t3 (mapcar 'tt3-ints tps))
+;; 	 (dups (mapcar (lambda (x y) (remove y x :key 'ints-tt3 :test 'type>=)) t3 tps))
+;; 	 (dups (reduce 'union dups :initial-value nil))
+;; 	 (ttf (mapcar 'list* t3 ff))
+;; 	 (df (mapcan (lambda (x) (make-branch f (list x) ttf)) dups))
+;; 	 (rf (mapcan (lambda (x) (make-branch f (set-difference (car x) dups) (list x))) ttf))
+;; 	 (af (nconc df rf))
+;; 	 (ob (when (and t3 (not (cdr t3)) (not (cdar t3)) (car t3)) (caar t3)))
+;; 	 (res (if ob
+;; 		  `(when ,(if (= ob 0) `(tt30 ,f) `(= (tt3 ,f) ,ob)) ,@(cdar af)) 
+;; 		`(case (tt3 ,f) ,@af)))
+;; 	 (res (if bind `(let (,bind) ,res) res)))
+;;     (when (= (length (reduce 'union t3 :initial-value nil)) (length *rep-lst1*))
+;;       (setf (caar (last af)) 'otherwise))
+;;     res))
 
 
 (defun tps-ints (t1 rl)
@@ -675,8 +754,8 @@
 ;;      (c1expr (car args)))))
 
 (defun c1infer-tp (args)
-  (let* ((v (c1arg (pop args)))
-	 (x (caaddr v))
+  (let* ((v (c1vref (pop args)))
+	 (x (car v))
 	 (tpi (cmp-norm-tp (pop args)))
 	 (tp (type-and (var-type x) tpi))
 	 (info (make-info))
@@ -686,7 +765,21 @@
 	 (ri (cadr res)))
     (add-info info ri)
     (setf (info-type info) (info-type ri))
-    `(infer-tp ,info ,v ,tpi ,res)))
+    `(infer-tp ,info (var ,(make-info) ,v) ,tpi ,res)))
+
+;; (defun c1infer-tp (args)
+;;   (let* ((v (c1arg (pop args)))
+;; 	 (x (caaddr v))
+;; 	 (tpi (cmp-norm-tp (pop args)))
+;; 	 (tp (type-and (var-type x) tpi))
+;; 	 (info (make-info))
+;; 	 (res (with-restore-vars
+;; 	       (do-setq-tp x nil tp)
+;; 	       (c1expr (car args))))
+;; 	 (ri (cadr res)))
+;;     (add-info info ri)
+;;     (setf (info-type info) (info-type ri))
+;;     `(infer-tp ,info ,v ,tpi ,res)))
 
 ;; (defun c1infer-tp (args)
 ;;   (let* ((x (car (member (pop args) *vars* :key (lambda (x) (when (var-p x) (var-name x))))))
@@ -1167,9 +1260,7 @@
 (defun inline-sym-src (n)
   (and (inline-possible n)
        (or (inline-asserted n)
-	   (eq (symbol-package n) (load-time-value (find-package :c)))
-	   (eq (symbol-package n) (load-time-value (find-package :libm)))
-	   (eq (symbol-package n) (load-time-value (find-package :libc)))
+	   (get n 'consider-inline)
 	   (multiple-value-bind (s k) (find-symbol (symbol-name n) :cl) 
 				(when (eq n s) (eq k :external))))
        (or (local-fun-src n)
@@ -1177,6 +1268,20 @@
 	     (when (functionp fn) 
 	       (unless (typep fn 'generic-function)
 		 (values (or (gethash fn *src-hash*) (setf (gethash fn *src-hash*) (function-lambda-expression fn))))))))))
+
+;; (defun inline-sym-src (n)
+;;   (and (inline-possible n)
+;;        (or (inline-asserted n)
+;; 	   (eq (symbol-package n) (load-time-value (find-package :c)))
+;; 	   (eq (symbol-package n) (load-time-value (find-package :libm)))
+;; 	   (eq (symbol-package n) (load-time-value (find-package :libc)))
+;; 	   (multiple-value-bind (s k) (find-symbol (symbol-name n) :cl) 
+;; 				(when (eq n s) (eq k :external))))
+;;        (or (local-fun-src n)
+;; 	   (let ((fn (when (fboundp n) (symbol-function n))))
+;; 	     (when (functionp fn) 
+;; 	       (unless (typep fn 'generic-function)
+;; 		 (values (or (gethash fn *src-hash*) (setf (gethash fn *src-hash*) (function-lambda-expression fn))))))))))
 
 ;; (defun inline-sym-src (n)
 ;;   (and (inline-possible n)
@@ -1310,7 +1415,7 @@
 	((atom s) nil)
 	((let* ((x (pop s))(x (car x)))
 	   (when (eq (car x) (car sir))
-	     (or (> (incf i) 10)
+	     (or (> (incf i) 15)
 		 (if (cdr x)
 		     (and (= (length (cdr x)) (length (cdr sir)));FIXME unroll strategy	       
 			  (every (lambda (x y) (type<= (bbump-tp x) (bbump-tp y))) (cdr x) (cdr sir)))
@@ -2017,6 +2122,7 @@
 		 (setq ,val ,(vp)
 		       ,val (if (and ,negp (= ,np 0)) ,val (cons ,val nil))
 		       ,vp (cond (,vp (rplacd ,vp ,val) ,val) ((setq ,lvp ,val))))))))
+   (declare (notinline bind kb rb));FIXME consing, closing la lvp na dfsrc breaks
    (do ((l l)(lk llk))
        ((not l)
 	(multiple-value-bind
@@ -2395,7 +2501,7 @@
 		   (f i) 
 		   (setq rp (last (if rp (rplacd rp f) (setq r f))))
 		   (add-info info i)))
-		 (do ((forms forms (cdr forms))) ((not forms))
+		 (do ((forms forms (cdr forms))) ((or (not forms) (when rp (not (info-type (cadar rp))))))
 		     (let ((form (if (cdr forms) (c1arg (car forms)) (c1expr (car forms)))))
 		       (cond ((and (cdr forms) (ignorable-form form)))
 			     ((eq (car form) 'progn) (collect (third form) (cadr form)))
@@ -2405,6 +2511,25 @@
 			(list 'progn info r))
 		       ((car r))
 		       ((c1nil))))))))
+
+;; (defun c1progn (forms &aux r rp)
+;;   (cond ((endp forms) (c1nil))
+;; 	((endp (cdr forms)) (c1expr (car forms)))
+;; 	((let ((info (make-info)))
+;; 	   (flet ((collect 
+;; 		   (f i) 
+;; 		   (setq rp (last (if rp (rplacd rp f) (setq r f))))
+;; 		   (add-info info i)))
+;; 		 (do ((forms forms (cdr forms))) ((not forms))
+;; 		     (let ((form (if (cdr forms) (c1arg (car forms)) (c1expr (car forms)))))
+;; 		       (cond ((and (cdr forms) (ignorable-form form)))
+;; 			     ((eq (car form) 'progn) (collect (third form) (cadr form)))
+;; 			     ((collect (cons form nil) (cadr form))))))
+;; 		 (cond ((cdr r)
+;; 			(setf (info-type info) (info-type (cadar rp)))
+;; 			(list 'progn info r))
+;; 		       ((car r))
+;; 		       ((c1nil))))))))
 
 ;; (defun c1progn (forms &aux r rp)
 ;;   (cond ((endp forms) (c1nil))
@@ -2658,49 +2783,90 @@
 
 (defun sv-wrap (x) `(symbol-value ',x))
 
-(defun c1constant-value (val always-p &aux (val (if (exit-to-fmla-p) (not (not val)) val)))
-  (cond
-   ((eq val nil) (c1nil))
-   ((eq val t) (c1t))
-   ((typep val 'char)
-    (list 'LOCATION (make-info :type (object-type val)) (list 'CHAR-VALUE nil val)))
-   ((si:fixnump val)
-    (list 'LOCATION (make-info :type (object-type val)) (list 'FIXNUM-VALUE (unless (si::seqindp val) (add-object val)) val)))
-   ((characterp val)
-    (list 'LOCATION (make-info :type (object-type val)) (list 'CHARACTER-VALUE nil (char-code val))))
-   ((typep val 'long-float)
-    ;; We can't read in long-floats which are too big:
-    (let* (sc 
-	   (vv 
-	    (cond ((= val +inf) (add-object (cons 'si::|#,| `(symbol-value ','+inf))));This cannot be a constant list
-		  ((= val -inf) (add-object (cons 'si::|#,| `(symbol-value ','-inf))))
-		  ((not (isfinite val)) (add-object (cons 'si::|#,| `(symbol-value ','nan))))
-		  ((> (abs val) (/ most-positive-long-float 2))
-		   (add-object (cons 'si::|#,| `(* ,(/ val most-positive-long-float) most-positive-long-float))))
-		  ((< 0.0 (abs val) (* least-positive-long-float 1.0d20))
-		   (add-object (cons `si::|#,| `(* ,(/ val least-positive-long-float) least-positive-long-float))))
-		  ((setq sc t) (add-object val)))))
-;      (unless (isfinite val) (setf (info-type info) #tlong-float))
-      `(location ,(make-info :type (object-type val)) ,(if sc `(long-float-value ,vv ,val) `(vv ,vv)))))
-   ((typep val 'short-float)
-    (list 'LOCATION (make-info :type (object-type val))
-          (list 'SHORT-FLOAT-VALUE (add-object val) val)))
-   ((typep val #tfcomplex)
-    (list 'LOCATION (make-info :type (object-type val))
-          (list 'FCOMPLEX-VALUE (add-object val) val)))
-   ((typep val #tdcomplex)
-    (list 'LOCATION (make-info :type (object-type val))
-          (list 'DCOMPLEX-VALUE (add-object val) val)))
-   ((and (consp val) (eq (car val) 'si::|#,|))
-;    (setf (info-type info) t);(object-type (cmp-eval (cdr val))))
-    (list 'LOCATION (make-info :type t) (list 'VV (add-object val))))
-   ((and *compiler-compile* (not *keep-gaz*))
-;    (setf (info-type info) (object-type val))
-    (list 'LOCATION (make-info :type (object-type val)) (list 'VV (add-object (cons 'si::|#,| `(si::nani ,(si::address val)))))))
-   ((and (arrayp val) (not (si::staticp val)) (eq (array-element-type val) t)) ;; This must be readable
-    (list 'LOCATION (make-info :type (object-type val)) (list 'VV (add-object val))))
-   (always-p
-    (list 'LOCATION (make-info :type (object-type val)) (list 'VV (add-object val))))))
+(defun infinite-val-symbol (val)
+  (or (car (member val '(+inf -inf nan) :key 'symbol-value))
+      (baboon)))
+
+(defun printable-long-float (val)
+  (labels ((scl (val s) `(* ,(/ val (symbol-value s)) ,s)))
+	  (let ((nval
+		 (cond ((not (isfinite val)) `(symbol-value ',(infinite-val-symbol val)))
+		       ((> (abs val) (/ most-positive-long-float 2)) (scl val 'most-positive-long-float))
+		       ((< 0.0 (abs val) (* least-positive-long-float 1.0d20)) (scl val 'least-positive-long-float)))))
+	    (add-object (if nval (cons '|#,| nval) val)))))
+  
+
+(defun ltvp (val)
+  (when (consp val) (eq (car val) '|#,|)))
+
+(defun c1constant-value-object (val always)
+  (typecase
+   val
+   (char                               `(char-value nil ,val))
+   (immfix                             `(fixnum-value nil ,val))
+   (character                          `(character-value nil ,(char-code val)))
+   (long-float                         `(vv ,(printable-long-float val)))
+   ((or fixnum float complex)          `(vv ,(add-object val)))
+   (otherwise                          (when (or always
+						 (ltvp val)
+						 (when (arrayp val) (unless (si::staticp val) (eq (array-element-type val) t))))
+					     `(vv ,(add-object val))))))
+
+(defun c1constant-value (val always &aux (val (if (exit-to-fmla-p) (not (not val)) val)))
+  (case 
+   val
+   ((nil) (c1nil))
+   ((t)   (c1t))
+   (otherwise
+    (let ((l (c1constant-value-object val (or always (when *compiler-compile* (not *keep-gaz*))))))
+      (when l 
+	`(location 
+	  ,(make-info :type (or (ltvp val) (object-type val)))
+	  ,l))))))
+
+;; (defun c1constant-value (val always-p &aux (val (if (exit-to-fmla-p) (not (not val)) val)))
+;;   (cond
+;;    ((eq val nil) (c1nil))
+;;    ((eq val t) (c1t))
+;;    ((typep val 'char)
+;;     (list 'LOCATION (make-info :type (object-type val)) (list 'CHAR-VALUE nil val)))
+;;    ((si:fixnump val)
+;;     (list 'LOCATION (make-info :type (object-type val)) (list 'FIXNUM-VALUE (unless (si::seqindp val) (add-object val)) val)))
+;;    ((characterp val)
+;;     (list 'LOCATION (make-info :type (object-type val)) (list 'CHARACTER-VALUE nil (char-code val))))
+;;    ((typep val 'long-float)
+;;     ;; We can't read in long-floats which are too big:
+;;     (let* (sc 
+;; 	   (vv 
+;; 	    (cond ((= val +inf) (add-object (cons 'si::|#,| `(symbol-value ','+inf))));This cannot be a constant list
+;; 		  ((= val -inf) (add-object (cons 'si::|#,| `(symbol-value ','-inf))))
+;; 		  ((not (isfinite val)) (add-object (cons 'si::|#,| `(symbol-value ','nan))))
+;; 		  ((> (abs val) (/ most-positive-long-float 2))
+;; 		   (add-object (cons 'si::|#,| `(* ,(/ val most-positive-long-float) most-positive-long-float))))
+;; 		  ((< 0.0 (abs val) (* least-positive-long-float 1.0d20))
+;; 		   (add-object (cons `si::|#,| `(* ,(/ val least-positive-long-float) least-positive-long-float))))
+;; 		  ((setq sc t) (add-object val)))))
+;; ;      (unless (isfinite val) (setf (info-type info) #tlong-float))
+;;       `(location ,(make-info :type (object-type val)) ,(if sc `(long-float-value ,vv ,val) `(vv ,vv)))))
+;;    ((typep val 'short-float)
+;;     (list 'LOCATION (make-info :type (object-type val))
+;;           (list 'SHORT-FLOAT-VALUE (add-object val) val)))
+;;    ((typep val #tfcomplex)
+;;     (list 'LOCATION (make-info :type (object-type val))
+;;           (list 'FCOMPLEX-VALUE (add-object val) val)))
+;;    ((typep val #tdcomplex)
+;;     (list 'LOCATION (make-info :type (object-type val))
+;;           (list 'DCOMPLEX-VALUE (add-object val) val)))
+;;    ((and (consp val) (eq (car val) 'si::|#,|))
+;; ;    (setf (info-type info) t);(object-type (cmp-eval (cdr val))))
+;;     (list 'LOCATION (make-info :type t) (list 'VV (add-object val))))
+;;    ((and *compiler-compile* (not *keep-gaz*))
+;; ;    (setf (info-type info) (object-type val))
+;;     (list 'LOCATION (make-info :type (object-type val)) (list 'VV (add-object (cons 'si::|#,| `(si::nani ,(si::address val)))))))
+;;    ((and (arrayp val) (not (si::staticp val)) (eq (array-element-type val) t)) ;; This must be readable
+;;     (list 'LOCATION (make-info :type (object-type val)) (list 'VV (add-object val))))
+;;    (always-p
+;;     (list 'LOCATION (make-info :type (object-type val)) (list 'VV (add-object val))))))
 
 ;; (defun c1constant-value (val always-p); &aux (info (make-info :type (object-type val))))
 ;; ;							    :referred-array +empty-info-array+
@@ -2821,7 +2987,7 @@
 	    ,@(when (eq crt :void) `(",Cnil)"))))))))
 
 (defun c1cadd-dladdress (args)
-  (list 'cadd-dladdress (make-info :type nil :flags (iflags side-effects)) args))
+  (list 'cadd-dladdress (make-info :type #tnull :flags (iflags side-effects)) args))
 (defun c2cadd-dladdress (args)
   (apply 'add-dladdress args))
 (si::putprop 'cadd-dladdress 'c1cadd-dladdress 'c1)

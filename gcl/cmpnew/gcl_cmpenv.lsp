@@ -114,9 +114,14 @@
 	   (setf (gethash object *objects*) *next-vv*)))))
 
 (defun add-object (object) 
-  (cond ((when (consp object) (eq (car object) '|#,|)) object)
+  (cond ((ltvp object) object)
 	((and *compiler-compile* (not *keep-gaz*)) (cons '|#,| `(nani ,(address object))))
 	(object)))
+
+;; (defun add-object (object) 
+;;   (cond ((when (consp object) (eq (car object) '|#,|)) object)
+;; 	((and *compiler-compile* (not *keep-gaz*)) (cons '|#,| `(nani ,(address object))))
+;; 	(object)))
 
 (defun add-constant (symbol) 
   (add-object (cons '|#,| symbol)))
@@ -311,7 +316,15 @@
     (or 
      (member fname *inline*)
      (local-fun-fn fname)
-     (get fname 'cmp-inline))))
+     (get fname 'cmp-inline)
+     (member (symbol-package fname) (load-time-value (mapcar 'find-package '(:c |libm| |libc|)))))))
+
+;; (defun inline-asserted (fname)
+;;   (unless *compiler-push-events*
+;;     (or 
+;;      (member fname *inline*)
+;;      (local-fun-fn fname)
+;;      (get fname 'cmp-inline))))
 
 ;; (defun inline-asserted (fname)
 ;;   (unless *compiler-push-events*

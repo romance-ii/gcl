@@ -320,7 +320,7 @@
 	((not v))
 	(set-var-init-type (car v) (or (car t1) #tnull))))
 
-  (dolist* (v vars) (push v *vars*))
+  (dolist* (v vars) (push-var v init-form))
 
   (check-vdecl vnames ts is)
 
@@ -333,6 +333,52 @@
   (dolist** (var vars) (check-vref var))
 
   (list 'multiple-value-bind info vars init-form body))
+
+;; (defun c1multiple-value-bind (args &aux (info (make-info))
+;;                                    (vars nil) (vnames nil) init-form
+;;                                    ss is ts body other-decls
+;;                                    (*vars* *vars*))
+;;   (when (or (endp args) (endp (cdr args)))
+;;     (too-few-args 'multiple-value-bind 2 (length args)))
+
+;;   (when (and (caar args) (not (cdar args)))
+;;     (return-from c1multiple-value-bind
+;; 		 (c1expr `(let ((,(caar args) ,(cadr args))) ,@(cddr args)))))
+
+;;   (multiple-value-setq (body ss ts is other-decls) (c1body (cddr args) nil))
+
+;;   (dolist (s (car args))
+;;     (let ((v (c1make-var s ss is ts)))
+;;       (push s vnames)
+;;       (push v vars)))
+
+;;   (c1add-globals (set-difference ss vnames))
+
+;;   (setq init-form (c1arg (cadr args) info))
+
+;;   (setq vars (nreverse vars))
+;;   (let* ((tp (info-type (second init-form)))
+;; 	 (tp (cond ((not tp) tp)
+;; 		   ((single-type-p tp) (list tp))
+;; 		   ((eq tp '*) (make-list (length vars) :initial-element t))
+;; 		   ((cdr tp)))))
+;;     (do ((v vars (cdr v)) (t1 tp (cdr t1)))
+;; 	((not v))
+;; 	(set-var-init-type (car v) (or (car t1) #tnull))))
+
+;;   (dolist* (v vars) (push v *vars*))
+
+;;   (check-vdecl vnames ts is)
+
+;;   (setq body (c1decl-body other-decls body))
+
+;;   (add-info info (cadr body))
+;;   (setf (info-type info) (info-type (cadr body)))
+
+;;   (ref-vars body vars)
+;;   (dolist** (var vars) (check-vref var))
+
+;;   (list 'multiple-value-bind info vars init-form body))
 
 ;; (defun c1multiple-value-bind (args &aux (info (make-info))
 ;;                                    (vars nil) (vnames nil) init-form

@@ -495,7 +495,7 @@
 			  ((not r) s)
 			  (t (setf (fill-pointer r) ri) r))))
 	     (if from-end (nreverse r) r)))
-	  (declare (seqind ri))
+	  (declare (seqind ri k));FIXME
 	  (let* ((e (or (= i end) (= j count)))
 		 (i (if e (if r ls k) i)))
 	    (when (or e (do-test test test-comp item (do-key key key-comp (if l (car p) (aref s i)))))

@@ -605,17 +605,17 @@ gcl_init_character()
 	  x->ch.ch_self=&x->ch.ch_code;
 	  x->ch.ch_fillp=1;
 	}
-#ifdef AV
-	for (i = -128;  i < 0;  i++) {
-	  object x=(object)(character_table+i);
-	  int j=i+CHCODELIM;
-	  set_type_of(x,t_character);
-	  x->ch.ch_code = j;
-	  x->ch.tt=((' ' <= j && j < '\177') || j == '\n');
-	  x->ch.ch_font = 0;
-	  x->ch.ch_bits = 0;
-	}
-#endif
+/* #ifdef AV */
+/* 	for (i = -128;  i < 0;  i++) { */
+/* 	  object x=(object)(character_table+i); */
+/* 	  int j=i+CHCODELIM; */
+/* 	  set_type_of(x,t_character); */
+/* 	  x->ch.ch_code = j; */
+/* 	  x->ch.tt=((' ' <= j && j < '\177') || j == '\n'); */
+/* 	  x->ch.ch_font = 0; */
+/* 	  x->ch.ch_bits = 0; */
+/* 	} */
+/* #endif */
 
  	make_constant("CHAR-CODE-LIMIT", make_fixnum(CHCODELIM));
  	make_si_constant("CHAR-FONT-LIMIT", make_fixnum(CHFONTLIM));
