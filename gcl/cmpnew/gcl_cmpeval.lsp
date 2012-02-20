@@ -259,7 +259,7 @@
 	   (ba (and be ;(si::dt-apply be (cons f (mapcar 'coerce-to-one-valuea args))))));FIXME
 		    (apply be (cons f (mapcar 'coerce-to-one-value args))))));FIXME
       (when ba
-	(return-from result-type-from-args (cmp-norm-tp ba))))
+	(return-from result-type-from-args (if (atomic-tp ba) ba (cmp-norm-tp ba)))))
     (dolist (v '(inline-always inline-unsafe))
       (let* ((w (get f v)))
 	(if (and w (symbolp (caar w)) (flag-p (third (car w)) itf))
@@ -275,6 +275,29 @@
 		       (unless (and (car a) (car b) (type>= (car b) (car a)))
 			 (return nil))))
 	      (return-from result-type-from-args (second w)))))))))
+
+;; (defun result-type-from-args (f args)
+;;   (when (and (or (not *compiler-new-safety*) (member f '(unbox box))));FIXME 
+;;     (let* ((be (get f 'type-propagator))
+;; 	   (ba (and be ;(si::dt-apply be (cons f (mapcar 'coerce-to-one-valuea args))))));FIXME
+;; 		    (apply be (cons f (mapcar 'coerce-to-one-value args))))));FIXME
+;;       (when ba
+;; 	(return-from result-type-from-args (cmp-norm-tp ba))))
+;;     (dolist (v '(inline-always inline-unsafe))
+;;       (let* ((w (get f v)))
+;; 	(if (and w (symbolp (caar w)) (flag-p (third (car w)) itf))
+;; 	    (return-from result-type-from-args (cadr (apply (caar w) args)))
+;; 	  (dolist (w w)
+;; 	    (fix-opt w)
+;; 	    (when (and
+;; 		   (flag-p (third w) result-type-from-args)
+;; 		   (>= (length args) (- (length (car w)) (length (member '* (car w)))))
+;; 		   (do ((a args (cdr a)) 
+;; 			(b (car w) (if (and (eq (cadr b) '*) (endp (cddr b))) b (cdr b))))
+;; 		       ((null a) t)
+;; 		       (unless (and (car a) (car b) (type>= (car b) (car a)))
+;; 			 (return nil))))
+;; 	      (return-from result-type-from-args (second w)))))))))
 	
 
 ;; omitting a flag means it is set to nil.
@@ -1448,7 +1471,7 @@
       (fun-name f)
     f))
 
-(dolist (l '(upgraded-array-element-type row-major-aref row-major-aset))
+(dolist (l '(upgraded-array-element-type row-major-aref row-major-aset si::set-array))
   (setf (get l 'consider-inline) t))
 
 (defun maybe-inline-src (fun fms src &aux (ll (cadr src)))

@@ -1112,7 +1112,19 @@
     (let ((s (when dot (car (last y))))(tp (info-type (cadar (last nargs)))));FIXME
       (cond ((when s (type>= #tproper-list tp)) #tproper-cons)
 	    ((when s (type-and #tnull tp)) #tcons)
-	    (t (when dot (setf (cdr (last y 2)) (car (last y)))) `(member ,y))))))
+	    (t (when dot (setf (cdr (last y 2)) (car (last y)))) (object-type y))))))
+
+;; (defun narg-list-type (nargs &optional dot)
+;;   (let* ((y (mapcar (lambda (x &aux (atp (atomic-tp (info-type (cadr x)))))
+;; 		     (cond ;((get-vbind x))
+;; 			   (atp (car atp));FIXME
+;; 			   ((get-vbind x))
+;; 			   (+opaque+))) nargs)))
+;; ;    (when dot (setf (cdr (last y 2)) (car (last y)))) ;FIXME bump-pcons -- get rid of pcons entirely
+;;     (let ((s (when dot (car (last y))))(tp (info-type (cadar (last nargs)))));FIXME
+;;       (cond ((when s (type>= #tproper-list tp)) #tproper-cons)
+;; 	    ((when s (type-and #tnull tp)) #tcons)
+;; 	    (t (when dot (setf (cdr (last y 2)) (car (last y)))) `(member ,y))))))
 
 (defun c1list (args)
   (let* ((info (make-info))

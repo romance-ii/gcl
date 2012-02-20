@@ -249,11 +249,35 @@
    (c1 (when (typep c1 t2) t1))
    ((when (setq h1 (gethash t1 *and-tp-hash*)) (multiple-value-setq (r f) (gethash t2 h1)) f) r)
    ((when (setq h2 (gethash t2 *and-tp-hash*)) (multiple-value-setq (r f) (gethash t1 h2)) f) r)
-   ((let ((q (type-and-int t1 t2 `(and ,t1 ,t2))))
-      (unless (contains-cons-tp q)
-	(unless (contains-cons-tp t2) (when h1 (setf (gethash t2 h1) q)))
-	(unless (contains-cons-tp t1) (when h2 (setf (gethash t1 h2) q))))
-      q))))
+   ((let ((x (uniq-tp `(and ,t1 ,t2))))
+      (multiple-value-bind
+       (r f)
+       (gethash x *norm-tp-hash*)
+       (if f r
+	 (let ((q (type-and-int t1 t2 x)))
+	   (unless (contains-cons-tp q)
+	     (setf (gethash x *norm-tp-hash*) q)
+	     (unless (contains-cons-tp t2) (when h1 (setf (gethash t2 h1) q)))
+	     (unless (contains-cons-tp t1) (when h2 (setf (gethash t1 h2) q))))
+	   q)))))))
+
+;; (defun type-and (t1 t2 &aux h1 h2 r f c1 c2);m1 m2
+;;   (cond
+;;    ((eq t1 t2) t2);accelerator
+;;    ((eq t1 '*) t2);accelerator
+;;    ((eq t2 '*) t1);accelerator
+;;    ((not t1) nil)
+;;    ((not t2) nil)
+;;    ((when (setq c1 (t-to-nil (car (atomic-tp t1))) c2 (t-to-nil (car (atomic-tp t2)))) nil))
+;;    (c2 (when (or (eql c1 c2) (typep c2 t1)) t2))
+;;    (c1 (when (typep c1 t2) t1))
+;;    ((when (setq h1 (gethash t1 *and-tp-hash*)) (multiple-value-setq (r f) (gethash t2 h1)) f) r)
+;;    ((when (setq h2 (gethash t2 *and-tp-hash*)) (multiple-value-setq (r f) (gethash t1 h2)) f) r)
+;;    ((let ((q (type-and-int t1 t2 `(and ,t1 ,t2))))
+;;       (unless (contains-cons-tp q)
+;; 	(unless (contains-cons-tp t2) (when h1 (setf (gethash t2 h1) q)))
+;; 	(unless (contains-cons-tp t1) (when h2 (setf (gethash t1 h2) q))))
+;;       q))))
 
 ;; (defun type-and (t1 t2 &aux h1 h2 r f c1 c2);m1 m2
 ;;   (cond ((eq t1 t2) t2);accelerator
@@ -306,11 +330,36 @@
 	 (c2 (if (unless (cmpt t1) (typep c2 t1)) t1 (if (consp c2) (type-or1 t1 (if (cdr c2) #tcons #tproper-cons)) (to t1 t2))))
 	 ((when (setq h1 (gethash t1 *or-tp-hash*)) (multiple-value-setq (r f) (gethash t2 h1)) f) r)
 	 ((when (setq h2 (gethash t2 *or-tp-hash*)) (multiple-value-setq (r f) (gethash t1 h2)) f) r)
-	 ((let ((q (type-or1-int t1 t2 `(or ,t1 ,t2))))
-	    (unless (contains-cons-tp q)
-	      (unless (contains-cons-tp t2) (when h1 (setf (gethash t2 h1) q)))
-	      (unless (contains-cons-tp t1) (when h2 (setf (gethash t1 h2) q))))
-	    q)))))
+	 ((let ((x (uniq-tp `(or ,t1 ,t2))))
+	    (multiple-value-bind
+	     (r f)
+	     (gethash x *norm-tp-hash*)
+	     (if f r
+	       (let ((q (type-or1-int t1 t2 x)))
+		 (unless (contains-cons-tp q)
+		   (setf (gethash x *norm-tp-hash*) q)
+		   (unless (contains-cons-tp t2) (when h1 (setf (gethash t2 h1) q)))
+		   (unless (contains-cons-tp t1) (when h2 (setf (gethash t1 h2) q))))
+		 q))))))))
+
+;; (defun type-or1 (t1 t2 &aux h1 h2 r f c1 c2);FIXME think about atomic types
+;;   (flet ((to (t1 t2 &aux (x (uniq-tp-from-stack `or t1 t2))) (cmp-norm-tp x)));(type-or1-int t1 t2 x)))
+;; 	(cond
+;; 	 ((eq t1 t2) t2);accelerator
+;; 	 ((eq t1 '*) t1);accelerator
+;; 	 ((eq t2 '*) t2);accelerator
+;; 	 ((not t1) t2);FIXME atomic type logic requires eq -> and
+;; 	 ((not t2) t1)
+;; 	 ((when (setq c1 (t-to-nil (car (atomic-tp t1))) c2 (t-to-nil (car (atomic-tp t2)))) nil))
+;; 	 (c1 (if (or (eql c1 c2) (unless (cmpt t2) (typep c1 t2))) t2 (if (consp c1) (type-or1 (if (cdr c1) #tcons #tproper-cons) t2) (to t1 t2))))
+;; 	 (c2 (if (unless (cmpt t1) (typep c2 t1)) t1 (if (consp c2) (type-or1 t1 (if (cdr c2) #tcons #tproper-cons)) (to t1 t2))))
+;; 	 ((when (setq h1 (gethash t1 *or-tp-hash*)) (multiple-value-setq (r f) (gethash t2 h1)) f) r)
+;; 	 ((when (setq h2 (gethash t2 *or-tp-hash*)) (multiple-value-setq (r f) (gethash t1 h2)) f) r)
+;; 	 ((let ((q (type-or1-int t1 t2 `(or ,t1 ,t2))))
+;; 	    (unless (contains-cons-tp q)
+;; 	      (unless (contains-cons-tp t2) (when h1 (setf (gethash t2 h1) q)))
+;; 	      (unless (contains-cons-tp t1) (when h2 (setf (gethash t1 h2) q))))
+;; 	    q)))))
 
 ;; (defun type-or1 (t1 t2 &aux h1 h2 r f c1 c2 m1 m2);FIXME think about atomic types
 ;;   (flet ((to (t1 t2 &aux (x (uniq-tp-from-stack `or t1 t2))) (cmp-norm-tp x)));(type-or1-int t1 t2 x)))
@@ -402,14 +451,28 @@
 ;; (declaim (inline othf))
 
 (defun object-type (thing); &optional lim
-  (typecase
+  (case 
    thing
-   (integer `(integer ,thing ,thing))
-   (short-float `(short-float ,thing ,thing))
-   (long-float `(long-float ,thing ,thing))
-   (null #tnull)
-   ((or symbol character complex cons function) `(member ,thing))
-   (otherwise (cmp-norm-tp (type-of thing)))))
+   ((nil) #tnull)
+   ((t) #t(member t))
+   (otherwise
+    (typecase
+     thing
+     (integer `(integer ,thing ,thing))
+     (short-float `(short-float ,thing ,thing))
+     (long-float `(long-float ,thing ,thing))
+     ((or symbol character complex cons function) `(member ,thing))
+     (otherwise (cmp-norm-tp (type-of thing)))))))
+
+;; (defun object-type (thing); &optional lim
+;;   (typecase
+;;    thing
+;;    (integer `(integer ,thing ,thing))
+;;    (short-float `(short-float ,thing ,thing))
+;;    (long-float `(long-float ,thing ,thing))
+;;    (null #tnull)
+;;    ((or symbol character complex cons function) `(member ,thing))
+;;    (otherwise (cmp-norm-tp (type-of thing)))))
 
 ;; (defun object-type (thing); &optional lim
 ;;   (typecase
@@ -1242,15 +1305,28 @@
 (defvar *ctov-hash* (make-hash-table :test 'eq))
 (defun coerce-to-one-value (type)
   (or (gethash type *ctov-hash*)
-      (setf (gethash type *ctov-hash*)
-	    (when type (type-and type t)))))
+      (let ((q (when type (type-and type t))))
+	(unless (contains-cons-tp q)
+	  (setf (gethash type *ctov-hash*) q))
+	q)))
+;; (defun coerce-to-one-value (type)
+;;   (or (gethash type *ctov-hash*)
+;;       (setf (gethash type *ctov-hash*)
+;; 	    (when type (type-and type t)))))
 ;	    (if type (type-and type t) #tnull)))) ;;FIXME ????
 
 (defvar *stp-hash* (make-hash-table :test 'eq))
 (defun single-type-p (type)
   (or (gethash type *stp-hash*)
-      (setf (gethash type *stp-hash*)
-	    (type>= t type))))	   
+      (let ((q (type>= t type)))
+	(unless (contains-cons-tp q)
+	  (setf (gethash type *stp-hash*) q))
+	q)))
+;; (defun single-type-p (type)
+;;   (or (gethash type *stp-hash*)
+;;       (setf (gethash type *stp-hash*)
+;; 	    (type>= t type))))
+
 
 (defun export-type (type)
   (cond ((atom type) type)
@@ -1347,6 +1423,10 @@
 
 (eval-when
  (compile eval)
+ (defconstant +array-type-size-alist+ 
+   (mapcar (lambda (x) `((array ,x) ,(c::array-eltsize (make-array 1 :element-type x)))) +array-types+))
+ (defconstant +array-aet-alist+ 
+   (mapcar (lambda (x) `(,x ,(c::array-elttype (make-array 1 :element-type x)))) +array-types+))
  (defmacro maep nil
    `(progn
       (defun array-eltsize-propagator (f x)
@@ -1354,14 +1434,14 @@
 	 ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-eltsize-propagator f x)) (cdr x))))
 	 ,@(mapcar (lambda (x)
 		     `((type>= (load-time-value (cmp-norm-tp ',(car x))) x) 
-		       (load-time-value (cmp-norm-tp ',(object-type (cadr x)))))) si::+array-type-size-alist+)))
-      (setf (get 'c::array-eltsize 'compiler::type-propagator) 'array-eltsize-propagator)
+		       (load-time-value (cmp-norm-tp ',(object-type (cadr x)))))) +array-type-size-alist+)))
+      (setf (get 'c::array-eltsize 'type-propagator) 'array-eltsize-propagator)
       (defun array-elttype-propagator (f x)
 	(cond
 	 ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-elttype-propagator f x)) (cdr x))))
 	 ,@(mapcar (lambda (x)
 		     `((type>= (load-time-value (cmp-norm-tp '(array ,(car x)))) x) 
-		       (load-time-value (cmp-norm-tp ',(object-type (cadr x)))))) si::+array-aet-alist+)))
-      (setf (get 'c::array-elttype 'compiler::type-propagator) 'array-elttype-propagator))))
+		       (load-time-value (cmp-norm-tp ',(object-type (cadr x)))))) +array-aet-alist+)))
+      (setf (get 'c::array-elttype 'type-propagator) 'array-elttype-propagator))))
 
 (maep)

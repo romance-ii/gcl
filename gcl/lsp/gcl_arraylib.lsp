@@ -94,7 +94,8 @@
 	       (c::array-eltsize r)
 	       ,@(mapcar (lambda (x &aux (y `(or ,(cadr x)))
 				    (s (cddr (assoc (car x) +array-size-syms+))))
-			   `(,(car x) (infer-tp r ,y (infer-tp s ,y (sp r i s j ',(pop s) ',(car s)))))) +array-size-type-alist+))))
+			   `(,(car x) (compiler::infer-tp 
+				       r ,y (compiler::infer-tp s ,y (sp r i s j ',(pop s) ',(car s)))))) +array-size-type-alist+))))
       (declaim (inline set-array))))
  
  (defmacro make-array-element-type nil
@@ -105,11 +106,16 @@
        x
        ,@(mapcar (lambda (x) `((array ,x) ',x)) +array-types+))))
 
+(defmacro check-bounds (a i)
+  `(let ((q (array-total-size ,a)))
+       (unless (< ,i q) (error 'type-error :datum ,i :expected-type `(integer 0 (,q))))))
+
 (defmacro make-row-major-aref nil
   `(defun row-major-aref (a i)
      (declare (optimize (safety 1)))
      (check-type a array)
      (check-type i seqind)
+     (check-bounds a i)
      (ecase
       (c::array-elttype a)
       (,(aets character) (code-char (c::unsigned-char-array-self a i)))
@@ -127,6 +133,7 @@
        (declare (optimize (safety 1)))
        (check-type a array)
        (check-type i seqind)
+       (check-bounds a i)
        (ecase
 	(c::array-elttype a)
 	(,(aets character) (code-char (c::set-unsigned-char-array-self (char-code v) a i)))
@@ -221,6 +228,7 @@
 
 
 (setf (symbol-function 'array-rank) (symbol-function 'c::array-rank))
+(setf (symbol-function 'array-total-size) (symbol-function 'c::array-dim))
 
 (defun array-has-fill-pointer-p (x)
   (declare (optimize (safety 1)))
