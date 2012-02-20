@@ -1343,3 +1343,25 @@
 	   (c1expr `',(cmp-eval `(si::expand-deftype ',(car atp)))));`',(cmp-norm-tp (car atp))))
 	  ((list 'call-global info 'si::expand-deftype nargs)))))
 (si::putprop 'si::expand-deftype 'c1expand-deftype 'c1)
+
+
+(eval-when
+ (compile eval)
+ (defmacro maep nil
+   `(progn
+      (defun array-eltsize-propagator (f x)
+	(cond
+	 ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-eltsize-propagator f x)) (cdr x))))
+	 ,@(mapcar (lambda (x)
+		     `((type>= (load-time-value (cmp-norm-tp ',(car x))) x) 
+		       (load-time-value (cmp-norm-tp ',(object-type (cadr x)))))) si::+array-type-size-alist+)))
+      (setf (get 'c::array-eltsize 'compiler::type-propagator) 'array-eltsize-propagator)
+      (defun array-elttype-propagator (f x)
+	(cond
+	 ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-elttype-propagator f x)) (cdr x))))
+	 ,@(mapcar (lambda (x)
+		     `((type>= (load-time-value (cmp-norm-tp '(array ,(car x)))) x) 
+		       (load-time-value (cmp-norm-tp ',(object-type (cadr x)))))) si::+array-aet-alist+)))
+      (setf (get 'c::array-elttype 'compiler::type-propagator) 'array-elttype-propagator))))
+
+(maep)

@@ -878,10 +878,10 @@
   (if (cddr form) form (cadr form)))
 (si::putprop 'identity 'identity-expander 'si::compiler-macro-prop)
 
-(defun seqind-wrap (form)
-  (if *safe-compile*
-      form
-    `(the seqind ,form)))
+;; (defun seqind-wrap (form)
+;;   (if *safe-compile*
+;;       form
+;;     `(the seqind ,form)))
 
 (defun fboundp-expander (form env)
   (declare (ignore env))
@@ -905,66 +905,66 @@
 ;; 	 (go ,tag))))))
 ;; (si::putprop 'maphash 'maphash-expander 'si::compiler-macro-prop)
 	
-(defun array-row-major-index-expander (form env &optional (it 0))
-  (declare (fixnum it)(ignorable env))
-  (let ((l (length form)))
-    (cond ((= l 2) 0)
-	  ((= l 3) (seqind-wrap (caddr form)))
-	  (t (let ((it (1+ it))
-		   (fn (car form))
-		   (ar (cadr form))
-		   (first (seqind-wrap (caddr form)))
-		   (second (seqind-wrap (cadddr form)))
-		   (rest (cddddr form)))
-	       (array-row-major-index-expander
-		`(,fn ,ar ,(seqind-wrap
-			    `(+
-			      ,(seqind-wrap
-				`(* ,first (array-dimension ,ar ,it))) ,second)) ,@rest)
-		nil it))))))
+;; (defun array-row-major-index-expander (form env &optional (it 0))
+;;   (declare (fixnum it)(ignorable env))
+;;   (let ((l (length form)))
+;;     (cond ((= l 2) 0)
+;; 	  ((= l 3) (seqind-wrap (caddr form)))
+;; 	  (t (let ((it (1+ it))
+;; 		   (fn (car form))
+;; 		   (ar (cadr form))
+;; 		   (first (seqind-wrap (caddr form)))
+;; 		   (second (seqind-wrap (cadddr form)))
+;; 		   (rest (cddddr form)))
+;; 	       (array-row-major-index-expander
+;; 		`(,fn ,ar ,(seqind-wrap
+;; 			    `(+
+;; 			      ,(seqind-wrap
+;; 				`(* ,first (array-dimension ,ar ,it))) ,second)) ,@rest)
+;; 		nil it))))))
 
-(si::putprop 'array-row-major-index 'array-row-major-index-expander 'si::compiler-macro-prop)
+;;(si::putprop 'array-row-major-index 'array-row-major-index-expander 'si::compiler-macro-prop)
 
-(defmacro with-pulled-array (bindings form &body body) ;FIXME
-  `(let ((,(car bindings) (cadr ,form)))
-     (let ((,(cadr bindings) `((,(tmpsym) ,,(car bindings)))))
-       (let ((,(caddr bindings) (or (caar ,(cadr bindings)) ,(car bindings))))
-	 ,@body))))
+;; (defmacro with-pulled-array (bindings form &body body) ;FIXME
+;;   `(let ((,(car bindings) (cadr ,form)))
+;;      (let ((,(cadr bindings) `((,(tmpsym) ,,(car bindings)))))
+;;        (let ((,(caddr bindings) (or (caar ,(cadr bindings)) ,(car bindings))))
+;; 	 ,@body))))
 	
 
-(defun aref-expander (form env)
-  (declare (ignore env))
-  (with-pulled-array
-   (ar lets sym) form
-   (let ((isym (tmpsym)))
-     (let ((lets (append lets `((,isym (array-row-major-index ,sym ,@(cddr form)))))))
-       (let-wrap lets `(compiler::cmp-aref ,sym ,isym))))))
+;; (defun aref-expander (form env)
+;;   (declare (ignore env))
+;;   (with-pulled-array
+;;    (ar lets sym) form
+;;    (let ((isym (tmpsym)))
+;;      (let ((lets (append lets `((,isym (array-row-major-index ,sym ,@(cddr form)))))))
+;;        (let-wrap lets `(compiler::cmp-aref ,sym ,isym))))))
 
-(si::putprop 'aref 'aref-expander 'si::compiler-macro-prop)
-(si::putprop 'row-major-aref 'aref-expander 'si::compiler-macro-prop)
+;; (si::putprop 'aref 'aref-expander 'si::compiler-macro-prop)
+;; (si::putprop 'row-major-aref 'aref-expander 'si::compiler-macro-prop)
 
-(defun aset-expander (form env)
-  (declare (ignore env))
-  (let ((form (if (eq (car form) 'si::aset-wrap) form 
-		(cons (car form) (append (cddr form) (list (cadr form)))))));FIXME
-    (with-pulled-array
-     (ar lets sym) form
-     (let ((isym (tmpsym)))
-       (let ((lets (append lets `((,isym (array-row-major-index ,sym ,@(butlast (cddr form))))))))
-	 (let-wrap lets `(compiler::cmp-aset ,sym ,isym ,(car (last form)))))))))
+;; (defun aset-expander (form env)
+;;   (declare (ignore env))
+;;   (let ((form (if (eq (car form) 'si::aset-wrap) form 
+;; 		(cons (car form) (append (cddr form) (list (cadr form)))))));FIXME
+;;     (with-pulled-array
+;;      (ar lets sym) form
+;;      (let ((isym (tmpsym)))
+;;        (let ((lets (append lets `((,isym (array-row-major-index ,sym ,@(butlast (cddr form))))))))
+;; 	 (let-wrap lets `(compiler::cmp-aset ,sym ,isym ,(car (last form)))))))))
 
-(si::putprop 'si::aset 'aset-expander 'si::compiler-macro-prop)
-(si::putprop 'si::aset-wrap 'aset-expander 'si::compiler-macro-prop)
+;; (si::putprop 'si::aset 'aset-expander 'si::compiler-macro-prop)
+;; (si::putprop 'si::aset-wrap 'aset-expander 'si::compiler-macro-prop)
 ;FIXME -- test and install this and svref, CM 20050106
 ;(si::putprop 'svset 'aset-expander 'si::compiler-macro-prop)
 
-(defun array-dimension-expander (form env)
-  (declare (ignore env))
-  (with-pulled-array
-   (ar lets sym) form
-   (let-wrap lets `(compiler::cmp-array-dimension ,sym ,(caddr form)))))
+;; (defun array-dimension-expander (form env)
+;;   (declare (ignore env))
+;;   (with-pulled-array
+;;    (ar lets sym) form
+;;    (let-wrap lets `(compiler::cmp-array-dimension ,sym ,(caddr form)))))
 
-(si::putprop 'array-dimension 'array-dimension-expander 'si::compiler-macro-prop)
+;;(si::putprop 'array-dimension 'array-dimension-expander 'si::compiler-macro-prop)
 
 (defmacro inlinable-fn (a) 
   `(or (constantp ,a) (and (consp ,a) (member (car ,a) '(function lambda)))))
@@ -1448,8 +1448,21 @@
       (fun-name f)
     f))
 
-(defun mi3 (fun args la fms ttag envl inls &aux (src (under-env (pop envl) (inline-src fun))) (env (car envl)))
+(dolist (l '(upgraded-array-element-type row-major-aref row-major-aset))
+  (setf (get l 'consider-inline) t))
+
+(defun maybe-inline-src (fun fms src &aux (ll (cadr src)))
   (when src
+    (or
+     (not (symbolp fun))
+     (not (get fun 'consider-inline))
+     (member-if-not (lambda (x) (type>= (car x) (cdr x))) 
+		    (let ((y (get-arg-types fun)))
+		      (mapcar (lambda (x &aux (y (unless (eq (car y) '*) (pop y)))) 
+				(cons (info-type (cadr x)) (nil-to-t y))) fms))))))
+
+(defun mi3 (fun args la fms ttag envl inls &aux (src (under-env (pop envl) (inline-src fun))) (env (car envl)))
+  (when (maybe-inline-src fun fms src)
     (let ((sir (cons (sir-name fun) (mapcar (lambda (x) (when x (info-type (cadr x)))) fms))))
       (if (prev-sir sir)
 	  (let ((tag (sir-tag sir))) (when tag (throw tag nil)))
@@ -1459,6 +1472,18 @@
 	  (with-restore-vars
 	   (prog1 (catch tag (mi4 fun args la tsrc env inls))
 	     (keep-vars))))))))
+
+;; (defun mi3 (fun args la fms ttag envl inls &aux (src (under-env (pop envl) (inline-src fun))) (env (car envl)))
+;;   (when src
+;;     (let ((sir (cons (sir-name fun) (mapcar (lambda (x) (when x (info-type (cadr x)))) fms))))
+;;       (if (prev-sir sir)
+;; 	  (let ((tag (sir-tag sir))) (when tag (throw tag nil)))
+;; 	(let* ((tag (tmpsym))
+;; 	       (tsrc (ttl-tag-src src tag))
+;; 	       (*src-inline-recursion* (maybe-cons-sir sir tag ttag src env)))
+;; 	  (with-restore-vars
+;; 	   (prog1 (catch tag (mi4 fun args la tsrc env inls))
+;; 	     (keep-vars))))))))
 
 ;; (defun mi3 (fun args la fms ttag envl &aux (src (under-env (pop envl) (inline-src fun))) (env (car envl)))
 ;;   (when src
