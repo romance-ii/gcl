@@ -504,7 +504,8 @@
 					 (mapcar (lambda (x) (if (atom x) x (car x))) (cadr form)))));FIXME key name
 		      (when r `((declare (special ,@r)))))
 		  ,@(ndbctxt (portable-source (cddr form) t))))
-	       ((quote function) form)
+	       ((quote function side-effects) form)
+	       (infer-tp `(,(car form) ,(cadr form) ,(caddr form) ,@(portable-source (cdddr form) t)))
 	       (declare 
 		(let ((opts (mapcan (lambda (x) (if (eq (car x) 'optimize) (cdr x) (list x)))
 				    (remove-if-not
@@ -933,6 +934,7 @@
 (setf (get 'fun-fun 'c2) 'c2fun-fun)
 (setf (get 'fun-fun 'wt-loc) 'wt-fun-fun)
 
+(defmacro side-effects nil nil)
 (defun c1side-effects (args)
   (declare (ignore args))
   (list 'side-effects (make-info :flags (iflags side-effects))))
@@ -1062,16 +1064,28 @@
       (member-if (lambda (x) (when (fun-p x) (unless (eq x fun) (not (consp (if (eq b 'cb) (fun-c1cb x) (fun-c1 x)))))))
 		 (append (info-ref (cadr l)) (info-ref-ccb (cadr l)))))))
 
-(defun do-l1-fun (name src e &aux *callees* *recursion-detected* *warning-note-stack*)
+(defun do-l1-fun (name src e &aux *callees* (*recursion-detected* (cons (list name) *recursion-detected*)) *warning-note-stack*)
 
   (let* ((l (c1lambda-expr src))
 	 (osig (car e))
 	 (sig (lam-e-to-sig l))
-	 (sig (if *recursion-detected* (list (car sig) (bbump-tp (cadr sig))) sig)))
+	 (rd (cdar *recursion-detected*))
+	 (sig (if rd (list (car sig) (bbump-tp (cadr sig))) sig)))
     (setf (car e) sig (cadr e) *callees*)
-    (if (and *recursion-detected* (not (eq (cadr osig) (cadr sig))))
+    (if (and rd (not (eq (cadr osig) (cadr sig))))
 	(progn (keyed-cmpnote (list name 'recursion) "Reprocessing ~s: ~s ~s" name osig sig) (do-l1-fun name src e))
       l)))
+
+;; (defun do-l1-fun (name src e &aux *callees* *recursion-detected* *warning-note-stack*)
+
+;;   (let* ((l (c1lambda-expr src))
+;; 	 (osig (car e))
+;; 	 (sig (lam-e-to-sig l))
+;; 	 (sig (if *recursion-detected* (list (car sig) (bbump-tp (cadr sig))) sig)))
+;;     (setf (car e) sig (cadr e) *callees*)
+;;     (if (and *recursion-detected* (not (eq (cadr osig) (cadr sig))))
+;; 	(progn (keyed-cmpnote (list name 'recursion) "Reprocessing ~s: ~s ~s" name osig sig) (do-l1-fun name src e))
+;;       l)))
 
 ;; (defun do-l1-fun (name src e &aux *callees* *recursion-detected* *warning-note-stack*)
 

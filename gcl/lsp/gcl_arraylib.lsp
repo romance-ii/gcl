@@ -40,156 +40,134 @@
 
 (in-package :system)
 
+(export '(+array-type-info+ strcat))
+
+(defun strcat (&rest r)
+  (declare (:dynamic-extent r))
+  (apply 'string-concatenate (mapcar 'string-downcase r)))
+
 (eval-when 
  (compile eval)
 
- (defconstant +array-type-size-alist+ 
-   (mapcar (lambda (x) `((array ,x) ,(c::array-eltsize (make-array 1 :element-type x)))) +array-types+))
- (defconstant +array-sizes+ 
-   (remove-duplicates (mapcar 'cadr +array-type-size-alist+)))
- (defconstant +array-size-type-alist+ 
-   (mapcar (lambda (x) (cons x (mapcar 'car (remove x +array-type-size-alist+ :test '/= :key 'cadr)))) +array-sizes+))
- (defconstant +array-size-syms+ (cons '(0 :bit c::bit-array-self c::set-bit-array-self)
-				      (mapcar (lambda (x &aux (af (intern (concatenate 'string (string x) "-ARRAY-SELF") 'c)))
-						`(,(c::array-eltsize (make-array 1 :element-type (get x 'compiler::lisp-type)))
-						  ,x ,af ,(intern (concatenate 'string "SET-" (string af)) 'c))) '(:char :short :fixnum :double))))
- (defconstant +array-aet-alist+ 
-   (mapcar (lambda (x) `(,x ,(c::array-elttype (make-array 1 :element-type x)))) +array-types+))							      
- (defmacro aets (&rest r)
-   `',(mapcar 'cadr (remove-if-not (lambda (x) (member (car x) r)) +array-aet-alist+)))
+ (defun proto-array (tp) (make-vector tp 1 nil nil nil 0 nil nil))
 
- (defmacro mff (&optional set)
-   `(progn
-      ,@(mapcar (lambda (x)
-		  `(defun ,(intern (concatenate 'string (if set "SET-" "") (string x) "-ARRAY-SELF") 'c)
-		     (,@(when set `(word)) array index)
-		     (declare (optimize (safety 1)))
-		     (check-type array (or ,@(when (eq x :char) `((array bit)))
-					   ,@(cdr (assoc (car (rassoc x +array-size-syms+ :key 'car)) +array-size-type-alist+))))
-		     (check-type index seqind)
-		     ,@(when set `((check-type word ,(get x 'compiler::lisp-type))(compiler::side-effects)))
-		     (lit ,x "((" ,(strcat x) "*)" (:object array) "->v.v_self)[" (:fixnum index) "]"
-			  ,@(when set `("=" (,x word)))))) '(:char :short :fixnum :double))))
+ (defun collect-if (f k l &aux r)
+   (mapc (lambda (x) (when (funcall f x) (pushnew (funcall k x) r))) l)
+   r)
 
- (defmacro mffu (&optional set)
-   `(progn
-      ,@(mapcar (lambda (x &aux (tp (let ((x (get x 'compiler::lisp-type))) `(integer 0 ,(- (caddr x) (cadr x))))))
-		  `(defun ,(intern (concatenate 'string (if set "SET-" "") "UNSIGNED-" (string x) "-ARRAY-SELF") 'c)
-		     (,@(when set `(word)) array index)
-		     (declare (optimize (safety 1)))
-		     (check-type array (or ,@(when (eq x :char) `((array bit)))
-					   ,@(cdr (assoc (car (rassoc x +array-size-syms+ :key 'car)) +array-size-type-alist+))))
-		     (check-type index seqind)
-		     ,@(when set `((check-type word ,tp)(compiler::side-effects)))
-		     (the ,tp (lit ,(if (eq x :char) :short :fixnum)
-				   "((unsigned " ,(strcat x) "*)" (:object array) "->v.v_self)[" (:fixnum index) "]"
-			  ,@(when set `("=" (,x word))))))) '(:char :short))))
+ (defconstant +array-type-info+ (mapcar (lambda (x &aux (y (proto-array x))) 
+					  (list x (array-elttype y) (array-eltsize y) (array-mode y))) +array-types+))
+
+ (defun maybe-cons (car cdr)
+   (if (cdr cdr) (cons car cdr) (car cdr)))
 
  (defmacro make-set-array nil
    `(progn
       (defun set-array (r i s j &optional sw);assumes arrays of same type and indices in bounds
 	(declare (optimize (safety 1))(seqind i j))
-	(flet ((sp (r i s j gf sf &aux (x (when sw (funcall gf r i)))) (funcall sf (funcall gf s j) r i) (when sw (funcall sf x s j))))
+	(check-type r array)
+	(check-type s array)
+	(flet ((sp (r i s j gf sf &aux (x (when sw (funcall gf r i)))) 
+		   (funcall sf (funcall gf s j) r i)
+		   (when sw (funcall sf x s j))))
 	      (case 
-	       (c::array-eltsize r)
-	       ,@(mapcar (lambda (x &aux (y `(or ,(cadr x)))
-				    (s (cddr (assoc (car x) +array-size-syms+))))
-			   `(,(car x) (compiler::infer-tp 
-				       r ,y (compiler::infer-tp s ,y (sp r i s j ',(pop s) ',(car s)))))) +array-size-type-alist+))))
+	       (array-eltsize r)
+	       ,@(mapcar (lambda (x &aux (z (pop x)) (y (maybe-cons 'or (mapcar (lambda (x) (list 'array x)) x))))
+			   `(,z (compiler::infer-tp 
+				       r ,y (compiler::infer-tp 
+					     s ,y 
+					     (sp r i s j 
+						 ,(if (zerop z) `0-byte-array-self `(lambda (r i) (rref r i ,z ,(if (= z 8) 2 0))))
+						 ,(if (zerop z) `set-0-byte-array-self `(lambda (v r i) (rref r i ,z ,(if (= z 8) 2 0) v))))))))
+			 (mapcar (lambda (x) 
+				   (cons x (collect-if (lambda (y) (= x (caddr y))) 'car +array-type-info+))) 
+				 (collect-if 'identity 'caddr +array-type-info+))))))
       (declaim (inline set-array))))
  
  (defmacro make-array-element-type nil
    `(defun array-element-type (x)
       (declare (optimize (safety 1)))
       (check-type x array)
-      (typecase
-       x
-       ,@(mapcar (lambda (x) `((array ,x) ',x)) +array-types+))))
+      (case
+       (array-elttype x)
+       ,@(mapcar (lambda (x &aux (tp (pop x))) `(,(car x) ',tp)) +array-type-info+))))
+ 
+ (defmacro check-bounds (a i)
+   `(let ((q (array-total-size ,a)))
+      (unless (< ,i q) (error 'type-error :datum ,i :expected-type `(integer 0 (,q))))))
+ 
+ (defmacro make-row-major-aref nil
+   `(defun row-major-aref (a i)
+      (declare (optimize (safety 1)))
+      (check-type a array)
+      (check-type i seqind)
+      (check-bounds a i)
+      (ecase
+       (array-elttype a)
+       ,@(mapcar (lambda (y &aux (x (pop y)))
+		   `(,(pop y) 
+		     ,(if (eq x 'bit) `(0-byte-array-self a i)
+			`(rref a i ,(pop y) ,(car y)))))
+		 +array-type-info+))))
+ 
+ (defmacro make-row-major-aset nil
+   `(progn
+      (defun row-major-aset (v a i)
+	(declare (optimize (safety 1)))
+	(check-type a array)
+	(check-type i seqind)
+	(check-bounds a i)
+	(ecase
+	 (array-elttype a)
+	 ,@(mapcar (lambda (y &aux (x (pop y)))
+		     `(,(pop y) 
+		       ,(if (eq x 'bit) `(set-0-byte-array-self v a i)
+			  `(rref a i ,(pop y) ,(car y) v))))
+		   +array-type-info+)))
+      (setf (get 'row-major-aset 'consider-inline) t))))
 
-(defmacro check-bounds (a i)
-  `(let ((q (array-total-size ,a)))
-       (unless (< ,i q) (error 'type-error :datum ,i :expected-type `(integer 0 (,q))))))
-
-(defmacro make-row-major-aref nil
-  `(defun row-major-aref (a i)
-     (declare (optimize (safety 1)))
-     (check-type a array)
-     (check-type i seqind)
-     (check-bounds a i)
-     (ecase
-      (c::array-elttype a)
-      (,(aets character) (code-char (c::unsigned-char-array-self a i)))
-      (,(aets bit) (c::bit-array-self a i))
-      (,(aets signed-char  non-negative-char  unsigned-char)  (c::char-array-self a i))
-      (,(aets signed-short non-negative-short unsigned-short) (c::short-array-self a i))
-      (,(aets fixnum       non-negative-fixnum) (c::fixnum-array-self a i))
-      (,(aets short-float) (c::sfarray-self a i))
-      (,(aets long-float) (c::lfarray-self a i))
-      (,(aets t) (c::array-self a i)))))
-
-(defmacro make-row-major-aset nil
-  `(progn
-     (defun row-major-aset (v a i)
-       (declare (optimize (safety 1)))
-       (check-type a array)
-       (check-type i seqind)
-       (check-bounds a i)
-       (ecase
-	(c::array-elttype a)
-	(,(aets character) (code-char (c::set-unsigned-char-array-self (char-code v) a i)))
-	(,(aets bit) (c::set-bit-array-self v a i))
-	(,(aets signed-char  non-negative-char  unsigned-char)  (c::set-char-array-self v a i))
-	(,(aets signed-short non-negative-short unsigned-short) (c::set-short-array-self v a i))
-	(,(aets fixnum       non-negative-fixnum) (c::set-fixnum-array-self v a i))
-	(,(aets short-float) (c::set-sfarray-self v a i))
-	(,(aets long-float) (c::set-lfarray-self v a i))
-	(,(aets t) (c::set-array-self v a i))))
-     (setf (get 'row-major-aset 'consider-inline) t))))
-
-
-
-
-(mff)
-(mff t)
-(mffu)
-(mffu t)
 (make-set-array)
 (make-array-element-type)
 (make-row-major-aref)
 (make-row-major-aset)
 
 
-(defun c::bit-array-self (array index)
+(defun 0-byte-array-self (array index)
   (declare (optimize (safety 1)))
   (check-type array (array bit))
   (check-type index seqind)
-  (let* ((off (+ index (c::array-offset array)))
+  (let* ((off (+ index (array-offset array)))
 	 (ind (ash off -3))
-	 (byte (c::char-array-self array ind))
+	 (byte (rref array ind 1 1))
 	 (shft (logand off 7))
 	 (shft (- shft #+clx-little-endian 7)))
     (logand (ash byte shft) 1)))
 
-(defun c::set-bit-array-self (bit array index)
+(defun set-0-byte-array-self (bit array index)
   (declare (optimize (safety 1)))
   (check-type array (array bit))
   (check-type index seqind)
   (check-type bit bit)
-  (let* ((off (+ index (c::array-offset array)))
+  (let* ((off (+ index (array-offset array)))
 	 (ind (ash off -3))
-	 (byte (c::char-array-self array ind))
+	 (byte (rref array ind 1 1))
 	 (shft (logand off 7))
 	 #+clx-little-endian (shft (- 7 shft))
-	 (val (ash 1 shft))
-	 (val (if (>= val 128) (- val 256) val)))
-    (c::set-char-array-self (if (zerop bit) (logandc2 byte val) (logior byte val)) array ind)
+	 (val (ash 1 shft)))
+    (rref array ind 1 1 (if (zerop bit) (logandc2 byte val) (logior byte val)))
     bit))
 
 (defun array-row-major-index (array &rest indices)
   (declare (:dynamic-extent indices))
-  (labels ((armi-dim (k) (if (< k 0) 1 (array-dimension array k)))
-	   (armi-loop (s &optional (j 0) (k -1)) (if s (armi-loop (cdr s) (+ (car s) (the seqind (* j (armi-dim k)))) (1+ k)) j)))
+  (labels ((armi-loop (s &optional (j 0) (k 0)) 
+		      (if s (armi-loop (cdr s) (+ (car s) (the seqind (* j (array-dimension array k)))) (1+ k)) j)))
 	  (the seqind (armi-loop indices))))
+
+;; (defun array-row-major-index (array &rest indices)
+;;   (declare (:dynamic-extent indices))
+;;   (labels ((armi-dim (k) (if (< k 0) 1 (array-dimension array k)))
+;; 	   (armi-loop (s &optional (j 0) (k -1)) (if s (armi-loop (cdr s) (+ (car s) (the seqind (* j (armi-dim k)))) (1+ k)) j)))
+;; 	  (the seqind (armi-loop indices))))
 
 (defun aref (a &rest q)
   (declare (optimize (safety 1)) (:dynamic-extent q))
@@ -217,7 +195,7 @@
   (check-type x array)
   (check-type i rnkind)
   (let ((r (array-rank x)))
-    (if (= 1 r) (c::vector-dim x) (the seqind (c::array-dims x i)))));FIXME
+    (if (= 1 r) (vector-dim x) (the seqind (array-dims x i)))));FIXME
 
 (defun array-dimensions (x)
   (declare (optimize (safety 1)))
@@ -227,15 +205,10 @@
 	    (ad-loop 0))))
 
 
-(setf (symbol-function 'array-rank) (symbol-function 'c::array-rank))
-(setf (symbol-function 'array-total-size) (symbol-function 'c::array-dim))
-
 (defun array-has-fill-pointer-p (x)
   (declare (optimize (safety 1)))
   (check-type x array)
-  (= (c::array-hasfillp x) 1))
-
-
+  (= (array-hasfillp x) 1))
 
 (defun upgraded-array-element-type (type &optional environment)
   (declare (ignore environment) (optimize (safety 1)))

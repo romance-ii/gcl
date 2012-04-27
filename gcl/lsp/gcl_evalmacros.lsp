@@ -27,7 +27,7 @@
 
 (in-package :SYSTEM)
 
-(export '(lit))
+(export '(lit sgen))
 
 (eval-when (eval compile) (setq si:*inhibit-macro-special* nil))
 
@@ -325,19 +325,36 @@
 			      (go ,label))
 			  (return (progn ,@result)))))))
 
-(defmacro case (keyform &rest clauses &aux (key (sgen "CASE")))
+
+(defmacro case (keyform &rest clauses &aux (key (sgen "CASE")) (c (reverse clauses)))
   (declare (optimize (safety 2)))
-  (labels ((sw (x) `(eql ,key ',x)))
+  (labels ((sw (x) `(eql ,key ',x))(dfp (x) (or (eq x t) (eq x 'otherwise)))
+	   (v (x) (if (when (listp x) (not (cdr x))) (car x) x))
+	   (m (x c &aux (v (v x))) (if (eq v x) (cons c v) v)))
 	  `(let ((,key ,keyform))
 	     (declare (ignorable ,key))
-	     ,(reduce (lambda (c y) 
-			(let* ((aa (pop c))
-			       (ka (or (atom aa) (cdr aa)))
-			       (da (if (and (listp c) (cdr c)) (cons 'progn c) (car c)))
-			       (v (if ka aa (car aa))))
-			  (if (member aa '(t otherwise)) da 
-			    `(if ,(if (when ka (listp aa)) `(or ,@(mapcar #'sw v)) (sw v)) ,da ,y))))
-		      clauses :initial-value nil :from-end t))))
+	     ,(let ((df (when (dfp (caar c)) (m (cdr (pop c)) 'progn))))
+		(reduce (lambda (y c &aux (a (pop c))(v (v a)))
+			  (when (dfp a) (error 'program-error "default case must be last"))
+			  `(if ,(if (when (eq a v) (listp v)) (m (mapcar #'sw v) 'or) (sw v)) ,(m c 'progn) ,y))
+			c :initial-value df)))))
+
+
+
+;; (defmacro case (keyform &rest clauses &aux (key (sgen "CASE")) f)
+;;   (declare (optimize (safety 2)))
+;;   (labels ((sw (x) `(eql ,key ',x))
+;; 	   (df (aa ff) (when (member aa '(t otherwise)) (when ff (error 'program-error "default case must be last")) t)))
+;; 	  `(let ((,key ,keyform))
+;; 	     (declare (ignorable ,key))
+;; 	     ,(reduce (lambda (c y &aux (ff f)) (setq f t)
+;; 			(let* ((aa (pop c))
+;; 			       (ka (or (atom aa) (cdr aa)))
+;; 			       (da (if (and (listp c) (cdr c)) (cons 'progn c) (car c)))
+;; 			       (v (if ka aa (car aa))))
+;; 			  (if (df aa ff) da
+;; 			    `(if ,(if (when ka (listp aa)) `(or ,@(mapcar #'sw v)) (sw v)) ,da ,y))))
+;; 		      clauses :initial-value nil :from-end t))))
 
 (defmacro ecase (keyform &rest clauses &aux (key (sgen "ECASE")))
   (declare (optimize (safety 2)))

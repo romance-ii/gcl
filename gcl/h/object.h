@@ -451,7 +451,8 @@ typedef struct {
   plist    J(b_,displaced);     /*  displaced  */	\
   uhfixnum J(b_,hasfillp:1);    /*  fillp compatability */	\
   uhfixnum J(b_,rank:6);        /*  array rank  */		\
-  uhfixnum J(b_,pad:HM7BITS);   /*  pad  */			\
+  uhfixnum J(b_,mode:3);        /*  array data mode  */		\
+  uhfixnum J(b_,pad:HM10BITS);  /*  pad  */			\
   uhfixnum J(b_,adjustable:1);  /*  adjustable flag  */		\
   uhfixnum J(b_,elttype:4);     /*  element type  */		\
   uhfixnum J(b_,eltsize:4);     /*  element size  */		\
@@ -475,7 +476,8 @@ typedef struct {
   plist    J(b_,displaced);     /*  displaced  */		\
   uhfixnum J(b_,hasfillp:1);    /*  has-fill-pointer flag  */	\
   uhfixnum J(b_,defrank:6);     /*  rank compatibility  */		\
-  uhfixnum J(b_,pad:HM7BITS);   /*  pad  */				\
+  uhfixnum J(b_,mode:3);        /*  array data mode  */		\
+  uhfixnum J(b_,pad:HM10BITS);  /*  pad  */				\
   uhfixnum J(b_,adjustable:1);  /*  adjustable flag  */		\
   uhfixnum J(b_,elttype:4);     /*  element type  */			\
   uhfixnum J(b_,eltsize:4);     /*  element size  */		\

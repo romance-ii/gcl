@@ -7,38 +7,33 @@
   (si::putprop 'tt3 t 'cmp-inline)
   (defun tt30 (x) (lit :boolean "!fto0(" (:object x) ")"))
   (si::putprop 'tt30 t 'cmp-inline)
-  (dolist (l '(add-info analyze-regs analyze-regs1 tt3 tt30 length))
-    (compile l))
-  (setq *rep-lst1* (mapcar (lambda (x) (list (car x) (tt3 (eval (cdr x))))) *rep-lst*)))
+  (compile 'tt3)
+  (compile 'tt30)
+  (setq *rep-lst1* (mapcar (lambda (x) (list (car x) (tt3 (eval (cdr x))))) *rep-lst*))
+  (dolist (l '(add-info analyze-regs length array-dimension ; analyze-regs1
+			array-row-major-index row-major-aref si::row-major-aset aref si::aset nreverse reverse))
+    (compile l)))
 (in-package 'user)
 
-(dolist (l '(cp))
-  (time (load (compile-file
-	       (concatenate 'string "../lsp/gcl_" (string-downcase (string l)) ".lsp")
-	       :c-file t :h-file t :data-file t :system-p t))))
+(compiler::cdebug)
+
+(dolist (l '(cp));c::>= object_to_dcomplex prob at safety 3
+  (time (load (compile-file (concatenate 'string "../lsp/gcl_" (string-downcase (string l)) ".lsp")))))
 
 #+pre-gcl(declaim (optimize (safety 3)))
 
 (dolist (l '(c listlib predlib arraylib seq seqlib bnum fle dl rm nr lr sym hash))
-  (time (load (compile-file
-	       (concatenate 'string "../lsp/gcl_" (string-downcase (string l)) ".lsp")
-	       :c-file t :h-file t :data-file t :system-p t))))
+  (time (load (compile-file (concatenate 'string "../lsp/gcl_" (string-downcase (string l)) ".lsp")))))
 
 (dolist (l '(cmptype cmpeval cmpvar cmpwt cmpif cmplet cmptag cmpinline cmpenv cmplam cmptop
 		     cmpbind cmpblock cmpcall cmpcatch cmpflet cmpfun cmplabel cmploc cmpmap 
 		     cmpmulti cmpspecial cmputil cmpvs cmpmain))
-  (time (load (compile-file
-	       (concatenate 'string "../cmpnew/gcl_" (string-downcase (string l)) ".lsp")
-	       :c-file t :h-file t :data-file t :system-p t))))
+  (time (load (compile-file (concatenate 'string "../cmpnew/gcl_" (string-downcase (string l)) ".lsp")))))
 
 (with-open-file (s "../lsp/gcl_recompile.lsp" :direction :output))
 (dolist (l '(recompile callhash assert defmacro defstruct describe evalmacros sc
 		       iolib mislib module numlib packlib setf top trace sloop debug info serror))
-  (time (compile-file
-	 (concatenate 'string "../lsp/gcl_" (string-downcase (string l)) ".lsp")
-	 :c-file t :h-file t :data-file t :system-p t)))
+  (time (compile-file (concatenate 'string "../lsp/gcl_" (string-downcase (string l)) ".lsp"))))
 
 (dolist (l '(mnum))
-  (time (compile-file
-	 (concatenate 'string "../lsp/gcl_" (string-downcase (string l)) ".lsp")
-	 :c-file t :h-file t :data-file t :system-p t)))
+  (time (compile-file (concatenate 'string "../lsp/gcl_" (string-downcase (string l)) ".lsp"))))

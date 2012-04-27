@@ -40,26 +40,13 @@
 
 (progn 
 
+  (in-package 'si)
+  (use-package :gmp)
+
   (system:init-system) 
+
   (gbc t)
 
-  (in-package 'si)
-;  (dolist (l *gmp-fun-plist*)
-;    (add-hash (car l) (cdr l) nil nil nil))
-   (do-symbols 
-    (s) 
-    (when (search "MPZ" (string s)) 
-      (unintern s :si)))
-;  (unintern (find-symbol "MPZ_GCD") :si);FIXME
-;  (unintern (find-symbol "MPZ_LCM") :si);FIXME
-;;   (do-symbols 
-;;    (s) 
-;;    (when (search "mpz" (string s)) 
-;;      (let ((x (intern (string-upcase s) :gmp)))
-;;        (export x :gmp)
-;;        (setf (symbol-function x) (symbol-function s))
-;;        (unintern s :si))))
-  (use-package :gmp)
   (do-symbols 
    (s) 
    (when (get s 'proclaimed-function)

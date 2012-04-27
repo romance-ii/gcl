@@ -422,10 +422,10 @@
 (deftype short-float (&optional (low '*) (high '*)) `(short-float ,low ,high))
 (deftype long-float (&optional (low '*) (high '*)) `(long-float ,low ,high))
 
-(deftype array (&optional (et '*) (dims '*)) 
-  `(array ,et ,(if (not dims) 0 dims)))
-(deftype simple-array (&optional (et '*) (dims '*)) 
-  `(array ,et ,(if (not dims) 0 dims)))
+(deftype array (&optional (et '*) (dims '*)) `(array ,et ,(or dims 0)))
+(deftype simple-array (&rest r) (cons 'array r))
+;; (deftype simple-array (&optional (et '*) (dims '*)) 
+;;   `(array ,et ,(if (not dims) 0 dims)))
 
 (deftype eql (&optional (x nil xp)) (when xp `(member ,x)))
 
@@ -1667,12 +1667,12 @@
 	      (or (endp i) (match-dimensions (array-dimensions object) i))))
 	((vector simple-vector)
 	 (and (vectorp object)
-	      (let ((at (upgraded-array-element-type (cond ((eq tp 'simple-vector)) (i (car i)) ('*)))))
+	      (let ((at (cond ((eq tp 'simple-vector)) (i (upgraded-array-element-type (car i))) ('*))))
 		(or (eq at '*) (eq at (upgraded-array-element-type (array-element-type object)))))
 	      (or (not (cdr i)) (match-dimensions (array-dimensions object) (cdr i)))))
 	((array simple-array)
 	 (and (arrayp object)
-	      (let ((at (upgraded-array-element-type (if i (car i) '*))))
+	      (let ((at (if i (upgraded-array-element-type (car i)) '*)))
 		(or (eq at '*) (eq at (upgraded-array-element-type (array-element-type object)))))
 	      (or (not (cdr i)) (eq (cadr i) '*)
 		  (if (listp (cadr i))
@@ -1693,45 +1693,45 @@
 ;;   (typep-int object type))
 (si::putprop 'typep 'compiler::co1typep 'compiler::co1special);FIXME
 
-(defun sequence-type-length-type-int (type)
-    (case (car type)
-	  (cons (do ((i 0 (1+ i)) (x type (caddr type))) 
-		    ((not (eq 'cons (car x))) 
-		     (cond ((equal x '(member nil)) `(eql ,i))
-			   ((not (equal x '(t))) `(eql ,(1+ i)))
-			   ('(integer 1)))) (declare (seqind i))))
-	  (member (unless (cadr type) `(eql 0)))
-	  (array (and (cddr type) (consp (caddr type)) (= (length (caddr type)) 1) (integerp (caaddr type))
-		    `(eql ,(caaddr type))))
-	  ((or and) (reduce (lambda (&rest xy) (when xy 
-						 (and (integerp (car xy)) 
-						      (integerp (cadr xy)) 
-						      (equal (car xy) (cadr xy)) (car xy))))
-			    (mapcar 'sequence-type-length-type-int (cdr type))))))
+;; (defun sequence-type-length-type-int (type)
+;;     (case (car type)
+;; 	  (cons (do ((i 0 (1+ i)) (x type (caddr type))) 
+;; 		    ((not (eq 'cons (car x))) 
+;; 		     (cond ((equal x '(member nil)) `(eql ,i))
+;; 			   ((not (equal x '(t))) `(eql ,(1+ i)))
+;; 			   ('(integer 1)))) (declare (seqind i))))
+;; 	  (member (unless (cadr type) `(eql 0)))
+;; 	  (array (and (cddr type) (consp (caddr type)) (= (length (caddr type)) 1) (integerp (caaddr type))
+;; 		    `(eql ,(caaddr type))))
+;; 	  ((or and) (reduce (lambda (&rest xy) (when xy 
+;; 						 (and (integerp (car xy)) 
+;; 						      (integerp (cadr xy)) 
+;; 						      (equal (car xy) (cadr xy)) (car xy))))
+;; 			    (mapcar 'sequence-type-length-type-int (cdr type))))))
 	  
-(defun sequence-type-length-type (type)
-  (cond ((eq type 'null) `(eql 0));;FIXME accelerators
-	((eq type 'cons) `(integer 1))
-	((consp type) (sequence-type-length-type-int (normalize-type type)))))
+;; (defun sequence-type-length-type (type)
+;;   (cond ((eq type 'null) `(eql 0));;FIXME accelerators
+;; 	((eq type 'cons) `(integer 1))
+;; 	((consp type) (sequence-type-length-type-int (normalize-type type)))))
 
-(defun sequence-type-element-type-int (type)
-    (case (car type)
-	  (cons t)
-	  (array (or (not (cdr type)) (upgraded-array-element-type (cadr type))))
-	  ((or and) (reduce 
-		     (lambda (&rest xy) 
-		       (when xy 
-			 (cond ((eq (car xy) '*) (cadr xy))
-			       ((eq (cadr xy) '*) (car xy))
-			       ((eq (car xy) (cadr xy)) (car xy))
-			       ('error))))
-		     (mapcar 'sequence-type-element-type-int (cdr type))))))
+;; (defun sequence-type-element-type-int (type)
+;;     (case (car type)
+;; 	  (cons t)
+;; 	  (array (or (not (cdr type)) (upgraded-array-element-type (cadr type))))
+;; 	  ((or and) (reduce 
+;; 		     (lambda (&rest xy) 
+;; 		       (when xy 
+;; 			 (cond ((eq (car xy) '*) (cadr xy))
+;; 			       ((eq (cadr xy) '*) (car xy))
+;; 			       ((eq (car xy) (cadr xy)) (car xy))
+;; 			       ('error))))
+;; 		     (mapcar 'sequence-type-element-type-int (cdr type))))))
 	  
-(defun sequence-type-element-type (type)
-  (let* ((type (resolve-type type))
-	 (type (unless (cadr type) (car type))))
-    (let ((x (sequence-type-element-type-int type)))
-      (or (eq x '*) x))))
+;; (defun sequence-type-element-type (type)
+;;   (let* ((type (resolve-type type))
+;; 	 (type (unless (cadr type) (car type))))
+;;     (let ((x (sequence-type-element-type-int type)))
+;;       (or (eq x '*) x))))
 
 
 ;; set by unixport/init_kcl.lsp

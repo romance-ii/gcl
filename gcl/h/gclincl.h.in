@@ -214,6 +214,9 @@
 #undef HAVE_XGCL
 
 /* fill bits needed in certain lisp structures */
+#undef HM10BITS
+
+/* fill bits needed in certain lisp structures */
 #undef HM1BITS
 
 /* fill bits needed in certain lisp structures */

@@ -436,7 +436,7 @@
 	  ((eq ft #tt) 
 	   (if *compiler-new-safety*
 	       (wt cast "object_to_" (if pp "pointer" "dcomplex") "(")
-	     (wt (or (cdr (assoc tt +to-c-var-alist+ :test 'type<=)) cast) "(")));FIXE prune to-c list
+	     (wt (or (cdr (assoc tt +to-c-var-alist+ :test 'type<=)) cast) "(")));FIXME prune to-c list
 	  ((eq tt #tt) (wt (or (cdr (assoc ft +wt-c-var-alist+)) "") "("))
 	  ((and (type>= #tcnum tt) (type>= #tcnum ft)) (wt "(" cast))
 	  ((baboon)))

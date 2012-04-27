@@ -463,35 +463,29 @@
 (eval-when 
  (compile eval)
 
- (defmacro dyncpl (x);FIXME this can't cons in a labels as it might be a separate fn.  Get do to unroll too.
-   `(labels ((dynloop (x y) (when x (setf (car x) (car y)) (dynloop (cdr x) (cdr y)))))
+ (defmacro locsym (f s) `(sgen (concatenate 'string (string ,f) ,s)))
+
+ (defmacro dyncpl (x &aux (l (locsym 'dyncpl "-LOOP")));FIXME this can't cons in a labels as it might be a separate fn.  Get do to unroll too.
+   `(labels ((,l (x y) (when x (setf (car x) (car y)) (,l (cdr x) (cdr y)))))
 	    (declare (notinline make-list))
 	    (let ((tmp (make-list (length ,x))))
 	      (declare (:dynamic-extent tmp))
-	      (dynloop tmp ,x);Can't be mapl, used by
+	      (,l tmp ,x);Can't be mapl, used by
 	     tmp)))
 
- (defmacro make-map (f c a &optional n)
+ (defmacro make-map (f c a &optional n &aux (l (locsym f "-LOOP")) (g (locsym f "-GATHER")))
    `(defun ,f (f l &rest q ,@(when a `(&aux r rp)))
       (declare (optimize (safety 2))(:dynamic-extent q))
       (check-type l proper-list)
-      (labels (,@(when a `((collect (x ,@(unless n `(&aux (x (cons x nil)))))
+      (labels (,@(when a `((,g (x ,@(unless n `(&aux (x (cons x nil)))))
 				    (if rp (rplacd rp x) (setq r x))
-				    ,(if n `(when (consp x) (setq rp (last x))) `(setq rp x));FIXME let compiler do this?
-				    )))
-	       (loop (l q ,@(when c `(v)))
+				    ,(if n `(when (consp x) (setq rp (last x))) `(setq rp x)))))
+	       (,l (l q ,@(when c `(v)))
 		     (unless (or (endp l) (member-if 'endp q)) 
 		       ,(let ((x `(apply f ,@(if c `((car l) (mapl (lambda (x y) (setf (car x) (pop (car y)))) v q)) `(l q)))))
-			  (if a `(collect ,x) x))
-		       (loop (cdr l) ,@(if c `(q v) `((mapl (lambda (x) (setf (car x) (cdar x))) q)))))))
-	      (loop l (dyncpl q) ,@(when c `((dyncpl q)))) ,(if a `r `l))))
-
- (defmacro seqend (seqs)
-   `(labels ((seqend-loop (s &aux (x (car s)) (y (length x))) (if s (min y (seqend-loop (cdr s))) array-dimension-limit)))
-	    (seqend-loop ,seqs)))
- 
- (defmacro seqvals (vals ns)
-   `(mapl (lambda (x y &aux (yc (car y))) (setf (car x) (if (listp yc) (pop (car y)) (aref yc i)))) ,vals ,ns)))
+			  (if a `(,g ,x) x))
+		       (,l (cdr l) ,@(if c `(q v) `((mapl (lambda (x) (setf (car x) (cdar x))) q)))))))
+	      (,l l (dyncpl q) ,@(when c `((dyncpl q)))) ,(if a `r `l)))))
 
 
 (make-map mapl    nil nil)

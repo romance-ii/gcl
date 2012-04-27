@@ -4,6 +4,8 @@ LIBC	= -lc
 
 -include ../makedefs
 
+RSYM=
+
 HDIR	= ../h
 ODIR	= ../o
 MDIR	= ../mod

@@ -30,25 +30,25 @@ aet_type_struct aet_types[] = {
   {" ",&sLcharacter,sizeof(char)},
   {zero,&sLbit,sizeof(char)},
   {zero,&sSnon_negative_char,sizeof(char)},
-  {zero,&sSsigned_char,sizeof(char)},
   {zero,&sSunsigned_char,sizeof(char)},
+  {zero,&sSsigned_char,sizeof(char)},
   {zero,&sSnon_negative_short,sizeof(short)},
-  {zero,&sSsigned_short,sizeof(short)},
   {zero,&sSunsigned_short,sizeof(short)},
+  {zero,&sSsigned_short,sizeof(short)},
+  {zero,&sLshort_float,sizeof(float)},
 #if SIZEOF_LONG != SIZEOF_INT
   {zero,&sSnon_negative_int,sizeof(int)},
-  {zero,&sSsigned_int,sizeof(int)},
   {zero,&sSunsigned_int,sizeof(int)},
+  {zero,&sSsigned_int,sizeof(int)},
 #endif
-  {zero,&sSnon_negative_fixnum,sizeof(fixnum)},
-  {zero,&sLfixnum,sizeof(fixnum)},
-  {zero,&sLshort_float,sizeof(float)},
   {zero,&sLlong_float,sizeof(double)},
-  {Cnil,&Iname_t,sizeof(object)}
+  {Cnil,&Iname_t,sizeof(object)},
+  {zero,&sSnon_negative_fixnum,sizeof(fixnum)},
+  {zero,&sLfixnum,sizeof(fixnum)}
 #if SIZEOF_LONG == SIZEOF_INT
   ,{zero,&sSnon_negative_int,sizeof(int)},
-  {zero,&sSsigned_int,sizeof(int)},
-  {zero,&sSunsigned_int,sizeof(int)}
+  {zero,&sSunsigned_int,sizeof(int)},
+  {zero,&sSsigned_int,sizeof(int)}
 #endif
 };
 
@@ -358,10 +358,41 @@ elt_size(fixnum elt_type) {
   }
 }
 
-DEFUN_NEW("MAKE-VECTOR2",object,fSmake_vector2,SI,7,7,NONE,OI,II,OI,OO,
-	  (fixnum elt_type,fixnum n,fixnum fillp,object displaced_to,fixnum V9,object staticp,object initial_element),"") {
+fixnum
+elt_mode(fixnum elt_type) {
+  switch (elt_type) {
+  case aet_bit:         /*  bit  */
+  case aet_uchar:       /*  unsigned char */
+  case aet_ushort:      /*  unsigned short   */
+  case aet_uint:        /*  unsigned int   */
+    return aem_unsigned;
+  case aet_ch:          /*  character  */
+    return aem_character;
+  case aet_nnchar:      /*  non-neg char */
+  case aet_char:        /*  signed char */
+  case aet_nnshort:     /*  non-neg short   */
+  case aet_short:       /*  signed short */
+  case aet_nnint:       /*  non-neg int   */
+  case aet_int:         /*  signed int */
+  case aet_nnfix:       /*  non-neg fixnum  */
+  case aet_fix:         /*  fixnum  */
+    return aem_signed;
+  case aet_object:      /*  t  */
+    return aem_t;
+  case aet_sf:          /*  short-float  */
+  case aet_lf:          /*  plong-float  */
+    return aem_float;
+  default:
+    FEerror("Bad elt type",0);
+    return -1;
+  }
+}
+
+DEFUN_NEW("MAKE-VECTOR",object,fSmake_vector,SI,8,8,NONE,OO,IO,OO,IO,
+	  (object etp,fixnum n,object adjp,object fp,object displaced_to,fixnum V9,object staticp,object initial_element),"") {
 
   object x;
+  fixnum elt_type=fix(fSget_aelttype(etp)),fillp=fp==Cnil ? -1 : (fp==Ct ? n : Mfix(fp));
 
   BEGIN_NO_INTERRUPT;
 
@@ -377,6 +408,7 @@ DEFUN_NEW("MAKE-VECTOR2",object,fSmake_vector2,SI,7,7,NONE,OI,II,OI,OO,
   }
   x->v.tt=x->v.v_elttype = elt_type;
   x->v.v_eltsize=elt_size(elt_type);
+  x->v.v_mode=elt_mode(elt_type);
   x->v.v_defrank=1;
   x->v.v_adjustable=1;
   x->v.v_dim = n;
@@ -403,94 +435,101 @@ DEFUN_NEW("MAKE-VECTOR2",object,fSmake_vector2,SI,7,7,NONE,OI,II,OI,OO,
   return x;
 
 }
-
-
-
-
-DEFUN_NEW("MAKE-VECTOR1",object,fSmake_vector1,SI,3,8,NONE,OI,
-	  IO,OO,OO,(fixnum n,fixnum elt_type,object staticp,...),"") { 
-
-  fixnum nargs=INIT_NARGS(3);
-  int displaced_index_offset=0;
-  va_list ap;
-  object fillp,initial_element,displaced_to,V9,x,l=Cnil,f=OBJNULL;
-  BEGIN_NO_INTERRUPT;
-
-  switch(elt_type) {
-  case aet_ch:
-    x = alloc_object(t_string);
-    /* x->ust.ust_elttype = elt_type; */
-    /* x->ust.ust_defrank=1; */
-    /* x->ust.ust_adjustable=1; */
-    /* goto a_string; */
-    break;
-  case aet_bit:
-    x = alloc_object(t_bitvector);
-    /* x->v.v_elttype = elt_type; */
-    /* x->v.v_defrank=1; */
-    /* x->v.v_adjustable=1; */
-    break;
-  default:
-    x = alloc_object(t_vector);
-  }
-  x->v.tt=x->v.v_elttype = elt_type;
-  x->v.v_eltsize=elt_size(elt_type);
-  x->v.v_defrank=1;
-  x->v.v_adjustable=1;
- /* a_string: */
-  x->v.v_dim = n;
-  x->v.v_self = 0;
-  x->v.v_displaced = Cnil;
-  
-  va_start(ap,staticp);
-  fillp=NEXT_ARG(nargs,ap,l,f,Cnil);
-  if (fillp == Cnil) {
-    x->v.v_hasfillp = 0;
-    x->v.v_fillp = n;
-  } else if (type_of(fillp)==t_fixnum) {	
-    x->v.v_fillp = Mfix(fillp);
-    if (x->v.v_fillp > n || x->v.v_fillp < 0) 
-      FEerror("bad fillp",0);
-    x->v.v_hasfillp = 1;
-  } else {
-    x->v.v_fillp = n;
-    x->v.v_hasfillp = 1;
-  }
-  
-  initial_element=NEXT_ARG(nargs,ap,l,f,Cnil);
-  displaced_to=NEXT_ARG(nargs,ap,l,f,Cnil);
-  V9=NEXT_ARG(nargs,ap,l,f,make_fixnum(0));
-
-  if (displaced_to!=Cnil) { 
-    ASSURE_TYPE(V9,t_fixnum);
-    displaced_index_offset=Mfix(V9);
-  }
-
-  va_end(ap);
-
-  if (displaced_to==Cnil)
-    array_allocself(x,staticp!=Cnil,initial_element);
-  else 
-    displace(x,displaced_to,displaced_index_offset);
-  
-  END_NO_INTERRUPT;
-  
-  return x;
-
+#ifdef STATIC_FUNCTION_POINTERS
+object
+fSmake_vector(object etp,fixnum n,object adjp,object fp,object displaced_to,fixnum V9,object staticp,object initial_element) {
+  return FFN(fSmake_vector)(etp,n,adjp,fp,displaced_to,V9,staticp,initial_element);
 }
+#endif
 
-object 
-fSmake_vector1_1(fixnum n,fixnum elt_type,object staticp) {
-  VFUN_NARGS=3;
-  return FFN(fSmake_vector1)(n,elt_type,staticp);
-}
+
+
+
+
+/* DEFUN_NEW("MAKE-VECTOR1",object,fSmake_vector1,SI,3,8,NONE,OI, */
+/* 	  IO,OO,OO,(fixnum n,fixnum elt_type,object staticp,...),"") {  */
+
+/*   fixnum nargs=INIT_NARGS(3); */
+/*   int displaced_index_offset=0; */
+/*   va_list ap; */
+/*   object fillp,initial_element,displaced_to,V9,x,l=Cnil,f=OBJNULL; */
+/*   BEGIN_NO_INTERRUPT; */
+
+/*   switch(elt_type) { */
+/*   case aet_ch: */
+/*     x = alloc_object(t_string); */
+/*     /\* x->ust.ust_elttype = elt_type; *\/ */
+/*     /\* x->ust.ust_defrank=1; *\/ */
+/*     /\* x->ust.ust_adjustable=1; *\/ */
+/*     /\* goto a_string; *\/ */
+/*     break; */
+/*   case aet_bit: */
+/*     x = alloc_object(t_bitvector); */
+/*     /\* x->v.v_elttype = elt_type; *\/ */
+/*     /\* x->v.v_defrank=1; *\/ */
+/*     /\* x->v.v_adjustable=1; *\/ */
+/*     break; */
+/*   default: */
+/*     x = alloc_object(t_vector); */
+/*   } */
+/*   x->v.tt=x->v.v_elttype = elt_type; */
+/*   x->v.v_eltsize=elt_size(elt_type); */
+/*   x->v.v_defrank=1; */
+/*   x->v.v_adjustable=1; */
+/*  /\* a_string: *\/ */
+/*   x->v.v_dim = n; */
+/*   x->v.v_self = 0; */
+/*   x->v.v_displaced = Cnil; */
+  
+/*   va_start(ap,staticp); */
+/*   fillp=NEXT_ARG(nargs,ap,l,f,Cnil); */
+/*   if (fillp == Cnil) { */
+/*     x->v.v_hasfillp = 0; */
+/*     x->v.v_fillp = n; */
+/*   } else if (type_of(fillp)==t_fixnum) {	 */
+/*     x->v.v_fillp = Mfix(fillp); */
+/*     if (x->v.v_fillp > n || x->v.v_fillp < 0)  */
+/*       FEerror("bad fillp",0); */
+/*     x->v.v_hasfillp = 1; */
+/*   } else { */
+/*     x->v.v_fillp = n; */
+/*     x->v.v_hasfillp = 1; */
+/*   } */
+  
+/*   initial_element=NEXT_ARG(nargs,ap,l,f,Cnil); */
+/*   displaced_to=NEXT_ARG(nargs,ap,l,f,Cnil); */
+/*   V9=NEXT_ARG(nargs,ap,l,f,make_fixnum(0)); */
+
+/*   if (displaced_to!=Cnil) {  */
+/*     ASSURE_TYPE(V9,t_fixnum); */
+/*     displaced_index_offset=Mfix(V9); */
+/*   } */
+
+/*   va_end(ap); */
+
+/*   if (displaced_to==Cnil) */
+/*     array_allocself(x,staticp!=Cnil,initial_element); */
+/*   else  */
+/*     displace(x,displaced_to,displaced_index_offset); */
+  
+/*   END_NO_INTERRUPT; */
+  
+/*   return x; */
+
+/* } */
+
+/* object  */
+/* fSmake_vector1_1(fixnum n,fixnum elt_type,object staticp) { */
+/*   VFUN_NARGS=3; */
+/*   return FFN(fSmake_vector1)(n,elt_type,staticp); */
+/* } */
 
 DEFUN_NEW("AELTTYPE-LIST",object,fSaelttype_list,SI,0,0,NONE,OO,OO,OO,OO,(),"") {
 
   aet_type_struct *p,*pe;
   object f=Cnil,x,y=OBJNULL;
 
-  for (p=aet_types,pe=p+aet_object;p<=pe;p++) {
+  for (p=aet_types,pe=p+aet_fix;p<=pe;p++) {
     x=MMcons(*p->namep,Cnil);
     y=y ? (y->c.c_cdr=x) : (f=x);
   }
@@ -538,14 +577,16 @@ fSget_aelttype(object x) {
 	static 6 &optional initial-element)
 */
 
-DEFUNO_NEW("MAKE-VECTOR",object,fSmake_vector,SI,8,8,NONE,
-	   OO,IO,OO,IO,void,siLmake_vector,(object x0,fixnum x1,object x2,object x3,object x4,fixnum x5,object x6,object initial_elt),"") {
+/* DEFUNO_NEW("MAKE-VECTOR",object,fSmake_vector,SI,8,8,NONE, */
+/* 	   OO,IO,OO,IO,void,siLmake_vector,(object x0,fixnum x1,object x2,object x3,object x4,fixnum x5,object x6,object initial_elt),"") { */
+/* DEFUN_NEW("MAKE-VECTOR",object,fSmake_vector,SI,8,8,NONE, */
+/* 	   OO,IO,OO,IO,(object x0,fixnum x1,object x2,object x3,object x4,fixnum x5,object x6,object initial_elt),"") { */
 
-  RETURN1(FFN(fSmake_vector2)(fix(fSget_aelttype(x0)),x1,
-			      x3==Cnil ? -1 : (x3==Ct ? x1 : Mfix(x3)),
-			      x4,x5,x6,initial_elt));
+/*   RETURN1(FFN(fSmake_vector2)(fix(fSget_aelttype(x0)),x1, */
+/* 			      x3==Cnil ? -1 : (x3==Ct ? x1 : Mfix(x3)), */
+/* 			      x4,x5,x6,initial_elt)); */
  
-}
+/* } */
 
 /* DEFUN_NEW("MAKE-VECTOR2",object,fSmake_vector2,SI,7,7,NONE,OI,II,OI,OO, */
 /* 	  (fixnum aet,fixnum size,fixnum fillp,object dispto,fixnum dispoff,object staticp,object init),"") { */
@@ -606,6 +647,7 @@ DEFUN_NEW("MAKE-ARRAY1",object,fSmake_array1,SI,6,6,
     x = alloc_object(t_array);
     x->a.tt=x->a.a_elttype = elt_type;
     x->a.a_eltsize=elt_size(elt_type);
+    x->a.a_mode=elt_mode(elt_type);
     x->a.a_self = 0;
     x->a.a_hasfillp = 0;
     x->a.a_rank = rank;
@@ -1097,6 +1139,94 @@ DEFUN_NEW("ARRAY-ELEMENT-TYPE",object,fLarray_element_type,LISP,1,1,NONE,OO,OO,O
   enum aelttype t;
   t = Iarray_element_type(x);
   return * aet_types[(int)t].namep;
+}
+
+DEFUN_NEW("REF",object,fSref,SI,5,5,NONE,OI,II,IO,OO,(fixnum addr,fixnum s,fixnum u,fixnum z,object v),"") { 
+
+#define el(s_,e_) ((Mjoin(u,s_) *)addr)->e_
+#define nw(s_,e_,v_) ({if (z) el(s_,e_)=v_(v); el(s_,e_);})
+
+  switch (s) {
+  case 1:
+    switch (u) {
+    case aem_character: RETURN1(code_char(nw(8,u,char_code)));
+    case aem_unsigned:  RETURN1(make_fixnum(nw(8,u,fix)));
+    case aem_signed:    RETURN1(make_fixnum(nw(8,i,fix)));
+    default: FEerror("Bad mode",0); RETURN1(Cnil);
+    }
+  case 2:
+    switch (u) {
+    case aem_unsigned:  RETURN1(make_fixnum(nw(16,u,fix)));
+    case aem_signed:    RETURN1(make_fixnum(nw(16,i,fix)));
+    default: FEerror("Bad mode",0); RETURN1(Cnil);
+    }
+  case 4:
+    switch (u) {
+    case aem_signed:    RETURN1(make_fixnum(nw(32,i,fix)));
+    case aem_float:     RETURN1(make_shortfloat(nw(32,f,sf)));
+#if SIZEOF_LONG!=4
+    case aem_unsigned:  RETURN1(make_fixnum(nw(32,u,fix)));
+#else
+    case aem_t:         RETURN1(nw(32,o,));
+#endif
+    default: FEerror("Bad mode",0); RETURN1(Cnil);
+    }
+  case 8:
+    switch (u) {
+#if SIZEOF_LONG!=4
+    case aem_t:         RETURN1(nw(64,i,));
+    case aem_signed:    RETURN1(make_fixnum(nw(64,i,fix)));
+#endif
+    case aem_float:     RETURN1(make_longfloat(nw(64,f,lf)));
+    case aem_complex:   RETURN1(make_fcomplex(nw(64,c,sfc)));
+    default: FEerror("Bad mode",0); RETURN1(Cnil);
+    }
+  case 16:
+    switch (u) {
+    case aem_complex:   RETURN1(make_dcomplex(nw(64,c,lfc)));
+    default: FEerror("Bad mode",0); RETURN1(Cnil);
+    }
+  default:
+    FEerror("Bad size", 0);
+    RETURN1(Cnil);
+  }
+}
+
+DEFUN_NEW("RREF",object,fSrref,SI,4,5,NONE,OO,II,IO,OO,(object x,fixnum i,fixnum s,fixnum u,...),"") { 
+  fixnum n=INIT_NARGS(4);
+  object l=Cnil,f=OBJNULL,v;
+  va_list ap;
+
+  va_start(ap,u);
+  v=NEXT_ARG(n,ap,l,f,OBJNULL);
+  va_end(ap);
+
+  RETURN1(FFN(fSref)((long)((char *)x->a.a_self+i*x->a.a_eltsize),s,u,v!=OBJNULL,v));
+
+}
+
+DEFUN_NEW("ARRAY-ELTSIZE",fixnum,fSarray_eltsize,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") { 
+  RETURN1(x->a.a_eltsize);
+}
+
+DEFUN_NEW("ARRAY-DIMS",fixnum,fSarray_dims,SI,2,2,NONE,IO,IO,OO,OO,(object x,fixnum i),"") { 
+  RETURN1(x->a.a_dims[i]);
+}
+
+DEFUN_NEW("ARRAY-MODE",fixnum,fSarray_mode,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") { 
+  RETURN1(x->a.a_mode);
+}
+
+DEFUN_NEW("ARRAY-HASFILLP",fixnum,fSarray_hasfillp,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") { 
+  RETURN1(x->a.a_hasfillp);
+}
+
+DEFUN_NEW("VECTOR-DIM",fixnum,fSvector_dim,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") { 
+  RETURN1(x->v.v_dim);
+}
+
+DEFUN_NEW("ARRAY-ELTTYPE",fixnum,fSarray_elttype,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") { 
+  RETURN1(x->a.a_elttype);
 }
 
 DEFUNO_NEW("ADJUSTABLE-ARRAY-P",object,fLadjustable_array_p,

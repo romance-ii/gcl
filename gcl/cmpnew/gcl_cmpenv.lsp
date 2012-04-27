@@ -149,9 +149,9 @@
 ;;;	( {type}* [ &optional {type}* ] [ &rest type ] [ &key {type}* ] )
 ;;; though &optional, &rest, and &key return types are simply ignored.
 
-(defmacro t-to-nil (x) (let ((s (tmpsym))) `(let ((,s ,x)) (if (eq ,s t) nil ,s))))
+;; (defmacro t-to-nil (x) (let ((s (tmpsym))) `(let ((,s ,x)) (if (eq ,s t) nil ,s))))
 
-(defmacro nil-to-t (x) `(or ,x t))
+;; (defmacro nil-to-t (x) `(or ,x t))
 
 
 (defun is-global-arg-type (x)

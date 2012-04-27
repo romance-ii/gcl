@@ -123,7 +123,8 @@ be over written.   \
     not_a_string_or_symbol(string);
   
   if (type_of(v) != t_vector || v->v.v_elttype != aet_fix || v->v.v_dim < NSUBEXP*2)
-    v=sSAmatch_dataA->s.s_dbind=fSmake_vector1_1((NSUBEXP *2),aet_fix,sLnil);
+    /* v=sSAmatch_dataA->s.s_dbind=fSmake_vector1_1((NSUBEXP *2),aet_fix,sLnil); */
+    v=sSAmatch_dataA->s.s_dbind=fSmake_vector(sLfixnum,(NSUBEXP *2),Cnil,Cnil,Cnil,0,Cnil,Cnil);
   
   va_start(ap,string);
   start=(fixnum)NEXT_ARG(nargs,ap,l,f,(object)0);

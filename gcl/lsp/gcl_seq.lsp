@@ -29,8 +29,6 @@
 
 (in-package :system)
 
-(export '(strcat))
-
 ;; (defun make-sequence-vector (element-type size iesp initial-element)
 ;;   (let ((sequence (si:make-vector element-type size nil nil nil nil nil)))
 ;;     (when iesp
@@ -95,10 +93,6 @@
 ;;        (do* ((j 0)(ls (length seq))) ((>= j ls))
 ;; 	   (setf (aref rs (++ i)) (aref seq (++ j))))))))
 ;; (declaim (inline string-concatenate))
-
-(defun strcat (&rest r)
-  (declare (:dynamic-extent r))
-  (apply 'concatenate 'string (mapcar 'string-downcase r)))
 
 (defun concatenate (rt &rest seqs)
   (declare (optimize (safety 2)) (:dynamic-extent seqs))

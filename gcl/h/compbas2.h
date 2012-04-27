@@ -196,3 +196,29 @@ object on_stack_make_list();
 #endif
 extern int Rset;
 #endif
+
+#ifndef U8_DEFINED
+
+#include <stdint.h>
+
+typedef union {int8_t i;uint8_t u;} u8;
+typedef union {int16_t i;uint16_t u;} u16;
+typedef union {
+  int32_t i;
+#if SIZEOF_LONG!=4
+  uint32_t u;
+#else
+  object o;
+#endif
+  float f;} u32;
+typedef union {
+#if SIZEOF_LONG!=4
+  int64_t i;
+  object o;
+#endif
+  double f;
+  fcomplex c;} u64;
+typedef union {dcomplex c;} u128;
+
+#define U8_DEFINED
+#endif

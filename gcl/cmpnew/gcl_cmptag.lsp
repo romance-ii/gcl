@@ -100,7 +100,6 @@
 		     (setq end w))))))))
 
 
-(defvar *tvc* nil)
 (defvar *ttl-tags* nil)
 
 (defun ref-tags (form tags)
@@ -152,122 +151,178 @@
 ;; 	(t (ref-tags (car form) tags l) (ref-tags (cdr form) tags l))))
 
 ;FIXME separate pass with no repetitive allocation
-(defun c1tagbody (body &aux (otags *tags*) (*tags* *tags*) (*ttl-tags* *ttl-tags*) popv
-		       (info (make-info :type #tnull)) (nt (tmpsym)))
+(defvar *bt* nil)
 
-  (setq body
-        (mapcar
-         (lambda (x)
-	   (cond ((or (symbolp x) (integerp x)) (car (push (make-tag :name x :ref nil :ref-ccb nil :ref-clb nil :label nt) *tags*)))
-		 ((tag-p x) (car (push x *tags*)))
-		 (x)))
-         body))
+(defun tst (y x &aux (z (eq (car x) y))) 
+  (unless z
+    (keyed-cmpnote (list 'tagbody-iteration) "Iterating tagbody on ~s conflicts" (length x))
+    (mapc (lambda (x &aux (v (pop x))) 
+	    (keyed-cmpnote (list (var-name v) 'tagbody-iteration)
+			   "    Iterating tagbody: setting ~s type ~s to ~s, store ~s to ~s"
+			   v (var-type v) (car x) (var-store v) (cadr x))
+	    (setf (var-type v) (car x) (var-store v) (cadr x))) x))
+  (when z x))
 
-  (let* ((x (car body))
-	 (y (when (tag-p x) (tag-name x)))
-	 (y (when (symbolp y) (get y 'ttl-tag))))
-    (when y
-      (push (list x *vars*) *ttl-tags*)))
+(defun pt (y x) 
+  (or (tst y (with-restore-vars (catch y (prog1 (cons y (pr x)) (keep-vars))))) (pt y x)))
 
-  (setq body 
-	(nreverse 
-	 (let* (nb 
-		(ob body)
-		(ft (do (l) ((or (not (setq l (pop ob))) (tag-p l)) l)
-			    (push (c1arg l) nb))))
-	   (if (not ft) nb
-	     (let ((nb (cons ft nb)) vl)
-	       (dolist (v *vars*) (when (var-p v) 
-				    (push (list v (var-mt v) (var-tag v) (var-flags v)) vl)
-				    (unset-var-set v)(unset-var-aliased v)
-				    (setf (var-tag v) nt (var-mt v) (var-type v))))
-	       (unwind-protect 
-		   (do ((tob ob ob) (tnb nb nb) *tvc* ns nud)
-		       ((not 
-			 (let ((nv (with-restore-vars  
-				     (catch nt 
-				       (do (l (*warning-note-stack* 
-					       (when (boundp '*warning-note-stack*) *warning-note-stack*))
-					      *undefined-vars*) 
-					   ((not (setq l (pop tob))) 
-					    (setq ns (when (boundp '*warning-note-stack*) 
-						       *warning-note-stack*) nud *undefined-vars*)
-					    (setq popv (append *restore-vars* popv) *restore-vars* nil))
-					   (push (if (tag-p l) 
-						     (progn (setq popv (append *restore-vars* popv)) (pop-restore-vars) l)
-						   (c1arg l)) tnb))))));maybe copy-info here
-			   (when nv
-			     (keyed-cmpnote (list 'tagbody-iteration) "Iterating tagbody on ~s conflicts" (length *tvc*))
-			     (do nil ((not (setq nv (pop *tvc*))) t)
-				 (keyed-cmpnote (list (var-name nv) 'tagbody-iteration)
-						"    Iterating tagbody: setting ~s type ~s to ~s"
-						(var-name nv) (var-type nv) (var-mt nv))
-				 (setf (var-type nv) (var-mt nv) (var-store nv) (tmpsym))))))
-			(when ns (setq *warning-note-stack* ns)) (setq *undefined-vars* nud)
-			tnb))
-		 (dolist (v vl) 
-		   (when (caddr v)
-		     (unless (type>= (cadr v) (var-mt (car v)))
-		       (pushnew (car v) *tvc*)))
-;		   (when (and (var-set (car v)) (var-aliased (car v)))
-;		     (unless (= 24 (logior 24 (cadddr v)));FIXME
-;		       (pushnew (car v) *tvc*)))
-		   (setf (var-mt (car v)) (type-or1 (var-mt (car v)) (cadr v))
-			 (var-tag (car v)) (caddr v)
-			 (var-flags (car v)) (logior (cadddr v) (var-flags (car v)))))))))))
+(defun mch nil
+  (mapcar (lambda (x) (list x (var-type x) (var-store x))) (remove-if-not 'var-p *vars*)))
+
+(defun pr (x &aux (y (member-if 'tag-p x))) 
+  (nconc (mapcar 'c1arg (ldiff x y)) 
+	 (when y (let* ((z (pop y))(*bt* (cons (cons z (mch)) *bt*))) (pt z y)))))
 
 
+(defun nttl-tags (body &aux (x (car body))(y (when (tag-p x) (tag-name x))))
+  (if (when (symbolp y) (get y 'ttl-tag))
+      (cons (list x *vars*) *ttl-tags*)
+    *ttl-tags*))
 
-  (let ((ntags (ldiff *tags* otags)))
-    (mapc (lambda (x) (unless (tag-p x) (ref-tags x ntags))) body)
-    (when t; FIXME (member-if (lambda (x) (when (tag-p x) (or (tag-ref x) (tag-ref-clb x) (tag-ref-ccb x)))) ntags)
-      (dolist (l popv)
-	(let ((l (car l)))
-	  (keyed-cmpnote (list (var-name l) 'tagbody-exit)
-			 "Exit tagbody setting ~s type ~s to ~s"
-			 (var-name l) (var-type l) (var-mt l))
-	  (setf (var-type l) (var-mt l) (var-store l) (tmpsym))))));do-setq-tp?
+(defun c1tagbody (body &aux (info (make-info :type #tnull)))
+
+  (let* ((body (mapcar (lambda (x) (if (or (symbolp x) (integerp x)) (make-tag :name x) x)) body))
+	 (tags (remove-if-not 'tag-p body))
+	 (body (let* ((*tags* (append tags *tags*))
+		      (*ttl-tags* (nttl-tags body)))
+		  (pr body)))
+	 (body (mapc (lambda (x) (unless (tag-p x) (ref-tags x tags))) body))
+	 (ref-clb (remove-if-not 'tag-ref-clb tags))
+	 (ref-ccb (remove-if-not 'tag-ref-ccb tags))
+	 (tagsc (union ref-clb ref-ccb))
+	 (tags (union (remove-if-not 'tag-ref tags) tagsc))
+	 (body (remove-if-not (lambda (x) (if (tag-p x) (member x tags) t)) body)))
+	 
+    (mapc (lambda (x) (setf (tag-var x) (add-object (tag-name x)))) tagsc)
+    (if tagsc (incf *setjmps*) (add-loop-registers body))
+    (when ref-ccb (mapc (lambda (x) (setf (tag-ref-ccb x) t)) ref-clb));FIXME?
+    (mapc (lambda (x) (unless (tag-p x) (add-info info (cadr x)))) body)
+    (let ((x (car (last body))))
+      (unless (or (not x) (tag-p x) (info-type (cadr x)))
+	(setf (info-type info) nil)))
+
+    (if tags
+	`(tagbody ,info ,(when ref-clb t) ,(when ref-ccb t) ,body)
+      (let* ((v (car (last body)))
+	     (v (if (when v (not (info-type (cadr v)))) body (nconc body (list (c1nil))))))
+	(if (cdr v) `(progn ,info ,v) (car v))))))
+
+;; (defun c1tagbody (body &aux (otags *tags*) (*tags* *tags*) (*ttl-tags* *ttl-tags*) popv
+;; 		       (info (make-info :type #tnull)) (nt (tmpsym)))
+
+;;   (setq body
+;;         (mapcar
+;;          (lambda (x)
+;; 	   (cond ((or (symbolp x) (integerp x)) (car (push (make-tag :name x :ref nil :ref-ccb nil :ref-clb nil :label nt) *tags*)))
+;; 		 ((tag-p x) (car (push x *tags*)))
+;; 		 (x)))
+;;          body))
+
+;;   (let* ((x (car body))
+;; 	 (y (when (tag-p x) (tag-name x)))
+;; 	 (y (when (symbolp y) (get y 'ttl-tag))))
+;;     (when y
+;;       (push (list x *vars*) *ttl-tags*)))
+
+;;   (setq body 
+;; 	(nreverse 
+;; 	 (let* (nb 
+;; 		(ob body)
+;; 		(ft (do (l) ((or (not (setq l (pop ob))) (tag-p l)) l)
+;; 			    (push (c1arg l) nb))))
+;; 	   (if (not ft) nb
+;; 	     (let ((nb (cons ft nb)) vl)
+;; 	       (dolist (v *vars*) (when (var-p v) 
+;; 				    (push (list v (var-mt v) (var-tag v) (var-flags v)) vl)
+;; 				    (unset-var-set v)(unset-var-aliased v)
+;; 				    (setf (var-tag v) nt (var-mt v) (var-type v))))
+;; 	       (unwind-protect 
+;; 		   (do ((tob ob ob) (tnb nb nb) *tvc* ns nud)
+;; 		       ((not 
+;; 			 (let ((nv (with-restore-vars  
+;; 				     (catch nt 
+;; 				       (do (l (*warning-note-stack* 
+;; 					       (when (boundp '*warning-note-stack*) *warning-note-stack*))
+;; 					      *undefined-vars*) 
+;; 					   ((not (setq l (pop tob))) 
+;; 					    (setq ns (when (boundp '*warning-note-stack*) 
+;; 						       *warning-note-stack*) nud *undefined-vars*)
+;; 					    (setq popv (append *restore-vars* popv) *restore-vars* nil))
+;; 					   (push (if (tag-p l) 
+;; 						     (progn (setq popv (append *restore-vars* popv)) (pop-restore-vars) l)
+;; 						   (c1arg l)) tnb))))));maybe copy-info here
+;; 			   (when nv
+;; 			     (keyed-cmpnote (list 'tagbody-iteration) "Iterating tagbody on ~s conflicts" (length *tvc*))
+;; 			     (do nil ((not (setq nv (pop *tvc*))) t)
+;; 				 (keyed-cmpnote (list (var-name nv) 'tagbody-iteration)
+;; 						"    Iterating tagbody: setting ~s type ~s to ~s"
+;; 						(var-name nv) (var-type nv) (var-mt nv))
+;; 				 (setf (var-type nv) (var-mt nv) (var-store nv) (tmpsym))))))
+;; 			(when ns (setq *warning-note-stack* ns)) (setq *undefined-vars* nud)
+;; 			tnb))
+;; 		 (dolist (v vl) 
+;; 		   (when (caddr v)
+;; 		     (unless (type>= (cadr v) (var-mt (car v)))
+;; 		       (pushnew (car v) *tvc*)))
+;; 		   (when (and (var-set (car v)) (var-aliased (car v)))
+;; 		     (unless (= 3 (ash (fourth v) -3));FIXME
+;; 		       (pushnew (car v) *tvc*)))
+;; 		   (setf (var-mt (car v)) (type-or1 (var-mt (car v)) (cadr v))
+;; 			 (var-tag (car v)) (caddr v)
+;; 			 (var-flags (car v)) (logior (cadddr v) (var-flags (car v)))))))))))
+
+
+
+;;   (let ((ntags (ldiff *tags* otags)))
+;;     (mapc (lambda (x) (unless (tag-p x) (ref-tags x ntags))) body)
+;;     (when t; FIXME (member-if (lambda (x) (when (tag-p x) (or (tag-ref x) (tag-ref-clb x) (tag-ref-ccb x)))) ntags)
+;;       (dolist (l popv)
+;; 	(let ((l (car l)))
+;; 	  (keyed-cmpnote (list (var-name l) 'tagbody-exit)
+;; 			 "Exit tagbody setting ~s type ~s to ~s"
+;; 			 (var-name l) (var-type l) (var-mt l))
+;; 	  (setf (var-type l) (var-mt l) (var-store l) (tmpsym))))));do-setq-tp?
   
-  ;; (let ((ntags (ldiff *tags* otags)))
-  ;;   (mapc (lambda (x) (unless (tag-p x) (ref-tags x ntags))) body))
+;;   ;; (let ((ntags (ldiff *tags* otags)))
+;;   ;;   (mapc (lambda (x) (unless (tag-p x) (ref-tags x ntags))) body))
 				     
-  (let (body1 ref ref-clb ref-ccb (*tags* otags))
+;;   (let (body1 ref ref-clb ref-ccb (*tags* otags))
 
-  ;;; Delete redundant tags.
-    (dolist (l body)
-      (cond ((not (tag-p l))
-	     (add-info info (cadr l))
-	     (push l body1))
-	    ((tag-ref-ccb l)
-	     (push l body1)
-	     (setf (tag-var l) (add-object (tag-name l)))
-	     (setq ref-ccb t))
-	    ((tag-ref-clb l)
-	     (push l body1)
-	     (setf (tag-var l) (add-object (tag-name l)))
-	     (setq ref-clb t))
-	    ((tag-ref l) (push l body1) (setq ref t))))
+;;   ;;; Delete redundant tags.
+;;     (dolist (l body)
+;;       (cond ((not (tag-p l))
+;; 	     (add-info info (cadr l))
+;; 	     (push l body1))
+;; 	    ((tag-ref-ccb l)
+;; 	     (push l body1)
+;; 	     (setf (tag-var l) (add-object (tag-name l)))
+;; 	     (setq ref-ccb t))
+;; 	    ((tag-ref-clb l)
+;; 	     (push l body1)
+;; 	     (setf (tag-var l) (add-object (tag-name l)))
+;; 	     (setq ref-clb t))
+;; 	    ((tag-ref l) (push l body1) (setq ref t))))
 
-    (when (and (listp (car body1)) (info-p (cadar body1)))
-      (let ((tp (info-type (cadar body1))))
-	(unless tp (setf (info-type info) nil))))
+;;     (when (and (listp (car body1)) (info-p (cadar body1)))
+;;       (let ((tp (info-type (cadar body1))))
+;; 	(unless tp (setf (info-type info) nil))))
 
-    (cond ((or ref-ccb ref-clb ref)
-	   (setq body1 (nreverse body1))
-	   ;; If ref-ccb is set, we will cons up the environment, hence
-	   ;; all tags which had level boundary references must be changed
-	   ;; to ccb references.  FIXME -- review this logic carefully
-	   ;; CM 20040228
-	   (when ref-ccb
-	     (dolist (l body1)
-	       (when (and (tag-p l) (tag-ref-clb l))
-		 (setf (tag-ref-ccb l) t))))
-	   (if (or ref-clb ref-ccb) 
-	       (incf *setjmps*)
-	     (add-loop-registers body1))
-	   `(tagbody ,info ,ref-clb ,ref-ccb ,body1))
-	  ((let* ((v (nreverse (if (when body1 (not (info-type (cadar body1)))) body1 (cons (c1nil) body1)))))
-	     (if (cdr v) `(progn ,info ,v) (car v)))))))
+;;     (cond ((or ref-ccb ref-clb ref)
+;; 	   (setq body1 (nreverse body1))
+;; 	   ;; If ref-ccb is set, we will cons up the environment, hence
+;; 	   ;; all tags which had level boundary references must be changed
+;; 	   ;; to ccb references.  FIXME -- review this logic carefully
+;; 	   ;; CM 20040228
+;; 	   (when ref-ccb
+;; 	     (dolist (l body1)
+;; 	       (when (and (tag-p l) (tag-ref-clb l))
+;; 		 (setf (tag-ref-ccb l) t))))
+;; 	   (if (or ref-clb ref-ccb) 
+;; 	       (incf *setjmps*)
+;; 	     (add-loop-registers body1))
+;; 	   `(tagbody ,info ,ref-clb ,ref-ccb ,body1))
+;; 	  ((let* ((v (nreverse (if (when body1 (not (info-type (cadar body1)))) body1 (cons (c1nil) body1)))))
+;; 	     (if (cdr v) `(progn ,info ,v) (car v)))))))
 
 ;; (defun c1tagbody (body &aux (otags *tags*) (*tags* *tags*) (*ttl-tags* *ttl-tags*) popv
 ;; 		       (info (make-info :type #tnull)) (nt (tmpsym)))
@@ -1010,6 +1065,14 @@
     (let ((*unwind-exit* (cons label *unwind-exit*)))
       (c2tagbody-body body))))
 
+(defun tag-throw (tag)
+  (let ((v (remove-if (lambda (x &aux (v (pop x))(tp (pop x))(st (car x))) 
+			(and (type>= tp (var-type v)) (eq st (var-store v))))
+		      (cdr (assoc tag *bt*)))))
+    (when v (throw tag (mapc (lambda (x &aux (v (pop x))(y x)(tp (pop x))(st (car x)))
+			       (setf (car y) (bbump-tp (type-or1 tp (var-type v))) y (cdr y)
+				     (car y) (if (eq st (var-store v)) st +opaque+))) v)))))
+
 (defun c1go (args &aux (name (car args)) ccb clb inner)
   (cond ((endp args) (too-few-args 'go 1 0))
         ((not (endp (cdr args))) (too-many-args 'go 1 (length args)))
@@ -1020,10 +1083,7 @@
 	  (cb (setq ccb t inner (or inner 'cb)))
 	  (lb (setq clb t inner (or inner 'lb)))
 	  (t (when (eq (tag-name tag) name)
-	       (when *tvc*
-		 (let ((v (car *tvc*)))
-		   (when (var-tag v)
-		     (throw (var-tag v) v))))
+	       (tag-throw tag)
 	       (let* ((ltag (list tag))
 		      (info (make-info :type nil))
 		      (c1fv (when ccb (c1inner-fun-var))))
@@ -1032,6 +1092,29 @@
 		       ((setf (info-ref info) ltag)))
 		 (when c1fv (add-info info (cadr c1fv)))
 		 (return (list 'go info tag ccb clb c1fv))))))))
+
+;; (defun c1go (args &aux (name (car args)) ccb clb inner)
+;;   (cond ((endp args) (too-few-args 'go 1 0))
+;;         ((not (endp (cdr args))) (too-many-args 'go 1 (length args)))
+;;         ((not (or (symbolp name) (integerp name)))
+;;          "The tag name ~s is not a symbol nor an integer." name))
+;;   (dolist (tag *tags* (cmperr "The tag ~s is undefined." name))
+;;     (case tag
+;; 	  (cb (setq ccb t inner (or inner 'cb)))
+;; 	  (lb (setq clb t inner (or inner 'lb)))
+;; 	  (t (when (eq (tag-name tag) name)
+;; 	       (when *tvc*
+;; 		 (let ((v (car *tvc*)))
+;; 		   (when (var-tag v)
+;; 		     (throw (var-tag v) v))))
+;; 	       (let* ((ltag (list tag))
+;; 		      (info (make-info :type nil))
+;; 		      (c1fv (when ccb (c1inner-fun-var))))
+;; 		 (cond (ccb (setf (info-ref-ccb info) ltag))
+;; 		       (clb (setf (info-ref-clb info) ltag))
+;; 		       ((setf (info-ref info) ltag)))
+;; 		 (when c1fv (add-info info (cadr c1fv)))
+;; 		 (return (list 'go info tag ccb clb c1fv))))))))
 
 ;; (defun c1go (args &aux (name (car args)) ccb clb inner)
 ;;   (cond ((endp args) (too-few-args 'go 1 0))

@@ -106,6 +106,8 @@ typedef double complex dcomplex;
       ((((ufixnum)_x)>=IM_FIX_BASE) ? (t_fixnum<<4)+1 :\
        ({union fstp _c=_x->fstp;_x->d.e && _c.f<IM_FIX_BASE ? _c.t.tp : 0;}));})
 
+#define tp8(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? t_end :\
+      ({union fstp _c=_x->fstp;_x->d.e && _c.f<IM_FIX_BASE ? _x->d.t : t_end;})-1;})
 
 
 /* #define immnum_comp(x,y,c) (fimf(((ufixnum)x)&((ufixnum)y)) ? (x c y) : (number_compare(x,y) c 0)) */
@@ -196,3 +198,5 @@ typedef double complex dcomplex;
 /* #else */
 /* #define immnum_negate(x) ({object _x=x,_t;_t=number_negate(_x);_t;}) */
 /* #endif */
+
+

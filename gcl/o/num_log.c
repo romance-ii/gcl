@@ -669,18 +669,8 @@ DEFUN_NEW("BIT-ARRAY-OP",object,fSbit_array_op,SI,4,4,NONE,OO,OO,OO,OO,
 			}
 		}
 	L1:
-		if (r == Cnil) {
-			vs_base = vs_top;
-			vs_push(sLbit);
-			vs_push(make_fixnum(d));
-			vs_push(Cnil);
-			vs_push(Cnil);
-			vs_push(Cnil);
-			vs_push(Cnil);
-			vs_push(Cnil);
-			siLmake_vector();
-			r = vs_base[0];
-		}
+		if (r == Cnil)
+		  r=fSmake_vector(sLbit,d,Cnil,Cnil,Cnil,0,Cnil,Cnil);
 	} else {
 		if (type_of(x) != t_array)
 			goto ERROR;

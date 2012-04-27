@@ -2464,13 +2464,14 @@ DEFUN_NEW("UNREAD-CHAR",object,fLunread_char,LISP,1,2,NONE,OO,OO,OO,OO,(object c
   RETURN1(Cnil);
 }
 
-DEFUN_NEW("PEEK-CHAR",object,fLpeek_char,LISP,1,5,NONE,OO,OO,OO,OO,(object peek_type,...),"") {
+DEFUN_NEW("PEEK-CHAR",object,fLpeek_char,LISP,0,5,NONE,OO,OO,OO,OO,(object peek_type,...),"") {
 
-  fixnum nargs=INIT_NARGS(1);
-  object l=Cnil,c,f=OBJNULL,strm,eof_errorp,eof_value,recursivep;
+  fixnum nargs=INIT_NARGS(0);
+  object l=Cnil,c,f=peek_type,strm,eof_errorp,eof_value,recursivep;
   va_list ap;
 
   va_start(ap,peek_type);
+  peek_type=NEXT_ARG(nargs,ap,l,f,Cnil);
   strm=NEXT_ARG(nargs,ap,l,f,sLAstandard_inputA->s.s_dbind);
   eof_errorp=NEXT_ARG(nargs,ap,l,f,Ct);
   eof_value= NEXT_ARG(nargs,ap,l,f,Cnil);

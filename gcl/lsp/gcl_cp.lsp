@@ -189,6 +189,7 @@
   (lit :object "((struct htent *)" (:fixnum x) ")->hte_key=" (:object y)))
 
 (defun c::make-string-output-stream nil
+  (declare (optimize (safety 1)))
   (lit :object "make_string_output_stream(64)"))
 
 (defun funcallable-symbol-p (s)
@@ -246,8 +247,55 @@
       (symbol-function 'si::package-external) (symbol-function 'c::package-external)
       (symbol-function 'si::package-external_size) (symbol-function 'c::package-external_size));FIXME
 
+(setf (symbol-function 'array-rank) (symbol-function 'c::array-rank)
+      (symbol-function 'array-total-size) (symbol-function 'c::array-dim)
+      (symbol-function 'si::array-hasfillp) (symbol-function 'c::array-hasfillp)
+      (symbol-function 'si::array-dims) (symbol-function 'c::array-dims)
+      (symbol-function 'si::array-elttype) (symbol-function 'c::array-elttype)
+      (symbol-function 'si::array-eltsize) (symbol-function 'c::array-eltsize)
+      (symbol-function 'si::array-mode) (symbol-function 'c::array-mode)
+      (symbol-function 'si::vector-dim) (symbol-function 'c::vector-dim))
+
 (defun c::set-d-tt (i o);FIXME automate
   (declare (optimize (safety 1)))
   (check-type i (mod 16))
   (side-effects)
   (lit :fixnum (:object o) "->d.tt=" (:fixnum i)))
+
+(in-package :si)
+
+(eval-when 
+ (compile)
+
+ (defmacro make-ref (&optional r &aux (fn (if r `rref `ref)) (ik (if +sfix+ :fixnum :int))(dk (unless +sfix+ :fixnum)))
+   (labels ((l1 (s k u &optional v)
+		`(lit ,k ,(strcat "((u" (format nil "~s" (* 8 s)) "*)") 
+		      (,(if r :object :fixnum) a) ,(if r "->a.a_self" "") ")[" (:fixnum i) "]." 
+		      ,(ecase u (0 "i")((1 4) "u")(2 "f")(3 "c")(5 "o")) ,@(when v `("=" (,k v)))))
+	    (l2 (u s k) `(if vp ,(l1 s k u t) ,(l1 s k u)))
+	    (l3 (s k fk &optional tp)
+		`(ecase 
+		  u
+		  ,@(when k `((0 ,(l2 0 s k)) 
+			      ,@(unless (eq k :fixnum) `((1 (the ,tp ,(l2 1 s k)))))))
+		  ,@(when fk `((2 ,(l2 2 s fk))))
+		  ,@(when (eq k :char) `((4 (let ((v (if vp (char-code v) #\Space))) (code-char ,(l2 4 s k))))))
+		  ,@(when (eq k :fixnum) `((5 ,(l2 5 s :object)))))))
+	   `(progn
+	      (defun ,fn (a i s u &optional (v nil vp))
+		(declare (optimize (safety 1)))
+		(check-type a array)
+		(check-type i seqind)
+		(check-type s seqind)
+		(check-type u seqind)
+		(compiler::side-effects);FIXME
+		(ecase 
+		 s
+		 (1 ,(l3 1 :char  nil 'unsigned-char))
+		 (2 ,(l3 2 :short nil 'unsigned-short))
+		 (4 ,(l3 4 ik  :float))
+		 (8 ,(l3 8 dk :double))))
+	      (putprop ',fn t 'compiler::cmp-inline)))))
+
+(make-ref)
+(make-ref t)

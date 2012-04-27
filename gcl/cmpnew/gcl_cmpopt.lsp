@@ -360,9 +360,9 @@
 ;   (get 'array-dimension 'inline-unsafe))
 
 ;;CMP-ARRAY-DIMENSION
-(setf (symbol-function 'cmp-array-dimension) (symbol-function 'array-dimension))
-(push '(cmp-array-dimension-inline-types nil #.(flags itf) cmp-array-dimension-inline)
-   (get 'cmp-array-dimension 'inline-always))
+;; (setf (symbol-function 'cmp-array-dimension) (symbol-function 'array-dimension))
+;; (push '(cmp-array-dimension-inline-types nil #.(flags itf) cmp-array-dimension-inline)
+;;    (get 'cmp-array-dimension 'inline-always))
 
 ;;ARRAY-TOTAL-SIZE
  (push '((t) fixnum #.(flags rfa)"((#0)->st.st_dim)")

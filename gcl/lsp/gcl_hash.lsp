@@ -1,0 +1,55 @@
+(in-package :si)
+
+(defun make-hash-table (&key (test 'eql) (size 1024) (rehash-size 1.5s0) (rehash-threshold 0.7s0))
+  (the hash-table (make-hash-table-int test size rehash-size rehash-threshold)))
+
+(defun hash-table-p (x)
+  (declare (optimize (safety 1)))
+  (typecase x (hash-table t)))
+
+(defun gethash (x y &optional z)
+  (declare (optimize (safety 1)))
+  (check-type y hash-table)
+  (let ((e (c::gethash-int x y)))
+    (if (eq (c::htent-key e) (nani 0)) (values z nil) (values (c::htent-value e) t))))
+
+(defun maphash (f h)
+  (declare (optimize (safety 1)))
+  (check-type h hash-table)
+  (let ((n (hash-table-size h)))
+    (dotimes (i n)
+      (let* ((e (c::hashtable-self h i))
+	     (k (c::htent-key e)))
+	(unless (eq k (nani 0))
+	  (funcall f k (c::htent-value e)))))))
+
+(defun remhash (x y)
+  (declare (optimize (safety 1)))
+  (check-type y hash-table)
+  (let ((e (c::gethash-int x y)))
+    (unless (eq (c::htent-key e) (nani 0))
+      (c::set-htent-key (nani 0) e)
+      (c::set-htent-value nil e)
+      (c::set-hashtable-nent (1- (c::hashtable-nent y)) y)
+      t)))
+
+(defun clrhash (h)
+  (declare (optimize (safety 1)))
+  (check-type h hash-table)
+  (let ((n (hash-table-size h)))
+    (dotimes (i n)
+      (let ((e (c::hashtable-self h i)))
+	(c::set-htent-key (nani 0) e)
+	(c::set-htent-value (nani 0) e)))
+    (c::set-hashtable-nent 0 h)
+    h))
+
+(defun sxhash (x)
+  (declare (optimize (safety 1)))
+  (typecase x
+	    (symbol (c::symbol-hash x))
+	    (otherwise (c::sxhash-int x))))
+
+(setf (symbol-function 'hash-table-count) (symbol-function 'c::hashtable-nent))
+(setf (symbol-function 'hash-table-size)  (symbol-function 'c::hashtable-size))
+

@@ -523,3 +523,5 @@
   (setq *pahl* (cons (cons 'add-hash (mapcar #'(lambda (x) `',x) r)) *pahl*)))
 
 (*make-constant '+array-types+ (si::aelttype-list))
+(*make-constant '+sfix+ (eql (truncate fixnum-length char-length) 4))
+

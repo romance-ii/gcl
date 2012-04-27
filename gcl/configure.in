@@ -33,7 +33,7 @@ AC_DEFINE_UNQUOTED(BDSSIZE,$enable_bdssize,[binding stack size])
 
 AC_ARG_ENABLE(ihssize,
 [ --enable-ihssize=XXXX  will compile in a invocation history stack of size XXX],
-,enable_ihssize=4096)
+,enable_ihssize=8192)
 AC_DEFINE_UNQUOTED(IHSSIZE,$enable_ihssize,[invocation history stack size])
 
 AC_ARG_ENABLE(frssize,
@@ -1211,6 +1211,18 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[
 	    fprintf(fp,"%d",(i>>1)-9);
 	    return 0;]])],[size=`cat conftest1`
   AC_DEFINE_UNQUOTED(HM9BITS,$size,[fill bits needed in certain lisp structures])],
+  [AC_MSG_ERROR([Cannot find fill bits])])
+
+AC_RUN_IFELSE([AC_LANG_PROGRAM([[
+	#include <stdio.h>
+	]],[[
+	    FILE *fp=fopen("conftest1","w");
+	    unsigned long c;
+	    int i;
+	    for (i=0,c=1;c;c<<=1,i++);
+	    fprintf(fp,"%d",(i>>1)-10);
+	    return 0;]])],[size=`cat conftest1`
+  AC_DEFINE_UNQUOTED(HM10BITS,$size,[fill bits needed in certain lisp structures])],
   [AC_MSG_ERROR([Cannot find fill bits])])
 
 AC_RUN_IFELSE([AC_LANG_PROGRAM([[

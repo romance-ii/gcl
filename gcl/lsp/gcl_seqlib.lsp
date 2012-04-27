@@ -114,7 +114,7 @@
  
  (defmacro mrotatef (a b &aux (s (sgen "MRF-S"))) `(let ((,s ,a)) (setf ,a ,b ,b ,s)))
  
- (defmacro raref (a seq n i j l) 
+ (defmacro raref (a seq i j l) 
    `(if ,l 
 	(mrotatef (car (aref ,a ,i)) (car (aref ,a ,j)))
       (set-array ,seq ,i ,seq ,j t)))
@@ -190,7 +190,7 @@
   (check-type s proper-sequence)
   (labels ((lr (tl &optional hd) (if tl (lr (cdr tl) (rplacd tl hd)) hd))
 	   (la (&optional (i 0) (j (1- (length s))))
-	       (when (< i j) (set-array s i s j t) (la (1+ i) (1- j))) s))
+	       (cond ((< i j) (set-array s i s j t) (la (1+ i) (1- j))) (s))))
 	  (if (listp s) (lr s) (la))))
 
 (defun reverse (s)
@@ -198,7 +198,7 @@
   (check-type s sequence);FIXME
   (labels ((lr (tl &optional hd) (if tl (lr (cdr tl) (cons (car tl) hd)) hd))
 	   (la (&optional (ls (length s)) (r (make-array ls :element-type (array-element-type s))) (i 0) (j (1- ls)))
-	       (when (< i ls) (set-array r i s j) (la ls r (1+ i) (1- j))) r))
+	       (cond ((and (< i ls) (>= j 0)) (set-array r i s j) (la ls r (1+ i) (1- j))) (r))))
 	  (if (listp s) (lr s) (la))))
 
 
@@ -436,17 +436,20 @@
 
 (eval-when 
  (compile eval)
- (defmacro dyncpl (x);FIXME this can't cons in a labels as it might be a separate fn.  Get do to unroll too.
-   `(labels ((dynloop (x y) (when x (setf (car x) (car y)) (dynloop (cdr x) (cdr y)))))
+
+ (defmacro locsym (f s) `(sgen (string-concatenate (string ,f) ,s)))
+
+ (defmacro dyncpl (x &aux (l (locsym 'dyncpl "-LOOP")));FIXME this can't cons in a labels as it might be a separate fn.  Get do to unroll too.
+   `(labels ((,l (x y) (when x (setf (car x) (car y)) (,l (cdr x) (cdr y)))))
 	    (declare (notinline make-list))
 	    (let ((tmp (make-list (length ,x))))
 	      (declare (:dynamic-extent tmp))
-	      (dynloop tmp ,x);Can't be mapl, used by
-	      tmp)))
+	      (,l tmp ,x);Can't be mapl, used by
+	     tmp)))
 
- (defmacro seqend (seq seqs)
-   `(labels ((seqend-loop (s &aux (x (car s)) (y (length x))) (if s (min y (seqend-loop (cdr s))) (length ,seq))))
-	    (seqend-loop ,seqs)))
+ (defmacro seqend (seq seqs &aux (l (locsym 'seqend "-LOOP")))
+   `(labels ((,l (s &aux (x (car s)) (y (length x))) (if s (min y (,l (cdr s))) (length ,seq))))
+	    (,l ,seqs)))
  
  (defmacro seqval (seq place i)
    `(if (listp ,seq) (pop ,place) (aref ,seq ,i)))
@@ -454,14 +457,14 @@
  (defmacro seqvals (vals ns i)
    `(mapl (lambda (x y &aux (yc (car y))) (setf (car x) (seqval yc (car y) ,i))) ,vals ,ns))
  
- (defmacro defevsm (f o w)
+ (defmacro defevsm (f o w &aux (l (locsym f "-LOOP")))
    `(defun ,f (pred seq &rest seqs &aux (end (seqend seq seqs)) (ns (dyncpl seqs)) (vals (dyncpl seqs)))
       (declare (optimize (safety 2))(:dynamic-extent seqs))
       (check-type seq proper-sequence)
-      (labels ((loop (i) (,o (>= i end)
+      (labels ((,l (i) (,o (>= i end)
 			     (,w (apply pred (seqval seq seq i) (seqvals vals ns i))
-				 (loop (1+ i))))))
-	      (loop 0)))))
+				 (,l (1+ i))))))
+	      (,l 0)))))
 
 
 (defevsm every or   when)
@@ -648,7 +651,6 @@
   (let* ((k (comp-key key))
 	 (ll (length seq))
 	 (list (listp seq))
-	 (n (if list 0 (comp-array (array-element-type seq))))
 	 (a (when list (make-array ll))))
     (when list
       (do ((fi 0 (1+ fi)) (l seq (cdr l))) ((>= fi ll)) (setf (aref a fi) l)))
@@ -659,7 +661,7 @@
 	  (do nil ((>= fi (1- ls)))
 	    (let* ((spi (+ fi (random (- ls fi))))
 		   (sp (do-key key k (garef a seq spi list))))
-	      (raref a seq n fi spi list)
+	      (raref a seq fi spi list)
 	      (do ((lf fi) (rt ls)) ((>= lf rt))
 		(declare (seqind lf rt));FIXME
 		(do ((q t)) 
@@ -670,7 +672,7 @@
 		(let* ((r (< lf rt))
 		       (f (if r lf fi))
 		       (s (if r rt (setq spi (1- lf)))))
-		  (raref a seq n f s list)))
+		  (raref a seq f s list)))
 	      (let* ((ospi (1+ spi))
 		     (b   (< (- ls ospi) (- spi fi)))
 		     (lf  (if b ospi 0))
