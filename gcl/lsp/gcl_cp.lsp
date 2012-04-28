@@ -250,6 +250,7 @@
 (setf (symbol-function 'array-rank) (symbol-function 'c::array-rank)
       (symbol-function 'array-total-size) (symbol-function 'c::array-dim)
       (symbol-function 'si::array-hasfillp) (symbol-function 'c::array-hasfillp)
+      (symbol-function 'si::array-offset) (symbol-function 'c::array-offset)
       (symbol-function 'si::array-dims) (symbol-function 'c::array-dims)
       (symbol-function 'si::array-elttype) (symbol-function 'c::array-elttype)
       (symbol-function 'si::array-eltsize) (symbol-function 'c::array-eltsize)

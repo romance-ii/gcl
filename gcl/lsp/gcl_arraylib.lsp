@@ -77,8 +77,8 @@
 				       r ,y (compiler::infer-tp 
 					     s ,y 
 					     (sp r i s j 
-						 ,(if (zerop z) `0-byte-array-self `(lambda (r i) (rref r i ,z ,(if (= z 8) 2 0))))
-						 ,(if (zerop z) `set-0-byte-array-self `(lambda (v r i) (rref r i ,z ,(if (= z 8) 2 0) v))))))))
+						 ,(if (zerop z) `'0-byte-array-self `(lambda (r i) (rref r i ,z ,(if (= z 8) 2 0))))
+						 ,(if (zerop z) `'set-0-byte-array-self `(lambda (v r i) (rref r i ,z ,(if (= z 8) 2 0) v))))))))
 			 (mapcar (lambda (x) 
 				   (cons x (collect-if (lambda (y) (= x (caddr y))) 'car +array-type-info+))) 
 				 (collect-if 'identity 'caddr +array-type-info+))))))
