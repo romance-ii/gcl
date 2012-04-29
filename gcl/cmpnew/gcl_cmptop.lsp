@@ -948,15 +948,25 @@
   (list 'bind-reg-clv (make-info :type #tt :flags (iflags side-effects))))
 (defun c2bind-reg-clv (&aux x clb var)
   (do nil
-      ((not (setq x (pop *reg-clv*) clb (pop x) var (car x))))
+      ((not (setq x (pop *reg-clv*) clb (pop x) var (car x))));FIXME ? eliminate clb var here
       (wt-nl)
-      (cond (clb
-	     (setf (var-ref var) (vs-push));FIXME ?
-	     (wt-vs (var-ref var)) (wt "= " (list 'cvar (var-loc var)) ";"))
-	    ((setf (var-ref var) (list 'cvar (var-loc var)))))
+      (setf (var-ref var) (vs-push));FIXME ? clb and ccb vars just appear in info-ref-ccb, only need push clb
+      (wt-vs (var-ref var)) (wt "= " (list 'cvar (var-loc var)) ";")
       (when (var-ref-ccb var)
 	(clink (var-ref var))
 	(setf (var-ref-ccb var) (ccb-vs-push)))))
+
+;; (defun c2bind-reg-clv (&aux x clb var)
+;;   (do nil
+;;       ((not (setq x (pop *reg-clv*) clb (pop x) var (car x))))
+;;       (wt-nl)
+;;       (cond (clb
+;; 	     (setf (var-ref var) (vs-push));FIXME ?
+;; 	     (wt-vs (var-ref var)) (wt "= " (list 'cvar (var-loc var)) ";"))
+;; 	    ((setf (var-ref var) (list 'cvar (var-loc var)))))
+;;       (when (var-ref-ccb var)
+;; 	(clink (var-ref var))
+;; 	(setf (var-ref-ccb var) (ccb-vs-push)))))
 
 ;; (defun c2bind-reg-clv (&aux var)
 ;;   (do nil

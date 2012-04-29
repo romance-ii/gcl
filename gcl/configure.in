@@ -33,7 +33,7 @@ AC_DEFINE_UNQUOTED(BDSSIZE,$enable_bdssize,[binding stack size])
 
 AC_ARG_ENABLE(ihssize,
 [ --enable-ihssize=XXXX  will compile in a invocation history stack of size XXX],
-,enable_ihssize=8192)
+,enable_ihssize=16384)
 AC_DEFINE_UNQUOTED(IHSSIZE,$enable_ihssize,[invocation history stack size])
 
 AC_ARG_ENABLE(frssize,

@@ -2168,7 +2168,7 @@
     (kesrc (nap src &aux (q (extra src)) (nap (unless np nap))) (setq keb t);fixme
 	   (cond ((eq k '&key) (when (consp src) `(unless ,aok (when ,(cadr src) ,(badk bk (caddr src))))))
 		 ((eq nap t) q)
-		 (`(when ,nap ,q))))
+		 (nap `(when ,nap ,q))))
     (rbb (v srcp src) (push (if srcp (list v src) v) r))
     (dfsrc (src defp) (if defp (na src) src))
     (rb (v src srcp defp) (rbb v srcp (dfsrc src defp)))
