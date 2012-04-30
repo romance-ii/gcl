@@ -518,7 +518,7 @@ do_hash(object obj, int dot)
  
 static void write_fasd(object obj);
 
-DEFUN_NEW("WRITE-FASD-TOP",object,fSwrite_fasd_top,SI
+DEFUN("WRITE-FASD-TOP",object,fSwrite_fasd_top,SI
 	  ,2,2,NONE,OO,OO,OO,OO,(object obj, object x),"") {
 
 /* static object */
@@ -544,7 +544,7 @@ struct fasd *fd = (struct fasd *) x->v.v_self;
 #define MAYBE_PATCH(result) \
   if (needs_patching)  result =fasd_patch_sharp(result,0)
 
-DEFUN_NEW("READ-FASD-TOP",object,fSread_fasd_top,SI
+DEFUN("READ-FASD-TOP",object,fSread_fasd_top,SI
 	  ,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 /* static object */
 /* FFN(read_fasd_top)(object x) */
@@ -593,7 +593,7 @@ object sLeq;
 object sSPinit;
 void Lmake_hash_table();
 
-DEFUN_NEW("OPEN-FASD",object,fSopen_fasd,SI
+DEFUN("OPEN-FASD",object,fSopen_fasd,SI
 	  ,4,4,NONE,OO,OO,OO,OO,(object stream, object direction, object eof, object tabl),"") {
 
 
@@ -649,7 +649,7 @@ DEFUN_NEW("OPEN-FASD",object,fSopen_fasd,SI
   return result;
   }}
 
-DEFUN_NEW("CLOSE-FASD",object,fSclose_fasd,SI
+DEFUN("CLOSE-FASD",object,fSclose_fasd,SI
 	  ,1,1,NONE,OO,OO,OO,OO,(object ar),"") {
 /* static object */
 /* FFN(close_fasd)(object ar) */
@@ -1082,7 +1082,7 @@ find_sharing(object x)
 /*  return Ct; */
 /* } */
 
-DEFUN_NEW("FIND-SHARING-TOP",object,fSfind_sharing_top,SI
+DEFUN("FIND-SHARING-TOP",object,fSfind_sharing_top,SI
 	  ,2,2,NONE,OO,OO,OO,OO,(object x,object table),"") {
 
   sharing_table=table;
@@ -1351,7 +1351,9 @@ read_fasd1(int i, object *loc)
 	      read_fasd1(GET_OP(),p++);
 	    vs_base=base;
 	    vs_top = p;
-	    siLmake_structure();
+#define str(a_) ({string_register->st.st_fillp=string_register->st.st_dim=sizeof(a_)-1;string_register->st.st_self=(a_);string_register;})
+	    funcall(find_symbol(str("MAKE_STRUCTURE"),system_package));
+	    /* siLmake_structure(); */
 	    *loc = vs_base[0];
 	    vs_top=vs_base=base;
 	    return;

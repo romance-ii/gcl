@@ -36,62 +36,54 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "page.h"
 
-DEFUNO_NEW("SPECIALP",object,fSspecialp,SI
-       ,1,1,NONE,OO,OO,OO,OO,void,siLspecialp,(object sym),"")
-{
-	/* 1 args */
-	if (type_of(sym) == t_symbol &&
-	    (enum stype)sym->s.s_stype == stp_special)
-		sym = Ct;
-	else
-		sym = Cnil;
-	RETURN1(sym);
+DEFUN("SPECIALP",object,fSspecialp,SI,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+  RETURN1((type_of(sym) == t_symbol && (enum stype)sym->s.s_stype == stp_special) ? Ct : Cnil);
 }
 
-DEFUN_NEW("BIG-TO-DOUBLE",object,fSbig_to_double,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("BIG-TO-DOUBLE",object,fSbig_to_double,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
   if (type_of(x)!=t_bignum)
     TYPE_ERROR(x,sLbignum);
   RETURN1(make_longfloat(big_to_double(x)));
 }
 
-DEFUN_NEW("LONG-TO-SHORT",object,fSlong_to_short,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("LONG-TO-SHORT",object,fSlong_to_short,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
   if (type_of(x)!=t_longfloat)
     TYPE_ERROR(x,sLlong_float);
   RETURN1(make_shortfloat((float)lf(x)));
 }
 
-DEFUN_NEW("COMPLEX-REAL",object,fScomplex_real,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("COMPLEX-REAL",object,fScomplex_real,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
   if (type_of(x)!=t_complex)
     TYPE_ERROR(x,sLcomplex);
   RETURN1(x->cmp.cmp_real);
 }
 
-DEFUN_NEW("COMPLEX-IMAG",object,fScomplex_imag,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("COMPLEX-IMAG",object,fScomplex_imag,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
   if (type_of(x)!=t_complex)
     TYPE_ERROR(x,sLcomplex);
   RETURN1(x->cmp.cmp_imag);
 }
 
-DEFUN_NEW("RATIO-NUMERATOR",object,fSratio_numerator,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("RATIO-NUMERATOR",object,fSratio_numerator,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
   if (type_of(x)!=t_ratio)
     TYPE_ERROR(x,sLratio);
   RETURN1(x->rat.rat_num);
 }
 
-DEFUN_NEW("RATIO-DENOMINATOR",object,fSratio_denominator,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("RATIO-DENOMINATOR",object,fSratio_denominator,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
   if (type_of(x)!=t_ratio)
     TYPE_ERROR(x,sLratio);
   RETURN1(x->rat.rat_den);
 }
 
-DEFUN_NEW("C-TYPE",object,fSc_type,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("C-TYPE",object,fSc_type,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
   RETURN1(make_fixnum(type_of(x)));
 }
 DEFCONST("C-TYPE-MAX", sSc_type_max,SI,make_fixnum(t_end-1),"");
 
 DEF_ORDINARY("DEBUGGER",sSdebugger,SI,"");
 
-DEFUN_NEW("DEFVAR1",object,fSdefvar1,SI
+DEFUN("DEFVAR1",object,fSdefvar1,SI
 	  ,2,3,NONE,OO,OO,OO,OO,(object sym,object val,...),"") {
 
   object doc,l=Cnil,f=OBJNULL;
@@ -111,7 +103,7 @@ DEFUN_NEW("DEFVAR1",object,fSdefvar1,SI
 }
 
 
-DEFUN_NEW("DEBUGGER",object,fSdebugger,SI
+DEFUN("DEBUGGER",object,fSdebugger,SI
        ,2,2,NONE,OO,OO,OO,OO,(object sym,object val),"")
 { /* 2 args */
   putprop(sym,val,sSdebugger);
@@ -119,7 +111,7 @@ DEFUN_NEW("DEBUGGER",object,fSdebugger,SI
 }
 
 
-DEFUN_NEW("SETVV",object,fSsetvv,SI
+DEFUN("SETVV",object,fSsetvv,SI
        ,2,2,NONE,OO,OO,OO,OO,(object index,object val),"")
 { /* 2 args */
   if(type_of(sSPmemory->s.s_dbind)==t_cfdata)
@@ -658,7 +650,7 @@ gcl_init_or_load1(void (*fn)(void),char *file)
   {printf("loading %s\n",file); fflush(stdout);  load(file);}
 }
 
-DEFUN_NEW("INIT-CMP-ANON", object, fSinit_cmp_anon, SI, 0, 0,
+DEFUN("INIT-CMP-ANON", object, fSinit_cmp_anon, SI, 0, 0,
        NONE, OO, OO, OO,OO,(void),
       "Initialize previously compiled and linked anonymous function from the \
 .text section of the running executable.  This function is inherently \
@@ -715,7 +707,7 @@ find_init_name1(char *s,unsigned len) {
 }
  
 
-DEFUN_NEW("FIND-INIT-NAME", object, fSfind_init_name, SI, 1, 1,
+DEFUN("FIND-INIT-NAME", object, fSfind_init_name, SI, 1, 1,
 	  NONE, OO, OO, OO,OO,(object namestring),"") 
 {
 

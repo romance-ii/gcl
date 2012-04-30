@@ -342,7 +342,7 @@ DEF_ORDINARY("PROCLAIMED-ARG-TYPES",sSproclaimed_arg_types,SI,"");
 DEF_ORDINARY("PROCLAIMED-RETURN-TYPE",sSproclaimed_return_type,SI,"");
 DEF_ORDINARY("PROCLAIMED-FUNCTION",sSproclaimed_function,SI,"");
 
-DEFUN_NEW("TYPE-OF-C",object,siLtype_of_c,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("TYPE-OF-C",object,siLtype_of_c,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
   fixnum i;
   
   switch (type_of(x)) {

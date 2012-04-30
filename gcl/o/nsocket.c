@@ -330,7 +330,7 @@ doConnect(host,port)
 
 #define SOCKET_FD(strm) ((strm)->sm.sm_fp ? fileno((strm)->sm.sm_fp) : -1)
 
-DEFUN_NEW("GETPEERNAME",object,fSgetpeername,SI,1,1,NONE,OO,OO,OO,OO,(object sock),
+DEFUN("GETPEERNAME",object,fSgetpeername,SI,1,1,NONE,OO,OO,OO,OO,(object sock),
  "Return a list of three elements: the address, the hostname and the port for the other end of the socket.  If hostname is not available it will be equal to the address.  Invalid on server sockets. Return NIL on failure.")
 {
  struct sockaddr_in peername;
@@ -358,7 +358,7 @@ DEFUN_NEW("GETPEERNAME",object,fSgetpeername,SI,1,1,NONE,OO,OO,OO,OO,(object soc
 }
 	    
 
-DEFUN_NEW("GETSOCKNAME",object,fSgetsockname,SI,1,1,NONE,OO,OO,OO,OO,(object sock),
+DEFUN("GETSOCKNAME",object,fSgetsockname,SI,1,1,NONE,OO,OO,OO,OO,(object sock),
  "Return a list of three elements: the address, the hostname and the port for the socket.  If hostname is not available it will be equal to the address. Return NIL on failure. ")
 { struct sockaddr_in sockname;
  unsigned size = sizeof(struct sockaddr_in);
@@ -394,7 +394,7 @@ DEFUN_NEW("GETSOCKNAME",object,fSgetsockname,SI,1,1,NONE,OO,OO,OO,OO,(object soc
      the channel is setto blocking or nonblocking mode. 
 */  
 
-DEFUN_NEW("SET-BLOCKING",object,fSset_blocking,SI,2,2,NONE,OO,OO,OO,OO,(object sock,object setBlocking),
+DEFUN("SET-BLOCKING",object,fSset_blocking,SI,2,2,NONE,OO,OO,OO,OO,(object sock,object setBlocking),
       "Set blocking on if MODE is T otherwise off.  Return 0 if succeeds. Otherwise the error number.")
 {
       int setting;

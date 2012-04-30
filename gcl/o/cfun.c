@@ -63,7 +63,7 @@ make_cfun(void (*self)(), object name, object data, char *start, int size) {
 
 }
 
-DEFUN_NEW("CFDL",object,fScfdl,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+DEFUN("CFDL",object,fScfdl,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
 
   struct typemanager *tm=tm_of(t_cfdata);
   extern long maxpage;
@@ -88,7 +88,7 @@ DEFUN_NEW("CFDL",object,fScfdl,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
   RETURN1(Cnil);
 }
     
-DEFUN_NEW("DLSYM",object,fSdlsym,SI,2,2,NONE,OI,OO,OO,OO,(fixnum h,object name),"") {
+DEFUN("DLSYM",object,fSdlsym,SI,2,2,NONE,OI,OO,OO,OO,(fixnum h,object name),"") {
 
   char ch,*er;
   void *ad;
@@ -111,7 +111,7 @@ DEFUN_NEW("DLSYM",object,fSdlsym,SI,2,2,NONE,OI,OO,OO,OO,(fixnum h,object name),
 
 }
 
-DEFUN_NEW("DLADDR",object,fSdladdr,SI,1,1,NONE,OI,OO,OO,OO,(fixnum ad),"") {
+DEFUN("DLADDR",object,fSdladdr,SI,1,1,NONE,OI,OO,OO,OO,(fixnum ad),"") {
 
   Dl_info info;
   unsigned long u;
@@ -130,7 +130,7 @@ DEFUN_NEW("DLADDR",object,fSdladdr,SI,1,1,NONE,OI,OO,OO,OO,(fixnum ad),"") {
 
 }
 
-DEFUN_NEW("DLOPEN",object,fSdlopen,SI,1,1,NONE,OO,OO,OO,OO,(object name),"") {
+DEFUN("DLOPEN",object,fSdlopen,SI,1,1,NONE,OO,OO,OO,OO,(object name),"") {
 
   char ch;
   void *v;
@@ -147,14 +147,14 @@ DEFUN_NEW("DLOPEN",object,fSdlopen,SI,1,1,NONE,OO,OO,OO,OO,(object name),"") {
 
 }
 
-DEFUN_NEW("DLADDR-SET",object,fSdladdr_set,SI,2,2,NONE,OI,IO,OO,OO,(fixnum adp,fixnum ad),"") {
+DEFUN("DLADDR-SET",object,fSdladdr_set,SI,2,2,NONE,OI,IO,OO,OO,(fixnum adp,fixnum ad),"") {
 
   *(void **)adp=(void *)ad;
   RETURN1(Cnil);
 
 }
 
-DEFUN_NEW("DLLIST-PUSH",object,fSdllist_push,SI,3,3,NONE,OO,OI,OO,OO,(object cfd,object sym,fixnum adp),"") {
+DEFUN("DLLIST-PUSH",object,fSdllist_push,SI,3,3,NONE,OO,OI,OO,OO,(object cfd,object sym,fixnum adp),"") {
 
   cfd->cfd.cfd_dlist=MMcons(MMcons(sym,make_fixnum(adp)),cfd->cfd.cfd_dlist);
   RETURN1(Cnil);
@@ -181,7 +181,7 @@ static object MFnew(object sym, void (*self)(), object data)
 	return sym;
 }
 
-DEFUN_NEW("MF",object,fSmf,SI
+DEFUN("MF",object,fSmf,SI
    ,2,2,NONE,OO,OO,OO,OO,(object name,object addr),"")
 
 { /* 2 args */
@@ -219,7 +219,7 @@ MM(object sym, void (*self)(), char *start, int size, object data)
 	return sym;
 }
 
-DEFUN_NEW("MM",object,fSmm,SI
+DEFUN("MM",object,fSmm,SI
    ,2,2,NONE,OO,OO,OO,OO,(object name,object addr),"")
 
 { /* 2 args */
@@ -292,7 +292,7 @@ make_macro_internal(char *s, void (*f)())
 	return(x);
 }
 
-DEFUN_NEW("COMPILED-FUNCTION-NAME",object,fScompiled_function_name,SI
+DEFUN("COMPILED-FUNCTION-NAME",object,fScompiled_function_name,SI
    ,1,1,NONE,OO,OO,OO,OO,(object fun),"")
 
 {

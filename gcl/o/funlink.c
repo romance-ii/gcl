@@ -105,7 +105,7 @@ delete_link(void *address, object link_ar) {
 }
 
 
-DEFUN_NEW("USE-FAST-LINKS",object,fSuse_fast_links,SI,1,2,NONE,OO,OO,OO,OO,(object flag,...),
+DEFUN("USE-FAST-LINKS",object,fSuse_fast_links,SI,1,2,NONE,OO,OO,OO,OO,(object flag,...),
       "Usage: (use-fast-links {nil,t} &optional fun) turns on or off \
 the fast linking depending on FLAG, so that things will either go \
 faster, or turns it off so that stack information is kept.  If SYMBOL \
@@ -1355,7 +1355,7 @@ clear_stack(object *beg, object *limit) {
   return 0;
 }
 
-DEFUN_NEW("SET-MV",object,fSset_mv,SI,2,2,NONE,OI,OO,OO,OO,(ufixnum i, object val),"") {
+DEFUN("SET-MV",object,fSset_mv,SI,2,2,NONE,OI,OO,OO,OO,(ufixnum i, object val),"") {
   if (i >= (sizeof(MVloc)/sizeof(object)))
     FEerror("Bad mv index",0);
   return(MVloc[i]=val);
@@ -1363,7 +1363,7 @@ DEFUN_NEW("SET-MV",object,fSset_mv,SI,2,2,NONE,OI,OO,OO,OO,(ufixnum i, object va
 }
 
 
-DEFUN_NEW("MV-REF",object,fSmv_ref,SI,1,1,NONE,OI,OO,OO,OO,(ufixnum i),"") {
+DEFUN("MV-REF",object,fSmv_ref,SI,1,1,NONE,OI,OO,OO,OO,(ufixnum i),"") {
   object x;
   if (i >= (sizeof(MVloc)/sizeof(object)))
     FEerror("Bad mv index",0);

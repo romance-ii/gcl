@@ -527,7 +527,7 @@ object on_stack_cons(object x, object y)
 }
 
 
-DEFUNM_NEW("ALLOCATED",object,fSallocated,SI,1,1,NONE,OO,OO,OO,OO,
+DEFUNM("ALLOCATED",object,fSallocated,SI,1,1,NONE,OO,OO,OO,OO,
 	   (object typ),"") { 
 
   struct typemanager *tm=(&tm_table[t_from_type(typ)]);
@@ -557,7 +557,7 @@ DEFUNM_NEW("ALLOCATED",object,fSallocated,SI,1,1,NONE,OO,OO,OO,OO,
  
 
 
-DEFUN_NEW("TOTAL-BYTES-ALLOCATED",object,fStotal_bytes_allocated,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+DEFUN("TOTAL-BYTES-ALLOCATED",object,fStotal_bytes_allocated,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
   int i;
   unsigned long bytes;
   for(bytes=0,i=t_start; i < t_end; i++) {
@@ -572,7 +572,7 @@ DEFUN_NEW("TOTAL-BYTES-ALLOCATED",object,fStotal_bytes_allocated,SI,0,0,NONE,OO,
 
 }
 
-DEFUN_NEW("RESET-NUMBER-USED",object,fSreset_number_used,SI,0,1,NONE,OO,OO,OO,OO,
+DEFUN("RESET-NUMBER-USED",object,fSreset_number_used,SI,0,1,NONE,OO,OO,OO,OO,
 	  (object typ,...),"") {
 
   fixnum i,nargs=INIT_NARGS(0);
@@ -1126,7 +1126,7 @@ gcl_init_alloc(void) {
   
 }
 
-DEFUN_NEW("STATICP",object,fSstaticp,SI,1,1,NONE,OO,OO,OO,OO,(object x),"Tell if the string or vector is static") 
+DEFUN("STATICP",object,fSstaticp,SI,1,1,NONE,OO,OO,OO,OO,(object x),"Tell if the string or vector is static") 
 { RETURN1((inheap(x->ust.ust_self) ? sLt : sLnil));
 }
 
@@ -1155,7 +1155,7 @@ t_from_type(object type) {
    when the sgc is turned on.  FREE_PERCENT is an integer between 0 and 100. 
    */
 
-DEFUN_NEW("ALLOCATE-SGC",object,fSallocate_sgc,SI
+DEFUN("ALLOCATE-SGC",object,fSallocate_sgc,SI
       ,4,4,NONE,OO,II,II,OO,(object type,fixnum min,fixnum max,fixnum free_percent),"") {
 
   int t=t_from_type(type);
@@ -1180,7 +1180,7 @@ DEFUN_NEW("ALLOCATE-SGC",object,fSallocate_sgc,SI
 /* Growth of TYPE will be by at least MIN pages and at most MAX pages.
    It will try to grow PERCENT of the current pages.
    */
-DEFUN_NEW("ALLOCATE-GROWTH",object,fSallocate_growth,SI,5,5,NONE,OO,II,II,OO,
+DEFUN("ALLOCATE-GROWTH",object,fSallocate_growth,SI,5,5,NONE,OO,II,II,OO,
       (object type,fixnum min,fixnum max,fixnum percent,fixnum percent_free),"")
 {int  t=t_from_type(type);
  struct typemanager *tm=tm_of(t);
@@ -1205,7 +1205,7 @@ DEFUN_NEW("ALLOCATE-GROWTH",object,fSallocate_growth,SI,5,5,NONE,OO,II,II,OO,
 
 
 
-DEFUN_NEW("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
+DEFUN("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
 	  ,1,2,NONE,OI,OO,OO,OO,(fixnum npages,...),"") {
 
   object really_do,l=Cnil,f=OBJNULL;
@@ -1250,14 +1250,14 @@ DEFUN_NEW("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
 }
 
 
-DEFUN_NEW("ALLOCATED-CONTIGUOUS-PAGES",object,fSallocated_contiguous_pages,SI
+DEFUN("ALLOCATED-CONTIGUOUS-PAGES",object,fSallocated_contiguous_pages,SI
        ,0,0,NONE,OO,OO,OO,OO,(void),"")
 {
 	/* 0 args */
 	RETURN1((make_fixnum(ncbpage)));
 }
 
-DEFUN_NEW("MAXIMUM-CONTIGUOUS-PAGES",object,fSmaximum_contiguous_pages,SI
+DEFUN("MAXIMUM-CONTIGUOUS-PAGES",object,fSmaximum_contiguous_pages,SI
        ,0,0,NONE,OO,OO,OO,OO,(void),"")
 {
 	/* 0 args */
@@ -1265,7 +1265,7 @@ DEFUN_NEW("MAXIMUM-CONTIGUOUS-PAGES",object,fSmaximum_contiguous_pages,SI
 }
 
 
-DEFUN_NEW("ALLOCATE-RELOCATABLE-PAGES",object,fSallocate_relocatable_pages,SI
+DEFUN("ALLOCATE-RELOCATABLE-PAGES",object,fSallocate_relocatable_pages,SI
 	  ,1,1,NONE,OI,OO,OO,OO,(fixnum npages),"") {
 
   if (npages  <= 0)
@@ -1283,7 +1283,7 @@ DEFUN_NEW("ALLOCATE-RELOCATABLE-PAGES",object,fSallocate_relocatable_pages,SI
 
 }
 
-DEFUN_NEW("ALLOCATE",object,fSallocate,SI
+DEFUN("ALLOCATE",object,fSallocate,SI
 	  ,2,3,NONE,OO,IO,OO,OO,(object type,fixnum npages,...),"") {
 
   object really_do,l=Cnil,f=OBJNULL;
@@ -1327,12 +1327,12 @@ DEFUN_NEW("ALLOCATE",object,fSallocate,SI
 
 }
 
-DEFUN_NEW("ALLOCATED-RELOCATABLE-PAGES",object,fSallocated_relocatable_pages,SI
+DEFUN("ALLOCATED-RELOCATABLE-PAGES",object,fSallocated_relocatable_pages,SI
 	  ,0,0,NONE,OO,OO,OO,OO,(void),"") {
   RETURN1(make_fixnum(nrbpage));
 }
 
-DEFUN_NEW("GET-HOLE-SIZE",object,fSget_hole_size,SI
+DEFUN("GET-HOLE-SIZE",object,fSget_hole_size,SI
        ,0,0,NONE,OO,OO,OO,OO,(void),"") {
   RETURN1((make_fixnum(new_holepage)));
 }
@@ -1377,7 +1377,7 @@ gprof_cleanup(void) {
     
  
 
-DEFUN_NEW("GPROF-START",object,fSgprof_start,SI
+DEFUN("GPROF-START",object,fSgprof_start,SI
        ,0,0,NONE,OO,OO,OO,OO,(void),"")
 {
   extern void monstartup(unsigned long,unsigned long);
@@ -1399,7 +1399,7 @@ DEFUN_NEW("GPROF-START",object,fSgprof_start,SI
 
 }
 
-DEFUN_NEW("GPROF-SET",object,fSgprof_set,SI
+DEFUN("GPROF-SET",object,fSgprof_set,SI
        ,2,2,NONE,OI,IO,OO,OO,(fixnum dstart,fixnum dend),"")
 {
 
@@ -1410,7 +1410,7 @@ DEFUN_NEW("GPROF-SET",object,fSgprof_set,SI
 
 }
 
-DEFUN_NEW("GPROF-QUIT",object,fSgprof_quit,SI
+DEFUN("GPROF-QUIT",object,fSgprof_quit,SI
        ,0,0,NONE,OO,OO,OO,OO,(void),"")
 {
   extern void _mcleanup(void);
@@ -1458,7 +1458,7 @@ DEFUN_NEW("GPROF-QUIT",object,fSgprof_quit,SI
 
 #endif
 
-DEFUNM_NEW("SET-HOLE-SIZE",object,fSset_hole_size,SI
+DEFUNM("SET-HOLE-SIZE",object,fSset_hole_size,SI
 	   ,1,2,NONE,OI,IO,OO,OO,(fixnum npages,...),"")
 {
 

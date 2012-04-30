@@ -187,9 +187,7 @@ macro_def(object form) {
 
 }
 
-DEFUNOM_NEW("MACROEXPAND",object,fLmacroexpand,LISP
-	    ,1,2,NONE,OO,OO,OO,OO,void,Lmacroexpand,
-	    (object form,...),"") {
+DEFUNM("MACROEXPAND",object,fLmacroexpand,LISP,1,2,NONE,OO,OO,OO,OO,(object form,...),"") {
 
   object envir;
   object exp_fun,l=Cnil,f=OBJNULL;

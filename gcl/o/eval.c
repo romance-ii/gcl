@@ -865,7 +865,7 @@ funcall_apply(object fun,fixnum nargs,va_list ap) {
 
 }
 
-DEFUNM_NEW("FUNCALL",object,fLfuncall,LISP,1,MAX_ARGS,NONE,OO,OO,OO,OO,(object fun,...),"") { 
+DEFUNM("FUNCALL",object,fLfuncall,LISP,1,MAX_ARGS,NONE,OO,OO,OO,OO,(object fun,...),"") { 
 
   va_list ap;
   object res;
@@ -879,7 +879,7 @@ DEFUNM_NEW("FUNCALL",object,fLfuncall,LISP,1,MAX_ARGS,NONE,OO,OO,OO,OO,(object f
 
 }
 
-DEFUNM_NEW("APPLY",object,fLapply,LISP,1,MAX_ARGS,NONE,OO,OO,OO,OO,(object fun,...),"") {	
+DEFUNM("APPLY",object,fLapply,LISP,1,MAX_ARGS,NONE,OO,OO,OO,OO,(object fun,...),"") {	
   
   va_list ap;
   object res;
@@ -893,7 +893,7 @@ DEFUNM_NEW("APPLY",object,fLapply,LISP,1,MAX_ARGS,NONE,OO,OO,OO,OO,(object fun,.
 }
 	
 
-DEFUNM_NEW("EVAL",object,fLeval,LISP,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+DEFUNM("EVAL",object,fLeval,LISP,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
 
   object *lex=lex_env,*base=vs_top;
   object *vals=(object *)fcall.valp;
@@ -906,7 +906,7 @@ DEFUNM_NEW("EVAL",object,fLeval,LISP,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
 
 }
 
-/* DEFUN_NEW("EVAL-SRC",object,fSeval_src,SI,0,63,NONE,OO,OO,OO,OO,(object first,...),"") { */
+/* DEFUN("EVAL-SRC",object,fSeval_src,SI,0,63,NONE,OO,OO,OO,OO,(object first,...),"") { */
 
 /*   object fun=fcall.fun,f,*base=vs_top,*vals=(object *)fcall.valp; */
 /*   struct cons *p,*p1,*pp,*q,*qq; */
@@ -950,7 +950,7 @@ DEFUNM_NEW("EVAL",object,fLeval,LISP,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
 
 /* } */
 
-/* DEFUNM_NEW("EVAL-CFUN",object,fSeval_cfun,SI,0,63,NONE,OO,OO,OO,OO,(object first,...),"") { */
+/* DEFUNM("EVAL-CFUN",object,fSeval_cfun,SI,0,63,NONE,OO,OO,OO,OO,(object first,...),"") { */
 
 /*   object fun=fcall.fun,*base=vs_top,*vals=(object *)fcall.valp; */
 /*   void (*f)(); */
@@ -973,7 +973,7 @@ DEFUNM_NEW("EVAL",object,fLeval,LISP,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
 
 /* } */
 
-DEFUNM_NEW("EVAL-SRC",object,fSeval_src,SI,0,63,NONE,OO,OO,OO,OO,(object first,...),"") {
+DEFUNM("EVAL-SRC",object,fSeval_src,SI,0,63,NONE,OO,OO,OO,OO,(object first,...),"") {
 
   object fun=fcall.fun,f,*base=vs_top,*vals=(object *)fcall.valp;
   fixnum i,j,narg=VFUN_NARGS;
@@ -995,7 +995,7 @@ DEFUNM_NEW("EVAL-SRC",object,fSeval_src,SI,0,63,NONE,OO,OO,OO,OO,(object first,.
 
 }
 
-DEFUN_NEW("FSET-IN",object,fSfset_in,SI,2,2,NONE,OO,OO,OO,OO,(object sym,object src),"") {
+DEFUN("FSET-IN",object,fSfset_in,SI,2,2,NONE,OO,OO,OO,OO,(object sym,object src),"") {
   
   object x;
 
@@ -1072,147 +1072,143 @@ LFD(siLapplyhook)(void)
 	bds_unwind(old_bds_top);
 }
 
-DEFUNO_NEW("CONSTANTP",object,fLconstantp,LISP
-	   ,1,2,NONE,OO,OO,OO,OO,void,Lconstantp,(object x0,...),"") {
+DEFUN("CONSTANTP",object,fLconstantp,LISP,1,2,NONE,OO,OO,OO,OO,(object x0,...),"") {
 
-  enum type tp;
-/*   fixnum n=VFUN_NARGS; */
-/*   object env,l=Cnil,f=OBJNULL; */
-  
-/*   env=NEXT_ARG(n,ap,l,f,Cnil); */
-  tp=type_of(x0);
+  enum type tp=type_of(x0);
+
   RETURN1((tp==t_cons && x0->c.c_car!=sLquote)||
 	  (tp==t_symbol && x0->s.s_stype!=stp_constant) ? Cnil : Ct);
 
 }
 
 object
-ieval(object x)
-{
-	object *old_vs_base;
-	object *old_vs_top;
+ieval(object x) {
 
-	old_vs_base = vs_base;
-	old_vs_top = vs_top;
-	eval(x);
-	x = vs_base[0];
-	vs_base = old_vs_base;
-	vs_top = old_vs_top;
-	return(x);
+  object *old_vs_base;
+  object *old_vs_top;
+  
+  old_vs_base = vs_base;
+  old_vs_top = vs_top;
+  eval(x);
+  x = vs_base[0];
+  vs_base = old_vs_base;
+  vs_top = old_vs_top;
+  return(x);
+
 }
 
 object
-ifuncall1(object fun, object arg1)
-{
-	object *old_vs_base;
-	object *old_vs_top;
-	object x;
+ifuncall1(object fun, object arg1) {
 
-	old_vs_base = vs_base;
-	old_vs_top = vs_top;
-	vs_base = vs_top;
-	vs_push(arg1);
-	super_funcall(fun);
-	x = vs_base[0];
-	vs_top = old_vs_top;
-	vs_base = old_vs_base;
-	return(x);
+  object *old_vs_base;
+  object *old_vs_top;
+  object x;
+  
+  old_vs_base = vs_base;
+  old_vs_top = vs_top;
+  vs_base = vs_top;
+  vs_push(arg1);
+  super_funcall(fun);
+  x = vs_base[0];
+  vs_top = old_vs_top;
+  vs_base = old_vs_base;
+  return(x);
+
 }
 
 object
-ifuncall2(object fun, object arg1, object arg2)
-{
-	object *old_vs_base;
-	object *old_vs_top;
-	object x;
+ifuncall2(object fun, object arg1, object arg2) {
 
-	old_vs_base = vs_base;
-	old_vs_top = vs_top;
-	vs_base = vs_top;
-	vs_push(arg1);
-	vs_push(arg2);
-	super_funcall(fun);
-	x = vs_base[0];
-	vs_top = old_vs_top;
-	vs_base = old_vs_base;
-	return(x);
+  object *old_vs_base;
+  object *old_vs_top;
+  object x;
+  
+  old_vs_base = vs_base;
+  old_vs_top = vs_top;
+  vs_base = vs_top;
+  vs_push(arg1);
+  vs_push(arg2);
+  super_funcall(fun);
+  x = vs_base[0];
+  vs_top = old_vs_top;
+  vs_base = old_vs_base;
+  return(x);
+
 }
 
 object
-ifuncall3(object fun, object arg1, object arg2, object arg3)
-{
-	object *old_vs_base;
-	object *old_vs_top;
-	object x;
+ifuncall3(object fun, object arg1, object arg2, object arg3) {
 
-	old_vs_base = vs_base;
-	old_vs_top = vs_top;
-	vs_base = vs_top;
-	vs_push(arg1);
-	vs_push(arg2);
-	vs_push(arg3);
-	super_funcall(fun);
-	x = vs_base[0];
-	vs_top = old_vs_top;
-	vs_base = old_vs_base;
-	return(x);
+  object *old_vs_base;
+  object *old_vs_top;
+  object x;
+  
+  old_vs_base = vs_base;
+  old_vs_top = vs_top;
+  vs_base = vs_top;
+  vs_push(arg1);
+  vs_push(arg2);
+  vs_push(arg3);
+  super_funcall(fun);
+  x = vs_base[0];
+  vs_top = old_vs_top;
+  vs_base = old_vs_base;
+  return(x);
+
 }
 
 void
-funcall_with_catcher(object fname, object fun)
-{
-	int n = vs_top - vs_base;
-	if (n > MAX_ARGS+1) 
-	  FEerror("Call argument linit exceeded",0);
-	frs_push(FRS_CATCH, make_cons(fname, make_fixnum(n)));
-	if (nlj_active)
-		nlj_active = FALSE;
-	else
-		funcall(fun);
-	frs_pop();
+funcall_with_catcher(object fname, object fun) {
+
+  int n = vs_top - vs_base;
+  if (n > MAX_ARGS+1) 
+    FEerror("Call argument linit exceeded",0);
+  frs_push(FRS_CATCH, make_cons(fname, make_fixnum(n)));
+  if (nlj_active)
+    nlj_active = FALSE;
+  else
+    funcall(fun);
+  frs_pop();
+
 }
 
 static object 
 fcalln_general(object first,va_list ap) {
-  int i=fcall.argd;
+  int i=fcall.argd,n= SFUN_NARGS(i);
+  object *old_vs_top=vs_top;
+  object x;
+  enum ftype typ,restype=SFUN_RETURN_TYPE(i);
 
-  {
-    int n= SFUN_NARGS(i);
-    /*  object *old_vs_base=vs_base; */
-    object *old_vs_top=vs_top;
-    object x;
-    enum ftype typ,restype=SFUN_RETURN_TYPE(i);
-    vs_top =  vs_base = old_vs_top;
-    SFUN_START_ARG_TYPES(i);
-    if (i==0) {
-      int jj=0;
-      while (n-- > 0) {
-	typ= SFUN_NEXT_TYPE(i);
-	x =
-	  (typ==f_object ?	(jj ? va_arg(ap,object) : first) :
-	   (typ==f_fixnum ? make_fixnum((jj ? va_arg(ap,fixnum) : (fixnum)first)) :
-	    (typ==f_integer ? make_integer((jj ? va_arg(ap,GEN) : (GEN)first)) :
-	     (object) (FEerror("bad type",0),Cnil))));
-	*(vs_top++) = x;
-	jj++;
-      }
-    } else {
-      object *base=vs_top;
-      *(base++)=first;
-      n--;
-      while (n-- > 0) 
-	*(base++) = va_arg(ap,object);
-     vs_top=base;
+  vs_top =  vs_base = old_vs_top;
+  SFUN_START_ARG_TYPES(i);
+  if (i==0) {
+    int jj=0;
+    while (n-- > 0) {
+      typ= SFUN_NEXT_TYPE(i);
+      x =
+	(typ==f_object ?	(jj ? va_arg(ap,object) : first) :
+	 (typ==f_fixnum ? make_fixnum((jj ? va_arg(ap,fixnum) : (fixnum)first)) :
+	  (typ==f_integer ? make_integer((jj ? va_arg(ap,GEN) : (GEN)first)) :
+	   (object) (FEerror("bad type",0),Cnil))));
+      *(vs_top++) = x;
+      jj++;
     }
-    funcall(fcall.fun);
-    x= vs_base[0];
-    vs_top=old_vs_top;
-    /* vs_base=old_vs_base; */
-    return (restype== f_object ? x :
-	    (restype== f_fixnum ? (object) (fix(x)) :
-	     (restype== f_integer ? (object) (otoi(x)) :
-	      (object) (FEerror("bad type",0),Cnil))));
+  } else {
+    object *base=vs_top;
+    *(base++)=first;
+    n--;
+    while (n-- > 0) 
+      *(base++) = va_arg(ap,object);
+    vs_top=base;
   }
+  funcall(fcall.fun);
+  x= vs_base[0];
+  vs_top=old_vs_top;
+  /* vs_base=old_vs_base; */
+  return (restype== f_object ? x :
+	  (restype== f_fixnum ? (object) (fix(x)) :
+	   (restype== f_integer ? (object) (otoi(x)) :
+	    (object) (FEerror("bad type",0),Cnil))));
 }
 
 object 

@@ -123,7 +123,7 @@ unix_time_to_universal_time(int i)
 	return(x);
 }
 
-DEFUN_NEW("GET-UNIVERSAL-TIME",object,fLget_universal_time,LISP
+DEFUN("GET-UNIVERSAL-TIME",object,fLget_universal_time,LISP
    ,0,0,NONE,OO,OO,OO,OO,(void),"")
 {
 	/* 0 args */
@@ -155,7 +155,7 @@ LFD(Lsleep)(void)
 	vs_push(Cnil);
 }
 
-DEFUNM_NEW("GET-INTERNAL-RUN-TIMES",object,fSget_internal_run_times,SI
+DEFUNM("GET-INTERNAL-RUN-TIMES",object,fSget_internal_run_times,SI
 	   ,0,0,NONE,OO,OO,OO,OO,(),"") {
 
   object *base=vs_top;
@@ -174,14 +174,14 @@ DEFUNM_NEW("GET-INTERNAL-RUN-TIMES",object,fSget_internal_run_times,SI
   
 }
 
-DEFUN_NEW("GET-INTERNAL-RUN-TIME",object,fLget_internal_run_time,LISP
+DEFUN("GET-INTERNAL-RUN-TIME",object,fLget_internal_run_time,LISP
 	   ,0,0,NONE,OO,OO,OO,OO,(void),"") {
   object x=FFN(fSget_internal_run_times)(0);
   RETURN1(x);
 }
 
 
-DEFUN_NEW("GETTIMEOFDAY",object,fSgettimeofday,SI,0,0,NONE,OO,OO,OO,OO,(void),"Return time with maximum resolution") {
+DEFUN("GETTIMEOFDAY",object,fSgettimeofday,SI,0,0,NONE,OO,OO,OO,OO,(void),"Return time with maximum resolution") {
 #ifdef __MINGW32__
     struct timeb t;
     ftime(&t);
@@ -204,7 +204,7 @@ fSgettimeofday() {
 #endif
 
 
-DEFUN_NEW("GET-INTERNAL-REAL-TIME",object,fLget_internal_real_time,LISP,0,0,NONE,OO,OO,OO,OO,(void),"Run time relative to beginning")
+DEFUN("GET-INTERNAL-REAL-TIME",object,fLget_internal_real_time,LISP,0,0,NONE,OO,OO,OO,OO,(void),"Run time relative to beginning")
      
 {
 #ifdef __MINGW32__

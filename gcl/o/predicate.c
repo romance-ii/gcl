@@ -28,322 +28,91 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdlib.h>
 #include "include.h"
 
-DEFUNO_NEW("NULL",object,fLnull,LISP
-	  ,1,1,NONE,OO,OO,OO,OO,void,Lnull,(object x0),"")
-{
-    /* 1 args */
-
-	if (x0 == Cnil)
-		x0 = Ct;
-	else
-		x0 = Cnil;
-	RETURN1(x0);
+DEFUN("NULL",object,fLnull,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(x==Cnil ? Ct : Cnil);
 }
 
-DEFUN_NEW("NOT",object,fLnot,LISP
-   ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-
-{
-    /* 1 args */
-
-	if (x0 == Cnil)
-		x0 = Ct;
-	else
-		x0 = Cnil;
-	RETURN1(x0);
+DEFUN("NOT",object,fLnot,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(x==Cnil ? Ct : Cnil);
 }
 
-DEFUNO_NEW("SYMBOLP",object,fLsymbolp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Lsymbolp,(object x0),"")
-
-{
-	/* 1 args */
-
-	if (type_of(x0) == t_symbol)
-		x0 = Ct;
-	else
-		x0 = Cnil;
-	RETURN1(x0);
+DEFUN("SYMBOLP",object,fLsymbolp,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x)==t_symbol ? Ct : Cnil);
 }
 
-DEFUNO_NEW("ATOM",object,fLatom  ,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Latom,(object x0),"")
-
-{
-	/* 1 args */
-
-	if (!consp(x0))
-		x0 = Ct;
-	else
-		x0 = Cnil;
-	RETURN1(x0);
+DEFUN("ATOM",object,fLatom,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(!consp(x) ? Ct : Cnil);
 }
 
-DEFUNO_NEW("CONSP",object,fLconsp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Lconsp,(object x0),"")
-
-{
-	/* 1 args */
-
-	if (consp(x0))
-		x0 = Ct;
-	else
-		x0 = Cnil;
-	RETURN1(x0);
+DEFUN("CONSP",object,fLconsp,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(consp(x) ? Ct : Cnil);
 }
 
-DEFUNO_NEW("LISTP",object,fLlistp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Llistp,(object x0),"")
-
-{
-	/* 1 args */
-
-	if (listp(x0))
-		x0 = Ct;
-	else
-		x0 = Cnil;
-	RETURN1(x0);
+DEFUN("LISTP",object,fLlistp,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(listp(x) ? Ct : Cnil);
 }
 
-DEFUNO_NEW("NUMBERP",object,fLnumberp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Lnumberp,(object x0),"")
-
-{
-	enum type t;
-	/* 1 args */
-
-	t = type_of(x0);
-	if (t == t_fixnum || t == t_bignum || t == t_ratio ||
-	    t == t_shortfloat || t == t_longfloat ||
-	    t == t_complex)
-		x0 = Ct;
-	else
-		x0 = Cnil;
-	RETURN1(x0);
+DEFUN("NUMBERP",object,fLnumberp,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(numberp(x) ? Ct : Cnil);
 }
 
-DEFUNO_NEW("INTEGERP",object,fLintegerp ,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Lintegerp,(object x0),"")
-
-{
-	enum type t;
-	/* 1 args */
-
-	t = type_of(x0);
-	if (t == t_fixnum || t == t_bignum)
-		x0 = Ct;
-	else
-		x0 = Cnil;
-	RETURN1(x0);
+DEFUN("INTEGERP",object,fLintegerp ,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(integerp(x) ? Ct : Cnil);
 }
 
-DEFUN_NEW("RATIONALP",object,fLrationalp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-
-{
-	enum type t;
-	/* 1 args */
-
-	t = type_of(x0);
-	if (t == t_fixnum || t == t_bignum || t == t_ratio)
-		x0 = Ct;
-	else
-		x0 = Cnil;
-	RETURN1(x0);
+DEFUN("RATIONALP",object,fLrationalp,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(rationalp(x) ? Ct : Cnil);
 }
 
-
-DEFUN_NEW("REALP",object,fLrealp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	enum type t;
-	t = type_of(x0);
-
-        RETURN1((TS_MEMBER(t,TS(t_fixnum)| TS(t_bignum)| TS(t_ratio)|
-			   TS(t_longfloat)| TS(t_shortfloat))
-		 ? Ct : Cnil));
-
+DEFUN("REALP",object,fLrealp,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(realp(x) ? Ct : Cnil);
 }
 
+DEFUN("FLOATP",object,fLfloatp,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(floatp(x) ? Ct : Cnil);}
 
-
-
-DEFUNO_NEW("FLOATP",object,fLfloatp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Lfloatp,(object x0),"")
-
-{
-	enum type t;
-	/* 1 args */
-
-	t = type_of(x0);
-	if (t == t_longfloat || t == t_shortfloat)
-		x0 = Ct;
-	else
-		x0 = Cnil;
-RETURN1(x0);}
-
-DEFUNO_NEW("COMPLEXP",object,fLcomplexp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Lcomplexp,(object x0),"")
-
-{
-	/* 1 args */
-
-	if (type_of(x0) == t_complex)
-		x0 = Ct;
-	else
-		x0 = Cnil;
-RETURN1(x0);}
-
-DEFUNO_NEW("CHARACTERP",object,fLcharacterp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Lcharacterp,(object x0),"")
-
-{
-	/* 1 args */
-
-	if (type_of(x0) == t_character)
-		x0 = Ct;
-	else
-		x0 = Cnil;
-RETURN1(x0);}
-
-DEFUNO_NEW("STRINGP",object,fLstringp ,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Lstringp,(object x0),"")
-
-{
-	/* 1 args */
-
-	if (type_of(x0) == t_string)
-		x0 = Ct;
-	else
-		x0 = Cnil;
-RETURN1(x0);}
-
-DEFUNO_NEW("BIT-VECTOR-P",object,fLbit_vector_p,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Lbit_vector_p,(object x0),"")
-
-{
-	/* 1 args */
-
-	if (type_of(x0) == t_bitvector)
-		x0 = Ct;
-	else
-		x0 = Cnil;
-RETURN1(x0);}
-
-DEFUNO_NEW("VECTORP",object,fLvectorp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Lvectorp,(object x0),"")
-
-{
-	enum type t;
-	/* 1 args */
-
-	t = type_of(x0);
-	if (t == t_vector || t == t_string || t == t_bitvector)
-		x0 = Ct;
-	else
-		x0 = Cnil;
-RETURN1(x0);}
-
-DEFUNO_NEW("SIMPLE-STRING-P",object,fLsimple_string_p,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Lsimple_string_p,(object x0),"") {
-
-  RETURN1(FFN(fLstringp)(x0));
-
+DEFUN("COMPLEXP",object,fLcomplexp,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x)==t_complex ? Ct : Cnil);
 }
 
-
-	/* 1 args */
-
-/* 	if (type_of(x0) == t_string && */
-
-/*	old    !x0->st.st_adjustable && */
-
-/* 	    !x0->st.st_hasfillp && */
-/* 	    x0->st.st_displaced->c.c_car == Cnil) */
-/* 		x0 = Ct; */
-/* 	else */
-/* 		x0 = Cnil; */
-/* RETURN1(x0);}  */
-
-DEFUNO_NEW("SIMPLE-BIT-VECTOR-P",object,fLsimple_bit_vector_p ,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Lsimple_bit_vector_p ,(object x0),"") {
-  
-  RETURN1(FFN(fLbit_vector_p)(x0));
-
+DEFUN("CHARACTERP",object,fLcharacterp,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x)==t_character ? Ct : Cnil);
 }
 
-	/* 1 args */
-
-/* 	if (type_of(x0) == t_bitvector && */
-
-
-	    /*	 old    !x0->bv.bv_adjustable && */
-
-
-/* 	    !x0->bv.bv_hasfillp && */
-/* 	    x0->bv.bv_displaced->c.c_car == Cnil) */
-/* 		x0 = Ct; */
-/* 	else */
-/* 		x0 = Cnil; */
-/* RETURN1(x0);} */
-
-
-DEFUNO_NEW("SIMPLE-VECTOR-P",object,fLsimple_vector_p ,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Lsimple_vector_p ,(object x0),"") {
-
-  RETURN1(FFN(fLvectorp)(x0)==Ct && (enum aelttype)x0->v.v_elttype == aet_object ? Ct : Cnil);
-
+DEFUN("STRINGP",object,fLstringp ,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x)==t_string ? Ct : Cnil);
 }
 
-/* 	enum type t; */
-	/* 1 args */
+DEFUN("BIT-VECTOR-P",object,fLbit_vector_p,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x)==t_bitvector ? Ct : Cnil);
+}
 
-/* 	t = type_of(x0); */
-/* 	if (t == t_vector && */
+DEFUN("VECTORP",object,fLvectorp,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(vectorp(x) ? Ct : Cnil);
+}
 
+DEFUN("SIMPLE-STRING-P",object,fLsimple_string_p,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(FFN(fLstringp)(x));
+}
 
-/*	old     !x0->v.v_adjustable && */
+DEFUN("SIMPLE-BIT-VECTOR-P",object,fLsimple_bit_vector_p,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(FFN(fLbit_vector_p)(x));
+}
 
-/* 	    !x0->v.v_hasfillp && */
-/* 	    x0->v.v_displaced->c.c_car == Cnil && */
-/* 	    (enum aelttype)x0->v.v_elttype == aet_object) */
-/* 		x0 = Ct; */
-/* 	else */
-/* 		x0 = Cnil; */
-/* RETURN1(x0);} */
+DEFUN("SIMPLE-VECTOR-P",object,fLsimple_vector_p,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(FFN(fLvectorp)(x)==Ct && (enum aelttype)x->v.v_elttype==aet_object ? Ct : Cnil);
+}
 
-DEFUNO_NEW("ARRAYP",object,fLarrayp ,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Larrayp,(object x0),"")
+DEFUN("ARRAYP",object,fLarrayp,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(arrayp(x) ? Ct : Cnil);
+}
 
-{
-	enum type t;
-	/* 1 args */
+DEFUN("PACKAGEP",object,fLpackagep,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x)==t_package ? Ct : Cnil);
+}
 
-	t = type_of(x0);
-	if (t == t_array ||
-	    t == t_vector || t == t_string || t == t_bitvector)
-		x0 = Ct;
-	else
-		x0 = Cnil;
-RETURN1(x0);}
-
-DEFUNO_NEW("PACKAGEP",object,fLpackagep ,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Lpackagep ,(object x0),"")
-
-{
-	/* 1 args */
-
-	if (type_of(x0) == t_package)
-		x0 = Ct;
-	else
-		x0 = Cnil;
-RETURN1(x0);}
-
-DEFUNO_NEW("FUNCTIONP",object,fLfunctionp,LISP
-	   ,1,1,NONE,OO,OO,OO,OO,void,Lfunctionp,(object x0),"") {
-  
-  RETURN1(functionp(x0) ? Ct : Cnil);
-
+DEFUN("FUNCTIONP",object,fLfunctionp,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(functionp(x) ? Ct : Cnil);
 }
 
 #ifdef STATIC_FUNCTION_POINTERS
@@ -353,80 +122,35 @@ fLfunctionp(object x) {
 }
 #endif
 
-DEFUNO_NEW("LOGICAL-PATHNAME-P",object,fSlogical_pathname_p,SI
-	   ,1,1,NONE,OO,OO,OO,OO,void,siLlogical_pathname_p,(object x),"") {
-
-  x=type_of(x)==t_pathname && pathname_lookup(x->pn.pn_host,sSApathname_logicalA->s.s_dbind)!=Cnil ? Ct : Cnil;
-  RETURN1(x);
-
+DEFUN("LOGICAL-PATHNAME-P",object,fSlogical_pathname_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x)==t_pathname && pathname_lookup(x->pn.pn_host,sSApathname_logicalA->s.s_dbind)!=Cnil ? Ct : Cnil);
 }
 
-DEFUNO_NEW("COMPILED-FUNCTION-P",object,fLcompiled_function_p,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Lcompiled_function_p,(object x0),"")
-
-{
-	/* 1 args */;
-
-	if (/* type_of(x0) == t_cfun || */
-	    type_of(x0) == t_function)
-		x0 = Ct;
-	else
-		x0 = Cnil;
-RETURN1(x0);}
-
-DEFUN_NEW("GENERIC-FUNCTION-P",object,fSgeneric_function_p,SI
-   ,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
-
-  RETURN1(type_of(x0) == t_function && x0->d.tt==1 ? Ct : Cnil);
-
+DEFUN("COMPILED-FUNCTION-P",object,fLcompiled_function_p,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x)==t_function ? Ct : Cnil);
 }
-DEFUN_NEW("SET-D-TT",object,fSset_d_tt_p,SI,2,2,NONE,OI,OO,OO,OO,(fixnum x,object y),"") {
 
+DEFUN("GENERIC-FUNCTION-P",object,fSgeneric_function_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x)==t_function && x->d.tt==1 ? Ct : Cnil);
+}
+DEFUN("SET-D-TT",object,fSset_d_tt_p,SI,2,2,NONE,OI,OO,OO,OO,(fixnum x,object y),"") {
   y->d.tt=x;
   RETURN1(y);
-
 }
 
-/* DEFUN_NEW("OLD-COMPILED-FUNCTION-P",object,fSold_compiled_function_p,SI */
-/*    ,1,1,NONE,OO,OO,OO,OO,(object x0),"") { */
 
-/*   RETURN1(type_of(x0) == t_cfun ? Ct : Cnil); */
+DEFUN("COMMONP",object,fScommonp,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x) != t_spice ? Ct : Cnil);
+}
 
-/* } */
-
-/* DEFUNO_NEW("INTERPRETED-FUNCTION-P",object,fSinterpreted_function_p,SI */
-/*    ,1,1,NONE,OO,OO,OO,OO,void,siLinterpreted_function_p,(object x0),"") */
-
-/* { */
-/* 	/\* 1 args *\/; */
-
-/* 	if (type_of(x0) == t_ifun) */
-/* 		x0 = Ct; */
-/* 	else */
-/* 		x0 = Cnil; */
-/* RETURN1(x0);} */
-
-DEFUN_NEW("COMMONP",object,fScommonp,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-
-{
-	/* 1 args */;
-
-	if (type_of(x0) != t_spice)
-		x0 = Ct;
-	else
-		x0 = Cnil;
-RETURN1(x0);}
-
-DEFUNO_NEW("EQ",object,fLeq,LISP,2,2,NONE,OO,OO,OO,OO,void,Leq,(object x0,object x1),"") {
-
+DEFUN("EQ",object,fLeq,LISP,2,2,NONE,OO,OO,OO,OO,(object x0,object x1),"") {
   RETURN1(x0==x1 ? Ct : Cnil);
-
 }
 
 #define eqlm(x,y) \
 \
   case t_fixnum:\
-    return (fix(x) == fix(y)) ? TRUE : FALSE;\
+    return (fix(x)==fix(y)) ? TRUE : FALSE;\
 \
   case t_bignum:\
     return big_compare(x,y) ? FALSE : TRUE;\
@@ -436,10 +160,10 @@ DEFUNO_NEW("EQ",object,fLeq,LISP,2,2,NONE,OO,OO,OO,OO,void,Leq,(object x0,object
 	    eql(x->rat.rat_den,y->rat.rat_den)) ? TRUE : FALSE;\
 \
   case t_shortfloat:\
-    return sf(x) == sf(y) ? TRUE : FALSE;\
+    return sf(x)==sf(y) ? TRUE : FALSE;\
 \
   case t_longfloat:\
-    return lf(x) == lf(y) ? TRUE : FALSE;\
+    return lf(x)==lf(y) ? TRUE : FALSE;\
 \
   case t_complex:\
     return (eql(x->cmp.cmp_real,y->cmp.cmp_real) &&\
@@ -451,9 +175,9 @@ DEFUNO_NEW("EQ",object,fLeq,LISP,2,2,NONE,OO,OO,OO,OO,void,Leq,(object x0,object
 bool
 eql1(register object x,register object y) {
 
-  if (x==Cnil || y==Cnil || is_imm_fixnum(x) || is_imm_fixnum(y)) return FALSE;
+  if (x==Cnil||y==Cnil||is_imm_fixnum(x)||is_imm_fixnum(y)) return FALSE;
 
-  if (valid_cdr(x) || valid_cdr(y) || x->d.t!=y->d.t) return FALSE;
+  if (valid_cdr(x)||valid_cdr(y)||x->d.t!=y->d.t) return FALSE;
   
   switch (x->d.t) {
 
@@ -463,10 +187,8 @@ eql1(register object x,register object y) {
 
 }
 
-DEFUNO_NEW("EQL",object,fLeql,LISP,2,2,NONE,OO,OO,OO,OO,void,Leql,(object x0,object x1),"") {
-
+DEFUN("EQL",object,fLeql,LISP,2,2,NONE,OO,OO,OO,OO,(object x0,object x1),"") {
   RETURN1(eql(x0,x1) ? Ct : Cnil);
-
 }
 
 
@@ -480,9 +202,9 @@ equal1(register object x, register object y) {
 
   if (x==y) return TRUE;
   if (cx)   return FALSE;
-  if (x==Cnil || y==Cnil || is_imm_fixnum(x) || is_imm_fixnum(y)) return FALSE;
+  if (x==Cnil||y==Cnil||is_imm_fixnum(x)||is_imm_fixnum(y)) return FALSE;
 
-  if (valid_cdr(y) || x->d.t!=y->d.t)
+  if (valid_cdr(y)||x->d.t!=y->d.t)
     return FALSE;
   
   switch(x->d.t) {
@@ -512,7 +234,7 @@ equal1(register object x, register object y) {
 	equal(x->pn.pn_name, y->pn.pn_name) &&
 	equal(x->pn.pn_type, y->pn.pn_type)) {
       /* version is ignored unless logical host */
-      if ((type_of(x->pn.pn_host) == t_string) &&
+      if ((type_of(x->pn.pn_host)==t_string) &&
 	  (pathname_lookup(x->pn.pn_host,sSApathname_logicalA) != Cnil))
 	return(equal(x->pn.pn_version, y->pn.pn_version) ? TRUE : FALSE);
       else
@@ -527,7 +249,7 @@ equal1(register object x, register object y) {
 }
 
 
-DEFUNO_NEW("EQUAL",object,fLequal,LISP,2,2,NONE,OO,OO,OO,OO,void,Lequal,(object x0,object x1),"") {
+DEFUN("EQUAL",object,fLequal,LISP,2,2,NONE,OO,OO,OO,OO,(object x0,object x1),"") {
   RETURN1(equal(x0, x1) ? Ct : Cnil);
 }
 
@@ -545,7 +267,7 @@ equalp1(register object x, register object y) {
     if (!equalp(x->c.c_car,y->c.c_car)) return FALSE;
 
   if (x==y) return TRUE;
-  if (cx || listp(y))   return FALSE;
+  if (cx||listp(y))   return FALSE;
   if (x==Cnil) return FALSE;
 
   tx=is_imm_fixnum(x) ? t_fixnum : x->d.t;
@@ -559,9 +281,9 @@ equalp1(register object x, register object y) {
   case t_shortfloat:
   case t_longfloat:
   case t_complex:
-    if (ty == t_fixnum || ty == t_bignum || ty == t_ratio ||
-	ty == t_shortfloat || ty == t_longfloat ||
-	ty == t_complex)
+    if (ty==t_fixnum||ty==t_bignum||ty==t_ratio ||
+	ty==t_shortfloat||ty==t_longfloat ||
+	ty==t_complex)
       return(!number_compare(x, y));
     else
       return(FALSE);
@@ -569,7 +291,7 @@ equalp1(register object x, register object y) {
   case t_vector:
   case t_string:
   case t_bitvector:
-    if (ty == t_vector || ty == t_string || ty == t_bitvector) {
+    if (ty==t_vector||ty==t_string||ty==t_bitvector) {
       j = x->v.v_fillp;
       if (j != y->v.v_fillp)
 	return FALSE;
@@ -579,7 +301,7 @@ equalp1(register object x, register object y) {
       return(FALSE);
     
   case t_array:
-    if (ty == t_array && x->a.a_rank == y->a.a_rank) { 
+    if (ty==t_array && x->a.a_rank==y->a.a_rank) { 
       if (x->a.a_rank > 1) {
 	fixnum i;
 	for (i=0; i< x->a.a_rank; i++) {
@@ -659,7 +381,7 @@ equalp1(register object x, register object y) {
 	if (x->ht.ht_self[i].hte_key==OBJNULL)
 	  continue;
 	if ((e=gethash(x->ht.ht_self[i].hte_key,y))->hte_key==OBJNULL
-	    || !equalp(x->ht.ht_self[i].hte_value,e->hte_value))
+	   ||!equalp(x->ht.ht_self[i].hte_value,e->hte_value))
 	  return(FALSE);
       }
       return(TRUE);
@@ -693,59 +415,55 @@ equalp1(register object x, register object y) {
 }
 
 
-DEFUNO_NEW("EQUALP",object,fLequalp,LISP,2,2,NONE,OO,OO,OO,OO,void,Lequalp,(object x0,object x1),"") {
-  
+DEFUN("EQUALP",object,fLequalp,LISP,2,2,NONE,OO,OO,OO,OO,(object x0,object x1),"") {
   RETURN1(equalp(x0,x1) ? Ct : Cnil);
-
 }
 
 static void
-FFN(Fand)(object args)
-{
+FFN(Fand)(object args) {
 
-	object *top = vs_top;
-
-	if (endp(args)) {
-		vs_base = vs_top;
-		vs_push(Ct);
-		return;
-	}
-	while (!endp(MMcdr(args))) {
-		eval(MMcar(args));
-		if (vs_base[0] == Cnil) {
-			vs_base = vs_top = top;
-			vs_push(Cnil);
-			return;
-		}
-		vs_top = top;
-		args = MMcdr(args);
-	}
-	eval(MMcar(args));
+  object *top = vs_top;
+  
+  if (endp(args)) {
+    vs_base = vs_top;
+    vs_push(Ct);
+    return;
+  }
+  while (!endp(MMcdr(args))) {
+    eval(MMcar(args));
+    if (vs_base[0]==Cnil) {
+      vs_base = vs_top = top;
+      vs_push(Cnil);
+      return;
+    }
+    vs_top = top;
+    args = MMcdr(args);
+  }
+  eval(MMcar(args));
 }
 
 static void
-FFN(For)(object args)
-{
+FFN(For)(object args) {
 
-	object *top = vs_top;
-
-	if (endp(args)) {
-		vs_base = vs_top;
-		vs_push(Cnil);
-		return;
-	}
-	while (!endp(MMcdr(args))) {
-		eval(MMcar(args));
-		if (vs_base[0] != Cnil) {
-			top[0] = vs_base[0];
-			vs_base = top;
-			vs_top = top+1;
-			return;
-		}
-		vs_top = top;
-		args = MMcdr(args);
-	}
-	eval(MMcar(args));
+  object *top = vs_top;
+  
+  if (endp(args)) {
+    vs_base = vs_top;
+    vs_push(Cnil);
+    return;
+  }
+  while (!endp(MMcdr(args))) {
+    eval(MMcar(args));
+    if (vs_base[0] != Cnil) {
+      top[0] = vs_base[0];
+      vs_base = top;
+      vs_top = top+1;
+      return;
+    }
+    vs_top = top;
+    args = MMcdr(args);
+  }
+  eval(MMcar(args));
 }
 
 /*
@@ -754,93 +472,66 @@ FFN(For)(object args)
 	Refer to the compiler about this magic.
 */
 bool
-contains_sharp_comma(object x)
-{
-	enum type tx;
+contains_sharp_comma(object x) {
 
-	cs_check(x);
+  enum type tx;
+  
+  cs_check(x);
+  
+ BEGIN:
+  tx = type_of(x);
+  if (tx==t_complex)
+    return(contains_sharp_comma(x->cmp.cmp_real) ||
+	   contains_sharp_comma(x->cmp.cmp_imag));
+  if (tx==t_vector)
+    {
+      int i;
+      if (x->v.v_elttype==aet_object)
+	for (i = 0;  i < x->v.v_fillp;  i++)
+	  if (contains_sharp_comma(x->v.v_self[i]))
+	    return(TRUE);
+      return(FALSE);
+    }
+  if (tx==t_cons) {
+    if (x->c.c_car==siSsharp_comma)
+      return(TRUE);
+    if (contains_sharp_comma(x->c.c_car))
+      return(TRUE);
+    x = x->c.c_cdr;
+    goto BEGIN;
+  }
+  if (tx==t_array)
+    {
+      int i, j;
+      if (x->a.a_elttype==aet_object) {
+	for (i = 0, j = 1;  i < x->a.a_rank;  i++)
+	  j *= x->a.a_dims[i];
+	for (i = 0;  i < j;  i++)
+	  if (contains_sharp_comma(x->a.a_self[i]))
+	    return(TRUE);
+      }
+      return(FALSE);
+    }
+  if (tx==t_structure)
+    return(TRUE);		/*  Oh, my god!  */
+  return(FALSE);
 
-BEGIN:
-	tx = type_of(x);
-	if (tx == t_complex)
-		return(contains_sharp_comma(x->cmp.cmp_real) ||
-		       contains_sharp_comma(x->cmp.cmp_imag));
-	if (tx == t_vector)
-	{
-		int i;
-	   if (x->v.v_elttype == aet_object)
-		for (i = 0;  i < x->v.v_fillp;  i++)
-			if (contains_sharp_comma(x->v.v_self[i]))
-				return(TRUE);
-		return(FALSE);
-	}
-	if (tx == t_cons) {
-		if (x->c.c_car == siSsharp_comma)
-			return(TRUE);
-		if (contains_sharp_comma(x->c.c_car))
-			return(TRUE);
-		x = x->c.c_cdr;
-		goto BEGIN;
-	}
-	if (tx == t_array)
-	{
-		int i, j;
-	   if (x->a.a_elttype == aet_object) {
-		for (i = 0, j = 1;  i < x->a.a_rank;  i++)
-			j *= x->a.a_dims[i];
-		for (i = 0;  i < j;  i++)
-			if (contains_sharp_comma(x->a.a_self[i]))
-				return(TRUE);
-	      }
-		return(FALSE);
-	}
-	if (tx == t_structure)
-		return(TRUE);		/*  Oh, my god!  */
-	return(FALSE);
 }
 
-DEFUN_NEW("CONTAINS-SHARP-COMMA",object,fScontains_sharp_comma,SI
-   ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-
-{
-	/* 1 args */
-
-	if (contains_sharp_comma(x0))
-		x0 = Ct;
-	else
-		x0 = Cnil;
-	RETURN1(x0);
+DEFUN("CONTAINS-SHARP-COMMA",object,fScontains_sharp_comma,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  RETURN1(contains_sharp_comma(x0) ? Ct : Cnil);
 }
 
-DEFUN_NEW("SPICEP",object,fSspicep  ,SI
-   ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-
-{
-	/* 1 args */
-	if (type_of(x0) == t_spice)
-		x0 = Ct;
-	else
-		x0 = Cnil;
-	RETURN1(x0);
+DEFUN("SPICEP",object,fSspicep,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  RETURN1(type_of(x0)==t_spice ? Ct : Cnil);
 }
 
-DEFUN_NEW("FIXNUMP",object,fSfixnump,SI
-   ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-
-{
-	/* 1 args */
-	if (type_of(x0) == t_fixnum)
-		x0 = Ct;
-	else
-		x0 = Cnil;
-	RETURN1(x0);
+DEFUN("FIXNUMP",object,fSfixnump,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  RETURN1(type_of(x0)==t_fixnum ? Ct : Cnil);
 }
 
 void
-gcl_init_predicate_function(void)
-{
-
+gcl_init_predicate_function(void) {
   sLand=make_special_form("AND",Fand);
   sLor=make_special_form("OR",For);
-
 }

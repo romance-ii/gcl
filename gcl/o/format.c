@@ -2282,18 +2282,16 @@ fmt_semicolon(bool colon, bool atsign)
 
 DEFVAR("*FORMAT-UNUSED-ARGS*",sSAformat_unused_argsA,SI,OBJNULL,"");
 
-DEFUNO_NEW("FORMAT",object,fLformat,LISP
-	   ,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,void,Lformat,
-	   (object strm, object control,...),"") {
+DEFUN("FORMAT",object,fLformat,LISP,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,(object strm, object control,...),"") {
 
   va_list ap; 
   VOL object x = OBJNULL;
   jmp_buf fmt_jmp_buf0;
   bool colon, e;
   VOL fixnum nargs=INIT_NARGS(2);
-
+  
   fmt_old;
-
+  
   if (strm == Cnil) {
     strm = make_string_output_stream(64);
     x = strm->sm.sm_object0;

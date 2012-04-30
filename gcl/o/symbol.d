@@ -343,7 +343,7 @@ object s, v, p;
 	return(v);
 }
 
-DEFUN_NEW("SPUTPROP",object,fSsputprop,SI,3,3,NONE,OO,OO,OO,OO,(object s,object p,object v),"") {
+DEFUN("SPUTPROP",object,fSsputprop,SI,3,3,NONE,OO,OO,OO,OO,(object s,object p,object v),"") {
 
   if (type_of(s) != t_symbol)
     not_a_symbol(s);
@@ -431,7 +431,7 @@ LFD(Lremprop)()
 	vs_popp;
 }
 
-DEFUN_NEW("SYMBOL-PLIST",object,fLsymbol_plist,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+DEFUN("SYMBOL-PLIST",object,fLsymbol_plist,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
   check_type_symbol(&sym);
   RETURN1(sym->s.s_plist);
 }
@@ -460,7 +460,7 @@ DEFUN_NEW("SYMBOL-PLIST",object,fLsymbol_plist,LISP,1,1,NONE,OO,OO,OO,OO,(object
 	@(return Cnil Cnil Cnil)
 @)
 
-DEFUN_NEW("SYMBOL-STRING",object,fSsymbol_string,SI,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+DEFUN("SYMBOL-STRING",object,fSsymbol_string,SI,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
   object y=alloc_simple_string(sym->st.st_fillp);
   y->st.st_self=sym->st.st_self;
   RETURN1(y);
@@ -491,12 +491,12 @@ object y;
     return(y);
 }
 
-DEFUN_NEW("SYMBOL-NAME",object,fLsymbol_name,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+DEFUN("SYMBOL-NAME",object,fLsymbol_name,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
 /* LFD(Lsymbol_name)() */
   RETURN1(symbol_name(sym));
 }
 
-DEFUN_NEW("MAKE-SYMBOL",object,fLmake_symbol,LISP,1,1,NONE,OO,OO,OO,OO,(object name),"") {
+DEFUN("MAKE-SYMBOL",object,fLmake_symbol,LISP,1,1,NONE,OO,OO,OO,OO,(object name),"") {
 /* LFD(Lmake_symbol)() */
   check_type_string(&name);
   RETURN1(make_symbol(name));
@@ -567,7 +567,7 @@ gensym_int(object this_gensym_prefix,object this_gensym_counter) {
 
 }
 
-DEFUN_NEW("GENSYM0",object,fSgensym0,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+DEFUN("GENSYM0",object,fSgensym0,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
 
   object x;
 
@@ -577,7 +577,7 @@ DEFUN_NEW("GENSYM0",object,fSgensym0,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
 
 }
 
-DEFUN_NEW("GENSYM1S",object,fSgensym1s,SI,1,1,NONE,OO,OO,OO,OO,(object g),"") {
+DEFUN("GENSYM1S",object,fSgensym1s,SI,1,1,NONE,OO,OO,OO,OO,(object g),"") {
 
   object x;
 
@@ -587,7 +587,7 @@ DEFUN_NEW("GENSYM1S",object,fSgensym1s,SI,1,1,NONE,OO,OO,OO,OO,(object g),"") {
 
 }
 
-DEFUN_NEW("GENSYM1IG",object,fSgensym1ig,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("GENSYM1IG",object,fSgensym1ig,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
   check_type_non_negative_integer(&x);
   RETURN1(gensym_int(NULL,x));
@@ -648,12 +648,12 @@ ONCE_MORE:
 	@(return smbl)
 @)
 
-DEFUN_NEW("SYMBOL-PACKAGE",object,fLsymbol_package,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+DEFUN("SYMBOL-PACKAGE",object,fLsymbol_package,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
   check_type_symbol(&sym);
   RETURN1(sym->s.s_hpack);
 }
 
-DEFUN_NEW("KEYWORDP",object,fLkeywordp,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+DEFUN("KEYWORDP",object,fLkeywordp,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
   RETURN1(type_of(sym) == t_symbol && keywordp(sym) ? Ct : Cnil);
 }
 

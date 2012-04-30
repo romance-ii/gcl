@@ -141,7 +141,7 @@ structure_set(object x, object name, int i, object v)
  return(v);
 }
 
-DEFUN_NEW("STRUCTURE-SUBTYPE-P",object,fSstructure_subtype_p,SI,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+DEFUN("STRUCTURE-SUBTYPE-P",object,fSstructure_subtype_p,SI,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
 
 /* static void */
 /* FFN(siLstructure_subtype_p)(void) */
@@ -181,7 +181,7 @@ structure_to_list(object x)
 	return(vs_pop);
 }
 
-DEFUNO_NEW("MAKE-STRUCTURE",object,fSmake_structure,SI,1,63,NONE,OO,OO,OO,OO,void,siLmake_structure,(object name,...),"") {/*FIXME*/
+DEFUN("MAKE-STRUCTURE",object,fSmake_structure,SI,1,63,NONE,OO,OO,OO,OO,(object name,...),"") {/*FIXME*/
 
   fixnum narg=INIT_NARGS(1),i,size;
   object l=Cnil,f=OBJNULL,v,x;
@@ -242,7 +242,7 @@ DEFUNO_NEW("MAKE-STRUCTURE",object,fSmake_structure,SI,1,63,NONE,OO,OO,OO,OO,voi
 
 }
 
-DEFUN_NEW("COPY-STRUCTURE",object,fLcopy_structure,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("COPY-STRUCTURE",object,fLcopy_structure,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
   object y;
   struct s_data *def;

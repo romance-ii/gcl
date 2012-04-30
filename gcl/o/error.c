@@ -170,199 +170,152 @@ ILLEGAL:
 	return(NULL);
 }
 
-DEFUNO_NEW("IHS-TOP",object,fSihs_top,SI
-       ,0,0,NONE,OO,OO,OO,OO,static void,siLihs_top,(void),"")
-
-{
-	/* 0 args */
+DEFUN("IHS-TOP",object,fSihs_top,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
   fixnum i=ihs_top-ihs_org;
   for (;i>=0 && type_of(ihs_org[i].ihs_function)==t_function && 
 	 ihs_org[i].ihs_function->fun.fun_self==FFN(fSihs_top);i--);
   RETURN1(make_fixnum(i));
 }
 
-DEFUN_NEW("IHS-FUN",object,fSihs_fun,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	/* 1 args */
-	x0 = get_ihs_ptr(x0)->ihs_function;
-	RETURN1(x0);
+DEFUN("IHS-FUN",object,fSihs_fun,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  x0 = get_ihs_ptr(x0)->ihs_function;
+  RETURN1(x0);
 }
 
-DEFUN_NEW("IHS-VS",object,fSihs_vs,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	/* 1 args */
-	x0 = make_fixnum(get_ihs_ptr(x0)->ihs_base - vs_org);
-	RETURN1(x0);
+DEFUN("IHS-VS",object,fSihs_vs,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  x0 = make_fixnum(get_ihs_ptr(x0)->ihs_base - vs_org);
+  RETURN1(x0);
 }
 
-static frame_ptr get_frame_ptr(object x)
-{
-	frame_ptr p;
+static frame_ptr get_frame_ptr(object x) {
 
-	if (type_of(x) != t_fixnum)
-		goto ILLEGAL;
-	p = frs_org + fix(x);
-	if (fix(x)==0) return p;
-	if (frs_org <= p && p <= frs_top)
-		return(p);
-ILLEGAL:
-	FEerror("~S is an illegal frs index.", 1, x);
-	return NULL;
+  frame_ptr p;
+  
+  if (type_of(x) != t_fixnum)
+    goto ILLEGAL;
+  p = frs_org + fix(x);
+  if (fix(x)==0) return p;
+  if (frs_org <= p && p <= frs_top)
+    return(p);
+ ILLEGAL:
+  FEerror("~S is an illegal frs index.", 1, x);
+  return NULL;
+
 }
 
-DEFUN_NEW("FRS-TOP",object,fSfrs_top,SI
-       ,0,0,NONE,OO,OO,OO,OO,(void),"")
-
-{
-	/* 0 args */
-	RETURN1((make_fixnum(frs_top - frs_org)));
+DEFUN("FRS-TOP",object,fSfrs_top,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+  RETURN1((make_fixnum(frs_top - frs_org)));
 }
 
-DEFUN_NEW("FRS-VS",object,fSfrs_vs,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	/* 1 args */
-	x0 = make_fixnum(get_frame_ptr(x0)->frs_lex - vs_org);
-	RETURN1(x0);
+DEFUN("FRS-VS",object,fSfrs_vs,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  x0 = make_fixnum(get_frame_ptr(x0)->frs_lex - vs_org);
+  RETURN1(x0);
 }
 
-DEFUN_NEW("FRS-BDS",object,fSfrs_bds,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	/* 1 args */
-	x0
-	= make_fixnum(get_frame_ptr(x0)->frs_bds_top - bds_org);
-	RETURN1(x0);
+DEFUN("FRS-BDS",object,fSfrs_bds,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  x0=make_fixnum(get_frame_ptr(x0)->frs_bds_top - bds_org);
+  RETURN1(x0);
 }
 
-DEFUN_NEW("FRS-CLASS",object,fSfrs_class,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	enum fr_class c;
+DEFUN("FRS-CLASS",object,fSfrs_class,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
 
-	/* 1 args */
+  enum fr_class c;
 
-	c = get_frame_ptr(x0)->frs_class;
-	if (c == FRS_CATCH) x0 = sKcatch;
-	else if (c == FRS_PROTECT) x0 = sKprotect;
-	else if (c == FRS_CATCHALL) x0 = sKcatchall;
-	else FEerror("Unknown frs class was detected.", 0);
-	RETURN1(x0);
+  c = get_frame_ptr(x0)->frs_class;
+  if (c == FRS_CATCH) x0 = sKcatch;
+  else if (c == FRS_PROTECT) x0 = sKprotect;
+  else if (c == FRS_CATCHALL) x0 = sKcatchall;
+  else FEerror("Unknown frs class was detected.", 0);
+  RETURN1(x0);
+
 }
 
-DEFUN_NEW("FRS-TAG",object,fSfrs_tag,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	/* 1 args */
-	x0 = get_frame_ptr(x0)->frs_val;
-	RETURN1(x0);
+DEFUN("FRS-TAG",object,fSfrs_tag,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  x0 = get_frame_ptr(x0)->frs_val;
+  RETURN1(x0);
 }
 
-DEFUN_NEW("FRS-IHS",object,fSfrs_ihs,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	/* 1 args */
-	x0
-	= make_fixnum(get_frame_ptr(x0)->frs_ihs - ihs_org);
-	RETURN1(x0);
+DEFUN("FRS-IHS",object,fSfrs_ihs,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  x0=make_fixnum(get_frame_ptr(x0)->frs_ihs - ihs_org);
+  RETURN1(x0);
 }
 
-static bds_ptr get_bds_ptr(object x)
-{
-	bds_ptr p;
+static bds_ptr get_bds_ptr(object x) {
 
-	if (type_of(x) != t_fixnum)
-		goto ILLEGAL;
-	p = bds_org + fix(x);
-	if (0 == fix(x)) return p;
-	if (bds_org <= p && p <= bds_top)
-		return(p);
-ILLEGAL:
-	FEerror("~S is an illegal bds index.", 1, x);
-	return NULL;
+  bds_ptr p;
+  
+  if (type_of(x) != t_fixnum)
+    goto ILLEGAL;
+  p = bds_org + fix(x);
+  if (0 == fix(x)) return p;
+  if (bds_org <= p && p <= bds_top)
+    return(p);
+ ILLEGAL:
+  FEerror("~S is an illegal bds index.", 1, x);
+  return NULL;
+
 }
 
-DEFUN_NEW("BDS-TOP",object,fSbds_top,SI
-       ,0,0,NONE,OO,OO,OO,OO,(void),"")
-
-{
-	/* 0 args */
-	RETURN1((make_fixnum(bds_top - bds_org)));
+DEFUN("BDS-TOP",object,fSbds_top,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+  RETURN1((make_fixnum(bds_top - bds_org)));
 }
 
-DEFUN_NEW("BDS-VAR",object,fSbds_var,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	/* 1 args */
-	x0 = get_bds_ptr(x0)->bds_sym;
-	RETURN1(x0);
+DEFUN("BDS-VAR",object,fSbds_var,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  x0 = get_bds_ptr(x0)->bds_sym;
+  RETURN1(x0);
 }
 
-DEFUN_NEW("BDS-VAL",object,fSbds_val,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	/* 1 args */
-	x0 = get_bds_ptr(x0)->bds_val;
-	RETURN1(x0);
+DEFUN("BDS-VAL",object,fSbds_val,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  x0 = get_bds_ptr(x0)->bds_val;
+  RETURN1(x0);
 }
 
-static object *get_vs_ptr(object x)
-{
-	object *p;
+static object *get_vs_ptr(object x) {
 
-	if (type_of(x) != t_fixnum)
-		goto ILLEGAL;
-	p = vs_org + fix(x);
-	if (vs_org <= p && p < vs_top)
-		return(p);
-ILLEGAL:
-	FEerror("~S is an illegal vs index.", 1, x);
-	return NULL;
+  object *p;
+
+  if (type_of(x) != t_fixnum)
+    goto ILLEGAL;
+  p = vs_org + fix(x);
+  if (vs_org <= p && p < vs_top)
+    return(p);
+ ILLEGAL:
+  FEerror("~S is an illegal vs index.", 1, x);
+  return NULL;
+
 }
 
-DEFUN_NEW("VS-TOP",object,fSvs_top,SI
-       ,0,0,NONE,OO,OO,OO,OO,(void),"")
-{
-	object x;
-	/* 0 args */
-	x = (make_fixnum(vs_top - vs_org));
-	RETURN1(x);
+DEFUN("VS-TOP",object,fSvs_top,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+  object x;
+  x = (make_fixnum(vs_top - vs_org));
+  RETURN1(x);
 }
 
-DEFUN_NEW("VS",object,fSvs,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	/* 1 args */
-	x0 = *get_vs_ptr(x0);
-	RETURN1(x0);
+DEFUN("VS",object,fSvs,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  x0 = *get_vs_ptr(x0);
+  RETURN1(x0);
 }
 
-DEFUN_NEW("SCH-FRS-BASE",object,fSsch_frs_base,SI
-       ,2,2,NONE,OO,OO,OO,OO,(object x0,object x1),"")
-{
-	frame_ptr x;
-	ihs_ptr y;
+DEFUN("SCH-FRS-BASE",object,fSsch_frs_base,SI,2,2,NONE,OO,OO,OO,OO,(object x0,object x1),"") {
 
-	/* 2 args */
-	y = get_ihs_ptr(x1);
-	for (x = get_frame_ptr(x0);
-	     x <= frs_top && x->frs_ihs < y; 
-	     x++);
-	if (x > frs_top) x0 = Cnil;
-	else x0 = make_fixnum(x - frs_org);
+  frame_ptr x;
+  ihs_ptr y;
+  
+  /* 2 args */
+  y = get_ihs_ptr(x1);
+  for (x = get_frame_ptr(x0);
+       x <= frs_top && x->frs_ihs < y; 
+       x++);
+  if (x > frs_top) x0 = Cnil;
+  else x0 = make_fixnum(x - frs_org);
+  
+  RETURN1(x0);
 
-	RETURN1(x0);
 }
 
-DEFUNM_NEW("INTERNAL-SUPER-GO",object,fSinternal_super_go,SI
-	   ,3,3,NONE,OO,OO,OO,OO,(object tag,object x1,object x2),"")
-{
+DEFUNM("INTERNAL-SUPER-GO",object,fSinternal_super_go,SI,3,3,NONE,OO,OO,OO,OO,(object tag,object x1,object x2),"") {
   frame_ptr fr;
   fixnum vals=(fixnum)fcall.valp;
-  
-  /* 3 args */
   
   fr = frs_sch(tag);
   if (fr == NULL)
@@ -372,7 +325,8 @@ DEFUNM_NEW("INTERNAL-SUPER-GO",object,fSinternal_super_go,SI
   else
     tag = MMcons(tag, x1);
   unwind(fr,tag);
-  RETURN0 ;
+  RETURN0;
+
 }
 
 DEF_ORDINARY("UNIVERSAL-ERROR-HANDLER",sSuniversal_error_handler,SI
@@ -381,7 +335,7 @@ DEF_ORDINARY("UNIVERSAL-ERROR-HANDLER",sSuniversal_error_handler,SI
                Args:  (error-name correctable function-name \
                        continue-format-string error-format-string \
                        &rest args)");
-DEFUN_NEW("UNIVERSAL-ERROR-HANDLER",object,fSuniversal_error_handler,SI
+DEFUN("UNIVERSAL-ERROR-HANDLER",object,fSuniversal_error_handler,SI
 	   ,1,F_ARG_LIMIT,NONE,OO,OO,OO,OO,
 	  (object x0,object x1,object x2,object x3,object x4,
 	   object error_fmt_string,...),"") {

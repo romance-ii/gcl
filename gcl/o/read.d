@@ -1132,7 +1132,7 @@ object in;
 	
 }
 
-DEFUN_NEW("DOUBLE-QUOTE-READER",object,fSdouble_quote_reader,SI,2,2,NONE,OO,OO,OO,OO,
+DEFUN("DOUBLE-QUOTE-READER",object,fSdouble_quote_reader,SI,2,2,NONE,OO,OO,OO,OO,
 	  (object s,object c),"") {
 
   read_string(char_code(c),s);
@@ -1192,7 +1192,7 @@ Ldispatch_reader()
 	super_funcall(x);
 }
 
-DEFUN_NEW("SINGLE-QUOTE-READER",object,fSsingle_quote_reader,SI,2,2,NONE,OO,OO,OO,OO,
+DEFUN("SINGLE-QUOTE-READER",object,fSsingle_quote_reader,SI,2,2,NONE,OO,OO,OO,OO,
 	  (object s,object c),"") {
   RETURN1(MMcons(sLquote,MMcons(read_object(s),Cnil)));
 }
@@ -1210,7 +1210,7 @@ DEFUN_NEW("SINGLE-QUOTE-READER",object,fSsingle_quote_reader,SI,2,2,NONE,OO,OO,O
 /* 	vs_base[0] = vs_pop; */
 /* } */
 
-DEFUN_NEW("RIGHT-PARENTHESIS-READER",object,fSright_parenthesis_reader,SI,2,2,NONE,OO,OO,OO,OO,
+DEFUN("RIGHT-PARENTHESIS-READER",object,fSright_parenthesis_reader,SI,2,2,NONE,OO,OO,OO,OO,
 	  (object s,object c),"") {
   if (!inlp)
     READER_ERROR(vs_base[0],"Right paren found with no left.");
@@ -1232,7 +1232,7 @@ DEFUN_NEW("RIGHT-PARENTHESIS-READER",object,fSright_parenthesis_reader,SI,2,2,NO
 Lcomma_reader(){}
 */
 
-DEFUNM_NEW("SEMICOLON-READER",object,fSsemicolon_reader,SI,2,2,NONE,OO,OO,OO,OO,
+DEFUNM("SEMICOLON-READER",object,fSsemicolon_reader,SI,2,2,NONE,OO,OO,OO,OO,
 	  (object str,object c),"") {
 
   fixnum vals=fcall.valp;
@@ -1270,7 +1270,7 @@ Lbackquote_reader(){}
 static void
 extra_argument(int);
 
-DEFUN_NEW("SHARP-C-READER",object,fSsharp_c_reader,SI,3,3,NONE,OO,OO,OO,OO,(object s,object x,object y),"") {
+DEFUN("SHARP-C-READER",object,fSsharp_c_reader,SI,3,3,NONE,OO,OO,OO,OO,(object s,object x,object y),"") {
   
   object r,i;
 
@@ -1362,7 +1362,7 @@ DEFUN_NEW("SHARP-C-READER",object,fSsharp_c_reader,SI,3,3,NONE,OO,OO,OO,OO,(obje
 /* 	vs_top = vs_base + 1; */
 /* } */
 
-DEFUN_NEW("SHARP-\\-READER",object,fSsharp_sl_reader,SI,3,3,NONE,OO,OO,OO,OO,(object s,object x,object y),"") {
+DEFUN("SHARP-\\-READER",object,fSsharp_sl_reader,SI,3,3,NONE,OO,OO,OO,OO,(object s,object x,object y),"") {
 
   object c;
   
@@ -1470,7 +1470,7 @@ DEFUN_NEW("SHARP-\\-READER",object,fSsharp_sl_reader,SI,3,3,NONE,OO,OO,OO,OO,(ob
 /* 		FEerror("~S is an illegal character name.", 1, c); */
 /* } */
 
-DEFUN_NEW("SHARP-'-READER",object,fSsharp_q_reader,SI,3,3,NONE,OO,OO,OO,OO,(object s,object x,object y),"") {
+DEFUN("SHARP-'-READER",object,fSsharp_q_reader,SI,3,3,NONE,OO,OO,OO,OO,(object s,object x,object y),"") {
 
   if(y != Cnil && !READsuppress)
     extra_argument('#');
@@ -2229,7 +2229,7 @@ current_readtable()
 
 
 
-DEFUN_NEW("READ",object,fLread,LISP,0,4,NONE,OO,OO,OO,OO,(object f,...),"") {
+DEFUN("READ",object,fLread,LISP,0,4,NONE,OO,OO,OO,OO,(object f,...),"") {
 
   fixnum nargs=INIT_NARGS(0);
   object l=Cnil,x,strm,eof_errorp,eof_value,recursivep;
@@ -2264,7 +2264,7 @@ DEFUN_NEW("READ",object,fLread,LISP,0,4,NONE,OO,OO,OO,OO,(object f,...),"") {
   
 }
 
-DEFUN_NEW("READ-PRESERVING-WHITESPACE",object,fLread_preserving_whitespace,LISP,
+DEFUN("READ-PRESERVING-WHITESPACE",object,fLread_preserving_whitespace,LISP,
 	  0,4,NONE,OO,OO,OO,OO,(object f,...),"") {
 
   fixnum nargs=INIT_NARGS(0);
@@ -2304,7 +2304,7 @@ DEFUN_NEW("READ-PRESERVING-WHITESPACE",object,fLread_preserving_whitespace,LISP,
   RETURN1(x);
 }
     
-DEFUN_NEW("READ-DELIMITED-LIST",object,fLread_delimited_list,LISP,1,3,NONE,OO,OO,OO,OO,(object d,...),"") {
+DEFUN("READ-DELIMITED-LIST",object,fLread_delimited_list,LISP,1,3,NONE,OO,OO,OO,OO,(object d,...),"") {
 
   fixnum nargs=INIT_NARGS(1);
   object l=Cnil,x,f=OBJNULL,strm,recursivep,*p;
@@ -2368,7 +2368,7 @@ DEFUN_NEW("READ-DELIMITED-LIST",object,fLread_delimited_list,LISP,1,3,NONE,OO,OO
   RETURN1(l);
 }
 
-DEFUNM_NEW("READ-LINE",object,fLread_line,LISP,0,4,NONE,OO,OO,OO,OO,(object f,...),"") {
+DEFUNM("READ-LINE",object,fLread_line,LISP,0,4,NONE,OO,OO,OO,OO,(object f,...),"") {
 
   fixnum vals=(fixnum)fcall.valp,nargs=INIT_NARGS(0),i;
   object l=Cnil,c,strm,eof_errorp,eof_value,recursivep,*base=vs_top;
@@ -2414,7 +2414,7 @@ DEFUNM_NEW("READ-LINE",object,fLread_line,LISP,0,4,NONE,OO,OO,OO,OO,(object f,..
 
 }
 
-DEFUN_NEW("READ-CHAR",object,fLread_char,LISP,0,4,NONE,OO,OO,OO,OO,(object f,...),"") {
+DEFUN("READ-CHAR",object,fLread_char,LISP,0,4,NONE,OO,OO,OO,OO,(object f,...),"") {
 
   fixnum nargs=INIT_NARGS(0);
   object l=Cnil,strm,eof_errorp,eof_value,recursivep;
@@ -2444,7 +2444,7 @@ DEFUN_NEW("READ-CHAR",object,fLread_char,LISP,0,4,NONE,OO,OO,OO,OO,(object f,...
   }
 }
 
-DEFUN_NEW("UNREAD-CHAR",object,fLunread_char,LISP,1,2,NONE,OO,OO,OO,OO,(object c,...),"") {
+DEFUN("UNREAD-CHAR",object,fLunread_char,LISP,1,2,NONE,OO,OO,OO,OO,(object c,...),"") {
 
   fixnum nargs=INIT_NARGS(1);
   object l=Cnil,f=OBJNULL,strm;
@@ -2464,7 +2464,7 @@ DEFUN_NEW("UNREAD-CHAR",object,fLunread_char,LISP,1,2,NONE,OO,OO,OO,OO,(object c
   RETURN1(Cnil);
 }
 
-DEFUN_NEW("PEEK-CHAR",object,fLpeek_char,LISP,0,5,NONE,OO,OO,OO,OO,(object peek_type,...),"") {
+DEFUN("PEEK-CHAR",object,fLpeek_char,LISP,0,5,NONE,OO,OO,OO,OO,(object peek_type,...),"") {
 
   fixnum nargs=INIT_NARGS(0);
   object l=Cnil,c,f=peek_type,strm,eof_errorp,eof_value,recursivep;
@@ -2524,7 +2524,7 @@ DEFUN_NEW("PEEK-CHAR",object,fLpeek_char,LISP,0,5,NONE,OO,OO,OO,OO,(object peek_
 }
 
 
-DEFUN_NEW("LISTEN",object,fLlisten,LISP,0,1,NONE,OO,OO,OO,OO,(object f,...),"") {
+DEFUN("LISTEN",object,fLlisten,LISP,0,1,NONE,OO,OO,OO,OO,(object f,...),"") {
 
   fixnum nargs=INIT_NARGS(0);
   object l=Cnil,strm;
@@ -2543,7 +2543,7 @@ DEFUN_NEW("LISTEN",object,fLlisten,LISP,0,1,NONE,OO,OO,OO,OO,(object f,...),"") 
 
 }
 
-DEFUN_NEW("READ-CHAR-NO-HANG",object,fLread_char_no_hang,LISP,0,4,NONE,OO,OO,OO,OO,(object f,...),"") {
+DEFUN("READ-CHAR-NO-HANG",object,fLread_char_no_hang,LISP,0,4,NONE,OO,OO,OO,OO,(object f,...),"") {
 
   fixnum nargs=INIT_NARGS(0);
   object l=Cnil,strm,eof_errorp,eof_value/* ,recursivep */;
@@ -2583,7 +2583,7 @@ DEFUN_NEW("READ-CHAR-NO-HANG",object,fLread_char_no_hang,LISP,0,4,NONE,OO,OO,OO,
 	@(return Cnil)
 @)
 
-DEFUNM_NEW("PARSE-INTEGER-INT",object,fSparse_integer_int,SI,5,5,NONE,OO,OO,IO,OO,
+DEFUNM("PARSE-INTEGER-INT",object,fSparse_integer_int,SI,5,5,NONE,OO,OO,IO,OO,
 	  (object strng,object start,object end,fixnum radix,object junk_allowed),"") {
 
   fixnum vals=(fixnum)fcall.valp;
@@ -2809,13 +2809,12 @@ LFD(Lreadtablep)()
 	@(return Ct)
 @)
 
-DEFUNO_NEW("READTABLE-CASE",object,fLreadtable_case,LISP,1,1,NONE,OO,OO,OO,OO,void,Lreadtable_case,(object rt),"") {
+DEFUN("READTABLE-CASE",object,fLreadtable_case,LISP,1,1,NONE,OO,OO,OO,OO,(object rt),"") {
   check_type_readtable_no_default(&rt);
   RETURN1(rt->rt.rt_case);
 }
 
-DEFUNO_NEW("SET-READTABLE-CASE",object,fSset_readtable_case,SI,2,2,NONE,
-	   OO,OO,OO,OO,void,siLset_readtable_case,(object rt,object cas),"") {
+DEFUN("SET-READTABLE-CASE",object,fSset_readtable_case,SI,2,2,NONE,OO,OO,OO,OO,(object rt,object cas),"") {
   check_type_readtable_no_default(&rt);
   if (cas!=sKupcase && cas!=sKdowncase && cas!=sKpreserve && cas!=sKinvert)
     TYPE_ERROR(cas,list(5,sLmember,sKupcase,sKdowncase,sKpreserve,sKinvert));

@@ -1498,7 +1498,7 @@ FFN(siLheap_report)(void) {
 }  
 
 
-DEFUN_NEW("ROOM-REPORT",object,fSroom_report,SI
+DEFUN("ROOM-REPORT",object,fSroom_report,SI
 	  ,0,0,NONE,OO,OO,OO,OO,(void),"") {
 /* static void */
 /* FFN(siLroom_report)(void) { */
@@ -1598,7 +1598,7 @@ mark_contblock(void *p, fixnum s) {
     set_mark_bit(x);
 }
 
-DEFUN_NEW("GBC",object,fSgbc,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"")
+DEFUN("GBC",object,fSgbc,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"")
 
 {
   /* 1 args */

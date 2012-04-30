@@ -9,8 +9,6 @@
 
 #define NONE 0
 
-/*  void SI_makefun(),LISP_makefun(),error(); */
-
 #define MAKEFUN(pack,string,fname,argd) \
   (pack == SI ? SI_makefun(string,fname,argd) : \
    pack == LISP ? LISP_makefun(string,fname,argd) : \
@@ -21,41 +19,22 @@
    pack == LISP ? make_ordinary(string) : \
    (error("Bad pack variable in MAKESYM\n"),Cnil))
 
-#undef DEFUN
-#define DEFUN(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,doc) \
-  {extern ret fname(); \
-     MAKEFUN(pack,string,fname,F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));}
-
-#undef DEFUNO
-#define DEFUNO(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,old,doc) \
-  {extern ret fname(); \
-     MAKEFUN(pack,string,fname,F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));}
-
 /* FIXME, possibly restore old MAKEFUN in place (in NewInit) here 
    when STATIC_FUNCTION_POINTERS not defined */
-#undef DEFUN_NEW
-#define DEFUN_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) \
+#undef DEFUN
+#define DEFUN(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) \
   {extern void Mjoin(fname,_init)(); Mjoin(fname,_init)();}
 
-#undef DEFUNB_NEW
-#define DEFUNB_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,p,doc) \
+#undef DEFUNB
+#define DEFUNB(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,p,doc) \
   {extern void Mjoin(fname,_init)(); Mjoin(fname,_init)();}
 
-#undef DEFUNO_NEW
-#define DEFUNO_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,oldret,old,args,doc) \
-  {extern void Mjoin(fname,_init)();Mjoin(fname,_init)();}
-
-#undef DEFUNM_NEW
-#define DEFUNM_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) \
+#undef DEFUNM
+#define DEFUNM(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) \
   {extern void Mjoin(fname,_init)(); Mjoin(fname,_init)();}
-
-#undef DEFUNOM_NEW
-#define DEFUNOM_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,oldret,old,args,doc) \
-  {extern void Mjoin(fname,_init)();Mjoin(fname,_init)();}
 
 #undef DEFCOMP
 #define DEFCOMP(type, fun,doc) Ineed_in_image(fun);
-
 
 #undef DEFVAR
 #define DEFVAR(name,cname,pack,val,doc) \

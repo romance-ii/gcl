@@ -28,20 +28,20 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 
-DEFUN_NEW("CFUN-CALL",object,fScfun_call,SI,1,1,NONE,OO,OO,OO,OO,(object fun),"") {
+DEFUN("CFUN-CALL",object,fScfun_call,SI,1,1,NONE,OO,OO,OO,OO,(object fun),"") {
   if (!functionp(fun))
     TYPE_ERROR(fun,sLfunction);
   RETURN1(fun->fun.fun_plist);
 }
 
-DEFUN_NEW("SET-CFUN-CALL",object,fSset_cfun_call,SI,2,2,NONE,OO,OO,OO,OO,(object call,object fun),"") {
+DEFUN("SET-CFUN-CALL",object,fSset_cfun_call,SI,2,2,NONE,OO,OO,OO,OO,(object call,object fun),"") {
   if (!functionp(fun))
     TYPE_ERROR(fun,sLfunction);
   RETURN1(fun->fun.fun_plist=call);
 }
 
 
-DEFUN_NEW("FBOUNDP-SYM",object,fSfboundp_sym,SI,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+DEFUN("FBOUNDP-SYM",object,fSfboundp_sym,SI,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
 
   if (type_of(sym) != t_symbol) {
     not_a_symbol(sym);
@@ -51,7 +51,7 @@ DEFUN_NEW("FBOUNDP-SYM",object,fSfboundp_sym,SI,1,1,NONE,OO,OO,OO,OO,(object sym
 
 }
 
-/* DEFUN_NEW("FBOUNDP-CONS",object,fSfboundp_cons,SI,1,1,NONE,OO,OO,OO,OO,(object sym),"") { */
+/* DEFUN("FBOUNDP-CONS",object,fSfboundp_cons,SI,1,1,NONE,OO,OO,OO,OO,(object sym),"") { */
 
 /*   if (!setf_fn_form(sym)) { */
 /*     not_a_symbol(sym);/\*FIXME*\/ */
@@ -62,7 +62,7 @@ DEFUN_NEW("FBOUNDP-SYM",object,fSfboundp_sym,SI,1,1,NONE,OO,OO,OO,OO,(object sym
 /* } */
 
 
-DEFUN_NEW("FBOUNDP",object,fLfboundp,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+DEFUN("FBOUNDP",object,fLfboundp,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
 
   if (type_of(sym) != t_symbol)
     sym=ifuncall1(sSfunid_to_sym,sym);
@@ -121,14 +121,14 @@ symbol_function_internal(object sym,int allow_setf) {
 }
 
 
-DEFUN_NEW("SYMBOL-FUNCTION",object,fLsymbol_function,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+DEFUN("SYMBOL-FUNCTION",object,fLsymbol_function,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
 
   RETURN1(symbol_function_internal(sym,0));
 
 }
 /* FIXME add setf expander for fdefinition */
 
-DEFUN_NEW("FDEFINITION",object,fLfdefinition,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+DEFUN("FDEFINITION",object,fLfdefinition,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
 
   RETURN1(symbol_function_internal(sym,1));
 
@@ -195,7 +195,7 @@ FFN(Ffunction)(object form)
 	}
 }
 
-DEFUN_NEW("SYMBOL-VALUE",object,fLsymbol_value,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+DEFUN("SYMBOL-VALUE",object,fLsymbol_value,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
 
   if (type_of(sym) != t_symbol)
     not_a_symbol(sym);
@@ -206,7 +206,7 @@ DEFUN_NEW("SYMBOL-VALUE",object,fLsymbol_value,LISP,1,1,NONE,OO,OO,OO,OO,(object
   RETURN1(Cnil);
 }
 
-DEFUN_NEW("BOUNDP",object,fLboundp,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+DEFUN("BOUNDP",object,fLboundp,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
 
   if (type_of(sym) != t_symbol)
     not_a_symbol(sym);
@@ -214,7 +214,7 @@ DEFUN_NEW("BOUNDP",object,fLboundp,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
 
 }
 
-/* DEFUN_NEW("MACRO-FUNCTION",object,fLmacro_function,SI,1,2,NONE,OO,OO,OO,OO,(object x,...),"") { */
+/* DEFUN("MACRO-FUNCTION",object,fLmacro_function,SI,1,2,NONE,OO,OO,OO,OO,(object x,...),"") { */
 
 /*   object  */
 
@@ -264,43 +264,19 @@ LFD(Lspecial_operator_p)(void)
 		vs_base[0] = Cnil;
 }
 
-DEFUNO_NEW("LEXICAL-BINDING-ENVIRONMENT",object,fSlexical_binding_environment,SI
-	   ,0,0,NONE,OO,OO,OO,OO,void,siLlexical_binding_environment,(void),"") {
-
+DEFUN("LEXICAL-BINDING-ENVIRONMENT",object,fSlexical_binding_environment,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
   RETURN1(list(3,lex_env[0],lex_env[1],lex_env[2]));
-
 }
 
-DEFUN_NEW("LEX-ENV",object,fSlex_env,SI,0,0,NONE,OI,OO,OO,OO,(fixnum i),"") {
-
+DEFUN("LEX-ENV",object,fSlex_env,SI,0,0,NONE,OI,OO,OO,OO,(fixnum i),"") {
   RETURN1(i>=0 && i<=3 ? lex_env[i] : Cnil);
-
 }
-
-/* DEFUNO_NEW("INTERPRETED-FUNCTION-LAMBDA",object,fSinterpreted_function_lambda,SI */
-/*    ,1,1,NONE,OO,OO,OO,OO,void,siLinterpreted_function_lambda,(object x),"") */
-
-/* { */
-
-/*   if (type_of(x)!=t_ifun) */
-/*     TYPE_ERROR(x,siLinterpreted_function); */
-/*   return x->ifn.ifn_self; */
-
-/* } */
-
 
 void
-gcl_init_reference(void)
-{
-/* 	make_function("SYMBOL-FUNCTION", Lsymbol_function); */
-/* 	make_function("FDEFINITION", Lfdefinition); */
-/* 	make_function("FBOUNDP", Lfboundp); */
-	sLquote=make_special_form("QUOTE", Fquote);
-	sLfunction = make_special_form("FUNCTION", Ffunction);
-/* 	make_function("SYMBOL-VALUE", Lsymbol_value); */
-/* 	make_function("BOUNDP", Lboundp); */
-	make_function("MACRO-FUNCTION", Lmacro_function);
-	/* make_function("SPECIAL-FORM-P", Lspecial_form_p); */
-	make_function("SPECIAL-OPERATOR-P", Lspecial_operator_p);
+gcl_init_reference(void) {
+  sLquote=make_special_form("QUOTE", Fquote);
+  sLfunction = make_special_form("FUNCTION", Ffunction);
+  make_function("MACRO-FUNCTION", Lmacro_function);
+  make_function("SPECIAL-OPERATOR-P", Lspecial_operator_p);
 }
 

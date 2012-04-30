@@ -49,7 +49,7 @@ FFN(Fcatch)(VOL object args)
 
 DEFCONST("+TOP-ABORT-TAG+",sSPtop_abort_tagP,SI,MMcons(Cnil,Cnil),"");
 
-DEFUNM_NEW("ERROR-SET",object,fSerror_set,SI
+DEFUNM("ERROR-SET",object,fSerror_set,SI
 	   ,1,1,NONE,OO,OO,OO,OO,(volatile object x0),
        "Evaluates the FORM in the null environment.  If the evaluation \
 of the FORM has successfully completed, SI:ERROR-SET returns NIL as the first \

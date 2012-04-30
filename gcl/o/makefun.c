@@ -1,7 +1,7 @@
 #include "include.h"
 #include "funlink.h"
 
-DEFUN_NEW("SET-FUNCTION-ENVIRONMENT",object,fSset_function_environment,SI,2,2,NONE,OO,OO,OO,OO, \
+DEFUN("SET-FUNCTION-ENVIRONMENT",object,fSset_function_environment,SI,2,2,NONE,OO,OO,OO,OO, \
 	  (object f,object env),"") { 
 
   ufixnum n;
@@ -80,24 +80,24 @@ make_fun(void *addr,object data,object call,object env,ufixnum argd,ufixnum size
 
 #define GET_DATA(d_,a_) ((d_)!=Cnil ? (d_) : ((a_) && (a_)->s.s_dbind && type_of((a_)->s.s_dbind)==t_cfdata ? (a_)->s.s_dbind : 0))
 
-DEFUN_NEW("ANONYMOUS-CLOSURE",object,fSanonymous_closure,SI,0,0,NONE,OO,OO,OO,OO,(),"") {
+DEFUN("ANONYMOUS-CLOSURE",object,fSanonymous_closure,SI,0,0,NONE,OO,OO,OO,OO,(),"") {
   object f=fcall.fun;
   RETURN1(f->fun.fun_env[0]->c.c_car);
 }
 
-DEFUN_NEW("MAKE-ANONYMOUS-CLOSURE",object,fSmake_anonymous_closure,SI,0,0,NONE,OO,OO,OO,OO,(),"") {
+DEFUN("MAKE-ANONYMOUS-CLOSURE",object,fSmake_anonymous_closure,SI,0,0,NONE,OO,OO,OO,OO,(),"") {
   
   RETURN1(FFN(fSinit_function)(list(5,Cnil,Cnil,Cnil,Cnil,Cnil),(void *)fSanonymous_closure,Cnil,MMcons(MMcons(Cnil,Cnil),Cnil),-1,0,0));
 
 }
 
-DEFUN_NEW("FUNCTION-ENVIRONMENT",object,fSfunction_environment,SI,1,1,NONE,OO,OO,OO,OO,(object f),"") {
+DEFUN("FUNCTION-ENVIRONMENT",object,fSfunction_environment,SI,1,1,NONE,OO,OO,OO,OO,(object f),"") {
 
   RETURN1(f->fun.fun_env[0]);
 
 }
 
-DEFUN_NEW("INIT-FUNCTION",object,fSinit_function,SI,7,7,NONE,OO,OO,OI,II, \
+DEFUN("INIT-FUNCTION",object,fSinit_function,SI,7,7,NONE,OO,OO,OI,II, \
 	  (object sc,object addr,object data,object env,\
 	   fixnum key,fixnum argd,fixnum sizes),\
 	  "Store a compiled function on SYMBOL whose body is in the VV array at \
@@ -134,7 +134,7 @@ fSinit_function(object x,object y,object z,object w,fixnum a,fixnum b,fixnum c) 
 }
 #endif
 
-DEFUN_NEW("SET-KEY-STRUCT",object,fSset_key_struct,SI,1,1,NONE,OO,OO,OO,OO,(object key_struct_ind),
+DEFUN("SET-KEY-STRUCT",object,fSset_key_struct,SI,1,1,NONE,OO,OO,OO,OO,(object key_struct_ind),
       "Called inside the loader.  The keystruct is set up in the file with \
    indexes rather than the actual entries.  We change these indices to \
    the objects")
@@ -288,7 +288,7 @@ LISP_makefunm(char *strg, object (*fn) (/* ??? */), unsigned int argd) {
   
 }
       
-DEFUN_NEW("INVOKE",object,fSinvoke,SI,1,ARG_LIMIT,NONE,OO,OO,OO,OO,(object x),
+DEFUN("INVOKE",object,fSinvoke,SI,1,ARG_LIMIT,NONE,OO,OO,OO,OO,(object x),
       "Invoke a C function whose body is at INDEX in the VV array")
 { int (*fn)();
   fn = (void *) PADDR(x);

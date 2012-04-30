@@ -36,12 +36,12 @@ DECL := $(HDIR)/new_decl.h
 CPP=
 %.ini: %.c grab_defs #plt.h
 	[ -e $(DECL) ] || touch $(DECL)
-	$(CC) -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c | sed -e 's,^.* DEFUNB_NEW,DEFUNB_NEW,g' -e 's/DEF,//g' -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
+	$(CC) -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c | sed -e 's,^.* DEFUNB,DEFUNB,g' -e 's/DEF,//g' -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
 
 %.ini: %.d $(DPP) grab_defs
 	[ -e $(DECL) ] || touch $(DECL)
 	$(DPP) $*
-	$(CC) -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c | sed -e 's,^.* DEFUNB_NEW,DEFUNB_NEW,g' -e 's/DEF,//g' | sed -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
+	$(CC) -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c | sed -e 's,^.* DEFUNB,DEFUNB,g' -e 's/DEF,//g' | sed -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
 	rm $*.c
 
 X11_INCLUDE=${TK_XINCLUDES} ${HAVE_X11}

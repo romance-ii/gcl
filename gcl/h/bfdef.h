@@ -132,9 +132,9 @@ extern object sLvalues,sLinteger,sLfixnum,big_fixnum1,big_fixnum2,big_fixnum3,bi
 #define HH_f(a_...)   RETURN1(a_)
 
 #define BF(n_,b_,r_,a_...)\
-  DEFUNB_NEW("mpz_" #b_,R1(r_),Join(fSmpz_,b_),\
-            GMP,n_,n_,NONE,Join(Q1,n_)(r_,a_),Join(Q2,n_)(r_,a_),Join(Q3,n_)(r_,a_),Join(Q4,n_)(r_,a_),\
-	     (Join(D,n_)(a_)),PT(r_),"") { \
+  DEFUNB("mpz_" #b_,R1(r_),Join(fSmpz_,b_),\
+	 GMP,n_,n_,NONE,Join(Q1,n_)(r_,a_),Join(Q2,n_)(r_,a_),Join(Q3,n_)(r_,a_),Join(Q4,n_)(r_,a_), \
+	 (Join(D,n_)(a_)),PT(r_),"") {					\
 \
   AA1(r_);\
 \

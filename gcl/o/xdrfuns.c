@@ -24,7 +24,7 @@ License for more details.
 
 extern aet_type_struct aet_types[];
 
-DEFUN_NEW("XDR-OPEN",object,fSxdr_open,SI,1,1,NONE,OO,OO,OO,OO,(object f),"") {
+DEFUN("XDR-OPEN",object,fSxdr_open,SI,1,1,NONE,OO,OO,OO,OO,(object f),"") {
 
   XDR *xdrs;
   object ar= alloc_simple_string(sizeof(XDR));
@@ -39,7 +39,7 @@ DEFUN_NEW("XDR-OPEN",object,fSxdr_open,SI,1,1,NONE,OO,OO,OO,OO,(object f),"") {
   return ar;
 }
 
-DEFUN_NEW("XDR-WRITE",object,fSxdr_write,SI,2,2,NONE,OO,OO,OO,OO,(object str,object elt),"") {
+DEFUN("XDR-WRITE",object,fSxdr_write,SI,2,2,NONE,OO,OO,OO,OO,(object str,object elt),"") {
 
   XDR *xdrp= (XDR *) str->ust.ust_self;
   xdrproc_t e;
@@ -97,7 +97,7 @@ DEFUN_NEW("XDR-WRITE",object,fSxdr_write,SI,2,2,NONE,OO,OO,OO,OO,(object str,obj
   return elt;
 }
 
-DEFUN_NEW("XDR-READ",object,fSxdr_read,SI,2,2,NONE,OO,OO,OO,OO,(object str,object elt),"") {
+DEFUN("XDR-READ",object,fSxdr_read,SI,2,2,NONE,OO,OO,OO,OO,(object str,object elt),"") {
 
   XDR *xdrp= (XDR *) str->ust.ust_self;
   xdrproc_t e;

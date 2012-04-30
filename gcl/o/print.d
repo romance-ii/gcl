@@ -1843,7 +1843,7 @@ int base;
 }
 
 
-DEFUN_NEW("WRITE-INT",object,fSwrite_int,SI,17,17,NONE,OO,OO,OO,OO,
+DEFUN("WRITE-INT",object,fSwrite_int,SI,17,17,NONE,OO,OO,OO,OO,
 	  (object x,object strm,object array,object base,object cas,
 	   object circle,object escape,object gensym,object length,
 	   object level,object lines,object miser_width,object pprint_dispatch,

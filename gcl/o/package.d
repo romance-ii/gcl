@@ -397,32 +397,32 @@ object x;
   return(h);
 }}
 
-DEFUN_NEW("PACK-HASH",fixnum,fSpack_hash,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {
+DEFUN("PACK-HASH",fixnum,fSpack_hash,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {
   RETURN1(pack_hash(x));
 }
 
-DEFUN_NEW("SET-SYMBOL-HPACK",object,fSset_symbol_hpack,SI,2,2,NONE,OO,OO,OO,OO,(object p,object s),"") { 
+DEFUN("SET-SYMBOL-HPACK",object,fSset_symbol_hpack,SI,2,2,NONE,OO,OO,OO,OO,(object p,object s),"") { 
   check_type_package(&p); 
   check_type_symbol(&s);
   RETURN1(s->s.s_hpack=p); 
 } 
 
-DEFUN_NEW("PACKAGE-INTERNAL",object,fSpackage_internal,SI,2,2,NONE,OO,IO,OO,OO,(object x,fixnum i),"") {
+DEFUN("PACKAGE-INTERNAL",object,fSpackage_internal,SI,2,2,NONE,OO,IO,OO,OO,(object x,fixnum i),"") {
   check_type_package(&x);
   RETURN1(x->p.p_internal[i]);
 }
 
-DEFUN_NEW("PACKAGE-INTERNAL_SIZE",fixnum,fSpackage_internal_size,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {
+DEFUN("PACKAGE-INTERNAL_SIZE",fixnum,fSpackage_internal_size,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {
   check_type_package(&x);
   RETURN1(x->p.p_internal_size);
 }
 
-DEFUN_NEW("PACKAGE-EXTERNAL",object,fSpackage_external,SI,2,2,NONE,OO,IO,OO,OO,(object x,fixnum i),"") {
+DEFUN("PACKAGE-EXTERNAL",object,fSpackage_external,SI,2,2,NONE,OO,IO,OO,OO,(object x,fixnum i),"") {
   check_type_package(&x);
   RETURN1(x->p.p_external[i]);
 }
 
-DEFUN_NEW("PACKAGE-EXTERNAL_SIZE",fixnum,fSpackage_external_size,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {
+DEFUN("PACKAGE-EXTERNAL_SIZE",fixnum,fSpackage_external_size,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {
   check_type_package(&x);
   RETURN1(x->p.p_external_size);
 }
@@ -871,7 +871,7 @@ delete_package(object n) {
 extern object sKuse;
 extern object sKnicknames;
 DEF_ORDINARY("IN-PACKAGE-INTERNAL",sSin_package_internal,SI,"");
-DEFUN_NEW("IN-PACKAGE-INTERNAL",object,fSin_package_internal,SI,2,2,NONE,OO,OO,OO,OO,(object p,object r),"") {
+DEFUN("IN-PACKAGE-INTERNAL",object,fSin_package_internal,SI,2,2,NONE,OO,OO,OO,OO,(object p,object r),"") {
 
   object use=Cnil,nick=Cnil;
 
@@ -910,7 +910,7 @@ FFN(Fin_package)(void) {
 
 #endif
 
-DEFUN_NEW("FIND-PACKAGE",object,fLfind_package,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("FIND-PACKAGE",object,fLfind_package,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
   RETURN1(find_package(x));/*FIXME p->p_link not exposable in lisp*/
 }
 

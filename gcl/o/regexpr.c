@@ -41,7 +41,7 @@ DEFVAR("*MATCH-DATA*",sSAmatch_dataA,SI,sLnil,"");
 DEFVAR("*CASE-FOLD-SEARCH*",sSAcase_fold_searchA,SI,sLnil,
        "Non nil means that a string-match should ignore case");
 
-DEFUN_NEW("MATCH-BEGINNING",object,fSmatch_beginning,SI,1,1,NONE,OI,OO,OO,OO,(fixnum i),
+DEFUN("MATCH-BEGINNING",object,fSmatch_beginning,SI,1,1,NONE,OI,OO,OO,OO,(fixnum i),
    "Returns the beginning of the I'th match from the previous STRING-MATCH, \
 where the 0th is for the whole regexp and the subsequent ones match parenthetical expressions.  -1 is returned if there is no match, or if the *match-data* \
 vector is not a fixnum array.")
@@ -52,7 +52,7 @@ vector is not a fixnum array.")
   RETURN1(make_fixnum(-1));
 }
 
-DEFUN_NEW("MATCH-END",object,fSmatch_end,SI,1,1,NONE,OI,OO,OO,OO,(fixnum i),
+DEFUN("MATCH-END",object,fSmatch_end,SI,1,1,NONE,OI,OO,OO,OO,(fixnum i),
    "Returns the end of the I'th match from the previous STRING-MATCH")
 { object v = sSAmatch_dataA->s.s_dbind;
   if (type_of(v)==t_vector
@@ -61,7 +61,7 @@ DEFUN_NEW("MATCH-END",object,fSmatch_end,SI,1,1,NONE,OI,OO,OO,OO,(fixnum i),
   RETURN1(make_fixnum(-1));
 }
 
-DEFUN_NEW("COMPILE-REGEXP",object,fScompile_regexp,SI,1,1,NONE,OO,OO,OO,OO,(object p),
+DEFUN("COMPILE-REGEXP",object,fScompile_regexp,SI,1,1,NONE,OO,OO,OO,OO,(object p),
 	  "Provide handle to export pre-compiled regexp's to string-match") {
 
   char *tmp;
@@ -95,7 +95,7 @@ DEFUN_NEW("COMPILE-REGEXP",object,fScompile_regexp,SI,1,1,NONE,OO,OO,OO,OO,(obje
 }
 
 
-DEFUN_NEW("STRING-MATCH",fixnum,fSstring_match,SI,2,4,NONE,IO,OO,OO,OO,
+DEFUN("STRING-MATCH",fixnum,fSstring_match,SI,2,4,NONE,IO,OO,OO,OO,
 	  (object pattern,object string,...),
       "Match regexp PATTERN in STRING starting in string starting at START \
 and ending at END.  Return -1 if match not found, otherwise \

@@ -60,22 +60,12 @@ EXTER object user_package;
   va_end(ap)
 
 #ifndef NO_DEFUN
-#undef DEFUN
-#define DEFUN(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,doc) ret fname
 /* eg.
    A function taking from 2 to 8 args
    returning object the first args is object, the next 6 int, and last defaults to object.
    note the return type must also be put in the signature.
   DEFUN("AREF",object,fSaref,SI,2,8,NONE,oo,ii,ii,ii)
 */
-
-/* for defining old style */
-#define DEFUNO(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,old,doc) \
-  ret fname (); \
-void old(void) \
-{   Iinvoke_c_function_from_value_stack(fname,F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
-    return;} \
-  ret fname
 
 #define MAKEFUN(pack,string,fname,argd) \
   (pack == SI ? SI_makefun(string,fname,argd) : \
@@ -126,19 +116,19 @@ void old(void) \
 #define STATD
 #endif
 
-#define DEFUN_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) STATD ret FFN(fname) args;\
+#define DEFUN(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) STATD ret FFN(fname) args;\
 void Mjoin(fname,_init) () {\
   MAKEFUN(pack,string,(void *)FFN(fname),F_ARGD(min,max,(flags|ONE_VAL),ARGTYPES(ret0a0,a12,a34,a56))); \
 }\
 STATD ret FFN(fname) args
 
-#define DEFUNB_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,p,doc) STATD ret FFN(fname) args; \
+#define DEFUNB(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,p,doc) STATD ret FFN(fname) args; \
 void Mjoin(fname,_init) () {\
   MAKEFUNB(pack,string,(void *)FFN(fname),F_ARGD(min,max,(flags|ONE_VAL),ARGTYPES(ret0a0,a12,a34,a56)),p); \
 }\
 STATD ret FFN(fname) args
 
-#define DEFUNM_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) STATD ret FFN(fname) args;\
+#define DEFUNM(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) STATD ret FFN(fname) args;\
 void Mjoin(fname,_init) () {\
   MAKEFUNM(pack,string,(void *)FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
 }\
@@ -151,29 +141,6 @@ STATD ret FFN(fname) args
   DEFUN("AREF",object,fSaref,SI,2,8,NONE,oo,ii,ii,ii)
 */
 
-/* for defining old style */
-#define DEFUNO_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,oldret,old,args,doc) \
-STATD  ret FFN(fname) args; \
-void Mjoin(fname,_init) () {\
-  MAKEFUN(pack,string,(void *)FFN(fname),F_ARGD(min,max,(flags|ONE_VAL),ARGTYPES(ret0a0,a12,a34,a56))); \
-}\
-LFD(old)(void) \
-{   Iinvoke_c_function_from_value_stack((void *)FFN(fname),F_ARGD(min,max,(flags|ONE_VAL),ARGTYPES(ret0a0,a12,a34,a56))); \
-    return;} \
-STATD  ret FFN(fname) args
-
-#define DEFUNOM_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,oldret,old,args,doc) \
-STATD  ret FFN(fname) args; \
-void Mjoin(fname,_init) () {\
-  MAKEFUNM(pack,string,(void *)FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
-}\
-LFD(old)(void) \
-{   Iinvoke_c_function_from_value_stack((void *)FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
-    return;} \
-STATD  ret FFN(fname) args
-
-  /* these will come later */
-#define DEFUNL DEFUN
   /* these are needed to be linked in to be called by incrementally
    loaded code */
 #define DEFCOMP(type,fun) type fun
@@ -199,14 +166,9 @@ TS_MEMBER(t0,TS(t1)|TS(t2)|TS(t3)...)
 #define TS(s) (1<<s)
 #define TS_MEMBER(t1,ts) ((TS(t1)) & (ts))
 
-/* #define ASSURE_TYPE(val,t) if(type_of(val)!=t) val= Icheck_one_type(val,t) */
-/* #define CHECK_TYPE(code,val,name) for (;code;val=Ieval(read_object(sLAstandard_inputA->s.s_dbind))) TYPE_ERROR(val,name) */
-/* #define ASSURE_TYPE(val,t) CHECK_TYPE(type_of(val)!=t,val,type_name(t)) */
 #define ASSURE_TYPE(val,t) if (type_of(val)!=t) TYPE_ERROR(val,type_name(t))
 
 object IisArray();
-
-/* void Wrong_type_error(char *,int,...); */
 
 /* array to which X is has its body displaced */
 #define DISPLACED_TO(x) Mcar(x->a.a_displaced)

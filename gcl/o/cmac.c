@@ -139,58 +139,31 @@ cplus(object a, object b)
    return(cmod(number_plus(a,b)));}
 
 
-DEFUNO_NEW("CMOD",object,fScmod,SI
-   ,1,1,NONE,OO,OO,OO,OO,void,siLcmod,(object num),"")
-
-{/* 1 args */
- num=cmod(num);
- RETURN1(num);
+DEFUN("CMOD",object,fScmod,SI,1,1,NONE,OO,OO,OO,OO,(object num),"") {
+  num=cmod(num);
+  RETURN1(num);
 }
 
 
-DEFUNO_NEW("CPLUS",object,fScplus,SI
-   ,2,2,NONE,OO,OO,OO,OO,void,siLcplus,(object x0,object x1),"")
-
-{ /* 2 args */
- x0 = cplus(x0,x1);
- RETURN1( x0 );
+DEFUN("CPLUS",object,fScplus,SI,2,2,NONE,OO,OO,OO,OO,(object x0,object x1),"") {
+  x0 = cplus(x0,x1);
+  RETURN1( x0 );
 }
 
-
-DEFUNO_NEW("CTIMES",object,fSctimes,SI
-   ,2,2,NONE,OO,OO,OO,OO,void,siLctimes,(object x0,object x1),"")
-
-{
- /* 2 args */
+DEFUN("CTIMES",object,fSctimes,SI,2,2,NONE,OO,OO,OO,OO,(object x0,object x1),"") {
  x0=ctimes(x0,x1);
  RETURN1(x0);
 }
 
-
-DEFUNO_NEW("CDIFFERENCE",object,fScdifference,SI
-   ,2,2,NONE,OO,OO,OO,OO,void,siLcdifference,(object x0,object x1),"")
-
-{ /* 2 args */
- x0=cdifference(x0,x1);
- RETURN1(x0);
+DEFUN("CDIFFERENCE",object,fScdifference,SI,2,2,NONE,OO,OO,OO,OO,(object x0,object x1),"") {
+  x0=cdifference(x0,x1);
+  RETURN1(x0);
 }
-
-/* static object  */
-/* memq(register object a, register object b) */
-/* {while (1) */
-/*     {if ((a==b->c.c_car)||b==Cnil) return b; */
-/*     b=b->c.c_cdr;}} */
 
 
 void     
-gcl_init_cmac(void)
-{
-/* add_symbol("ctimes",&ctimes,"cplus",&cplus,"cdifference",&cdifference,"cmod",
- &cmod, 0); */
-gclModulus = (&((make_si_special("MODULUS",Cnil))->s.s_dbind));
-/* make_si_function("CMOD",siLcmod); */
-/* make_si_function("CPLUS",siLcplus); */
-/* make_si_function("CTIMES",siLctimes); */
-/* make_si_function("CDIFFERENCE",siLcdifference); */
+gcl_init_cmac(void) {
+
+  gclModulus = (&((make_si_special("MODULUS",Cnil))->s.s_dbind));
 
 }

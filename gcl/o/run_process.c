@@ -603,7 +603,7 @@ FFN(siLmake_socket_pair)()
                                   c_=fix(a_->c.c_cdr);})
 
 
-DEFUNO_NEW("KILL",object,fSkill,SI,2,2,NONE,OO,IO,OO,OO,void,siLkill,(object x,fixnum err),"") {
+DEFUN("KILL",object,fSkill,SI,2,2,NONE,OO,IO,OO,OO,(object x,fixnum err),"") {
 
   fixnum k,l;
   int e,status;
@@ -636,8 +636,8 @@ DEFUNO_NEW("KILL",object,fSkill,SI,2,2,NONE,OO,IO,OO,OO,void,siLkill,(object x,f
   return Cnil;
 }
   
-DEFUNO_NEW("SELECT-READ",object,fSselect_read,SI,2,2,NONE,IO,IO,OO,OO,void,siLselect_read,
-	   (object x,fixnum usec),"") {
+DEFUN("SELECT-READ",object,fSselect_read,SI,2,2,NONE,IO,IO,OO,OO,(object x,fixnum usec),"") {
+
   fd_set fds;
   fixnum max=-1,k,mask,i;
   object y=x;
@@ -662,8 +662,7 @@ DEFUNO_NEW("SELECT-READ",object,fSselect_read,SI,2,2,NONE,IO,IO,OO,OO,void,siLse
   return (object)mask;
 }
   
-DEFUNO_NEW("WRITE-POINTER-OBJECT",object,fSwrite_pointer_object,SI,2,2,NONE,OO,OO,OO,OO,
-	   void,siLwrite_pointer_object,(object x,object z),"") {
+DEFUN("WRITE-POINTER-OBJECT",object,fSwrite_pointer_object,SI,2,2,NONE,OO,OO,OO,OO,(object x,object z),"") {
 
   object y;
   fixnum pid,s;
@@ -685,8 +684,7 @@ DEFUNO_NEW("WRITE-POINTER-OBJECT",object,fSwrite_pointer_object,SI,2,2,NONE,OO,O
   return Cnil;
 }
 
-DEFUNO_NEW("READ-POINTER-OBJECT",object,fSread_pointer_object,SI,1,1,NONE,OO,OO,OO,OO,
-	   void,siLread_pointer_object,(object z),"") {
+DEFUN("READ-POINTER-OBJECT",object,fSread_pointer_object,SI,1,1,NONE,OO,OO,OO,OO,(object z),"") {
 
   object x;
   fixnum pid,s;
@@ -711,7 +709,8 @@ DEFUNO_NEW("READ-POINTER-OBJECT",object,fSread_pointer_object,SI,1,1,NONE,OO,OO,
 
 DEFVAR("*CHILD-STACK-ALLOC*",sSAchild_stack_allocA,SI,make_shortfloat(0.8),"");
 
-DEFUNO_NEW("FORK",object,fSfork,SI,0,0,NONE,OO,OO,OO,OO,void,siLfork,(void),"") {
+DEFUN("FORK",object,fSfork,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+
   int p[2],j=0;
   pid_t pid;
 

@@ -57,7 +57,7 @@ void* (*gcl_gmp_allocfun)(size_t)=FFN(alloc_relblock);
 int gmp_relocatable=1;
 
 
-DEFUN_NEW("SET-GMP-ALLOCATE-RELOCATABLE",object,fSset_gmp_allocate_relocatable,SI,1,1,NONE,OO,OO,OO,OO,
+DEFUN("SET-GMP-ALLOCATE-RELOCATABLE",object,fSset_gmp_allocate_relocatable,SI,1,1,NONE,OO,OO,OO,OO,
       (object flag),"Set the allocation to be relocatble ")
 {
   if (flag == Ct) {

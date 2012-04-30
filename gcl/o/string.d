@@ -571,8 +571,7 @@ LFD(Lnstring_capitalize)() { casefun = char_capitalize;  FFN(Lnstring_case)(); }
 	@(return `coerce_to_string(x)`)
 @)
 
-DEFUNO_NEW("STRING-CONCATENATE",object,fLstring_concatenate,SI,
-	   0,63,NONE,OO,OO,OO,OO,void,siLstring_concatenate,(object first,...),"") {
+DEFUN("STRING-CONCATENATE",object,fLstring_concatenate,SI,0,63,NONE,OO,OO,OO,OO,(object first,...),"") {
 
   fixnum i,l,m,narg=INIT_NARGS(0);
   object x,ll=Cnil,z;

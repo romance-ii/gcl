@@ -240,7 +240,7 @@ BEGIN:
 }
 
 	
-DEFUN_NEW("HASH-EQUAL",object,fShash_equal,SI
+DEFUN("HASH-EQUAL",object,fShash_equal,SI
 	  ,2,2,NONE,OO,IO,OO,OO,(object x,fixnum depth),"") {
 /* static object */
 /* FFN(hash_equal)(object x,int depth) { */
@@ -410,7 +410,7 @@ BEGIN:
 }
 
 	
-DEFUN_NEW("HASH-EQUALP",object,fShash_equalp,SI
+DEFUN("HASH-EQUALP",object,fShash_equalp,SI
 	  ,2,2,NONE,OO,IO,OO,OO,(object x,fixnum depth),"") {
 /* static object */
 /* FFN(hash_equalp)(object x,int depth) { */
@@ -660,7 +660,7 @@ print_hash_table (object ht,char *procedure_name) {
 }
 */
 
-DEFUN_NEW("MAKE-HASH-TABLE-INT",object,fSmake_hash_table_int,SI,4,4,NONE,OO,OO,OO,OO,
+DEFUN("MAKE-HASH-TABLE-INT",object,fSmake_hash_table_int,SI,4,4,NONE,OO,OO,OO,OO,
 	  (object test,object size,object rehash_size,object rehash_threshold),"") {
 
   enum httest htt=0;
@@ -761,27 +761,27 @@ DEFUN_NEW("MAKE-HASH-TABLE-INT",object,fSmake_hash_table_int,SI,4,4,NONE,OO,OO,O
   @(return h)
 @)
 
-DEFUN_NEW("HASH-TABLE-P",object,fLhash_table_p,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("HASH-TABLE-P",object,fLhash_table_p,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
   RETURN1(type_of(x)==t_hashtable ? Ct : Cnil);
 }
 
-DEFUN_NEW("HASH-TABLE-EQ-P",object,fShash_table_eq_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("HASH-TABLE-EQ-P",object,fShash_table_eq_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
   RETURN1(type_of(x)==t_hashtable && x->ht.ht_test==htt_eq ? Ct : Cnil);
 }
 
-DEFUN_NEW("HASH-TABLE-EQL-P",object,fShash_table_eql_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("HASH-TABLE-EQL-P",object,fShash_table_eql_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
   RETURN1(type_of(x)==t_hashtable && x->ht.ht_test==htt_eql  ? Ct : Cnil);
 }
 
-DEFUN_NEW("HASH-TABLE-EQUAL-P",object,fShash_table_equal_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("HASH-TABLE-EQUAL-P",object,fShash_table_equal_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
   RETURN1(type_of(x)==t_hashtable && x->ht.ht_test==htt_equal  ? Ct : Cnil);
 }
 
-DEFUN_NEW("HASH-TABLE-EQUALP-P",object,fShash_table_equalp_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("HASH-TABLE-EQUALP-P",object,fShash_table_equalp_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
   RETURN1(type_of(x)==t_hashtable && x->ht.ht_test==htt_equalp  ? Ct : Cnil);
 }
 
-DEFUNM_NEW("GETHASH",object,fLgethash,LISP,2,3,NONE,OO,OO,OO,OO,(object x,object y,...),"") {
+DEFUNM("GETHASH",object,fLgethash,LISP,2,3,NONE,OO,OO,OO,OO,(object x,object y,...),"") {
 
   fixnum nargs=INIT_NARGS(2),vals=(fixnum)fcall.valp;
   object *base=vs_top,l=Cnil,f=OBJNULL,z;
@@ -825,7 +825,7 @@ DEFUNM_NEW("GETHASH",object,fLgethash,LISP,2,3,NONE,OO,OO,OO,OO,(object x,object
 /* 	vs_popp; */
 /* } */
 
-DEFUN_NEW("HASH-SET",object,fShash_set,SI,3,3,NONE,OO,OO,OO,OO,(object x,object y,object z),"") {
+DEFUN("HASH-SET",object,fShash_set,SI,3,3,NONE,OO,OO,OO,OO,(object x,object y,object z),"") {
 /* LFD(siLhash_set)() */
 /* { */
 /* 	check_arg(3); */
@@ -836,7 +836,7 @@ DEFUN_NEW("HASH-SET",object,fShash_set,SI,3,3,NONE,OO,OO,OO,OO,(object x,object 
 /* 	vs_base += 2; */
 }
  	
-DEFUN_NEW("REMHASH",object,fLremhash,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+DEFUN("REMHASH",object,fLremhash,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
 
   struct htent *e;
   
@@ -852,7 +852,7 @@ DEFUN_NEW("REMHASH",object,fLremhash,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object 
 
 }
 
-DEFUN_NEW("CLRHASH",object,fLclrhash,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("CLRHASH",object,fLclrhash,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
   int i;
   
@@ -865,19 +865,19 @@ DEFUN_NEW("CLRHASH",object,fLclrhash,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
   RETURN1(x);
 }
 
-DEFUN_NEW("HASH-TABLE-COUNT",fixnum,fLhash_table_count,LISP,1,1,NONE,IO,OO,OO,OO,(object x),"") {
+DEFUN("HASH-TABLE-COUNT",fixnum,fLhash_table_count,LISP,1,1,NONE,IO,OO,OO,OO,(object x),"") {
   
   check_type_hash_table(&x);
   RETURN1(x->ht.ht_nent);
 }
 
 
-DEFUN_NEW("SXHASH",fixnum,fLsxhash,LISP,1,1,NONE,IO,OO,OO,OO,(object x),"") {
+DEFUN("SXHASH",fixnum,fLsxhash,LISP,1,1,NONE,IO,OO,OO,OO,(object x),"") {
   /*FIXME 64*/
   RETURN1(ihash_equal(x,0));/*  & 0x7fffffff */
 }
 
-DEFUN_NEW("MAPHASH",object,fLmaphash,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+DEFUN("MAPHASH",object,fLmaphash,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
 
   int i;
   
@@ -889,7 +889,7 @@ DEFUN_NEW("MAPHASH",object,fLmaphash,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object 
   RETURN1(Cnil);
 }
 
-DEFUNM_NEW("NEXT-HASH-TABLE-ENTRY",object,fSnext_hash_table_entry,SI,2,2,NONE,OO,OO,OO,OO,
+DEFUNM("NEXT-HASH-TABLE-ENTRY",object,fSnext_hash_table_entry,SI,2,2,NONE,OO,OO,OO,OO,
 	   (object table,object ind),"For HASH-TABLE and for index I return three values: NEXT-START, the next KEY and its  VALUE.   NEXT-START will be -1 if there are no more entries, otherwise it will be a value suitable for passing as an index")
 { 
   int i = fix(ind);
@@ -908,7 +908,7 @@ DEFUNM_NEW("NEXT-HASH-TABLE-ENTRY",object,fSnext_hash_table_entry,SI,2,2,NONE,OO
 
 }
 
-DEFUN_NEW("NEXT-HASH-TABLE-INDEX",object,fSnext_hash_table_index,SI,2,2,NONE,OO,OO,OO,OO,(object table,object ind),"For HASH-TABLE and for index I return the index of the next valid entry, or -1.") { 
+DEFUN("NEXT-HASH-TABLE-INDEX",object,fSnext_hash_table_index,SI,2,2,NONE,OO,OO,OO,OO,(object table,object ind),"For HASH-TABLE and for index I return the index of the next valid entry, or -1.") { 
 
   fixnum i = fix(ind);
 
@@ -925,7 +925,7 @@ DEFUN_NEW("NEXT-HASH-TABLE-INDEX",object,fSnext_hash_table_index,SI,2,2,NONE,OO,
 
 }
 
-DEFUN_NEW("HASH-ENTRY-BY-INDEX",object,fShash_entry_by_index,SI,2,2,NONE,OO,OO,OO,OO,(object table,object ind),"For HASH-TABLE and for index I return the index of the next valid entry, or -1.") { 
+DEFUN("HASH-ENTRY-BY-INDEX",object,fShash_entry_by_index,SI,2,2,NONE,OO,OO,OO,OO,(object table,object ind),"For HASH-TABLE and for index I return the index of the next valid entry, or -1.") { 
 
   fixnum i = fix(ind);
 
@@ -938,7 +938,7 @@ DEFUN_NEW("HASH-ENTRY-BY-INDEX",object,fShash_entry_by_index,SI,2,2,NONE,OO,OO,O
 
 }
 
-DEFUN_NEW("HASH-KEY-BY-INDEX",object,fShash_key_by_index,SI,2,2,NONE,OO,OO,OO,OO,(object table,object ind),"For HASH-TABLE and for index I return the index of the next valid key, or -1.") { 
+DEFUN("HASH-KEY-BY-INDEX",object,fShash_key_by_index,SI,2,2,NONE,OO,OO,OO,OO,(object table,object ind),"For HASH-TABLE and for index I return the index of the next valid key, or -1.") { 
 
   fixnum i = fix(ind);
 
@@ -951,7 +951,7 @@ DEFUN_NEW("HASH-KEY-BY-INDEX",object,fShash_key_by_index,SI,2,2,NONE,OO,OO,OO,OO
 
 }
 
-DEFUN_NEW("HASH-TABLE-TEST",object,fLhash_table_test,LISP,1,1,NONE,OO,OO,OO,OO,(object table),
+DEFUN("HASH-TABLE-TEST",object,fLhash_table_test,LISP,1,1,NONE,OO,OO,OO,OO,(object table),
  "Given a HASH-TABLE return a symbol which specifies the function used in its test") 
 { 
   check_type_hash_table(&table);
@@ -965,19 +965,19 @@ DEFUN_NEW("HASH-TABLE-TEST",object,fLhash_table_test,LISP,1,1,NONE,OO,OO,OO,OO,(
   RETURN1(sLnil);
 }
 
-DEFUN_NEW("HASH-TABLE-SIZE",object,fLhash_table_size,LISP,1,1,NONE,OO,OO,OO,OO,(object table),"")
+DEFUN("HASH-TABLE-SIZE",object,fLhash_table_size,LISP,1,1,NONE,OO,OO,OO,OO,(object table),"")
 {
   check_type_hash_table(&table);
   RETURN1(make_fixnum(table->ht.ht_size));
 }
 
-DEFUN_NEW("HASH-TABLE-REHASH-SIZE",object,fLhash_table_rehash_size,LISP,1,1,NONE,OO,OO,OO,OO,(object table),"")
+DEFUN("HASH-TABLE-REHASH-SIZE",object,fLhash_table_rehash_size,LISP,1,1,NONE,OO,OO,OO,OO,(object table),"")
 {
   check_type_hash_table(&table);
   RETURN1(table->ht.ht_rhsize);
 }
 
-DEFUN_NEW("HASH-TABLE-REHASH-THRESHOLD",object,fLhash_table_rehash_threshold,LISP,1,1,NONE,OO,OO,OO,OO,(object table),"")
+DEFUN("HASH-TABLE-REHASH-THRESHOLD",object,fLhash_table_rehash_threshold,LISP,1,1,NONE,OO,OO,OO,OO,(object table),"")
 {
   check_type_hash_table(&table);
   RETURN1(table->ht.ht_rhthresh);

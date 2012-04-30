@@ -513,7 +513,7 @@ DEF_ORDINARY("FILE",sKfile,KEYWORD,"");
 
 /* extern char *ctime_r(const time_t *,char *); */
 
-DEFUN_NEW("STAT",object,fSstat,SI,1,1,NONE,OO,OO,OO,OO,(object path),"") {
+DEFUN("STAT",object,fSstat,SI,1,1,NONE,OO,OO,OO,OO,(object path),"") {
 
   char filename[MAXPATHLEN];
   struct stat ss;
@@ -535,7 +535,7 @@ DEFUN_NEW("STAT",object,fSstat,SI,1,1,NONE,OO,OO,OO,OO,(object path),"") {
   }
 }
 
-DEFUN_NEW("SETENV",object,fSsetenv,SI,2,2,NONE,OO,OO,OO,OO,(object variable,object value),"Set environment VARIABLE to VALUE")
+DEFUN("SETENV",object,fSsetenv,SI,2,2,NONE,OO,OO,OO,OO,(object variable,object value),"Set environment VARIABLE to VALUE")
 
 {
 
@@ -557,23 +557,21 @@ DEFUN_NEW("SETENV",object,fSsetenv,SI,2,2,NONE,OO,OO,OO,OO,(object variable,obje
   RETURN1((res == 0 ? Ct : Cnil ));
 }
 
-DEFUNO_NEW("DELETE-FILE",object,fLdelete_file,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Ldelete_file,(object path),"")
+DEFUN("DELETE-FILE",object,fLdelete_file,LISP,1,1,NONE,OO,OO,OO,OO,(object path),"") {
 
-{
-	char filename[MAXPATHLEN];
+  char filename[MAXPATHLEN];
+  
+  check_type_or_pathname_string_symbol_stream(&path);
+  
+  if (wild_pathname_p(path,Cnil) == Ct)
+    RETURN1(WILD_PATH(path));
+  
+  coerce_to_local_filename(path, filename);
+  if (unlink(filename) < 0 && rmdir(filename) < 0)
+    FEerror("Cannot delete the file ~S: ~s.", 2, path, make_simple_string(strerror(errno)));
+  path = Ct;
+  RETURN1(path);
 
-	/* 1 args */
-	check_type_or_pathname_string_symbol_stream(&path);
-
-	if (wild_pathname_p(path,Cnil) == Ct)
-	    RETURN1(WILD_PATH(path));
-
-	coerce_to_local_filename(path, filename);
- 	if (unlink(filename) < 0 && rmdir(filename) < 0)
- 		FEerror("Cannot delete the file ~S: ~s.", 2, path, make_simple_string(strerror(errno)));
-	path = Ct;
-	RETURN1(path);
 }
 #ifdef STATIC_FUNCTION_POINTERS
 object

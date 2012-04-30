@@ -135,7 +135,7 @@ int gcl_isnormal_float(float f)
 #endif
 
 
-DEFUN_NEW("ISFINITE",object,fSisfinite,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("ISFINITE",object,fSisfinite,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
   switch (type_of(x)) {
   case t_longfloat:
@@ -504,7 +504,7 @@ LFD(Ldenominator)(void)
 		vs_base[0] = small_fixnum(1);
 }
 
-DEFUNM_NEW("FLOOR",object,fLfloor,LISP,1,2,NONE,OO,OO,OO,OO,(object x,...),"") {
+DEFUNM("FLOOR",object,fLfloor,LISP,1,2,NONE,OO,OO,OO,OO,(object x,...),"") {
 
   fixnum nargs=INIT_NARGS(1);
   object f=OBJNULL,l=Cnil,y,z,w,q,q1;
@@ -1197,7 +1197,7 @@ LFD(Lfloat_precision)(void)
 #endif
 }
 
-DEFUNM_NEW("INTEGER-DECODE-FLOAT",object,fLinteger_decode_float,LISP,1,1,NONE,OO,OO,OO,OO,
+DEFUNM("INTEGER-DECODE-FLOAT",object,fLinteger_decode_float,LISP,1,1,NONE,OO,OO,OO,OO,
 	   (object x),"") {
 
   int h,l,e,s;

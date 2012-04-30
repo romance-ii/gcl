@@ -140,33 +140,30 @@ FILE *fp;
 #define	feof	feof1
 
 void
-end_of_stream(strm)
-object strm;
-{
-	END_OF_FILE(strm);
+end_of_stream(object strm) {
+  END_OF_FILE(strm);
 }
 
-DEFUNO_NEW("TEMP-STREAM",object,fStemp_stream,SI
-	   ,2,2,NONE,OO,OO,OO,OO,void,siLtemp_stream,(object x,object ext),"") {
+DEFUN("TEMP-STREAM",object,fStemp_stream,SI,2,2,NONE,OO,OO,OO,OO,(object x,object ext),"") {
   
-    object st;
+  object st;
 #ifdef _WIN32
-    DWORD dwRetVal;
-    char lpPathBuffer[MAX_PATH];
-      
-    check_type ( x,   t_string );
-    check_type ( ext, t_string );
-
-    dwRetVal = GetTempPath ( MAX_PATH, lpPathBuffer );
-    if ( dwRetVal + ext->st.st_fillp + x->st.st_fillp + 2 > MAX_PATH ) {
-        FEerror ( "Length of temporary file path combined with file name is too large.", 0 );
-    }
-
-    strcat ( lpPathBuffer, x->st.st_self );
-    strcat ( lpPathBuffer, "." );
-    strcat ( lpPathBuffer, ext->st.st_self );
-    st = make_simple_string ( lpPathBuffer );
-    x  = open_stream ( st, smm_io, sKsupersede, Cnil );
+  DWORD dwRetVal;
+  char lpPathBuffer[MAX_PATH];
+  
+  check_type ( x,   t_string );
+  check_type ( ext, t_string );
+  
+  dwRetVal = GetTempPath ( MAX_PATH, lpPathBuffer );
+  if ( dwRetVal + ext->st.st_fillp + x->st.st_fillp + 2 > MAX_PATH ) {
+    FEerror ( "Length of temporary file path combined with file name is too large.", 0 );
+  }
+  
+  strcat ( lpPathBuffer, x->st.st_self );
+  strcat ( lpPathBuffer, "." );
+  strcat ( lpPathBuffer, ext->st.st_self );
+  st = make_simple_string ( lpPathBuffer );
+  x  = open_stream ( st, smm_io, sKsupersede, Cnil );
   
 #else
   char *c, *d;
@@ -193,17 +190,13 @@ DEFUNO_NEW("TEMP-STREAM",object,fStemp_stream,SI
   x=open_stream(st,smm_output,sKsupersede,Cnil);
   close(l);
 #endif
-
+  
   RETURN1(x);
   
 }
 
-DEFUNO_NEW("TERMINAL-INPUT-STREAM-P",object,fSterminal_input_stream_p,SI
-	  ,1,1,NONE,OO,OO,OO,OO,void,siLterminal_input_stream_p,(object x),"")
-{
-
+DEFUN("TERMINAL-INPUT-STREAM-P",object,fSterminal_input_stream_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
   RETURN1(type_of(x)==t_stream && x->sm.sm_mode==smm_input && x->sm.sm_fp && isatty(fileno(x->sm.sm_fp)) ? Ct : Cnil);
-
 }
 
 
@@ -1992,7 +1985,7 @@ LFD(Lmake_concatenated_stream)()
 	vs_base[0] = x;
 }
 
-DEFUN_NEW("MAKE-TWO-WAY-STREAM", object, fLmake_two_way_stream,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+DEFUN("MAKE-TWO-WAY-STREAM", object, fLmake_two_way_stream,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
 
   if (type_of(x) != t_stream || !input_stream_p(x)) TYPE_ERROR(x,sLinput_stream);
   if (type_of(y) != t_stream || !output_stream_p(y)) TYPE_ERROR(y,sLoutput_stream);
@@ -2349,14 +2342,14 @@ for the string ~S.",
 		3, istart, iend, strng);
 @)
 
-DEFUN_NEW("MAKE-STRING-OUTPUT-STREAM",object,fLmake_string_output_stream,LISP,0,2,NONE,OO,OO,OO,OO,(object tp,...),"") {
+DEFUN("MAKE-STRING-OUTPUT-STREAM",object,fLmake_string_output_stream,LISP,0,2,NONE,OO,OO,OO,OO,(object tp,...),"") {
 
  tp=tp;/*FIXME lintian*/
  RETURN1(make_string_output_stream(64));
 
 }
 
-DEFUN_NEW("GET-OUTPUT-STREAM-STRING",object,fLget_output_stream_string,LISP,
+DEFUN("GET-OUTPUT-STREAM-STRING",object,fLget_output_stream_string,LISP,
 	   1,1,NONE,OO,OO,OO,OO,(object stream),"") {
 
   if (type_of(stream) != t_stream ||
@@ -2463,7 +2456,7 @@ LFD(Lstream_element_type)()
 	@(return Ct)
 @)
 
-DEFUN_NEW("OPEN-INT",object,fSopen_int,SI,8,8,NONE,OO,OO,OO,OO,
+DEFUN("OPEN-INT",object,fSopen_int,SI,8,8,NONE,OO,OO,OO,OO,
 	  (object filename,object direction,object element_type,object if_exists,
 	   object iesp,object if_does_not_exist,object idnesp,
 	   object external_format),"") {
@@ -2969,7 +2962,7 @@ FFN(siLfp_input_stream)()
 }
  
 
-DEFUN_NEW("FWRITE",object,fSfwrite,SI,4,4,NONE,OO,OO,OO,OO,
+DEFUN("FWRITE",object,fSfwrite,SI,4,4,NONE,OO,OO,OO,OO,
 	  (object vector,object start,object count,object stream),"") {
 
   unsigned char *p;
@@ -2984,7 +2977,7 @@ DEFUN_NEW("FWRITE",object,fSfwrite,SI,4,4,NONE,OO,OO,OO,OO,
   RETURN1(Cnil);
 }
 
-DEFUN_NEW("FREAD",object,fSfread,SI,4,4,NONE,OO,OO,OO,OO,
+DEFUN("FREAD",object,fSfread,SI,4,4,NONE,OO,OO,OO,OO,
 	  (object vector,object start,object count,object stream),"") {
   char *p;
   int n,beg;
@@ -3416,19 +3409,19 @@ DEF_ORDINARY("SUPERSEDE",sKsupersede,KEYWORD,"");
 DEF_ORDINARY("VERBOSE",sKverbose,KEYWORD,"");
 
 
-DEFUNO_NEW("STREAM-OBJECT0",object,fSstream_object0,SI,1,1,NONE,OO,OO,OO,OO,void,siLstream_object0,(object strm),"") { 
+DEFUN("STREAM-OBJECT0",object,fSstream_object0,SI,1,1,NONE,OO,OO,OO,OO,(object strm),"") {
   
   object x;
-
+  
   if (type_of(strm)!=t_stream)
     TYPE_ERROR(strm,sLstream);
   x=strm->sm.sm_object0;
   x=x==OBJNULL ? Cnil : x;
   RETURN1(x);
-
+  
 }
 
-DEFUNO_NEW("STREAM-OBJECT1",object,fSstream_object1,SI,1,1,NONE,OO,OO,OO,OO,void,siLstream_object1,(object strm),"") { 
+DEFUN("STREAM-OBJECT1",object,fSstream_object1,SI,1,1,NONE,OO,OO,OO,OO,(object strm),"") { 
 
   object x;
 

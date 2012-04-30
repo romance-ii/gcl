@@ -110,7 +110,7 @@ xor_op(int i, int j)
 
 
 #define BI(n_)\
-  DEFUN_NEW(#n_,fixnum,Join(fS,n_),SI,1,1,NONE,II,OO,OO,OO,(fixnum x),"") {\
+  DEFUN(#n_,fixnum,Join(fS,n_),SI,1,1,NONE,II,OO,OO,OO,(fixnum x),"") {\
 \
   RETURN1(Join(__builtin_,n_)(x));\
 \
@@ -123,7 +123,7 @@ BI(parityl)
 BI(popcountl)
 
 
-DEFUN_NEW("SHFT",object,fSshft,SI,2,2,NONE,OO,IO,OO,OO,(object x,fixnum y),"") {
+DEFUN("SHFT",object,fSshft,SI,2,2,NONE,OO,IO,OO,OO,(object x,fixnum y),"") {
 
   object u=new_bignum();
 
@@ -134,7 +134,7 @@ DEFUN_NEW("SHFT",object,fSshft,SI,2,2,NONE,OO,IO,OO,OO,(object x,fixnum y),"") {
 }
 
 
-DEFUN_NEW("LOGCB1",object,fSlogcb1,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("LOGCB1",object,fSlogcb1,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
   object u=new_bignum();
 
@@ -145,7 +145,7 @@ DEFUN_NEW("LOGCB1",object,fSlogcb1,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 }
 
 #define B2OP(n_,b_)						\
-DEFUN_NEW(#n_ "B2",object,Join(Join(fSlog,n_),b2),SI,3,3,NONE,OO,OO,OO,OO,(object x,object y,object z),"") { \
+DEFUN(#n_ "B2",object,Join(Join(fSlog,n_),b2),SI,3,3,NONE,OO,OO,OO,OO,(object x,object y,object z),"") { \
 \
   object u=new_bignum();\
 \
@@ -516,7 +516,7 @@ LFD(Llogbitp)(void)
 		vs_push(Cnil);
 }
 
-DEFUN_NEW("ASH",object,fLash,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+DEFUN("ASH",object,fLash,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
 
   int w,sign_x;
   
@@ -618,7 +618,7 @@ LFD(Linteger_length)(void)
 /* } */
 
   
-DEFUN_NEW("BIT-ARRAY-OP",object,fSbit_array_op,SI,4,4,NONE,OO,OO,OO,OO,
+DEFUN("BIT-ARRAY-OP",object,fSbit_array_op,SI,4,4,NONE,OO,OO,OO,OO,
 	  (object o,object x,object y,object r),"") {
 
 /* LFD(siLbit_array_op)(void) */

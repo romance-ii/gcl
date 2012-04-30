@@ -37,7 +37,7 @@ profil(void)
 
 
 #ifndef NO_PROFILE
-DEFUN_NEW("PROFILE",object,fSprofile,SI
+DEFUN("PROFILE",object,fSprofile,SI
        ,2,2,NONE,OO,OO,OO,OO,(object start_address,object scale),
        "Sets up profiling with START-ADDRESS and  SCALE where scale is \
   between 0 and 256")
@@ -58,7 +58,7 @@ DEFUN_NEW("PROFILE",object,fSprofile,SI
 }
 
 #endif
-DEFUN_NEW("FUNCTION-START",object,fSfunction_start,SI
+DEFUN("FUNCTION-START",object,fSfunction_start,SI
        ,1,1,NONE,OO,OO,OO,OO,(object funobj),"")
 {/* 1 args */
  if(/* type_of(funobj)!=t_cfun */
@@ -173,7 +173,7 @@ bfd_combined_table_update(struct bfd_link_hash_entry *h,PTR ct) {
 #endif
 
 
-DEFUN_NEW("SET-UP-COMBINED",object,fSset_up_combined,SI
+DEFUN("SET-UP-COMBINED",object,fSset_up_combined,SI
 	  ,0,1,NONE,OO,OO,OO,OO,(object first,...),"") {
 
   unsigned int n;
@@ -253,7 +253,7 @@ endar=aar+dim;
 }
 
 
-DEFUN_NEW("DISPLAY-PROFILE",object,fSdisplay_profile,SI
+DEFUN("DISPLAY-PROFILE",object,fSdisplay_profile,SI
        ,2,2,NONE,OO,OO,OO,OO,(object start_addr,object scal),"")
 {if (!combined_table.ptable)
    FEerror("must symbols first",0);
@@ -312,7 +312,7 @@ DEFUN_NEW("DISPLAY-PROFILE",object,fSdisplay_profile,SI
    of an array body, and to allow jumping to inside the body
    of the array */
 
-DEFUN_NEW("ARRAY-ADRESS",object,fSarray_adress,SI
+DEFUN("ARRAY-ADRESS",object,fSarray_adress,SI
        ,1,1,NONE,OO,OO,OO,OO,(object array),"")
 {/* 1 args */
  array=make_fixnum((long) (&(array->st.st_self[0])));

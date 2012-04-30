@@ -125,38 +125,25 @@ FFN(Fpsetq)(object arg)
 	vs_push(Cnil);
 }
 
-DEFUNO_NEW("SET",object,fLset,LISP
-   ,2,2,NONE,OO,OO,OO,OO,void,Lset,(object symbol,object value),"")
+DEFUN("SET",object,fLset,LISP,2,2,NONE,OO,OO,OO,OO,(object symbol,object value),"") {
 
-{
-	/* 2 args */
-	if (type_of(symbol) != t_symbol)
-		not_a_symbol(symbol);
-	if ((enum stype)symbol->s.s_stype == stp_constant)
-		FEinvalid_variable("Cannot assign to the constant ~S.",
-				   symbol);
-	symbol->s.s_dbind = value;
-	RETURN1(value);
+  /* 2 args */
+  if (type_of(symbol) != t_symbol)
+    not_a_symbol(symbol);
+  if ((enum stype)symbol->s.s_stype == stp_constant)
+    FEinvalid_variable("Cannot assign to the constant ~S.",
+		       symbol);
+  symbol->s.s_dbind = value;
+  RETURN1(value);
+
 }
 
-DEFUNO_NEW("FUNCTION-NAME",object,fSfunction_name,SI
-	   ,1,1,NONE,OO,OO,OO,OO,void,siLfunction_name,(object x),"") {
+DEFUN("FUNCTION-NAME",object,fSfunction_name,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
   switch(type_of(x)) {
   case t_function: 
     x=Cnil;
     break;
-  /* case t_cfun: */
-  /*   x=x->cf.cf_name; */
-  /*   break; */
-  /* case t_ifun: */
-  /*   x=x->ifn.ifn_self; */
-  /*   x=consp(x) ?  */
-  /*     (x->c.c_car==sLlambda_block ? */
-  /*      x->c.c_cdr->c.c_car : */
-  /*      (x->c.c_car==sLlambda_block_closure ?  */
-  /* 	x->c.c_cdr->c.c_cdr->c.c_cdr->c.c_cdr->c.c_car : Cnil)) : Cnil; */
-  /*   break; */
   default:
     TYPE_ERROR(x,sLfunction);
     x=Cnil;
@@ -170,57 +157,44 @@ DEFUNO_NEW("FUNCTION-NAME",object,fSfunction_name,SI
 	
 
 
-DEFUNO_NEW("FSET",object,fSfset,SI
-   ,2,2,NONE,OO,OO,OO,OO,void,siLfset,(object sym,object function),"")
+DEFUN("FSET",object,fSfset,SI,2,2,NONE,OO,OO,OO,OO,(object sym,object function),"") {
 
-{
-	/* 2 args */
-/*         if (type_of(sym) != t_symbol) { */
-/* 	  if (setf_fn_form(sym)) { */
-/* 	    putprop(MMcadr(sym),function,sSsetf_function); */
-/* 	    return(function); */
-/* 	  } else */
-/* 	    not_a_symbol(sym); */
-/* 	} */
   if (type_of(sym)!=t_symbol)
     sym=ifuncall1(sSfunid_to_sym,sym);
+  
+  if (sym->s.s_sfdef != NOT_SPECIAL) {
+    if (sym->s.s_mflag) {
+      if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
+	sym->s.s_sfdef = NOT_SPECIAL;
+    } else if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
+      FEerror("~S, a special form, cannot be redefined.",
+	      1, sym);
+  }
+  if (sym->s.s_hpack == lisp_package &&
+      sym->s.s_gfdef != OBJNULL && initflag && sLwarn->s.s_gfdef)
+    ifuncall2(sLwarn,make_simple_string("~S is being redefined."),
+	      sym);
+  sym = clear_compiler_properties(sym,function);
+  if (type_of(function) == t_function) {
+    sym->s.s_gfdef = function;
+    sym->s.s_mflag = FALSE;
+  } else if (car(function) == sLspecial)
+    FEerror("Cannot define a special form.", 0);
+  else if (function->c.c_car == sLmacro) {
+    function=function->c.c_cdr;
+    sym->s.s_gfdef = function;
+    sym->s.s_mflag = TRUE;
+  } else {
+    sym->s.s_gfdef = function;
+    sym->s.s_mflag = FALSE;
+  }
+  
+  sym->s.s_sfdef=NOT_SPECIAL;/*FIXME?*/
+  if (function->fun.fun_plist!=Cnil)
+    function->fun.fun_plist->c.c_cdr->c.c_cdr->c.c_cdr->c.c_cdr->c.c_cdr->c.c_car=sym;/*FIXME*/
+  
+  RETURN1(function);
 
-/*   if (type_of(sym)!=t_symbol) */
-/*     not_a_symbol(sym); */
-	if (sym->s.s_sfdef != NOT_SPECIAL) {
-		if (sym->s.s_mflag) {
-			if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
-				sym->s.s_sfdef = NOT_SPECIAL;
-		} else if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
-			FEerror("~S, a special form, cannot be redefined.",
-				1, sym);
-	}
-	if (sym->s.s_hpack == lisp_package &&
-	    sym->s.s_gfdef != OBJNULL && initflag && sLwarn->s.s_gfdef)
-		ifuncall2(sLwarn,make_simple_string("~S is being redefined."),
-			 sym);
-	sym = clear_compiler_properties(sym,function);
-	if (/* type_of(function) == t_cfun || */
-	    /* type_of(function) == t_ifun || */
-	    type_of(function) == t_function) {
-		sym->s.s_gfdef = function;
-		sym->s.s_mflag = FALSE;
-	} else if (car(function) == sLspecial)
-		FEerror("Cannot define a special form.", 0);
-	else if (function->c.c_car == sLmacro) {
-	  function=function->c.c_cdr;
-		sym->s.s_gfdef = function;
-		sym->s.s_mflag = TRUE;
-	} else {
-		sym->s.s_gfdef = function;
-		sym->s.s_mflag = FALSE;
-	}
-
-	sym->s.s_sfdef=NOT_SPECIAL;/*FIXME?*/
-	if (function->fun.fun_plist!=Cnil)
-	  function->fun.fun_plist->c.c_cdr->c.c_cdr->c.c_cdr->c.c_cdr->c.c_cdr->c.c_car=sym;/*FIXME*/
-
-	RETURN1(function);
 }
 #ifdef STATIC_FUNCTION_POINTERS
 object
@@ -251,43 +225,25 @@ FFN(Fmultiple_value_setq)(object form) {
 
 }
 
-DEFUNO_NEW("MAKUNBOUND",object,fLmakunbound,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Lmakunbound,(object sym),"")
+DEFUN("MAKUNBOUND",object,fLmakunbound,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
 
-{
-	/* 1 args */
-	if (type_of(sym) != t_symbol)
-		not_a_symbol(sym);
-	if ((enum stype)sym->s.s_stype == stp_constant)
-		FEinvalid_variable("Cannot unbind the constant ~S.",
-				   sym);
-	sym->s.s_dbind = OBJNULL;
-	RETURN1(sym);
+  if (type_of(sym) != t_symbol)
+    not_a_symbol(sym);
+  if ((enum stype)sym->s.s_stype == stp_constant)
+    FEinvalid_variable("Cannot unbind the constant ~S.",
+		       sym);
+  sym->s.s_dbind = OBJNULL;
+  RETURN1(sym);
+
 }
 
 object sStraced;
 
-DEFUNO_NEW("FMAKUNBOUND",object,fLfmakunbound,LISP,1,1,NONE,OO,OO,OO,OO,void,Lfmakunbound,(object sym),"") {
+DEFUN("FMAKUNBOUND",object,fLfmakunbound,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
 
   object rsym;
 
   rsym=type_of(sym)==t_symbol ? sym : ifuncall1(sSfunid_to_sym,sym);
-/*   if (rsym==Cnil)  */
-/*     TYPE_ERROR(sym,sLfunction_identifier); */
-
-/*   /\*FIXME -- store a symbol in plist for setf functions as opposed to */
-/*     the function itself, and centralize function name resolution. */
-/*     Allow for tracing, etc. thereby. 20050307 CM*\/ */
-
-/*   if (setf_fn_form(sym)) { */
-
-/*     if (get(sym->c.c_cdr->c.c_car,sSsetf_function,OBJNULL)!=OBJNULL) */
-/* /\*       FEundefined_function(sym); *\/ */
-/*       remf(&sym->c.c_cdr->c.c_car->s.s_plist,sSsetf_function); */
-/*     RETURN1(sym); */
-/*   } */
-
-  /* 1 args */
 
   if (rsym->s.s_sfdef != NOT_SPECIAL) {
     if (rsym->s.s_mflag) {
@@ -387,15 +343,18 @@ setf(object place, object form)
 	  val = Ieval1(form);
 	  return putprop(sym,val,key); 
 	}
-/* 	if (fun == sLgetf)  */
-/* 	  Ieval(Mcaddr(args)); */
-	if (fun == sLaref) { f = siLaset; args=MMcons(form,args);goto EVAL; }
-	if (fun == sLsvref) { f = siLsvset; goto EVAL; }
+
+#define str(a_) ({string_register->st.st_fillp=string_register->st.st_dim=sizeof(a_)-1;string_register->st.st_self=(a_);string_register;})
+	
+	if (fun == sLaref) 
+	  return Ieval1(MMcons(find_symbol(str("ASET"),system_package),MMcons(form,args)));
+	if (fun == sLsvref)
+	  return Ieval1(MMcons(find_symbol(str("SVSET"),system_package),append(args,MMcons(form,Cnil))));
 	if (fun == sLelt) { f = siLelt_set; goto EVAL; }
 	if (fun == sLchar) { f = siLchar_set; goto EVAL; }
 	if (fun == sLschar) { f = siLchar_set; goto EVAL; }
-	if (fun == sLfill_pointer) { f = siLfill_pointer_set; goto EVAL; }
-/* 	if (fun == sLgethash) { f = siLhash_set; nka=2; goto EVAL; } */
+	if (fun == sLfill_pointer) 
+	  return Ieval1(MMcons(find_symbol(str("FILL-POINTER-SET"),system_package),append(args,MMcons(form,Cnil))));
 	if (fun == sLcar) {
 		x = Ieval1(Mcar(args));
 		result = Ieval1(form);
@@ -442,7 +401,7 @@ setf(object place, object form)
 EVAL:
 	for (;!endp(args);args=args->c.c_cdr)
 	  eval_push(args->c.c_car);
-	if (f!=siLaset) eval_push(form);
+	/* if (f!=siLaset) eval_push(form); */
 	if (nka && vs_top-vs>nka) {
 	  vs[nka]=vs_base[0];
 	  vs_top=vs+nka+1;
@@ -614,7 +573,7 @@ FFN(Fdecf)(object form)
 
 DEF_ORDINARY("CLEAR-COMPILER-PROPERTIES",sSclear_compiler_properties,SI,"");
 
-DEFUN_NEW("CLEAR-COMPILER-PROPERTIES",object,fSclear_compiler_properties,SI
+DEFUN("CLEAR-COMPILER-PROPERTIES",object,fSclear_compiler_properties,SI
    ,2,2,NONE,OO,OO,OO,OO,(object x0,object x1),"")
 
 {
@@ -622,7 +581,7 @@ DEFUN_NEW("CLEAR-COMPILER-PROPERTIES",object,fSclear_compiler_properties,SI
   RETURN1(Cnil);
 }
 
-DEFUN_NEW("EMERGENCY-FSET",object,fSemergency_fset,SI
+DEFUN("EMERGENCY-FSET",object,fSemergency_fset,SI
    ,2,2,NONE,OO,OO,OO,OO,(object sym,object function),"")
 
 {

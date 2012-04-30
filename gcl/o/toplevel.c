@@ -117,7 +117,7 @@ FFN(siLAmake_special)(void)
 }
 
 
-DEFUN_NEW("*MAKE-CONSTANT",object,fSAmake_constant,SI,2,2,NONE,OO,OO,OO,OO, \
+DEFUN("*MAKE-CONSTANT",object,fSAmake_constant,SI,2,2,NONE,OO,OO,OO,OO, \
 	  (object s,object v),"") { 
 
   check_type_symbol(&s);
@@ -156,7 +156,7 @@ static void
 FFN(Feval_when)(object arg)
 {
 
-	object *base = vs_base;
+	object *base = vs_top;
 	object ss;
 	bool flag = FALSE;
 

@@ -873,8 +873,7 @@ segmentation_catcher(int i, long code, void *scp, char *addr) {
 
 }
 
-/* DEFUNO_NEW("BYE",object,fSbye,SI,0,1,NONE,OI,OO,OO,OO,void,Lby,(ufixnum exit_code,...),"") { */
-DEFUN_NEW("BYE",object,fSbye,SI,0,1,NONE,OI,OO,OO,OO,(ufixnum exit_code,...),"") {
+DEFUN("BYE",object,fSbye,SI,0,1,NONE,OI,OO,OO,OO,(ufixnum exit_code,...),"") {
 
   fixnum n=INIT_NARGS(0);
   object l=Cnil,f=(object)(exit_code+1);
@@ -892,7 +891,7 @@ DEFUN_NEW("BYE",object,fSbye,SI,0,1,NONE,OI,OO,OO,OO,(ufixnum exit_code,...),"")
 
 }
 
-DEFUN_NEW("QUIT",object,fSquit,SI,0,1,NONE,OI,OO,OO,OO,(fixnum exitc),"") {
+DEFUN("QUIT",object,fSquit,SI,0,1,NONE,OI,OO,OO,OO,(fixnum exitc),"") {
   return FFN(fSbye)(exitc); 
 }
  
@@ -963,7 +962,7 @@ FFN(siLcheck_vs)(void) {
   vs_base[0] = Cnil;
 }
 
-DEFUN_NEW("CATCH-FATAL",object,fScatch_fatal,SI,1,1,NONE,OI,OO,OO,OO,(fixnum i),"") {
+DEFUN("CATCH-FATAL",object,fScatch_fatal,SI,1,1,NONE,OI,OO,OO,OO,(fixnum i),"") {
   catch_fatal=i;
   return Cnil;
 }
@@ -1090,30 +1089,20 @@ FFN(siLinitialization_failure)(void) {
   exit(0);
 }
 
-DEFUNO_NEW("IDENTITY",object,fLidentity,LISP
-       ,1,1,NONE,OO,OO,OO,OO,void,Lidentity,(object x0),"")
-{
-	/* 1 args */
+DEFUN("IDENTITY",object,fLidentity,LISP,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
   RETURN1 (x0);
 }
 
-DEFUNO_NEW("GCL-COMPILE-TIME",object,fSgcl_compile_time,SI
-       ,0,0,NONE,OO,OO,OO,OO,void,Lgcl_compile_time,(void),"")
-{
+DEFUN("GCL-COMPILE-TIME",object,fSgcl_compile_time,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
   RETURN1 (make_simple_string(__DATE__ " " __TIME__));
 }
 
-DEFUNO_NEW("LDB1",object,fSldb1,SI
-       ,3,3,NONE,OI,II,OO,OO,void,Lldb1,(fixnum a,fixnum b, fixnum c),"")
-{
+DEFUN("LDB1",object,fSldb1,SI,3,3,NONE,OI,II,OO,OO,(fixnum a,fixnum b, fixnum c),"") {
   RETURN1 (make_fixnum(((((~(-1 << (a))) << (b)) & (c)) >> (b))));
 }
 
-DEFUN_NEW("LISP-IMPLEMENTATION-VERSION",object,fLlisp_implementation_version,LISP
-       ,0,0,NONE,OO,OO,OO,OO,(void),"")
-{
-	/* 0 args */
-	RETURN1((make_simple_string(LISP_IMPLEMENTATION_VERSION)));
+DEFUN("LISP-IMPLEMENTATION-VERSION",object,fLlisp_implementation_version,LISP,0,0,NONE,OO,OO,OO,OO,(void),"") {
+  RETURN1((make_simple_string(LISP_IMPLEMENTATION_VERSION)));
 }
 
 
@@ -1314,6 +1303,6 @@ init_main(void) {
   
   make_si_function("SAVE-SYSTEM", siLsave_system);
 /*   make_si_sfun("CATCH-FATAL",siLcatch_fatal,ARGTYPE1(f_fixnum)); */
-  make_si_function("WARN-VERSION",Lidentity);
+  /* make_si_function("WARN-VERSION",Lidentity); */
   
 }

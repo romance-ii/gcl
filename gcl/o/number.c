@@ -61,7 +61,7 @@ object small_fixnum ( int i ) {
 struct {int min,max;} bigger_fixnums;
 
 struct fixnum_struct *bigger_fixnum_table;
-DEFUN_NEW("ALLOCATE-BIGGER-FIXNUM-RANGE",object,fSallocate_bigger_fixnum_range,
+DEFUN("ALLOCATE-BIGGER-FIXNUM-RANGE",object,fSallocate_bigger_fixnum_range,
       SI,2,2,NONE,OI,IO,OO,OO,(fixnum min,fixnum max),"") 
 { int j; 
   if (min <= max); else {FEerror("Need Min < Max",0);}
