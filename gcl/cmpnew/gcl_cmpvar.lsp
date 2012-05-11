@@ -770,7 +770,7 @@
 		 (sft (car (last form)) type)
 		 (mapc (lambda (x y) (sft y (var-type x)))
 		       (caddr form) (cadddr form)))
-		(var (do-setq-tp (caaddr form) nil nt))
+		(var (do-setq-tp (caaddr form) nil (type-and nt (var-type (caaddr form)))))
 		(progn (sft (car (last (third form))) type))
 		;; (if 
 		;;     (when (ignorable-form (third form));FIXME put third form into progn
