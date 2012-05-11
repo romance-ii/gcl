@@ -286,14 +286,14 @@ sgc_mark_object1(object x) {
       goto CASE_GENERAL;
     
   CASE_SPECIAL:
-    cp = x->fixa.fixa_self;
+    cp = x->a.a_self;
     if (cp == NULL)
       break;
     /* set j to the size in char of the body of the array */
     
     switch((enum aelttype)x->a.a_elttype){
     case aet_lf:
-      j= sizeof(longfloat)*x->lfa.lfa_dim;
+      j= sizeof(longfloat)*x->a.a_dim;
       if (((int)what_to_collect >= (int)t_contiguous) &&
 	  !(inheap(cp)) && SGC_RELBLOCK_P(x->a.a_self))
 	ROUND_RB_POINTERS_DOUBLE;
@@ -314,7 +314,7 @@ sgc_mark_object1(object x) {
       j=sizeof(int)*x->a.a_dim;
       break;
     default:
-      j=sizeof(fixnum)*x->fixa.fixa_dim;}
+      j=sizeof(fixnum)*x->a.a_dim;}
     
     goto COPY;
     

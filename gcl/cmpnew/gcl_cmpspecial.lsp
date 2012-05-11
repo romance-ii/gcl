@@ -197,11 +197,18 @@
 
 (defun find-special-var (l f &aux v)
   (labels ((ccar (x) (when (listp x) (car x))))
-	(cond ((funcall f l) l)
-	      ((atom l) nil)
-	      ((setq v (cadr (member 'bind-reg-clv l :key #'ccar)))
-	       (when (eq 'let* (ccar v)) (find-special-var (caddr v) f)))
-	      ((or (find-special-var (car l) f) (find-special-var (cdr l) f))))))
+	  (cond ((atom l) nil)
+		((setq v (cadr (member 'bind-reg-clv l :key #'ccar)))
+		 (when (eq 'let* (ccar v)) (car (member-if f (caddr v)))))
+		((or (find-special-var (car l) f) (find-special-var (cdr l) f))))))
+
+;; (defun find-special-var (l f &aux v)
+;;   (labels ((ccar (x) (when (listp x) (car x))))
+;; 	(cond ((funcall f l) l)
+;; 	      ((atom l) nil)
+;; 	      ((setq v (cadr (member 'bind-reg-clv l :key #'ccar)))
+;; 	       (when (eq 'let* (ccar v)) (find-special-var (caddr v) f)))
+;; 	      ((or (find-special-var (car l) f) (find-special-var (cdr l) f))))))
 
 ;; (defun find-special-var (l f)
 ;;   (cond ((funcall f l) l)
@@ -209,8 +216,10 @@
 ;; 	((eq (car l) 'block) nil)
 ;; 	((or (find-special-var (car l) f) (find-special-var (cdr l) f)))))
 
-(defun is-narg-le (l)
-  (find-special-var l 'is-narg-var))
+(defun is-narg-le (l) (caadr (caddr l)))
+
+;; (defun is-narg-le (l)
+;;   (find-special-var l 'is-narg-var))
 
 (defun mv-var (l)
   (find-special-var l 'is-mv-var))
@@ -226,11 +235,32 @@
       (if (cdar atp) #tcons #tproper-cons)
     tp))
 
-(defun lam-e-to-sig (l &aux (args (caddr l)) (regs (car args)) (narg (is-narg-le l))
-		       (first (is-first-var (car regs))) (regs (if first (cdr regs) regs)))
+;; (defun mbt (tp &aux (atp (atomic-tp tp)))
+;;   (cond (*compiler-new-safety* (if (single-type-p tp) #tt #t*))
+;; 	((and atp (consp (car atp))) (if (cdar atp) #tcons #tproper-cons))
+;; 	(tp)))
+
+(defun lam-e-to-sig (l &aux (args (caddr l)) (regs (car args)) (regs (if (is-first-var (car regs)) (cdr regs) regs)))
   `((,@(mapcar 'var-type regs)
-	  ,@(when (or narg (member-if 'identity (cdr args))) `(*)))
-	,(mbt (info-type (cadar (last l))))))
+     ,@(when (or (is-narg-le l) (member-if 'identity (cdr args))) `(*)))
+    ,(mbt (info-type (cadar (last l))))))
+
+;; (defun lam-e-to-sig (l &aux (args (caddr l)) (regs (car args)) (narg (is-narg-le l))
+;; 		       (first (is-first-var (car regs))) (regs (if first (cdr regs) regs)))
+;;   `((,@(mapcar (lambda (x) (if *compiler-new-safety* #tt (var-type x))) regs)
+;; 	  ,@(when (or narg (member-if 'identity (cdr args))) `(*)))
+;; 	,(mbt (info-type (cadar (last l))))))
+
+;; (defun mbt (tp &aux (atp (atomic-tp tp)))
+;;   (if (and atp (consp (car atp)))
+;;       (if (cdar atp) #tcons #tproper-cons)
+;;     tp))
+
+;; (defun lam-e-to-sig (l &aux (args (caddr l)) (regs (car args)) (narg (is-narg-le l))
+;; 		       (first (is-first-var (car regs))) (regs (if first (cdr regs) regs)))
+;;   `((,@(mapcar 'var-type regs)
+;; 	  ,@(when (or narg (member-if 'identity (cdr args))) `(*)))
+;; 	,(mbt (info-type (cadar (last l))))))
 
 ;; (defun lam-e-to-sig (l &aux (args (caddr l)) (regs (car args)) (narg (is-narg-le l))
 ;; 		       (first (is-first-var (car regs))) (regs (if first (cdr regs) regs)))

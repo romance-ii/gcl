@@ -386,7 +386,7 @@ mark_object(object x) {
       goto CASE_GENERAL;
     
   CASE_SPECIAL:
-    cp = x->fixa.fixa_self;
+    cp = x->a.a_self;
     if (cp == NULL)
       break;
     /* set j to the size in char of the body of the array */
@@ -399,7 +399,7 @@ mark_object(object x) {
        rb_pointer1 +=  (sizeof(double) - tem); \
      }}
     case aet_lf:
-      j= sizeof(longfloat)*x->lfa.lfa_dim;
+      j= sizeof(longfloat)*x->a.a_dim;
       if (((int)what_to_collect >= (int)t_contiguous) &&
 	  !(inheap(cp))) ROUND_RB_POINTERS_DOUBLE;
       break;
@@ -419,7 +419,7 @@ mark_object(object x) {
       j=sizeof(int)*x->a.a_dim;
       break;
     default:
-      j=sizeof(fixnum)*x->fixa.fixa_dim;}
+      j=sizeof(fixnum)*x->a.a_dim;}
     
     goto COPY;
     

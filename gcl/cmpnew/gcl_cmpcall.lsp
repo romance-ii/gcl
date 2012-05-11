@@ -228,15 +228,29 @@
 	 (s (car args))
 	 (ts (or (car (member tag *ttl-tags* :key (lambda (x) (tag-name (car x))))) (baboon)))
 	 (ttl-tag (pop ts))
-	 (nv (mapcar (lambda (x) (car (member (cdr x) *vars* 
-					      :key (lambda (x) (when (var-p x) (var-name x)))))) s))
-	 (ov (mapcar (lambda (x) (car (member (car x) (car ts) 
-					      :key (lambda (x) (when (var-p x) (var-name x)))))) s))
-	 (*vars* (mapc (lambda (x) (set-var-noreplace x)) (append nv ov)))
+	 (vs (remove-if-not 'var-p *vars*))
+	 (nv (mapcar (lambda (x) (car (member (cdr x) *vars* :key (lambda (x) (when (var-p x) (var-name x)))))) s))
+	 (ov (mapcar (lambda (x) (car (member (car x) (car ts)  :key (lambda (x) (when (var-p x) (var-name x)))))) s))
+	 (*vars* (append (mapc (lambda (x) (set-var-noreplace x)) (append nv ov)) *vars*))
 	 (*tags* (cons ttl-tag *tags*)))
     (c1expr `(progn
 	       (setq ,@(mapcan (lambda (x) (list (car x) (cdr x))) s))
 	       (go ,tag)))))
+
+;; (defun c1tail-recur (args)
+;;   (let* ((tag (pop args))
+;; 	 (s (car args))
+;; 	 (ts (or (car (member tag *ttl-tags* :key (lambda (x) (tag-name (car x))))) (baboon)))
+;; 	 (ttl-tag (pop ts))
+;; 	 (nv (mapcar (lambda (x) (car (member (cdr x) *vars* 
+;; 					      :key (lambda (x) (when (var-p x) (var-name x)))))) s))
+;; 	 (ov (mapcar (lambda (x) (car (member (car x) (car ts) 
+;; 					      :key (lambda (x) (when (var-p x) (var-name x)))))) s))
+;; 	 (*vars* (mapc (lambda (x) (set-var-noreplace x)) (append nv ov)))
+;; 	 (*tags* (cons ttl-tag *tags*)))
+;;     (c1expr `(progn
+;; 	       (setq ,@(mapcan (lambda (x) (list (car x) (cdr x))) s))
+;; 	       (go ,tag)))))
 
 ;; (defun c1tail-recur (args)
 ;;   (let* ((tag (pop args))

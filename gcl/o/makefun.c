@@ -32,7 +32,7 @@ DEFUN("SET-FUNCTION-ENVIRONMENT",object,fSset_function_environment,SI,2,2,NONE,O
 
 }
 
-#define PADDR(i) ((void *)(sSPinit->s.s_dbind->fixa.fixa_self[Mfix(i)]))
+#define PADDR(i) ((void *)(((fixnum *)sSPinit->s.s_dbind->a.a_self)[Mfix(i)]))
 
 #define POP_BITS(x_,y_) ({ufixnum _t=x_&((1<<y_)-1);x_>>=y_;_t;})
 object

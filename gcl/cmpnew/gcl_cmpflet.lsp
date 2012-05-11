@@ -307,11 +307,57 @@
   (add-info info (cadr body))
   (setf (info-type info) (info-type (cadr body)))
 
-  (let ((funs (mapcar 'car defs1)))
-    (list (if labels 'labels 'flet) info 
-	  (mapcar (lambda (x) (caddr (fun-c1   x))) (remove-if-not 'fun-ref funs))
-	  (mapcar (lambda (x) (caddr (fun-c1cb x))) (remove-if-not 'fun-ref-ccb funs))
-	  body)))
+  (let* ((funs (mapcar 'car defs1))
+	 (fns (mapcar (lambda (x) (caddr (fun-c1   x))) (remove-if-not 'fun-ref funs)))
+	 (cls (mapcar (lambda (x) (caddr (fun-c1cb x))) (remove-if-not 'fun-ref-ccb funs))))
+    (if (or fns cls)
+	(list (if labels 'labels 'flet) info fns cls body)
+      body)))
+
+;; (defun c1flet-labels (labels args &aux body ss ts is other-decl (info (make-info))
+;; 			     defs1 fnames (ofuns *funs*) (*funs* *funs*))
+
+;;   (when (endp args) (too-few-args 'flet 1 0))
+
+;;   (dolist (def (car args) (setq defs1 (nreverse defs1)))
+;;     (let* ((x (car def))(y (si::funid-sym x))) (unless (eq x y) (setq def (cons y (cdr def)))))
+;;     (cmpck (or (endp def) (endp (cdr def))) "The function definition ~s is illegal." def)
+;;     (when labels
+;;       (cmpck (member (car def) fnames) "The function ~s was already defined." (car def))
+;;       (push (car def) fnames))
+;;     (let* ((src (si::block-lambda (cadr def) (car def) (cddr def)))
+;; 	   (fun (make-fun :name (car def) :src src :info (make-info :type nil :sp-change 1))))
+;;       (push fun *funs*)
+;;       (push (list fun (cdr def)) defs1)))
+  
+;;   (let ((*funs* (if labels *funs* ofuns)))
+;; ;    (mapc (lambda (x &aux (x (car x))) (setf (fun-fn x) (afe (cons 'df (current-env)) (mf (fun-name x))))) defs1))
+;;     (mapc (lambda (x &aux (x (car x))) (setf (fun-fn x) (mf (fun-name x)))) defs1))
+
+;;   (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
+  
+;;   (c1add-globals ss)
+;;   (check-vdecl nil ts is)
+;;   (setq body (c1decl-body other-decl body))
+  
+;;   (let ((nf (mapcar 'car defs1)))
+;;     (ref-funs body nf)
+;;     (when labels
+;;       (do (fun) ((not (setq fun (car (member-if (lambda (x) (or (fun-ref x) (fun-ref-ccb x))) nf)))))
+;; 	  (setq nf (remove fun nf))
+;; 	  (when (fun-ref fun)
+;; 	    (ref-funs (fun-c1 fun) nf))
+;; 	  (when (fun-ref-ccb fun)
+;; 	    (ref-funs (fun-c1cb fun) nf)))))
+
+;;   (add-info info (cadr body))
+;;   (setf (info-type info) (info-type (cadr body)))
+
+;;   (let ((funs (mapcar 'car defs1)))
+;;     (list (if labels 'labels 'flet) info 
+;; 	  (mapcar (lambda (x) (caddr (fun-c1   x))) (remove-if-not 'fun-ref funs))
+;; 	  (mapcar (lambda (x) (caddr (fun-c1cb x))) (remove-if-not 'fun-ref-ccb funs))
+;; 	  body)))
 
 ;; (defun c1flet-labels (labels args &aux body ss ts is other-decl (info (make-info))
 ;; 			     defs1 fnames (ofuns *funs*) (*funs* *funs*))

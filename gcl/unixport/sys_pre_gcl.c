@@ -61,7 +61,6 @@ gcl_init_init()
   build_symbol_table();
 
   lsp_init("../lsp/gcl_export.lsp");
-  /* lsp_init("../lsp/gcl_pl.lsp"); */
 
   lsp_init("../lsp/gcl_dl.lsp");
   lsp_init("../lsp/gcl_fle.lsp");
@@ -83,6 +82,8 @@ gcl_init_system(object no_init)
   if (type_of(no_init)!=t_symbol)
     error("Supplied no_init is not of type symbol\n");
 
+  lsp_init("../lsp/gcl_s.lsp");
+  lsp_init("../lsp/gcl_sf.lsp");
   lsp_init("../lsp/gcl_predlib.lsp");
   lsp_init("../lsp/gcl_callhash.lsp");
   lsp_init("../lsp/gcl_assert.lsp");

@@ -1291,7 +1291,8 @@ LFD(Lacons)()
 		if (a_list->c.c_car != Cnil && 
 		    TEST((*car_or_cdr)(a_list->c.c_car))) {
 			a_list = a_list->c.c_car;
-			goto L;
+			break;
+			/* goto L; */
 		}
 		a_list = a_list->c.c_cdr;
 	}

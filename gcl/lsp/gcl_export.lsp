@@ -498,7 +498,12 @@
        user-homedir-pathname                yes-or-no-p               
        values                               zerop))
 
+(unless (find-package :s)
+  (make-package :s :use '(:cl)))
+
 (in-package :si)
+
+(use-package :s)
 
 (let ((l (package-used-by-list (find-package :old-lisp))))
   (dolist (l l) 
@@ -507,7 +512,7 @@
 
 ;(delete-package-internal :old-lisp)
 
-(make-package :COMPILER :use '(:lisp :si))
+(make-package :COMPILER :use '(:lisp :si :s))
 
 ;FIXME bootstrap code
 
@@ -524,4 +529,9 @@
 
 (*make-constant '+array-types+ (si::aelttype-list))
 (*make-constant '+sfix+ (eql (truncate fixnum-length char-length) 4))
+
+(in-package :s)
+(si::import-internal 'si::(\| & ^ ~ c+ << >> string-concatenate strcat lit seqind fixnum-length char-length cref address))
+(si::import-internal 'compiler::(lisp-type cmp-norm-tp))
+
 

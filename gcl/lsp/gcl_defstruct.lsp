@@ -297,7 +297,7 @@
   (dolist (v slot-descriptions)
 	  (when (and v (car v))
 		(setf type 
-		      (or (upgraded-array-element-type (caddr v)) t)
+		      (upgraded-array-element-type (or (caddr v) t))
 		      (caddr v) type)
 		(let ((val (second v)))
 		  (unless (typep val type)

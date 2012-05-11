@@ -1299,6 +1299,11 @@ init_main(void) {
 #ifdef STATIC_LINKING
   ADD_FEATURE("STATIC");
 #endif	 
+
+#if SIZEOF_LONG==8
+  ADD_FEATURE("64BIT");
+#endif	 
+
   make_special("*FEATURES*",features);}
   
   make_si_function("SAVE-SYSTEM", siLsave_system);

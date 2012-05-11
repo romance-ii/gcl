@@ -483,9 +483,8 @@
 		    (let ((type (max-vtp (cadr decl))))
 		      (when type
 			(dolist (var (cddr decl))
-			  (cmpck (not (symbolp var)) "The type declaration ~s contains a non-symbol ~s."
-				 decl var)
-			  (cond ((eq stype 'hint) (push (cons var type) cps) 
+			  (cmpck (not (symbolp var)) "The type declaration ~s contains a non-symbol ~s." decl var)
+			  (cond ((unless (get var 'tmp) (eq stype 'hint)) (push (cons var type) cps) ;FIXME
 				 (push (cons var (global-type-bump type)) ts))
 				((push (cons var type) ts)))))))
 		   (class
@@ -534,67 +533,368 @@
       (setq body (nreconc ctps body))))
   (values body ss ts is others (when doc-p doc) cps)))
 
-(defun c1decl-body (decls body &aux (dl nil))
-  (if (null decls)
-      (c1progn body)
-    (let ((*function-declarations* *function-declarations*)
-	  (*alien-declarations* *alien-declarations*)
-	  (*notinline* *notinline*)
-	  (*inline* *inline*)
-	  (*space* *space*)
-	  (*compiler-check-args* *compiler-check-args*)
-	  (*compiler-new-safety* *compiler-new-safety*)
-	  (*compiler-push-events* *compiler-push-events*)
-	  (*safe-compile* *safe-compile*))
-      (dolist (decl decls dl)
-	(case (car decl)
-	      (optimize
-	       (dolist (d (cdr decl)) (push d dl))
-	       (local-compile-decls (cdr decl)))
-              (ftype
-               (if (or (endp (cdr decl))
-                       (not (consp (cadr decl)))
-                       (not (eq (caadr decl) 'function))
-                       (endp (cdadr decl)))
-                   (cmpwarn "The function declaration ~s is illegal." decl)
-		 (dolist (fname (cddr decl))
-		   (add-function-declaration
-		    fname (cadadr decl) (cddadr decl)))))
-              (function
-               (if (or (endp (cdr decl))
-                       (endp (cddr decl))
-                       (not (symbolp (cadr decl))))
-                   (cmpwarn "The function declaration ~s is illegal." decl)
+;; (defun c1body (body doc-p &aux ss is ts others cps)
+;;   (multiple-value-bind
+;;    (doc decls ctps body)
+;;    (parse-body-header body (unless doc-p ""))
+;;    (dolist (decl decls)
+;;      (dolist (decl (cdr decl))
+;;        (cmpck (not (consp decl)) "The declaration ~s is illegal." decl)
+;;        (let ((dtype (car decl)))
+;; 	 (if (consp dtype)
+;; 	     (let* ((dtype (max-vtp dtype))
+;; 		    (stype (if (consp dtype) (car dtype) dtype)))
+;; 	       (case stype
+;; 		     (satisfies (push decl others))
+;; 		     (otherwise
+;; 		      (dolist (var (cdr decl))
+;; 			(cmpck (not (symbolp var)) "The type declaration ~s contains a non-symbol ~s."
+;; 			       decl var)
+;; 			(push (cons var dtype) ts)))))
+;; 	   (let ((stype dtype))
+;; 	     (cmpck (not (symbolp stype)) "The declaration ~s is illegal." decl)
+;; 	     (case stype
+;; 		   (special
+;; 		    (dolist (var (cdr decl))
+;; 		      (cmpck (not (symbolp var)) "The special declaration ~s contains a non-symbol ~s."
+;; 			     decl var)
+;; 		      (push var ss)))
+;; 		   ((ignore ignorable)
+;; 		    (dolist (var (cdr decl))
+;; 		      (cmpck (not (symbolp var)) "The ignore declaration ~s contains a non-symbol ~s."
+;; 			     decl var)
+;; 		      (when (eq stype 'ignorable)
+;; 			(push 'ignorable is))
+;; 		      (push var is)))
+;; 		   ((optimize ftype inline notinline)
+;; 		    (push decl others))
+;; 		   ((hint type)
+;; 		    (cmpck (endp (cdr decl))  "The type declaration ~s is illegal." decl)
+;; 		    (let ((type (max-vtp (cadr decl))))
+;; 		      (when type
+;; 			(dolist (var (cddr decl))
+;; 			  (cmpck (not (symbolp var)) "The type declaration ~s contains a non-symbol ~s." decl var)
+;; 			  (push (cons var type) ts)))))
+;; 		   (class
+;; 		    (cmpck (cdddr decl) "The type declaration ~s is illegal." decl)
+;; 		    (let ((type (max-vtp (or (caddr decl) (car decl)))))
+;; 		      (when type
+;; 			(let ((var (cadr decl)))
+;; 			  (cmpck (not (symbolp var)) "The type declaration ~s contains a non-symbol ~s."
+;; 				 decl var)
+;; 			  (push (cons var type) ts)))))
+;; 		   (object
+;; 		    (dolist (var (cdr decl))
+;; 		      (cmpck (not (symbolp var)) "The object declaration ~s contains a non-symbol ~s."
+;; 			     decl var)
+;; 		      (push (cons var 'object) ts)))
+;; 		   (:register
+;; 		    (dolist (var (cdr decl))
+;; 		      (cmpck (not (symbolp var)) "The register declaration ~s contains a non-symbol ~s."
+;; 			     decl var)
+;; 		      (push (cons var  'register) ts)))
+;; 		   ((:dynamic-extent dynamic-extent)
+;; 		    (dolist (var (cdr decl))
+;; 		      (cmpck (not (symbolp var)) "The type declaration ~s contains a non-symbol ~s."
+;; 			     decl var)
+;; 		      (push (cons var 'dynamic-extent) ts)))
+;; 		   (otherwise
+;; 		    (let ((type (max-vtp stype)))
+;; 		      (unless (eq type t)
+;; 			(dolist (var (cdr decl))
+;; 			  (cmpck (not (symbolp var)) "The type declaration ~s contains a non-symbol ~s."
+;; 				 decl var)
+;; 			  (push (cons var type) ts)))))))))))
+
+;;   (dolist (l ctps) 
+;;     (when (and (cadr l) (symbolp (cadr l))) 
+;;       (let ((tp (max-vtp (caddr l)))) 
+;; 	(unless (eq tp t) 
+;; 	  (push (cons (cadr l) tp) cps)))))
+
+;;   (let ((s (> (effective-safety (mapcar (lambda (x) `(declare ,x)) others)) 0)))
+;;     (when cps
+;;       (unless s
+;; ;	  (setq body `((let ,(mapcar (lambda (x) (list (car x) (car x))) cps) ,@body)))
+;; 	(setq ts (nconc cps ts))))
+;;     (when (and ctps s)
+;;       (setq body (nreconc ctps body))))
+;;   (values body ss ts is others (when doc-p doc) cps)))
+
+;; (defun c1body (body doc-p &aux ss is ts others cps)
+;;   (multiple-value-bind
+;;    (doc decls ctps body)
+;;    (parse-body-header body (unless doc-p ""))
+;;    (dolist (decl decls)
+;;      (dolist (decl (cdr decl))
+;;        (cmpck (not (consp decl)) "The declaration ~s is illegal." decl)
+;;        (let ((dtype (car decl)))
+;; 	 (if (consp dtype)
+;; 	     (let* ((dtype (max-vtp dtype))
+;; 		    (stype (if (consp dtype) (car dtype) dtype)))
+;; 	       (case stype
+;; 		     (satisfies (push decl others))
+;; 		     (otherwise
+;; 		      (dolist (var (cdr decl))
+;; 			(cmpck (not (symbolp var)) "The type declaration ~s contains a non-symbol ~s."
+;; 			       decl var)
+;; 			(push (cons var dtype) ts)))))
+;; 	   (let ((stype dtype))
+;; 	     (cmpck (not (symbolp stype)) "The declaration ~s is illegal." decl)
+;; 	     (case stype
+;; 		   (special
+;; 		    (dolist (var (cdr decl))
+;; 		      (cmpck (not (symbolp var)) "The special declaration ~s contains a non-symbol ~s."
+;; 			     decl var)
+;; 		      (push var ss)))
+;; 		   ((ignore ignorable)
+;; 		    (dolist (var (cdr decl))
+;; 		      (cmpck (not (symbolp var)) "The ignore declaration ~s contains a non-symbol ~s."
+;; 			     decl var)
+;; 		      (when (eq stype 'ignorable)
+;; 			(push 'ignorable is))
+;; 		      (push var is)))
+;; 		   ((optimize ftype inline notinline)
+;; 		    (push decl others))
+;; 		   ((hint type)
+;; 		    (cmpck (endp (cdr decl))  "The type declaration ~s is illegal." decl)
+;; 		    (let ((type (max-vtp (cadr decl))))
+;; 		      (when type
+;; 			(dolist (var (cddr decl))
+;; 			  (cmpck (not (symbolp var)) "The type declaration ~s contains a non-symbol ~s."
+;; 				 decl var)
+;; 			  (cond ((eq stype 'hint) (push (cons var type) cps) 
+;; 				 (push (cons var (global-type-bump type)) ts))
+;; 				((push (cons var type) ts)))))))
+;; 		   (class
+;; 		    (cmpck (cdddr decl) "The type declaration ~s is illegal." decl)
+;; 		    (let ((type (max-vtp (or (caddr decl) (car decl)))))
+;; 		      (when type
+;; 			(let ((var (cadr decl)))
+;; 			  (cmpck (not (symbolp var)) "The type declaration ~s contains a non-symbol ~s."
+;; 				 decl var)
+;; 			  (push (cons var type) ts)))))
+;; 		   (object
+;; 		    (dolist (var (cdr decl))
+;; 		      (cmpck (not (symbolp var)) "The object declaration ~s contains a non-symbol ~s."
+;; 			     decl var)
+;; 		      (push (cons var 'object) ts)))
+;; 		   (:register
+;; 		    (dolist (var (cdr decl))
+;; 		      (cmpck (not (symbolp var)) "The register declaration ~s contains a non-symbol ~s."
+;; 			     decl var)
+;; 		      (push (cons var  'register) ts)))
+;; 		   ((:dynamic-extent dynamic-extent)
+;; 		    (dolist (var (cdr decl))
+;; 		      (cmpck (not (symbolp var)) "The type declaration ~s contains a non-symbol ~s."
+;; 			     decl var)
+;; 		      (push (cons var 'dynamic-extent) ts)))
+;; 		   (otherwise
+;; 		    (let ((type (max-vtp stype)))
+;; 		      (unless (eq type t)
+;; 			(dolist (var (cdr decl))
+;; 			  (cmpck (not (symbolp var)) "The type declaration ~s contains a non-symbol ~s."
+;; 				 decl var)
+;; 			  (push (cons var type) ts)))))))))))
+
+;;   (dolist (l ctps) 
+;;     (when (and (cadr l) (symbolp (cadr l))) 
+;;       (let ((tp (max-vtp (caddr l)))) 
+;; 	(unless (eq tp t) 
+;; 	  (push (cons (cadr l) tp) cps)))))
+
+;;   (let ((s (> (effective-safety (mapcar (lambda (x) `(declare ,x)) others)) 0)))
+;;     (when cps
+;;       (unless s
+;; ;	  (setq body `((let ,(mapcar (lambda (x) (list (car x) (car x))) cps) ,@body)))
+;; 	(setq ts (nconc cps ts))))
+;;     (when (and ctps s)
+;;       (setq body (nreconc ctps body))))
+;;   (values body ss ts is others (when doc-p doc) cps)))
+
+(defun c1decl-body (decls body &aux dl)
+  (let ((*function-declarations* *function-declarations*)
+	(*alien-declarations* *alien-declarations*)
+	(*notinline* *notinline*)
+	(*inline* *inline*)
+	(*space* *space*)
+	(*compiler-check-args* *compiler-check-args*)
+	(*compiler-new-safety* *compiler-new-safety*)
+	(*compiler-push-events* *compiler-push-events*)
+	(*safe-compile* *safe-compile*))
+    (dolist (decl decls dl)
+      (case (car decl)
+	    (optimize
+	     (dolist (d (cdr decl)) (push d dl))
+	     (local-compile-decls (cdr decl)))
+	    (ftype
+	     (if (or (endp (cdr decl))
+		     (not (consp (cadr decl)))
+		     (not (eq (caadr decl) 'function))
+		     (endp (cdadr decl)))
+		 (cmpwarn "The function declaration ~s is illegal." decl)
+	       (dolist (fname (cddr decl))
 		 (add-function-declaration
-		  (cadr decl) (caddr decl) (cdddr decl))))
-              (inline
-		(dolist (fun (cdr decl))
-		  (if (symbolp fun)
-		      (progn (push (list 'inline fun) dl)
-			     (pushnew fun *inline*)
-			     (setq *notinline* (remove fun *notinline*)))
-		    (cmpwarn "The function name ~s is not a symbol." fun))))
-              (notinline
-               (dolist (fun (cdr decl))
-		 (if (symbolp fun)
-                     (progn (push (list 'notinline fun) dl)
-                            (pushnew fun *notinline*)
-			    (setq *inline* (remove fun *inline*)))
-		   (cmpwarn "The function name ~s is not a symbol." fun))))
-              (declaration
-               (dolist (x (cdr decl))
-                 (if (symbolp x)
-                     (unless (member x *alien-declarations*)
-		       (push x *alien-declarations*))
-		   (cmpwarn "The declaration specifier ~s is not a symbol."
-			    x))))
-              (otherwise
-               (unless (member (car decl) *alien-declarations*)
-                 (cmpwarn "The declaration specifier ~s is unknown." (car decl))))))
-      (setq body (c1progn body))
-      (cond ((null dl) body)
-	    ((eq (car body) 'decl-body) (setf (third body) (nunion dl (third body))) body)
-	    ((list 'decl-body (copy-info (cadr body)) dl body))))))
+		  fname (cadadr decl) (cddadr decl)))))
+	    (function
+	     (if (or (endp (cdr decl))
+		     (endp (cddr decl))
+		     (not (symbolp (cadr decl))))
+		 (cmpwarn "The function declaration ~s is illegal." decl)
+	       (add-function-declaration
+		(cadr decl) (caddr decl) (cdddr decl))))
+	    (inline
+	      (dolist (fun (cdr decl))
+		(if (symbolp fun)
+		    (progn (push (list 'inline fun) dl)
+			   (pushnew fun *inline*)
+			   (setq *notinline* (remove fun *notinline*)))
+		  (cmpwarn "The function name ~s is not a symbol." fun))))
+	    (notinline
+	     (dolist (fun (cdr decl))
+	       (if (symbolp fun)
+		   (progn (push (list 'notinline fun) dl)
+			  (pushnew fun *notinline*)
+			  (setq *inline* (remove fun *inline*)))
+		 (cmpwarn "The function name ~s is not a symbol." fun))))
+	    (declaration
+	     (dolist (x (cdr decl))
+	       (if (symbolp x)
+		   (unless (member x *alien-declarations*)
+		     (push x *alien-declarations*))
+		 (cmpwarn "The declaration specifier ~s is not a symbol."
+			  x))))
+	    (otherwise
+	     (unless (member (car decl) *alien-declarations*)
+	       (cmpwarn "The declaration specifier ~s is unknown." (car decl))))))
+    (let ((c1b (c1progn body)))
+      (cond ((null dl) c1b)
+	    ((unless *safe-compile* (member (car c1b) '(lit var))) c1b)
+	    ((eq (car c1b) 'decl-body) (setf (third c1b) (nunion dl (third c1b))) c1b)
+	    ((list 'decl-body (copy-info (cadr c1b)) dl c1b))))))
+
+;; (defun c1decl-body (decls body &aux dl)
+;;   (let ((*function-declarations* *function-declarations*)
+;; 	(*alien-declarations* *alien-declarations*)
+;; 	(*notinline* *notinline*)
+;; 	(*inline* *inline*)
+;; 	(*space* *space*)
+;; 	(*compiler-check-args* *compiler-check-args*)
+;; 	(*compiler-new-safety* *compiler-new-safety*)
+;; 	(*compiler-push-events* *compiler-push-events*)
+;; 	(*safe-compile* *safe-compile*))
+;;     (dolist (decl decls dl)
+;;       (case (car decl)
+;; 	    (optimize
+;; 	     (dolist (d (cdr decl)) (push d dl))
+;; 	     (local-compile-decls (cdr decl)))
+;; 	    (ftype
+;; 	     (if (or (endp (cdr decl))
+;; 		     (not (consp (cadr decl)))
+;; 		     (not (eq (caadr decl) 'function))
+;; 		     (endp (cdadr decl)))
+;; 		 (cmpwarn "The function declaration ~s is illegal." decl)
+;; 	       (dolist (fname (cddr decl))
+;; 		 (add-function-declaration
+;; 		  fname (cadadr decl) (cddadr decl)))))
+;; 	    (function
+;; 	     (if (or (endp (cdr decl))
+;; 		     (endp (cddr decl))
+;; 		     (not (symbolp (cadr decl))))
+;; 		 (cmpwarn "The function declaration ~s is illegal." decl)
+;; 	       (add-function-declaration
+;; 		(cadr decl) (caddr decl) (cdddr decl))))
+;; 	    (inline
+;; 	      (dolist (fun (cdr decl))
+;; 		(if (symbolp fun)
+;; 		    (progn (push (list 'inline fun) dl)
+;; 			   (pushnew fun *inline*)
+;; 			   (setq *notinline* (remove fun *notinline*)))
+;; 		  (cmpwarn "The function name ~s is not a symbol." fun))))
+;; 	    (notinline
+;; 	     (dolist (fun (cdr decl))
+;; 	       (if (symbolp fun)
+;; 		   (progn (push (list 'notinline fun) dl)
+;; 			  (pushnew fun *notinline*)
+;; 			  (setq *inline* (remove fun *inline*)))
+;; 		 (cmpwarn "The function name ~s is not a symbol." fun))))
+;; 	    (declaration
+;; 	     (dolist (x (cdr decl))
+;; 	       (if (symbolp x)
+;; 		   (unless (member x *alien-declarations*)
+;; 		     (push x *alien-declarations*))
+;; 		 (cmpwarn "The declaration specifier ~s is not a symbol."
+;; 			  x))))
+;; 	    (otherwise
+;; 	     (unless (member (car decl) *alien-declarations*)
+;; 	       (cmpwarn "The declaration specifier ~s is unknown." (car decl))))))
+;;     (let ((c1b (c1progn body)))
+;;       (cond ((null dl) c1b)
+;; 	    ((unless *safe-compile* (eq (car c1b) 'lit)) c1b)
+;; 	    ((eq (car c1b) 'decl-body) (setf (third c1b) (nunion dl (third c1b))) c1b)
+;; 	    ((list 'decl-body (copy-info (cadr c1b)) dl c1b))))))
+
+;; (defun c1decl-body (decls body &aux (dl nil))
+;;   (if (null decls)
+;;       (c1progn body)
+;;     (let ((*function-declarations* *function-declarations*)
+;; 	  (*alien-declarations* *alien-declarations*)
+;; 	  (*notinline* *notinline*)
+;; 	  (*inline* *inline*)
+;; 	  (*space* *space*)
+;; 	  (*compiler-check-args* *compiler-check-args*)
+;; 	  (*compiler-new-safety* *compiler-new-safety*)
+;; 	  (*compiler-push-events* *compiler-push-events*)
+;; 	  (*safe-compile* *safe-compile*))
+;;       (dolist (decl decls dl)
+;; 	(case (car decl)
+;; 	      (optimize
+;; 	       (dolist (d (cdr decl)) (push d dl))
+;; 	       (local-compile-decls (cdr decl)))
+;;               (ftype
+;;                (if (or (endp (cdr decl))
+;;                        (not (consp (cadr decl)))
+;;                        (not (eq (caadr decl) 'function))
+;;                        (endp (cdadr decl)))
+;;                    (cmpwarn "The function declaration ~s is illegal." decl)
+;; 		 (dolist (fname (cddr decl))
+;; 		   (add-function-declaration
+;; 		    fname (cadadr decl) (cddadr decl)))))
+;;               (function
+;;                (if (or (endp (cdr decl))
+;;                        (endp (cddr decl))
+;;                        (not (symbolp (cadr decl))))
+;;                    (cmpwarn "The function declaration ~s is illegal." decl)
+;; 		 (add-function-declaration
+;; 		  (cadr decl) (caddr decl) (cdddr decl))))
+;;               (inline
+;; 		(dolist (fun (cdr decl))
+;; 		  (if (symbolp fun)
+;; 		      (progn (push (list 'inline fun) dl)
+;; 			     (pushnew fun *inline*)
+;; 			     (setq *notinline* (remove fun *notinline*)))
+;; 		    (cmpwarn "The function name ~s is not a symbol." fun))))
+;;               (notinline
+;;                (dolist (fun (cdr decl))
+;; 		 (if (symbolp fun)
+;;                      (progn (push (list 'notinline fun) dl)
+;;                             (pushnew fun *notinline*)
+;; 			    (setq *inline* (remove fun *inline*)))
+;; 		   (cmpwarn "The function name ~s is not a symbol." fun))))
+;;               (declaration
+;;                (dolist (x (cdr decl))
+;;                  (if (symbolp x)
+;;                      (unless (member x *alien-declarations*)
+;; 		       (push x *alien-declarations*))
+;; 		   (cmpwarn "The declaration specifier ~s is not a symbol."
+;; 			    x))))
+;;               (otherwise
+;;                (unless (member (car decl) *alien-declarations*)
+;;                  (cmpwarn "The declaration specifier ~s is unknown." (car decl))))))
+;;       (setq body (c1progn body))
+;;       (cond ((null dl) body)
+;; 	    ((eq (car body) 'decl-body) (setf (third body) (nunion dl (third body))) body)
+;; 	    ((list 'decl-body (copy-info (cadr body)) dl body))))))
 
 (si:putprop 'decl-body 'c2decl-body 'c2)
 

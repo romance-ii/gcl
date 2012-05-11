@@ -72,19 +72,19 @@ typedef unsigned char   uqfixnum;
 
 #define FIRSTWORD ufixnum e:1,m:1,f:1,s:1,tt:4,t:5,st:3,w:LM16BITS
 #define FSTPWORD  ufixnum emfs:4,         tp:9,    st:3,w:LM16BITS
-#define MARKWORD  ufixnum e:1,mf:2,   s:1,tt:4,t:5,w:LM5BITS
-#define SGCMWORD  ufixnum e:1,mfs:3,      tt:4,t:5,w:LM5BITS
-#define TYPEWORD  ufixnum emf:3,      s:1,tt:4,t:5,w:LM5BITS
-#define FUNWORD   ufixnum e:1,m:1,f:1,s:1,tt:4,t:5,fun_minarg:6,fun_maxarg:6,fun_neval:5,fun_vv:1,w:LM31BITS
+#define MARKWORD  ufixnum e:1,mf:2,   s:1,tt:4,t:5,x:LM13BITS
+#define SGCMWORD  ufixnum e:1,mfs:3,      tt:4,t:5,x:LM13BITS
+#define TYPEWORD  ufixnum emf:3,      s:1,tt:4,t:5,x:LM13BITS
+#define FUNWORD   ufixnum e:1,m:1,f:1,s:1,tt:4,t:5,fun_minarg:6,fun_maxarg:6,fun_neval:5,fun_vv:1,y:LM31BITS
 
 #else
 
 #define FIRSTWORD ufixnum w:LM16BITS,st:3,t:5,tt:4,s:1,f:1,m:1,e:1
 #define FSTPWORD  ufixnum w:LM16BITS,st:3,tp:9,    emfs:4
-#define MARKWORD  ufixnum w:LM5BITS,      t:5,tt:4,s:1,mf:2,   e:1
-#define SGCMWORD  ufixnum w:LM5BITS,      t:5,tt:4,mfs:3,      e:1
-#define TYPEWORD  ufixnum w:LM5BITS,      t:5,tt:4,s:1,emf:3
-#define FUNWORD   ufixnum w:LM31BITS,fun_vv:1,fun_neval:5,fun_maxarg:6,fun_minarg:6,t:5,tt:4,s:1,f:1,m:1,e:1
+#define MARKWORD  ufixnum x:LM13BITS,      t:5,tt:4,s:1,mf:2,   e:1
+#define SGCMWORD  ufixnum x:LM13BITS,      t:5,tt:4,mfs:3,      e:1
+#define TYPEWORD  ufixnum x:LM13BITS,      t:5,tt:4,s:1,emf:3
+#define FUNWORD   ufixnum y:LM31BITS,fun_vv:1,fun_neval:5,fun_maxarg:6,fun_minarg:6,t:5,tt:4,s:1,f:1,m:1,e:1
 
 #endif
 
@@ -315,8 +315,8 @@ enum stype {     /*  symbol type  */
 
 };
 
-#define s_fillp  st_fillp
-#define s_self   st_self
+/* #define s_fillp  st_fillp */
+/* #define s_self   st_self */
 
 struct symbol {
 
@@ -512,7 +512,7 @@ struct string {           /*  string header  */
 
 struct ustring {
 
-  vtempl(unsigned char,ust_);
+  vtempl(uchar,ust_);
 
 };
 
@@ -535,23 +535,23 @@ struct bitvector {         /*  bitvector header  */
 
 };
 
-struct fixarray {            /*  fixnum array header  */
+/* struct fixarray {            /\*  fixnum array header  *\/ */
 
-  atempl(fixnum,fixa_);
+/*   atempl(fixnum,fixa_); */
 
-};
+/* }; */
 
-struct sfarray {                  /*  short-float array header  */
+/* struct sfarray {                  /\*  short-float array header  *\/ */
 
-  atempl(shortfloat,sfa_);
+/*   atempl(shortfloat,sfa_); */
 
-};
+/* }; */
 
-struct lfarray {             /*  plong-float array header  */
+/* struct lfarray {             /\*  plong-float array header  *\/ */
 
-  atempl(longfloat,lfa_);
+/*   atempl(longfloat,lfa_); */
 
-};
+/* }; */
 
 struct structure {  /*  structure header  */
 
@@ -826,8 +826,9 @@ struct spice {
  dummy type
 */
 struct dummy      {FIRSTWORD;};
+struct ff         {ufixnum ff;};
 struct fstpw      {FSTPWORD;};
-union  fstp       {ufixnum f;struct fstpw t;};
+union  fstp       {ufixnum ff;struct fstpw t;};
 struct mark       {MARKWORD;};
 struct typew      {TYPEWORD;};
 struct sgcm       {SGCMWORD;};
@@ -847,35 +848,36 @@ union lispunion {
  struct package             p; /*  package  */
  struct cons                c; /*  cons  */
  struct hashtable          ht; /*  hash table  */
- struct array               a; /*  array  */
- struct vector              v; /*  vector  */
  struct string             st; /*  string  */
  struct stdesig            sd; /*  array character symbol -- phony for c package ref  */
  struct ustring           ust;
  struct bitvector          bv; /*  bit-vector  */
+ struct vector              v; /*  vector  */
+ struct array               a; /*  array  */
  struct structure         str; /*  structure  */
  struct stream             sm; /*  stream  */
  struct random            rnd; /*  random-states  */
  struct readtable          rt; /*  read table  */
  struct pathname           pn; /*  path name  */
  /* struct cfun               cf; /\*  compiled function  uses value stack] *\/ */
- struct closure            cl; /*  compiled closure  uses c stack */
+ /* struct closure            cl; /\*  compiled closure  uses c stack *\/ */
  struct function          fun; /*  compiled closure  uses c stack */
  /* struct ifun              ifn; /\*  interpreted function *\/ */
  struct cfdata            cfd; /* compiled fun data */
  struct spice             spc; /*  spice  */
 
  struct dummy               d; /*  dummy  */
- union  fstp             fstp; /*  fast type  */
+ struct fstpw            fstp; /*  fast type  */
+ struct ff                 ff; /*  fast type  */
  struct mark               md; /*  mark dummy  */
  struct sgcm              smd; /*  sgc mark dummy  */
  struct typew              td; /*  type dummy  */
  fixnum                    fw;
  void *                    vw;
 
- struct fixarray         fixa; /*  fixnum array  */
- struct sfarray           sfa; /*  short-float array  */
- struct lfarray           lfa; /*  plong-float array  */
+ /* struct fixarray         fixa; /\*  fixnum array  *\/ */
+ /* struct sfarray           sfa; /\*  short-float array  *\/ */
+ /* struct lfarray           lfa; /\*  plong-float array  *\/ */
 
 };
 

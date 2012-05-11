@@ -1136,9 +1136,9 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[
 	    unsigned long c;
 	    int i;
 	    for (i=0,c=1;c;c<<=1,i++);
-	    fprintf(fp,"%d",i-5);
+	    fprintf(fp,"%d",i-13);
 	    return 0;]])],[size=`cat conftest1`
-  AC_DEFINE_UNQUOTED(LM5BITS,$size,[fill bits needed in certain lisp structures])],
+  AC_DEFINE_UNQUOTED(LM13BITS,$size,[fill bits needed in certain lisp structures])],
   [AC_MSG_ERROR([Cannot find fill bits])])
 
 AC_RUN_IFELSE([AC_LANG_PROGRAM([[

@@ -868,4 +868,4 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	image))))
 
 (defun cdebug nil 
-  (setq *default-system-p* t *default-c-file* t *default-data-file* t *default-h-file* t *keep-gaz* t))
+  (setq *default-system-p* t *default-c-file* t *default-data-file* t *default-h-file* t *keep-gaz* t *annotate* t))

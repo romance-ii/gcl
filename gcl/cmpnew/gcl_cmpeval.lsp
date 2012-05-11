@@ -789,8 +789,6 @@
 ;;      (do-setq-tp x nil (type-and tp (var-type x)))
 ;;      (c1expr (car args)))))
 
-(defmacro infer-tp (x y z) z)
-
 (defun c1infer-tp (args)
   (let* ((v (c1vref (pop args)))
 	 (x (car v))
@@ -1060,9 +1058,33 @@
 	 (fm (pop args))
 	 (nargs (under-env env (c1let-* (cdr fm) t inls)))
 	 (nm (car cl))
-	 (nm (if (symbolp nm) nm (tmpsym))))
+	 (nm (if (symbolp nm) nm (tmpsym)))
+	 (s (with-output-to-string (s) (princ cl s))))
     (assert (and (eq (car fm) 'let*) (not args)))
-    (list 'inline (copy-info (cadr nargs)) nm (with-output-to-string (s) (princ cl s)) nargs)))
+    (if (member (car nargs) '(lit var))
+	(setf (fourth nargs) (string-concatenate (fourth nargs) (if *annotate* (string-concatenate "/* " s " */") "")) nargs nargs)
+      (list 'inline (copy-info (cadr nargs)) nm s nargs))))
+
+;; (defun c1inline (args env inls)
+;;   (let* ((cl (pop args))
+;; 	 (fm (pop args))
+;; 	 (nargs (under-env env (c1let-* (cdr fm) t inls)))
+;; 	 (nm (car cl))
+;; 	 (nm (if (symbolp nm) nm (tmpsym)))
+;; 	 (s (with-output-to-string (s) (princ cl s))))
+;;     (assert (and (eq (car fm) 'let*) (not args)))
+;;     (if (eq (car nargs) 'lit)
+;; 	(setf (fourth nargs) (string-concatenate (fourth nargs) (if *annotate* (string-concatenate "/* " s " */") "")) nargs nargs)
+;;       (list 'inline (copy-info (cadr nargs)) nm s nargs))))
+
+;; (defun c1inline (args env inls)
+;;   (let* ((cl (pop args))
+;; 	 (fm (pop args))
+;; 	 (nargs (under-env env (c1let-* (cdr fm) t inls)))
+;; 	 (nm (car cl))
+;; 	 (nm (if (symbolp nm) nm (tmpsym))))
+;;     (assert (and (eq (car fm) 'let*) (not args)))
+;;     (list 'inline (copy-info (cadr nargs)) nm (with-output-to-string (s) (princ cl s)) nargs)))
 
 ;; (defun c1inline (args env inls &aux (ce (current-env)))
 ;;   (let* ((cl (pop args))
@@ -1079,7 +1101,7 @@
 ;; 	 (nm (if (symbolp nm) nm (tmpsym))))
 ;;     (list 'inline (copy-info (cadr nargs)) nm (with-output-to-string (s) (princ (car args) s)) nargs)))
 
-(defvar *annotate* t)
+(defvar *annotate* nil)
 
 (defun c2inline (name comment expr)
   (declare (ignore name))
@@ -1305,8 +1327,12 @@
 (defvar *callees* nil)
 
 (defun maybe-reverse-type-prop (dt f)
-  (unless *safe-compile*
+  (unless (or *safe-compile* (when (consp f) (eq (car f) 'lit)));FIXME push-vbind/c1var copy
     (set-form-type f dt)))
+
+;; (defun maybe-reverse-type-prop (dt f)
+;;   (unless *safe-compile*
+;;     (set-form-type f dt)))
 
 (defun cll (fn)
   (car (member (sir-name fn) *src-inline-recursion* :key 'caar)))
@@ -2220,12 +2246,13 @@
 	   (bind (setq negp (tmpsym)) `(< ,np 0))
 	   (bind np `(if ,negp (si::number-minus 0 ,np) ,np))
 	   (bind np `(si::number-minus ,np ,nr)))))
+    (wcr (x) (when (cdr x) x))
     (la (def &optional p &aux (v (lvp)) (pv (eq p 'done)) (p (unless (eq p 'done) p)) (ff f) (vp (vp)))
 	(when p (setq f ff))
-	`(cond ,@(when (unless pv np) `(((and ,negp (= ,np 1) (setq ,lvp ,vp) ,@(unless p `(nil))))))
+	(wcr `(cond ,@(when (unless pv np) `(((and ,negp (= ,np 1) (setq ,lvp ,vp) ,@(unless p `(nil))))))
 	       ,@(when np `(((> ,np 0) ,@(unless p (list vp)))))
 	       ,@(when v `((,lvp ,@(unless p `((pop ,lvp))))))
-	       ,@(when def `((,def)))))
+	       ,@(when def `((,def))))))
     (na (&optional def) (if a (pop a) (la def)))
     (nap nil (if a t (la nil t)))
     (srr (rv) 

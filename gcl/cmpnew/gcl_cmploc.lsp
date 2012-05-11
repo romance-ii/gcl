@@ -423,7 +423,7 @@
 	   (wt-var var ccb))
 	  (t (wt-vs (var-ref var))))));FIXME side-effect propagation
 
-(defun wt-gen-loc (key loc)
+(defun wt-gen-loc (key loc &aux p)
   (let* ((cl   (when (consp loc) (car loc)))
 	 (fit  (car (rassoc cl +inline-types-alist+)))
 	 (fvt  (car (rassoc cl +value-types+)))
@@ -432,15 +432,18 @@
 	 (cast (if (member key '(:cnum :creal)) "" (strcat "(" key ")")))
 	 (pp   (search "*" cast)))
 
-    (cond ((eq ft tt) (wt "("))
+    (cond ((eq ft tt))
 	  ((eq ft #tt) 
 	   (if *compiler-new-safety*
-	       (wt cast "object_to_" (if pp "pointer" "dcomplex") "(")
-	     (wt (or (cdr (assoc tt +to-c-var-alist+ :test 'type<=)) cast) "(")));FIXME prune to-c list
-	  ((eq tt #tt) (wt (or (cdr (assoc ft +wt-c-var-alist+)) "") "("))
-	  ((and (type>= #tcnum tt) (type>= #tcnum ft)) (wt "(" cast))
+	       (wt cast (setq p "object_to_") (if pp "pointer" "dcomplex"))
+	     (wt (or (setq p (cdr (assoc tt +to-c-var-alist+ :test 'type<=))) cast))));FIXME prune to-c list
+	  ((eq tt #tt) (wt (or (setq p (cdr (assoc ft +wt-c-var-alist+))) "")))
+	  ((and (type>= #tfixnum tt) (type>= tt ft)))
+	  ((and (type>= #tcnum tt) (type>= #tcnum ft)) (wt cast))
 	  ((baboon)))
-		 
+
+    (when p (wt "("))
+
     (cond ((not loc) (wt "Cnil"))
 	  ((eq loc t) (wt "Ct"))
 	  ((eq cl 'var) (case (var-kind (cadr loc)) 
@@ -459,8 +462,49 @@
 	  ((baboon)))
 
     (when pp (unless *compiler-new-safety* (wt "->v.v_self")))
-    (wt ")")
+
+    (when p (wt ")"))
+
     (when (and (eq tt #tt) (eq ft #tboolean)) (wt "?Ct:Cnil"))))
+
+;; (defun wt-gen-loc (key loc)
+;;   (let* ((cl   (when (consp loc) (car loc)))
+;; 	 (fit  (car (rassoc cl +inline-types-alist+)))
+;; 	 (fvt  (car (rassoc cl +value-types+)))
+;; 	 (ft   (loc-kind loc))
+;; 	 (tt   (cmp-norm-tp (get key 'lisp-type)))
+;; 	 (cast (if (member key '(:cnum :creal)) "" (strcat "(" key ")")))
+;; 	 (pp   (search "*" cast)))
+
+;;     (cond ((eq ft tt) (wt "("))
+;; 	  ((eq ft #tt) 
+;; 	   (if *compiler-new-safety*
+;; 	       (wt cast "object_to_" (if pp "pointer" "dcomplex") "(")
+;; 	     (wt (or (cdr (assoc tt +to-c-var-alist+ :test 'type<=)) cast) "(")));FIXME prune to-c list
+;; 	  ((eq tt #tt) (wt (or (cdr (assoc ft +wt-c-var-alist+)) "") "("))
+;; 	  ((and (type>= #tcnum tt) (type>= #tcnum ft)) (wt "(" cast))
+;; 	  ((baboon)))
+		 
+;;     (cond ((not loc) (wt "Cnil"))
+;; 	  ((eq loc t) (wt "Ct"))
+;; 	  ((eq cl 'var) (case (var-kind (cadr loc)) 
+;; 			      ((special global) (wt "(" (vv-str (var-loc (cadr loc))) "->s.s_dbind)"))
+;; 			      (lexical (wt-lexical-var (cdr loc)))
+;; 			      (otherwise (cond ((integerp (var-loc (cadr loc))) (wt "V" (var-loc (cadr loc))))
+;; 					       ((and (consp (var-loc (cadr loc))) (rassoc (car (var-loc (cadr loc))) +value-types+))
+;; 						(wt (caddr (var-loc (cadr loc)))))
+;; 					       ((wt (var-loc (cadr loc))))))))
+;; 	  ((eq cl 'cvar) (wt "V" (cadr loc)))
+;; 	  ((eq cl 'vv) (wt loc))
+;; ;	  ((eq cl 'character-value) (wt "code_char(" (caddr loc) ")"));FIXME
+;; 	  (fit (wt-inline-loc (caddr loc) (cadddr loc)))
+;; 	  (fvt (cond ((= (caddr loc) most-negative-fixnum) (wt "(" (1+ most-negative-fixnum) "- 1)"))
+;; 		     ((wt (caddr loc)))))
+;; 	  ((baboon)))
+
+;;     (when pp (unless *compiler-new-safety* (wt "->v.v_self")))
+;;     (wt ")")
+;;     (when (and (eq tt #tt) (eq ft #tboolean)) (wt "?Ct:Cnil"))))
 
 ;; (defun wt-gen-loc (key loc)
 ;;   (let* ((cl   (when (consp loc) (car loc)))

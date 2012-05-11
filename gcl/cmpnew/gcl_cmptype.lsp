@@ -45,6 +45,8 @@
 ;;;	SHORT-FLOAT	float
 ;;;	LONG-FLOAT	double
 
+(defmacro infer-tp (x y z) z)
+
 (defmacro t-to-nil (x) (let ((s (tmpsym))) `(let ((,s ,x)) (if (eq ,s t) nil ,s))))
 (defmacro nil-to-t (x) `(or ,x t))
 
@@ -734,8 +736,12 @@
 
 (dolist (l '(/ floor ceiling truncate round ffloor fceiling ftruncate fround))
   (si::putprop l t 'zero-pole))
-(dolist (l '(si::number-plus si::number-minus si::number-times + - * exp float atan tanh sinh asinh))
+(dolist (l '(si::number-plus si::number-minus si::number-times + - * exp atan tanh sinh asinh))
   (si::putprop l 'super-range 'type-propagator))
+
+(defun float-propagator (f t1 &optional (t2 #tnull))
+  (super-range f (type-and #treal t1) (type-and #t(or nil float) t2)))
+(setf (get 'float 'type-propagator) 'float-propagator)
 
 (defun bit-type (tp)
   (cond ((not tp) tp)
@@ -893,6 +899,7 @@
 	 (p (type>= #tproper-list (info-type (cadadr nargs))))
 	 (atp (car (atomic-tp (info-type (cadar nargs)))))
 	 (atp1 (car (atomic-tp (info-type (cadadr nargs))))))
+    (c1side-effects nil)
     (when (consp atp) 
       (when (eq atp atp1) (setq atp1 (copy-list atp1)))
       (setf (cdr atp) (or atp1 +opaque+)))
@@ -900,6 +907,20 @@
       (bump-pcons (caaddr (car nargs)) p))
     (setf (info-type info) (if p #tproper-cons #tcons))
     (list 'call-global info 'rplacd nargs)))
+
+;; (defun c1rplacd (args)
+;;   (let* ((info (make-info :flags (iflags side-effects)))
+;; 	 (nargs (c1args args info))
+;; 	 (p (type>= #tproper-list (info-type (cadadr nargs))))
+;; 	 (atp (car (atomic-tp (info-type (cadar nargs)))))
+;; 	 (atp1 (car (atomic-tp (info-type (cadadr nargs))))))
+;;     (when (consp atp) 
+;;       (when (eq atp atp1) (setq atp1 (copy-list atp1)))
+;;       (setf (cdr atp) (or atp1 +opaque+)))
+;;     (when (eq (caar nargs) 'var)
+;;       (bump-pcons (caaddr (car nargs)) p))
+;;     (setf (info-type info) (if p #tproper-cons #tcons))
+;;     (list 'call-global info 'rplacd nargs)))
 
 ;; (defun c1rplacd (args)
 ;;   (let* ((info (make-info :flags (iflags side-effects)))
@@ -934,6 +955,7 @@
 	 (nargs (c1args args info))
 	 (atp (car (atomic-tp (info-type (cadar nargs)))))
 	 (atp1 (car (atomic-tp (info-type (cadadr nargs))))))
+    (c1side-effects nil)
     (when (consp atp) 
       (when (eq atp atp1) (setq atp1 (copy-list atp1)))
       (setf (car atp) (or atp1 +opaque+)))
@@ -942,6 +964,20 @@
     (setf (info-type info) (cons-propagator 'cons (info-type (cadadr nargs))
 					    (cdr-propagator 'cdr (info-type (cadar nargs)))))
     (list 'call-global info 'rplaca nargs)))
+
+;; (defun c1rplaca (args)
+;;   (let* ((info (make-info :flags (iflags side-effects)))
+;; 	 (nargs (c1args args info))
+;; 	 (atp (car (atomic-tp (info-type (cadar nargs)))))
+;; 	 (atp1 (car (atomic-tp (info-type (cadadr nargs))))))
+;;     (when (consp atp) 
+;;       (when (eq atp atp1) (setq atp1 (copy-list atp1)))
+;;       (setf (car atp) (or atp1 +opaque+)))
+;;     (when (eq (caar nargs) 'var)
+;;       (bump-pconsa (caaddr (car nargs)) (info-type (cadadr nargs))))
+;;     (setf (info-type info) (cons-propagator 'cons (info-type (cadadr nargs))
+;; 					    (cdr-propagator 'cdr (info-type (cadar nargs)))))
+;;     (list 'call-global info 'rplaca nargs)))
 
 ;; (defun c1rplaca (args)
 ;;   (let* ((info (make-info :flags (iflags side-effects)))
@@ -1422,38 +1458,33 @@
 	  ((list 'call-global info 'si::expand-deftype nargs)))))
 (si::putprop 'si::expand-deftype 'c1expand-deftype 'c1)
 
-
 (eval-when
- (compile eval)
- ;; (defconstant +array-type-size-alist+ 
- ;;   (mapcar (lambda (x) `((array ,x) ,(c::array-eltsize (make-array 1 :element-type x)))) +array-types+))
- ;; (defconstant +array-aet-alist+ 
- ;;   (mapcar (lambda (x) `(,x ,(c::array-elttype (make-array 1 :element-type x)))) +array-types+))
- (defmacro maep nil
+ (eval compile)
+  (defmacro maep nil
    `(progn
       (defun array-eltsize-propagator (f x)
 	(cond
 	 ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-eltsize-propagator f x)) (cdr x))))
 	 ,@(mapcar (lambda (x)
 		     `((type>= (load-time-value (cmp-norm-tp '(array ,(pop x)))) x) 
-		       (load-time-value (cmp-norm-tp ',(object-type (cadr x)))))) +array-type-info+)
+		       (load-time-value (cmp-norm-tp ',(object-type (cadr x)))))) si::*array-type-info*)
 	 ((type>= (load-time-value (cmp-norm-tp 'array)) x) 
-	  (load-time-value (cmp-norm-tp ',(reduce 'type-or1 (mapcar 'object-type (remove-duplicates (mapcar 'caddr +array-type-info+)))))))))
-      (setf (get 'c::array-eltsize 'type-propagator) 'array-eltsize-propagator)
+	  (load-time-value (cmp-norm-tp ',(reduce 'type-or1 (mapcar 'object-type (remove-duplicates (mapcar 'caddr si::*array-type-info*)))))))))
+      (setf (get 'c-array-eltsize 'type-propagator) 'array-eltsize-propagator)
       (defun array-elttype-propagator (f x)
 	(cond
 	 ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-elttype-propagator f x)) (cdr x))))
 	 ,@(mapcar (lambda (x)
 		     `((type>= (load-time-value (cmp-norm-tp '(array ,(pop x)))) x) 
-		       (load-time-value (cmp-norm-tp ',(object-type (car x)))))) +array-type-info+)))
-      (setf (get 'c::array-elttype 'type-propagator) 'array-elttype-propagator))))
+		       (load-time-value (cmp-norm-tp ',(object-type (car x)))))) si::*array-type-info*)))
+      (setf (get 'c-array-elttype 'type-propagator) 'array-elttype-propagator)
+      (defun array-rank-propagator (f x)
+	(cond
+	 ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-rank-propagator f x)) (cdr x))))
+	 ((type>= #tvector x) (object-type 1))
+	 ((and (consp x) (eq (car x) 'array)) 
+	  (let ((x (caddr x))) (typecase x (rnkind (object-type x)) (list (object-type (length x))) (otherwise #trnkind))))))
+      (setf (get 'c-array-rank 'type-propagator) 'array-rank-propagator))))
 
 (maep)
 
-(defun array-rank-propagator (f x)
-  (cond
-   ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-rank-propagator f x)) (cdr x))))
-   ((type>= #tvector x) (object-type 1))
-   ((and (consp x) (eq (car x) 'array)) 
-    (let ((x (caddr x))) (typecase x (rnkind (object-type x)) (list (object-type (length x))) (otherwise #trnkind))))))
-(setf (get 'array-rank 'type-propagator) 'array-rank-propagator)

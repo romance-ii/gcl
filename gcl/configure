@@ -6955,7 +6955,7 @@ main ()
 	    unsigned long c;
 	    int i;
 	    for (i=0,c=1;c;c<<=1,i++);
-	    fprintf(fp,"%d",i-5);
+	    fprintf(fp,"%d",i-13);
 	    return 0;
   ;
   return 0;
@@ -6965,7 +6965,7 @@ if ac_fn_c_try_run "$LINENO"; then :
   size=`cat conftest1`
 
 cat >>confdefs.h <<_ACEOF
-#define LM5BITS $size
+#define LM13BITS $size
 _ACEOF
 
 else

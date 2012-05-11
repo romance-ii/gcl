@@ -3,8 +3,9 @@
 (eval-when
  (compile)
 
- (dolist (l '(^ \| & ~ >> <<))
-   (unintern l)(import (find-symbol (symbol-name l) 'c) 'si)));FIXME
+ ;; (dolist (l '(^ \| & ~ >> <<))
+ ;;   (unintern l)(import (find-symbol (symbol-name l) 'c) 'si))
+ );FIXME
 
 (eval-when
  (compile)

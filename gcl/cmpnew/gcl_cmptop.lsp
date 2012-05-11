@@ -937,7 +937,11 @@
 (defmacro side-effects nil nil)
 (defun c1side-effects (args)
   (declare (ignore args))
+  (mapc (lambda (x) (when (var-p x) (remprop (var-store x) 'bindings))) *vars*)
   (list 'side-effects (make-info :flags (iflags side-effects))))
+;; (defun c1side-effects (args)
+;;   (declare (ignore args))
+;;   (list 'side-effects (make-info :flags (iflags side-effects))))
 (defun c2side-effects nil nil)
 (setf (get 'side-effects 'c1) 'c1side-effects)
 (setf (get 'side-effects 'c2) 'c2side-effects)
@@ -1039,7 +1043,20 @@
 				(setq inl (strcat inl (if sp x (strcat "#" (write-to-string (incf i))))))
 				(unless sp (list (c1arg (cons 'ub x) info)))) args)))
 	  (when (eq tp :opaque) (baboon))
+	  (when (search "=" inl) (setf (info-flags info) (logior (iflags side-effects) (info-flags info))))
 	  (list 'lit info (info-type info) inl nargs))))
+
+;; (defun c1lit (args)
+;;   (flet ((strcat (&rest r) (apply 'concatenate 'string r)))
+;; 	(let* ((tp (get (pop args) 'lisp-type :opaque))
+;; 					;	 (info (make-info :type (cmp-norm-tp tp) :flags (iflags side-effects))) ;FIXME boolean
+;; 	       (info (make-info :type (cmp-norm-tp tp))) ;FIXME boolean
+;; 	       (inl "")(i -1)
+;; 	       (nargs (mapcan (lambda (x &aux (sp (stringp x))) 
+;; 				(setq inl (strcat inl (if sp x (strcat "#" (write-to-string (incf i))))))
+;; 				(unless sp (list (c1arg (cons 'ub x) info)))) args)))
+;; 	  (when (eq tp :opaque) (baboon))
+;; 	  (list 'lit info (info-type info) inl nargs))))
 
 ;; (defun c1lit (args)
 ;;   (flet ((strcat (&rest r) (apply 'concatenate 'string r)))
@@ -1054,12 +1071,18 @@
 ;; 	  (list 'lit info (info-type info) inl nargs))))
 
 (defun c2lit (tp inl args)
-  (let* ((sig (list (mapcar (lambda (x) (info-type (cadr x))) args) tp))
-	 (*inline-blocks* 0)
+  (let* ((*inline-blocks* 0)
 	 (*restore-avma*  *restore-avma*))
-    (unwind-exit (get-inline-loc (list (car sig) (cadr sig) (flags rfa) inl) args)
-		 nil (cons 'values (if (eq (cadr sig) #t(returns-exactly)) 0 1)))
+    (unwind-exit (lit-loc tp inl args) nil (cons 'values (if (eq tp #t(returns-exactly)) 0 1)))
     (close-inline-blocks)))
+
+;; (defun c2lit (tp inl args)
+;;   (let* ((sig (list (mapcar (lambda (x) (info-type (cadr x))) args) tp))
+;; 	 (*inline-blocks* 0)
+;; 	 (*restore-avma*  *restore-avma*))
+;;     (unwind-exit (get-inline-loc (list (car sig) (cadr sig) (flags rfa) inl) args)
+;; 		 nil (cons 'values (if (eq (cadr sig) #t(returns-exactly)) 0 1)))
+;;     (close-inline-blocks)))
 (setf (get 'lit 'c1) 'c1lit)
 (setf (get 'lit 'c2) 'c2lit)
 
@@ -1304,8 +1327,9 @@
 
 (defun wt-if-proclaimed (fname cfun lambda-expr)
   (when (fast-link-proclaimed-type-p fname);(and  (not (member '* (get-arg-types fname))))
-    (let ((at (get-arg-types fname))
-	  (rt (get-return-type fname)))
+    (let* ((sig (lam-e-to-sig lambda-expr))
+	   (at (pop sig))
+	   (rt (car sig)))
       (cond ((assoc fname *inline-functions*)
 	     (add-init `(si::init-function ',fname
 					   ,(add-address (c-function-name "LI" cfun fname))
@@ -1328,6 +1352,33 @@
 		       " ~a is proclaimed but not in *inline-functions* ~
         ~%T1defun could not assure suitability of args for C call" fname)))
 	       nil))))))
+
+;; (defun wt-if-proclaimed (fname cfun lambda-expr)
+;;   (when (fast-link-proclaimed-type-p fname);(and  (not (member '* (get-arg-types fname))))
+;;     (let ((at (get-arg-types fname))
+;; 	  (rt (get-return-type fname)))
+;;       (cond ((assoc fname *inline-functions*)
+;; 	     (add-init `(si::init-function ',fname
+;; 					   ,(add-address (c-function-name "LI" cfun fname))
+;; 					   nil nil -1 ,(new-proclaimed-argd at rt)
+;; 					   ,(argsizes at rt (xa lambda-expr)))))
+;; 	    ((let ((arg-c (length (car (lambda-list lambda-expr))))
+;; 		   (arg-p (length at))
+;; 		   (va (member '* at)))
+;; 	       (cond (va
+;; 		      (or (>= arg-c (- arg-p (length va)))
+;; 			  (cmpwarn "~a needs ~a args. ~a supplied." fname (- arg-p (length va)) arg-c)))
+;; 		     ((not (eql arg-c arg-p))
+;; 		      (cmpwarn
+;; 		       "~%;; ~a Number of proclaimed args was ~a. ~
+;;                           ~%;;Its definition had ~a." fname arg-p arg-c))
+;; 					;((>= arg-c 10.)) ;checked above 
+;; 					;(cmpwarn " t1defun only likes 10 args ~
+;; 					;            ~%for proclaimed functions")
+;; 		     (t (cmpwarn
+;; 		       " ~a is proclaimed but not in *inline-functions* ~
+;;         ~%T1defun could not assure suitability of args for C call" fname)))
+;; 	       nil))))))
 	
 
 (defun volatile (info)
@@ -1454,8 +1505,9 @@
 
   (unless (wt-if-proclaimed fname cfun lambda-expr)
     (assert (numberp cfun))
-    (let ((at (mapcar 'global-type-bump (get-arg-types fname)))
-	  (rt (global-type-bump (get-return-type fname))))
+    (let* ((sig (lam-e-to-sig lambda-expr))
+	   (at (mapcar 'global-type-bump (pop sig)))
+	   (rt (global-type-bump (car sig))))
       (add-init `(init-function
 		  ',fname
 		  ,(add-address (c-function-name "LI" (format nil "~a" cfun) fname))
@@ -1464,6 +1516,23 @@
 
   (when *compiler-auto-proclaim*
     (add-init `(si::add-hash ',fname ,@(mapcar (lambda (x) `(quote ,x)) (export-call (gethash fname *sigs*)))))))
+
+;; (defun t3init-fun (fname cfun lambda-expr doc)
+
+;;   (when doc (add-init `(putprop ',fname ,doc 'function-documentation)))
+
+;;   (unless (wt-if-proclaimed fname cfun lambda-expr)
+;;     (assert (numberp cfun))
+;;     (let ((at (mapcar 'global-type-bump (get-arg-types fname)))
+;; 	  (rt (global-type-bump (get-return-type fname))))
+;;       (add-init `(init-function
+;; 		  ',fname
+;; 		  ,(add-address (c-function-name "LI" (format nil "~a" cfun) fname))
+;; 		  nil nil -1 ,(new-proclaimed-argd at rt)
+;; 		  ,(argsizes at rt (xa lambda-expr))))))
+
+;;   (when *compiler-auto-proclaim*
+;;     (add-init `(si::add-hash ',fname ,@(mapcar (lambda (x) `(quote ,x)) (export-call (gethash fname *sigs*)))))))
 
 (defun t3defun (fname cfun lambda-expr doc sp &aux inline-info 
 		      (*current-form* (list 'defun fname))

@@ -48,7 +48,7 @@ vector is not a fixnum array.")
 { object v = sSAmatch_dataA->s.s_dbind;
   if (type_of(v)==t_vector
       && (v->v.v_elttype == aet_fix))
-  RETURN1(make_fixnum(sSAmatch_dataA->s.s_dbind->fixa.fixa_self[i]));
+    RETURN1(make_fixnum(((fixnum *)sSAmatch_dataA->s.s_dbind->a.a_self)[i]));
   RETURN1(make_fixnum(-1));
 }
 
@@ -57,7 +57,7 @@ DEFUN("MATCH-END",object,fSmatch_end,SI,1,1,NONE,OI,OO,OO,OO,(fixnum i),
 { object v = sSAmatch_dataA->s.s_dbind;
   if (type_of(v)==t_vector
       && (v->v.v_elttype == aet_fix))
-  RETURN1(make_fixnum(sSAmatch_dataA->s.s_dbind->fixa.fixa_self[i+NSUBEXP]));
+    RETURN1(make_fixnum(((fixnum *)sSAmatch_dataA->s.s_dbind->a.a_self)[i+NSUBEXP]));
   RETURN1(make_fixnum(-1));
 }
 
@@ -137,8 +137,8 @@ be over written.   \
    if (len==0) {
      /* trivial case of empty pattern */
      for (i=0;i<NSUBEXP;i++) 
-       v->fixa.fixa_self[i]=i ? -1 : 0;
-     memcpy(v->fixa.fixa_self+NSUBEXP,v->fixa.fixa_self,NSUBEXP*sizeof(*v->fixa.fixa_self));
+       ((fixnum *)v->a.a_self)[i]=i ? -1 : 0;
+     memcpy(((fixnum *)v->a.a_self)+NSUBEXP,((fixnum *)v->a.a_self),NSUBEXP*sizeof(*((fixnum *)v->a.a_self)));
      RETURN1(0);
    }
 
@@ -183,13 +183,13 @@ be over written.   \
 
      pp=compiled_regexp->startp;
      for (i=0;i<NSUBEXP;i++,pp++)
-       v->fixa.fixa_self[i]=*pp ? *pp-str : -1;
+       ((fixnum *)v->a.a_self)[i]=*pp ? *pp-str : -1;
      pp=compiled_regexp->endp;
      for (;i<2*NSUBEXP;i++,pp++)
-       v->fixa.fixa_self[i]=*pp ? *pp-str : -1;
+       ((fixnum *)v->a.a_self)[i]=*pp ? *pp-str : -1;
 
      END_NO_INTERRUPT;
-     RETURN1(v->fixa.fixa_self[0]);
+     RETURN1(((fixnum *)v->a.a_self)[0]);
 
    }
 

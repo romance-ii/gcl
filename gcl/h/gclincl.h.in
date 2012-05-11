@@ -265,6 +265,9 @@
 #undef LISTEN_USE_FCNTL
 
 /* fill bits needed in certain lisp structures */
+#undef LM13BITS
+
+/* fill bits needed in certain lisp structures */
 #undef LM16BITS
 
 /* fill bits needed in certain lisp structures */
@@ -278,9 +281,6 @@
 
 /* fill bits needed in certain lisp structures */
 #undef LM4BITS
-
-/* fill bits needed in certain lisp structures */
-#undef LM5BITS
 
 /* fill bits needed in certain lisp structures */
 #undef LM9BITS

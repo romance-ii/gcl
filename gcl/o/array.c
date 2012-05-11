@@ -157,11 +157,11 @@ DEFUN("ROW-MAJOR-AREF",object,fLrow_major_aref,LISP,2,2,NONE,OO,IO,OO,OO,(object
       return make_fixnum(BITREF(x, i));
     case aet_fix:
     case aet_nnfix:
-      return make_fixnum(x->fixa.fixa_self[i]);
+      return make_fixnum(((fixnum *)x->a.a_self)[i]);
     case aet_sf:
-      return make_shortfloat(x->sfa.sfa_self[i]);
+      return make_shortfloat(((float *)x->a.a_self)[i]);
     case aet_lf:
-      return make_longfloat(x->lfa.lfa_self[i]);
+      return make_longfloat(((double *)x->a.a_self)[i]);
     case aet_char:
     case aet_nnchar:
       return small_fixnum(x->st.st_self[i]);
@@ -226,15 +226,15 @@ DEFUN("ASET1", object, fSaset1, SI, 3, 3, NONE, OO, IO, OO,OO,(object x, fixnum 
     case aet_fix:
     case aet_nnfix:
       ASSURE_TYPE(val,t_fixnum);
-      (x->fixa.fixa_self[i]) = Mfix(val);
+      (((fixnum *)x->a.a_self)[i]) = Mfix(val);
       break;
     case aet_sf:
       ASSURE_TYPE(val,t_shortfloat);
-      (x->sfa.sfa_self[i]) = Msf(val);
+      (((float *)x->a.a_self)[i]) = Msf(val);
       break;
     case aet_lf:
       ASSURE_TYPE(val,t_longfloat);
-      (x->lfa.lfa_self[i]) = Mlf(val);
+      (((double *)x->a.a_self)[i]) = Mlf(val);
       break;
     case aet_char:
     case aet_nnchar:
@@ -1064,14 +1064,14 @@ array_allocself(object x, int staticp, object dflt)
 		SET_BV_OFFSET(x,0);
 	case aet_fix:
 	case aet_nnfix:
-		x->fixa.fixa_self = AR_ALLOC(*fun,n,fixnum);
-		break;
+	  x->a.a_self = (void *)AR_ALLOC(*fun,n,fixnum);
+	  break;
 	case aet_sf:
-		x->sfa.sfa_self = AR_ALLOC(*fun,n,shortfloat);
-		break;
+	  x->a.a_self = (void *)AR_ALLOC(*fun,n,shortfloat);
+	  break;
 	case aet_lf:
-		x->lfa.lfa_self = AR_ALLOC(*fun,n,longfloat);
-		break;
+	  x->a.a_self = (void *)AR_ALLOC(*fun,n,longfloat);
+	  break;
 	default:
 	  break;
 	}
@@ -1125,6 +1125,28 @@ DEFUN("ARRAY-ELEMENT-TYPE",object,fLarray_element_type,LISP,1,1,NONE,OO,OO,OO,OO
   return * aet_types[(int)t].namep;
 }
 
+DEFUN("C+",fixnum,fScp,SI,2,2,NONE,II,IO,00,00,(fixnum x,fixnum y),"") {
+  RETURN1(x+y);
+}
+DEFUN("&",fixnum,fSand,SI,2,2,NONE,II,IO,00,00,(fixnum x,fixnum y),"") {
+  RETURN1(x&y);
+}
+DEFUN("|",fixnum,fSor,SI,2,2,NONE,II,IO,00,00,(fixnum x,fixnum y),"") {
+  RETURN1(x|y);
+}
+DEFUN("^",fixnum,fSxor,SI,2,2,NONE,II,IO,00,00,(fixnum x,fixnum y),"") {
+  RETURN1(x^y);
+}
+DEFUN("~",fixnum,fSnot,SI,1,1,NONE,II,OO,00,00,(fixnum x),"") {
+  RETURN1(~x);
+}
+DEFUN("<<",fixnum,fSlshft,SI,2,2,NONE,II,IO,00,00,(fixnum x,fixnum y),"") {
+  RETURN1(x<<y);
+}
+DEFUN(">>",fixnum,fSrshft,SI,2,2,NONE,II,IO,00,00,(fixnum x,fixnum y),"") {
+  RETURN1(x>>y);
+}
+
 DEFUN("REF",object,fSref,SI,5,5,NONE,OI,II,IO,OO,(fixnum addr,fixnum s,fixnum u,fixnum z,object v),"") { 
 
 #define el(s_,e_) ((Mjoin(u,s_) *)addr)->e_
@@ -1175,6 +1197,11 @@ DEFUN("REF",object,fSref,SI,5,5,NONE,OI,II,IO,OO,(fixnum addr,fixnum s,fixnum u,
     RETURN1(Cnil);
   }
 }
+
+DEFUN("CREF",object,fScref,SI,5,5,NONE,OI,II,IO,OO,(fixnum addr,fixnum s,fixnum u,fixnum z,object v),"") { 
+  RETURN1(FFN(fSref)(addr,s,u,z,v));
+}
+
 
 DEFUN("RREF",object,fSrref,SI,4,5,NONE,OO,II,IO,OO,(object x,fixnum i,fixnum s,fixnum u,...),"") { 
   fixnum n=INIT_NARGS(4);
