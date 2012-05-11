@@ -531,7 +531,7 @@
 (*make-constant '+sfix+ (eql (truncate fixnum-length char-length) 4))
 
 (in-package :s)
-(si::import-internal 'si::(\| & ^ ~ c+ << >> string-concatenate strcat lit seqind fixnum-length char-length cref address))
+(si::import-internal 'si::(\| & ^ ~ c+ c* << >> string-concatenate strcat lit seqind fixnum-length char-length cref address))
 (si::import-internal 'compiler::(lisp-type cmp-norm-tp))
 
 
