@@ -412,7 +412,7 @@
 (deftype real (&optional (low '*) (high '*)) `(or (rational ,low ,high) (float ,low ,high)))
 (deftype number () `(or real complex))
 (deftype atom () `(not cons))
-(deftype function (&rest r) `(compiled-function))
+(deftype function (&rest r) (declare (ignore r)) `(compiled-function))
 ;  `(or interpreted-function compiled-function))
 (deftype compiled-function nil `(or generic-function non-generic-compiled-function))
 ;(deftype generic-function nil `(satisfies generic-function-p));Overwritten by pcl check ;FIXME

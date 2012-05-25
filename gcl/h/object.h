@@ -221,7 +221,7 @@ struct shortfloat_struct {
 };
 #define Msf(obje) (obje)->SF.SFVAL
 #define sf(x) Msf(x)
-#define sfc(x) (sf(x->cmp.cmp_real)+I*sf(x->cmp.cmp_imag))
+#define sfc(x) ({object _x=x;sf(_x->cmp.cmp_real)+I*sf(_x->cmp.cmp_imag);})
 
 struct longfloat_struct {
 
@@ -233,7 +233,7 @@ struct longfloat_struct {
 };
 #define Mlf(obje) (obje)->LF.LFVAL
 #define lf(x) Mlf(x)
-#define lfc(x) (lf(x->cmp.cmp_real)+I*lf(x->cmp.cmp_imag))
+#define lfc(x) ({object _x=x;lf(_x->cmp.cmp_real)+I*lf(_x->cmp.cmp_imag);})
 
 
 struct bignum {

@@ -265,9 +265,8 @@ DEFUN("BDS-VAR",object,fSbds_var,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
   RETURN1(x0);
 }
 
-DEFUN("BDS-VAL",object,fSbds_val,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
-  x0 = get_bds_ptr(x0)->bds_val;
-  RETURN1(x0);
+DEFUN("BDS-VAL",fixnum,fSbds_val,SI,1,1,NONE,IO,OO,OO,OO,(object x0),"") {
+  RETURN1((fixnum)get_bds_ptr(x0)->bds_val);
 }
 
 static object *get_vs_ptr(object x) {

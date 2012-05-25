@@ -178,7 +178,7 @@ typedef int (*FUNC)();
 /* error.c:422:OF */ extern object fSfrs_ihs (object x0); /* (x0) object x0; */
 /* error.c:448:OF */ extern object fSbds_top (void); /* () */
 /* error.c:455:OF */ extern object fSbds_var (object x0); /* (x0) object x0; */
-/* error.c:464:OF */ extern object fSbds_val (object x0); /* (x0) object x0; */
+/* error.c:464:OF */ extern fixnum fSbds_val (object x0); /* (x0) object x0; */
 /* error.c:487:OF */ extern object fSvs_top (void); /* () */
 /* error.c:496:OF */ extern object fSvs (object x0); /* (x0) object x0; */
 /* error.c:505:OF */ extern object fSsch_frs_base (object x0, object x1); /* (x0, x1) object x0; object x1; */

@@ -213,6 +213,10 @@
 		  (gen (list (cons +gen+ (cons (when (type-and #t(not null) tp) t) (when (type-and #tnull tp) t)))))
 		  (*infer-tags* (cons (cons (third fmla) gen) *infer-tags*)))
 	     (fmla-infer-tp (fourth fmla))
+	     (labels ((fmla-walk (f) (cond ((atom f));FIXME now that this is in, maybe remove mapc in tagbody and switch
+					   ((eq (car f) 'return-from) (fmla-infer-tp f))
+					   (t (fmla-walk (car f)) (fmla-walk (cdr f))))))
+		     (fmla-walk (fourth fmla)))
 	     (cdar *infer-tags*)))
 	  (progn (fmla-infer-tp (car (last (third fmla)))))
 	  (decl-body (fmla-infer-tp (fourth fmla)))
@@ -220,7 +224,7 @@
 	   (let ((x (assoc (third fmla) *infer-tags*)))
 	     (when x (setf (cdr x) (fmla-if1 nil (cdr x) (fmla-infer-tp (seventh fmla)))))))
 	  (switch
-	   (mapc 'fmla-infer-tp (sixth fmla)) nil);FIXME
+	   (mapc 'fmla-infer-tp (fourth fmla)) nil);FIXME
 	  (infer-tp (let ((tp (info-type (cadr (fifth fmla))))
 			  (v (car (third (third fmla)))))
 		      (cond ((type>= #tnull tp) (list (list* v nil (fourth fmla))))
@@ -252,6 +256,57 @@
 	   (cond ((consp (car fmla)) (fmla-infer-tp (car fmla)))
 		 ((type>= #tnull (info-type (cadr fmla))) *gen-nil*)
 		 ((type>= #t(not null) (info-type (cadr fmla))) *gen-t*))))))
+
+;; (defun fmla-infer-tp (fmla)
+;;   (when (unless *compiler-new-safety* (listp fmla))
+;;     (case (car fmla)
+;; 	  (inline (fmla-infer-tp (fifth fmla)))
+;; 	  ((let let*) (remove-if (lambda (x) (member (car x) (third fmla))) (fmla-infer-tp (fifth fmla))))
+;; 	  (tagbody (mapc 'fmla-infer-tp (fifth fmla)) nil);FIXME need catch/throw here, and make this an ecase 
+;; 	  (block 
+;; 	   (let* ((tp (info-type (cadr (fourth fmla))))
+;; 		  (gen (list (cons +gen+ (cons (when (type-and #t(not null) tp) t) (when (type-and #tnull tp) t)))))
+;; 		  (*infer-tags* (cons (cons (third fmla) gen) *infer-tags*)))
+;; 	     (fmla-infer-tp (fourth fmla))
+;; 	     (cdar *infer-tags*)))
+;; 	  (progn (fmla-infer-tp (car (last (third fmla)))))
+;; 	  (decl-body (fmla-infer-tp (fourth fmla)))
+;; 	  (return-from 
+;; 	   (let ((x (assoc (third fmla) *infer-tags*)))
+;; 	     (when x (setf (cdr x) (fmla-if1 nil (cdr x) (fmla-infer-tp (seventh fmla)))))))
+;; 	  (switch
+;; 	   (mapc 'fmla-infer-tp (sixth fmla)) nil);FIXME
+;; 	  (infer-tp (let ((tp (info-type (cadr (fifth fmla))))
+;; 			  (v (car (third (third fmla)))))
+;; 		      (cond ((type>= #tnull tp) (list (list* v nil (fourth fmla))))
+;; 			    ((type>= #t(not null) tp) (list (list* v (fourth fmla) nil))))))
+;; 	  (if (apply 'fmla-if (cddr fmla)))
+;; 	  (var (when (vlp fmla) (list (cons (car (third fmla)) (cons #t(not null) #tnull)))))
+;; 	  (setq (fmla-infer-tp (fourth fmla)));FIXME set var too, and in call global
+;; 	  (call-global
+;; 	   (let* ((fn (third fmla)) (rfn (cdr (assoc fn +bool-inf-op-list+)))
+;; 		  (sfn (cdr (assoc fn +bool-inf-sop-list+)))
+;; 		  (srfn (cdr (assoc sfn +bool-inf-op-list+)))
+;; 		  (args (if (eq (car fmla) 'inline) (fourth (fifth fmla)) (fourth fmla)))
+;; 		  (l (length args))
+;; 		  (pt (get fn 'si::predicate-type)));FIXME +cmp-type-alist+
+;; 	     (cond ((and (= l 1) (vlp (first args)) pt) 
+;; 		    (list (cons (car (third (first args))) (cons (cmp-norm-tp pt) (cmp-norm-tp `(not ,pt))))))
+;; 		   ((and (= l 2) (eq fn 'typep) (vlp (first args))
+;; 			 (let ((tp (cmp-norm-tp (get-object-value (second args)))))
+;; 			   (when tp (list (cons (car (third (first args))) (cons tp (cmp-norm-tp `(not ,tp)))))))))
+;; 		   ((and (= l 2) rfn)
+;; 		    (nconc
+;; 		     (when (vlp (first args))
+;; 		       (list (cons (car (third (first args)))
+;; 				   (tppra (vl-type (first args)) (second args) fn rfn))))
+;; 		     (when (vlp (second args))
+;; 		       (list (cons (car (third (second args)))
+;; 				   (tppra (vl-type (second args)) (first args) sfn srfn)))))))))
+;; 	  (otherwise
+;; 	   (cond ((consp (car fmla)) (fmla-infer-tp (car fmla)))
+;; 		 ((type>= #tnull (info-type (cadr fmla))) *gen-nil*)
+;; 		 ((type>= #t(not null) (info-type (cadr fmla))) *gen-t*))))))
 
 ;; (defun fmla-infer-tp (fmla)
 ;;   (when (unless *compiler-new-safety* (listp fmla))
@@ -452,7 +507,7 @@
 (defun fmla-is-changed (var fmla)
   (cond ((info-p fmla) (is-changed var fmla))
 	((atom fmla) nil)
-	((or (fmla-is-changed name (car fmla)) (fmla-is-changed name (cdr fmla))))))
+	((or (fmla-is-changed var (car fmla)) (fmla-is-changed var (cdr fmla))))))
 
 ;; (defun fmla-is-changed (name fmla)
 ;;   (cond ((info-p fmla) (let ((v (car (member name *vars* :key (lambda (x) (when (var-p x) (var-name x)))))))
@@ -1193,24 +1248,29 @@
 ;;If the key is declared fixnum, then we convert a case statement to a switch,
 ;;so that we may see the benefit of a table jump.
 
-(defun convert-case-to-switch (args default)
-  (let ((sym (tmpsym)) body keys)
-    (dolist (v (cdr args))
-	    (cond ((si::fixnump (car v)) (push  (car v) body))
-		  ((consp (car v))(dolist (w (car v)) (push w body)))
-		  ((member (car v) '(t otherwise))
-		   (and default
-			(cmperror "T or otherwise found in an ecase"))
-		   (push t body)))
-	    (push `(return-from ,sym (progn ,@ (cdr v))) body))
-    (cond (default (push t body)
-	    (dolist (v (cdr args))
-		    (cond ((atom (car v)) (push (car v) keys))
-			  (t (setq keys (append (car v) keys)))))
-	    (push `(error "The key ~a for ECASE was not found in cases ~a"
-			  ,(car args) ',keys)
-		  body)))
-    `(block ,sym (switch ,(car args) ,@(nreverse body)))))
+(defun convert-case-to-switch (args)
+  (let* ((sym (sgen "SWITCH"))
+	 (op (pop args))
+	 (args (mapcan (lambda (x &aux (k (pop x))(k (or (eq k 'otherwise) k))) 
+			 (when k `(,@(if (listp k) k (list k)) (return-from ,sym (progn ,@x))))) args)))
+    `(block ,sym (switch ,op ,@(if (member t args) args (nconc args `(t (return-from ,sym nil))))))))
+
+;; (defun convert-case-to-switch (args default)
+;;   (let ((sym (tmpsym)) body keys)
+;;     (dolist (v (cdr args))
+;; 	    (cond ((si::fixnump (car v)) (push  (car v) body))
+;; 		  ((consp (car v))(dolist (w (car v)) (push w body)))
+;; 		  ((member (car v) '(t otherwise))
+;; 		   (and default
+;; 			(cmperror "T or otherwise found in an ecase"))
+;; 		   (push t body)))
+;; 	    (push `(return-from ,sym (progn ,@ (cdr v))) body))
+;;     (cond (default (push t body)
+;; 	    (dolist (v (cdr args))
+;; 	      (cond ((atom (car v)) (push (car v) keys))
+;; 		    (t (setq keys (append (car v) keys)))))
+;; 	    (push `(error "The key ~a for ECASE was not found in cases ~a" ,(car args) ',keys) body)))
+;;     `(block ,sym (switch ,(car args) ,@(nreverse body)))))
 	    
 		  
 
@@ -1232,8 +1292,19 @@
 	     (ff (when rem (conv-kl (caar rem) s))))
 	(flet ((f (x) (let ((d (cdar x))) (if (cdr d) (cons 'progn d) (car d)))))
 	      (cond ((unless (cdr rem) (when ff `(if ,ff ,(f rem) ,(f oth)))))
-		    ((convert-case-to-switch (cdr form) nil)))))
+		    ((convert-case-to-switch (cdr form))))))
     form))
+
+;; (define-compiler-macro case (&whole form &rest args)
+;;   (if (type>= #tfixnum (nil-to-t (info-type (cadr (with-restore-vars (c1arg (car args)))))))
+;;       (let* ((s (pop args))
+;; 	     (oth (member-if (lambda (x &aux (x (car x))) (or (eq x t) (eq x 'otherwise))) args))
+;; 	     (rem (ldiff args oth))
+;; 	     (ff (when rem (conv-kl (caar rem) s))))
+;; 	(flet ((f (x) (let ((d (cdar x))) (if (cdr d) (cons 'progn d) (car d)))))
+;; 	      (cond ((unless (cdr rem) (when ff `(if ,ff ,(f rem) ,(f oth)))))
+;; 		    ((convert-case-to-switch (cdr form) nil)))))
+;;     form))
 
 ;; (defun c1case (args &optional (default nil))
 ;;   (when (endp args) (too-few-args 'case 1 0))

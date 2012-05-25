@@ -84,12 +84,13 @@
 ;;; is a list ( macro-name expansion-function).
 
 (defvar *restore-vars-env* nil)
-(defmacro with-restore-vars (&rest body &aux (rv (sgen "WRV-")))
-  `(let (,rv)
+(defmacro with-restore-vars (&rest body &aux (rv (sgen "WRV-"))(wns (sgen "WRVW-")))
+  `(let (,rv (,wns *warning-note-stack*))
      (declare (ignorable ,rv))
-     (flet ((keep-vars nil (setq ,rv *restore-vars*))
+     (flet ((keep-vars nil (setq ,rv *restore-vars* ,wns *warning-note-stack*))
 	    (pop-restore-vars 
 	     nil
+	     (setq *warning-note-stack* ,wns)
 	     (mapc (lambda (l &aux (v (pop l))(tp (pop l))(st (car l))) 
 		     (keyed-cmpnote (list (var-name v) 'type-propagation 'type)
 				    "Restoring var type on ~s from ~s to ~s"
@@ -101,6 +102,24 @@
 		     (progn ,@body)
 		   (pop-restore-vars)))
 	     (mapc (lambda (l) (when (member (car l) *restore-vars-env*) (pushnew l *restore-vars* :key 'car))) ,rv)))))
+
+;; (defmacro with-restore-vars (&rest body &aux (rv (sgen "WRV-")))
+;;   `(let (,rv)
+;;      (declare (ignorable ,rv))
+;;      (flet ((keep-vars nil (setq ,rv *restore-vars*))
+;; 	    (pop-restore-vars 
+;; 	     nil
+;; 	     (mapc (lambda (l &aux (v (pop l))(tp (pop l))(st (car l))) 
+;; 		     (keyed-cmpnote (list (var-name v) 'type-propagation 'type)
+;; 				    "Restoring var type on ~s from ~s to ~s"
+;; 				    (var-name v) (var-type v) tp)
+;; 		     (setf (var-type v) tp (var-store v) st)) (ldiff *restore-vars* ,rv))))
+;; 	   (prog1
+;; 	       (let (*restore-vars* (*restore-vars-env* *vars*))
+;; 		 (unwind-protect 
+;; 		     (progn ,@body)
+;; 		   (pop-restore-vars)))
+;; 	     (mapc (lambda (l) (when (member (car l) *restore-vars-env*) (pushnew l *restore-vars* :key 'car))) ,rv)))))
 
 ;; (defmacro with-restore-vars (&rest body);FIXME var-flags
 ;;   (let ((rv (tmpsym)))
@@ -661,8 +680,8 @@
 	   (ifunm               (pred i)       (or  (ifunp 'fun-c1 pred (info-ref i)) (ifunp 'fun-c1cb pred (info-ref-ccb i))))
 	   (calls-blocked-fun-p (fun i)        (ifunm (lambda (x y) (unless (eq x fun) (eq y t))) i))
 	   (unfinished-p        (fun i)        (ifunm (lambda (x y) (not y)) i))
-	   (blocked-above       nil            (member-if (lambda (x &aux (y (pop x))) (eq t (if x (fun-c1cb y) (fun-c1 y)))) (cdr *fun-stack*)))
-	   (recursive-p         (fun i)        (ifunm (lambda (x y) (when y (eq x fun))) i)))
+	   (blocked-above       nil            (member-if (lambda (x &aux (y (pop x))) (eq t (if x (fun-c1cb y) (fun-c1 y)))) (cdr *fun-stack*))))
+;	   (recursive-p         (fun i)        (ifunm (lambda (x y) (when y (eq x fun))) i)))
 	  
 	  (cond ((eq c1 t) 
 		 (keyed-cmpnote (list (fun-name fun) 'recursion) "recursive call to local fun ~s" (fun-name fun))
@@ -684,11 +703,48 @@
 				 (set fun res)
 				 (make-fun-c1 fun ccb env sig))
 				((set fun res) )))
-			 ((when (recursive-p fun i) (not (eq (cadr osig) (cadr sig))));FIXME bump?
-			  (keyed-cmpnote (list (fun-name fun) 'recursion) "reprocessing recursive local fun ~s: ~s ~s" (fun-name fun) osig sig)
-			  (set fun res)
-			  (make-fun-c1 fun ccb env sig))
+			 ;; ((when (recursive-p fun i) (not (eq (cadr osig) (cadr sig))));FIXME bump?
+			 ;;  (keyed-cmpnote (list (fun-name fun) 'recursion) "reprocessing recursive local fun ~s: ~s ~s" (fun-name fun) osig sig)
+			 ;;  (set fun res)
+			 ;;  (make-fun-c1 fun ccb env sig))
 			 ((set fun res))))))))
+
+;; (defun make-fun-c1 (fun ccb env &optional osig
+;; 			&aux (c1 (if ccb (fun-c1cb fun) (fun-c1 fun))) tmp (*fun-stack* (cons (cons fun ccb) *fun-stack*)))
+
+;;   (labels ((set                 (fun val)      (if ccb (setf (fun-c1cb fun) val) (setf (fun-c1 fun) val)))
+;; 	   (ifunp               (key pred l)   (car (member-if (lambda (x) (when (fun-p x) (funcall pred x (funcall key x)))) l)))
+;; 	   (ifunm               (pred i)       (or  (ifunp 'fun-c1 pred (info-ref i)) (ifunp 'fun-c1cb pred (info-ref-ccb i))))
+;; 	   (calls-blocked-fun-p (fun i)        (ifunm (lambda (x y) (unless (eq x fun) (eq y t))) i))
+;; 	   (unfinished-p        (fun i)        (ifunm (lambda (x y) (not y)) i))
+;; 	   (blocked-above       nil            (member-if (lambda (x &aux (y (pop x))) (eq t (if x (fun-c1cb y) (fun-c1 y)))) (cdr *fun-stack*)))
+;; 	   (recursive-p         (fun i)        (ifunm (lambda (x y) (when y (eq x fun))) i)))
+	  
+;; 	  (cond ((eq c1 t) 
+;; 		 (keyed-cmpnote (list (fun-name fun) 'recursion) "recursive call to local fun ~s" (fun-name fun))
+;; 		 nil)
+;; 		((unless osig c1))
+;; 		((let* ((c1 (or c1 (set fun t)))
+;; 			(res (under-env env (c1function (list (fun-src fun)) (if ccb 'cb 'lb) fun)))
+;; 			(i (cadr res))
+;; 			(sig (car (fun-call fun))))
+;; 		   (cond ((setq tmp (calls-blocked-fun-p fun i))
+;; 			  (keyed-cmpnote (list (fun-name fun) 'recursion) "local fun ~s calls unfinalized funs ~s" (fun-name fun) tmp)
+;; 			  (set fun nil))
+;; 			 ((setq tmp (unfinished-p fun i))
+;; 			  (cond ((blocked-above)
+;; 				 (keyed-cmpnote (list (fun-name fun) 'recursion) "setting unfinished fun ~s to nil, ufun ~s" (fun-name fun) tmp)
+;; 				 (set fun nil))
+;; 				((eq c1 t)
+;; 				 (keyed-cmpnote (list (fun-name fun) 'recursion) "reprocessing unfinished local fun ~s: ~s" (fun-name fun) tmp)
+;; 				 (set fun res)
+;; 				 (make-fun-c1 fun ccb env sig))
+;; 				((set fun res) )))
+;; 			 ((when (recursive-p fun i) (not (eq (cadr osig) (cadr sig))));FIXME bump?
+;; 			  (keyed-cmpnote (list (fun-name fun) 'recursion) "reprocessing recursive local fun ~s: ~s ~s" (fun-name fun) osig sig)
+;; 			  (set fun res)
+;; 			  (make-fun-c1 fun ccb env sig))
+;; 			 ((set fun res))))))))
 
 ;; (defun make-fun-c1 (fun ccb env &optional osig &aux (c1 (if ccb (fun-c1cb fun) (fun-c1 fun))))
 

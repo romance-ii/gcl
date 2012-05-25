@@ -228,9 +228,8 @@
 	 (s (car args))
 	 (ts (or (car (member tag *ttl-tags* :key (lambda (x) (tag-name (car x))))) (baboon)))
 	 (ttl-tag (pop ts))
-	 (vs (remove-if-not 'var-p *vars*))
 	 (nv (mapcar (lambda (x) (car (member (cdr x) *vars* :key (lambda (x) (when (var-p x) (var-name x)))))) s))
-	 (ov (mapcar (lambda (x) (car (member (car x) (car ts)  :key (lambda (x) (when (var-p x) (var-name x)))))) s))
+	 (ov (mapcar (lambda (x) (car (member (car x) (car ts) :key (lambda (x) (when (var-p x) (var-name x)))))) s))
 	 (*vars* (append (mapc (lambda (x) (set-var-noreplace x)) (append nv ov)) *vars*))
 	 (*tags* (cons ttl-tag *tags*)))
     (c1expr `(progn

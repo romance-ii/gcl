@@ -955,10 +955,19 @@
       ((not (setq x (pop *reg-clv*) clb (pop x) var (car x))));FIXME ? eliminate clb var here
       (wt-nl)
       (setf (var-ref var) (vs-push));FIXME ? clb and ccb vars just appear in info-ref-ccb, only need push clb
-      (wt-vs (var-ref var)) (wt "= " (list 'cvar (var-loc var)) ";")
+      (wt-vs (var-ref var)) (wt "= " `(gen-loc :object (cvar ,(var-loc var))) ";")
       (when (var-ref-ccb var)
 	(clink (var-ref var))
 	(setf (var-ref-ccb var) (ccb-vs-push)))))
+;; (defun c2bind-reg-clv (&aux x clb var)
+;;   (do nil
+;;       ((not (setq x (pop *reg-clv*) clb (pop x) var (car x))));FIXME ? eliminate clb var here
+;;       (wt-nl)
+;;       (setf (var-ref var) (vs-push));FIXME ? clb and ccb vars just appear in info-ref-ccb, only need push clb
+;;       (wt-vs (var-ref var)) (wt "= " (list 'cvar (var-loc var)) ";")
+;;       (when (var-ref-ccb var)
+;; 	(clink (var-ref var))
+;; 	(setf (var-ref-ccb var) (ccb-vs-push)))))
 
 ;; (defun c2bind-reg-clv (&aux x clb var)
 ;;   (do nil
@@ -1044,7 +1053,20 @@
 				(unless sp (list (c1arg (cons 'ub x) info)))) args)))
 	  (when (eq tp :opaque) (baboon))
 	  (when (search "=" inl) (setf (info-flags info) (logior (iflags side-effects) (info-flags info))))
-	  (list 'lit info (info-type info) inl nargs))))
+	  (list 'lit info (info-type info) inl nargs (make-vs info)))))
+
+;; (defun c1lit (args)
+;;   (flet ((strcat (&rest r) (apply 'concatenate 'string r)))
+;; 	(let* ((tp (get (pop args) 'lisp-type :opaque))
+;; 					;	 (info (make-info :type (cmp-norm-tp tp) :flags (iflags side-effects))) ;FIXME boolean
+;; 	       (info (make-info :type (cmp-norm-tp tp))) ;FIXME boolean
+;; 	       (inl "")(i -1)
+;; 	       (nargs (mapcan (lambda (x &aux (sp (stringp x))) 
+;; 				(setq inl (strcat inl (if sp x (strcat "#" (write-to-string (incf i))))))
+;; 				(unless sp (list (c1arg (cons 'ub x) info)))) args)))
+;; 	  (when (eq tp :opaque) (baboon))
+;; 	  (when (search "=" inl) (setf (info-flags info) (logior (iflags side-effects) (info-flags info))))
+;; 	  (list 'lit info (info-type info) inl nargs))))
 
 ;; (defun c1lit (args)
 ;;   (flet ((strcat (&rest r) (apply 'concatenate 'string r)))
@@ -1070,11 +1092,17 @@
 ;; 	  (when (eq tp :opaque) (baboon))
 ;; 	  (list 'lit info (info-type info) inl nargs))))
 
-(defun c2lit (tp inl args)
+(defun c2lit (tp inl args stores)
   (let* ((*inline-blocks* 0)
 	 (*restore-avma*  *restore-avma*))
-    (unwind-exit (lit-loc tp inl args) nil (cons 'values (if (eq tp #t(returns-exactly)) 0 1)))
+    (unwind-exit (lit-loc tp inl args stores) nil (cons 'values (if (eq tp #t(returns-exactly)) 0 1)))
     (close-inline-blocks)))
+
+;; (defun c2lit (tp inl args)
+;;   (let* ((*inline-blocks* 0)
+;; 	 (*restore-avma*  *restore-avma*))
+;;     (unwind-exit (lit-loc tp inl args) nil (cons 'values (if (eq tp #t(returns-exactly)) 0 1)))
+;;     (close-inline-blocks)))
 
 ;; (defun c2lit (tp inl args)
 ;;   (let* ((sig (list (mapcar (lambda (x) (info-type (cadr x))) args) tp))
@@ -1097,7 +1125,7 @@
       (member-if (lambda (x) (when (fun-p x) (unless (eq x fun) (not (consp (if (eq b 'cb) (fun-c1cb x) (fun-c1 x)))))))
 		 (append (info-ref (cadr l)) (info-ref-ccb (cadr l)))))))
 
-(defun do-l1-fun (name src e &aux *callees* (*recursion-detected* (cons (list name) *recursion-detected*)) *warning-note-stack*)
+(defun do-l1-fun (name src e b &aux (wns *warning-note-stack*) *callees* (*recursion-detected* (cons (list name) *recursion-detected*)))
 
   (let* ((l (c1lambda-expr src))
 	 (osig (car e))
@@ -1105,9 +1133,41 @@
 	 (rd (cdar *recursion-detected*))
 	 (sig (if rd (list (car sig) (bbump-tp (cadr sig))) sig)))
     (setf (car e) sig (cadr e) *callees*)
-    (if (and rd (not (eq (cadr osig) (cadr sig))))
-	(progn (keyed-cmpnote (list name 'recursion) "Reprocessing ~s: ~s ~s" name osig sig) (do-l1-fun name src e))
-      l)))
+    (cond ((and rd (not (eq (cadr osig) (cadr sig))))
+	   (keyed-cmpnote (list name 'recursion) "Reprocessing ~s: ~s ~s" name osig sig)
+	   (setq *warning-note-stack* wns);FIXME try to use with-restore-vars
+	   (do-l1-fun name src e b))
+	  (l))))
+
+;; (defun do-l1-fun (name src e b &aux *callees* (*recursion-detected* (cons (list name) *recursion-detected*))
+;; 		       *warning-note-stack* *undefined-vars*)
+
+;;   (let* ((l (c1lambda-expr src))
+;; 	 (osig (car e))
+;; 	 (sig (lam-e-to-sig l))
+;; 	 (rd (cdar *recursion-detected*))
+;; 	 (sig (if rd (list (car sig) (bbump-tp (cadr sig))) sig)))
+;;     (setf (car e) sig (cadr e) *callees*)
+;;     (if (and rd (not (eq (cadr osig) (cadr sig))))
+;; 	(progn
+;; 	  (keyed-cmpnote (list name 'recursion) "Reprocessing ~s: ~s ~s" name osig sig)
+;; 	  (do-l1-fun name src e b))
+;;       (progn
+;; 	(unless (suppress-unfinalized-local-fun-warnings name b l)
+;; 	  (output-warning-note-stack))
+;; 	l))))
+
+;; (defun do-l1-fun (name src e &aux *callees* (*recursion-detected* (cons (list name) *recursion-detected*)) *warning-note-stack*)
+
+;;   (let* ((l (c1lambda-expr src))
+;; 	 (osig (car e))
+;; 	 (sig (lam-e-to-sig l))
+;; 	 (rd (cdar *recursion-detected*))
+;; 	 (sig (if rd (list (car sig) (bbump-tp (cadr sig))) sig)))
+;;     (setf (car e) sig (cadr e) *callees*)
+;;     (if (and rd (not (eq (cadr osig) (cadr sig))))
+;; 	(progn (keyed-cmpnote (list name 'recursion) "Reprocessing ~s: ~s ~s" name osig sig) (do-l1-fun name src e))
+;;       l)))
 
 ;; (defun do-l1-fun (name src e &aux *callees* *recursion-detected* *warning-note-stack*)
 
@@ -1176,15 +1236,33 @@
 	 (*src-inline-recursion* (when vis (list (list (list (sir-name name)) tag (ttl-ll (cadr src))))))
 	 (*c1exit* (list name))
 	 (*current-form* `(defun ,name))
-	 (l (do-l1-fun name (cdr (new-defun-args src tag)) e))
+	 (l (do-l1-fun name (cdr (new-defun-args src tag)) e b))
 	 (clv (get-clv l)))
     (setf (car e) (export-sig (car e))
 	  (third e) (list src clv name)
 	  (fourth e) (unless *compiler-compile* (namestring (truename (pathname *compiler-input*))))
 	  (fifth e) (if (= (length clv) 0) 1 0))
-    (if (suppress-unfinalized-local-fun-warnings name b l)
-      (output-warning-note-stack))
     l))
+
+;; (defun do-fun (name src e vis b)
+;;   (let* ((*vars*   (when b (cons b *vars*)))
+;; 	 (*funs*   (when b (cons b *funs*)))
+;; 	 (*blocks* (when b (cons b *blocks*)))
+;; 	 (*tags*   (when b (cons b *tags*)))
+;; 	 (tag (tmpsym))
+;; 	 (*prev-sri* (append *src-inline-recursion* *prev-sri*))
+;; 	 (*src-inline-recursion* (when vis (list (list (list (sir-name name)) tag (ttl-ll (cadr src))))))
+;; 	 (*c1exit* (list name))
+;; 	 (*current-form* `(defun ,name))
+;; 	 (l (do-l1-fun name (cdr (new-defun-args src tag)) e))
+;; 	 (clv (get-clv l)))
+;;     (setf (car e) (export-sig (car e))
+;; 	  (third e) (list src clv name)
+;; 	  (fourth e) (unless *compiler-compile* (namestring (truename (pathname *compiler-input*))))
+;; 	  (fifth e) (if (= (length clv) 0) 1 0))
+;;     (if (suppress-unfinalized-local-fun-warnings name b l)
+;;       (output-warning-note-stack))
+;;     l))
 
 ;; (defun do-fun (name src e vis b)
 ;;   (let* ((*vars*   (when b (cons b *vars*)))
@@ -1225,7 +1303,7 @@
 ;;     l))
 	 
 
-(defun t1defun (args)
+(defun t1defun (args &aux *warning-note-stack*)
 
   (when (or (endp args) (endp (cdr args)))
     (too-few-args 'defun 2 (length args)))
@@ -1268,9 +1346,58 @@
   
     (push (list 'defun fname cfun lambda-expr doc nil) *top-level-forms*)
     (push (cons fname cfun) *global-funs*)
-    
+
+    (output-warning-note-stack)
+
     (when *sig-discovery*
       (si::add-hash fname (car e) (cadr e) nil nil))))
+
+;; (defun t1defun (args)
+
+;;   (when (or (endp args) (endp (cdr args)))
+;;     (too-few-args 'defun 2 (length args)))
+;;   (maybe-eval nil (cons 'defun args))
+;;   (setq *non-package-operation* t)
+
+;;   (let* ((fname (car args))
+;; 	 (fname (or (function-symbol fname) (cmperr "The function name ~s is not valid." fname)))
+;; 	 (cfun (next-cfun))
+;; 	 (oal (get-arg-types fname)) (ort (get-return-type fname))
+;; 	 (osig (export-sig (list oal ort)))
+;; 	 (e (or (gethash fname *sigs*) (setf (gethash fname *sigs*) (make-list 5))))
+;; 	 (setjmps *setjmps*)
+;; 	 (lambda-expr (do-fun fname args e t nil))
+;; 	 (sig (car e))
+;; 	 (osig (if (equal '((*) *) osig) sig osig));FIXME
+;; 	 (doc (cadddr lambda-expr)))
+	 
+;;     (or (eql setjmps *setjmps*) (setf (info-volatile (cadr lambda-expr)) 1))
+;;     (keyed-cmpnote (list 'return-type fname) "~s return type ~s" fname (c1retnote lambda-expr))
+    
+;;     (unless (or (equal osig sig) (eq fname 'cmp-anon));FIXME
+;;       (cmpwarn "signature change on function ~s, ~s -> ~s~%" fname osig sig)
+;;       (setq *new-sigs-in-file* 
+;; 	    (some
+;; 	     (lambda (x) 
+;; 	       (unless (eq x fname)
+;; 		 (multiple-value-bind 
+;; 		  (s f) (gethash x *sigs*) 
+;; 		  (declare (ignore s))
+;; 		  (when f (list x fname osig sig))))) (si::callers fname))))
+    
+;;     (push (let* ((at (car sig))
+;; 		 (al (mapcar (lambda (x) (link-rt (cmp-norm-tp x) nil)) at))
+;; 		 (rt (link-rt (cmp-norm-tp (cadr sig)) nil)))
+;; 	    (list fname al rt
+;; 		  (if (single-type-p rt) (flags set ans) (flags set ans sets-vs-top))
+;; 		  (make-inline-string cfun at fname)))
+;; 	  *inline-functions*)
+  
+;;     (push (list 'defun fname cfun lambda-expr doc nil) *top-level-forms*)
+;;     (push (cons fname cfun) *global-funs*)
+    
+;;     (when *sig-discovery*
+;;       (si::add-hash fname (car e) (cadr e) nil nil))))
 
 (defun make-inline-string (cfun args fname)
   (format nil "~d(~a)" (c-function-name "LI" cfun fname)
@@ -1411,12 +1538,12 @@
   (prog1 *vind* (incf *vind*)))
 
 ;FIXME obsolete
-(defun collect-objects (le)
-  (cond ((atom le) nil)
-	((and (eq (car le) 'location) (consp (caddr le)) (eq (caaddr le) 'vv))
-	 (list (or (car (member (cadr (caddr le)) *top-level-forms* :key 'cadr))
-		   (aref (data-vector) (cadr (caddr le))))))
-	((append (collect-objects (car le)) (collect-objects (cdr le))))))
+;; (defun collect-objects (le)
+;;   (cond ((atom le) nil)
+;; 	((and (eq (car le) 'location) (consp (caddr le)) (eq (caaddr le) 'vv))
+;; 	 (list (or (car (member (cadr (caddr le)) *top-level-forms* :key 'cadr))
+;; 		   (aref (data-vector) (cadr (caddr le))))))
+;; 	((append (collect-objects (car le)) (collect-objects (cdr le))))))
 
 
 (defun xa (l)

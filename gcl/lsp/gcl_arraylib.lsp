@@ -169,7 +169,9 @@
   (check-type array array)
   (let* ((*array* array)(i indices))(check-type i (satisfies array-in-bounds)))
   (labels ((cpt (i j k l) (the seqind (if (zerop k) i (c+ i (c* j l)))));FIXME
-	   (armi-loop (s &optional (j 0) (k 0)) (if s (armi-loop (cdr s) (cpt (car s) j k (array-dimension array k)) (1+ k)) j)))
+	   (armi-loop (s &optional (j 0) (k 0)) 
+		      (declare (rnkind k));FIXME
+		      (if s (armi-loop (cdr s) (cpt (car s) j k (array-dimension array k)) (1+ k)) j)))
 	  (armi-loop indices)))
 
 ;; (defun array-row-major-index (array &rest indices)
@@ -218,7 +220,7 @@
   (check-type i rnkind)
   (let ((r (c-array-rank x)));FIXME
     (let ((*dim* r)(i i))(check-type i (satisfies array-dimension-index-less-than-rank)))
-    (if (= 1 r) (c-array-dim x) (*fixnum (c-array-dims x) i nil nil))))
+    (if (= 1 r) (c-array-dim x) (the seqind (*fixnum (c-array-dims x) i nil nil)))))
 
 ;; (defun array-dimension (x i)
 ;;   (declare (optimize (safety 1)))
@@ -311,18 +313,18 @@
                        (cdr cursor))))
 
 
-(defun vector (&rest objects &aux (l (list (length objects))))
-  (declare (:dynamic-extent objects l))
-  (make-array l :element-type t :initial-contents objects))
+(defun vector (&rest objects)
+  (declare (:dynamic-extent objects))
+  (make-array (length objects) :element-type t :initial-contents objects))
 
 (defun bit (bit-array &rest indices)
   (declare (:dynamic-extent indices))
-  (apply #'aref bit-array indices))
+  (apply 'aref bit-array indices))
 
 
 (defun sbit (bit-array &rest indices)
   (declare (:dynamic-extent indices))
-  (apply #'aref bit-array indices))
+  (apply 'aref bit-array indices))
 
 
 (defun bit-and (bit-array1 bit-array2 &optional result-bit-array)

@@ -175,7 +175,7 @@
 	      (if (array-has-fill-pointer-p x) (fill-pointer x) (array-dimension x 0)))))
 
 
-(defun elt (seq n &aux r)
+(defun elt (seq n)
   (declare (optimize (safety 2)))
   (check-type seq sequence)
   (check-type n seqind)
@@ -417,21 +417,61 @@
 		       (t (set-array r ri r i)(setf ri (1+ ri))))))))))
 
 
-(defnseq reduce ((f) s nil nil nil t)
-  (when from-end 
-    (setq s (reverse s))
-    (let ((tmp start))
-      (setq start (if endp (- ls end) 0) end (if hls (- ls tmp) array-dimension-limit))))
-  (do ((p (when l (nthcdr start s)) (cdr p))
-       (i start (1+ i))
-       (f (if (functionp f) f (funcallable-symbol-function f)))
-       (red-comp (comp-red f))
-       (rx initial-value (let* ((el (do-key key key-comp (if l (car p) (aref s i))))
-				(ry (if from-end rx el))
-				(rx (if from-end el rx)))
-			  (cond (ivsp (do-red f red-comp rx ry))
-				((setq ivsp t) el)))))
-      ((or (>= i end) (when l (endp p))) (if ivsp rx (values (funcall f))))))
+(defun tofn (o);FIXME coerce function, elsewhere
+  (etypecase 
+   o
+   (function o) 
+   (otherwise (the function (c::symbol-gfdef o)))))
+    ;; (let ((f (address (c::symbol-gfdef o)))(m (c::symbol-mflag o)))
+    ;;   (check-type f (not (integer 0 0)))
+    ;;   (check-type m (integer 0 0))
+    ;;   (the function (nani f))))))
+(declaim (inline tofn))
+
+(deftype fn nil `(satisfies fnp))
+(defun fnp (x)
+  (typecase
+   x
+   (function t)
+   ((and symbol (not boolean))
+    (and (= 0 (c::symbol-mflag x))
+	 (/= 0 (address (c::symbol-gfdef x)))))))
+(declaim (inline fnp))
+
+(defun reduce (f s &key key from-end (start 0) end (initial-value nil ivp) 
+		 &aux (key (if key (tofn key) #'identity))(f (tofn f))
+		 (l (listp s))(lim (if l array-dimension-limit (length s)))(ftt ivp)(e (or end lim)))
+  (declare (optimize (safety 2)))
+  (check-type f fn)
+  (check-type s sequence)
+  (check-type key (or null fn))
+  (check-type start seqind)
+  (check-type end (or null seqind))
+  (labels ((rl (s &optional (i 0) (res initial-value) (ft ivp))
+	       (if (or (>= i e) (when l (endp s)))
+		   (if ft res (funcall f))
+	       (let ((k (funcall key (if l (car s) (aref s i)))))
+		 (if from-end 
+		     (let ((r (rl (if l (cdr s) s) (1+ i) (if ftt res k) t)))
+		       (cond (ftt (funcall f k r)) ((setq ftt t) r)))
+		   (rl (if l (cdr s) s) (1+ i) (if ft (funcall f res k) k) t))))))
+	    (rl (if l (nthcdr start s) s) start)))
+
+;; (defnseq reduce ((f) s nil nil nil t)
+;;   (when from-end 
+;;     (setq s (reverse s))
+;;     (let ((tmp start))
+;;       (setq start (if endp (- ls end) 0) end (if hls (- ls tmp) array-dimension-limit))))
+;;   (do ((p (when l (nthcdr start s)) (cdr p))
+;;        (i start (1+ i))
+;;        (f (if (functionp f) f (funcallable-symbol-function f)))
+;;        (red-comp (comp-red f))
+;;        (rx initial-value (let* ((el (do-key key key-comp (if l (car p) (aref s i))))
+;; 				(ry (if from-end rx el))
+;; 				(rx (if from-end el rx)))
+;; 			  (cond (ivsp (do-red f red-comp rx ry))
+;; 				((setq ivsp t) el)))))
+;;       ((or (>= i end) (when l (endp p))) (if ivsp rx (values (funcall f))))))
 
 
 (eval-when 

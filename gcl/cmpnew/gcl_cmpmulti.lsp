@@ -230,7 +230,7 @@
 (defun c2values (forms)
   (if *mv-var*
     (let* ((*inline-blocks* 0)
-	   (types (mapcar (lambda (x) (let ((x (info-type (cadr x)))) (if (type>= #tboolean x) t x))) forms))
+	   (types (mapcar (lambda (x) (let ((x (coerce-to-one-value (info-type (cadr x))))) (if (type>= #tboolean x) t x))) forms))
 	   (i 0)
 	   (s (mapcar (lambda (x &aux (x (when x (write-to-string (incf i))))) (strcat "@" x "(#" x ")@")) (cdr forms)))
 	   (s (strcat "({" (apply 'strcat s) "#0;})"))
@@ -239,6 +239,19 @@
       (unwind-exit in nil (cons 'values (length forms)))
       (close-inline-blocks))
    (c2expr (car forms))))
+
+;; (defun c2values (forms)
+;;   (if *mv-var*
+;;     (let* ((*inline-blocks* 0)
+;; 	   (types (mapcar (lambda (x) (let ((x (info-type (cadr x)))) (if (type>= #tboolean x) t x))) forms))
+;; 	   (i 0)
+;; 	   (s (mapcar (lambda (x &aux (x (when x (write-to-string (incf i))))) (strcat "@" x "(#" x ")@")) (cdr forms)))
+;; 	   (s (strcat "({" (apply 'strcat s) "#0;})"))
+;; 	   (s (cons s (mapcar 'inline-type (cdr types))))
+;; 	   (in (list (inline-type (car types)) (flags) s (inline-args forms types))))
+;;       (unwind-exit in nil (cons 'values (length forms)))
+;;       (close-inline-blocks))
+;;    (c2expr (car forms))))
 
 ;; (defun c2values (forms &aux (base *vs*) (*vs* *vs*))
 ;;   (when (and (eq *value-to-go* 'return-object)

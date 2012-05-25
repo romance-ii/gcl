@@ -49,16 +49,29 @@
 	  (unless (eq ctp (if (listp ntype) (car ntype) ntype))
 	    ntype))))))
 
-(defun make-sequence (type size &key initial-element &aux ntype (atp (listp type)))
+(defun make-sequence (type size &key initial-element &aux (atp (listp type)))
   (declare (optimize (safety 1)))
-  (let ((res
-	 (case (if atp (car type) type)
-	       ((list cons member) (make-list size :initial-element initial-element))
-	       ((vector array) (make-vector (upgraded-array-element-type (or (when atp (cadr type)) t)) size nil nil nil 0 nil initial-element))
-	       (otherwise 'none))))
-    (cond ((not (eq res 'none)) (check-type-eval res type) res)
-	  ((setq ntype (expand-deftype type)) (make-sequence ntype size :initial-element initial-element))
-	  ((check-type type (member list vector))))))
+  (flet ((chk (res) (check-type-eval res type) res))
+	(case (if atp (car type) type)
+	      ;FIXME or
+	      ((list cons member) (chk (make-list size :initial-element initial-element)))
+	      ((vector array) (chk (make-vector
+				    (upgraded-array-element-type (or (when atp (cadr type)) t))
+				    size nil nil nil 0 nil initial-element)))
+	      (otherwise (let ((ntype (expand-deftype type)))
+			   (if ntype (make-sequence ntype size :initial-element initial-element)
+			     (check-type type (member list vector))))))))
+
+;; (defun make-sequence (type size &key initial-element &aux ntype (atp (listp type)))
+;;   (declare (optimize (safety 1)))
+;;   (let ((res
+;; 	 (case (if atp (car type) type)
+;; 	       ((list cons member) (make-list size :initial-element initial-element))
+;; 	       ((vector array) (make-vector (upgraded-array-element-type (or (when atp (cadr type)) t)) size nil nil nil 0 nil initial-element))
+;; 	       (otherwise 'none))))
+;;     (cond ((not (eq res 'none)) (check-type-eval res type) res)
+;; 	  ((setq ntype (expand-deftype type)) (make-sequence ntype size :initial-element initial-element))
+;; 	  ((check-type type (member list vector))))))
 
 ;; (defun make-sequence (type size &key (initial-element nil iesp))
 
@@ -124,16 +137,52 @@
 ;; 		(if rc (setf (car rh) tmp rh (cdr rh))
 ;; 		  (setf (aref rs (++ i)) tmp)))))))))
 
-(defun map (rt f seq &rest sqs &aux (seqs (cons seq sqs)) (l (length seqs)) (vals (make-list l)))
-  (declare (optimize (safety 2)))
-  (declare (:dynamic-extent sqs seqs vals))
-  (let ((sl (reduce (lambda (y x) (min y (length x))) seqs :initial-value array-dimension-limit)))
-    (do* ((x (when rt (make-sequence rt sl)))(xc (consp x))(xp x)(i 0 (1+ i)))
-	 ((or (when xc (endp xp)) (>= i sl)) x)
-	 (mapl (lambda (x y &aux (z (car x)))
-		 (setf (car y) (if (listp z) (pop (car x)) (aref z i)))) seqs vals)
-	 (let ((tmp (apply f vals)))
-	   (cond (xc (setf (car xp) tmp xp (cdr xp))) (rt (setf (aref x i) tmp)))))))
+(eval-when
+ (compile eval)
+
+ (defmacro locsym (f s) `(si::sgen (concatenate 'string (string ,f) ,s)))
+ 
+ (defmacro dyncpl (x &aux (l (locsym 'dyncpl "-LOOP")));FIXME this can't cons in a labels as it might be a separate fn.  Get do to unroll too.
+   `(labels ((,l (x y) (when x (setf (car x) (car y)) (,l (cdr x) (cdr y)))))
+	    (declare (notinline make-list))
+	    (let ((tmp (make-list (length ,x))))
+	      (declare (:dynamic-extent tmp))
+	      (,l tmp ,x);Can't be mapl, used by
+	     tmp)))
+
+ (defmacro seqend (seq seqs &aux (l (locsym 'seqend "-LOOP"))(ll (locsym 'seqend "-LOOP")))
+   `(labels ((,ll (x) (if (listp x) array-dimension-limit (length x)))
+	     (,l (s z) (if s (,l (cdr s) (min (,ll (car s)) z)) z)))
+	    (,l ,seqs (length ,seq))))
+ 
+ (defmacro seqval (seq place i)
+   `(if (listp ,seq) (pop ,place) (aref ,seq ,i)))
+
+ (defmacro seqvals (vals ns i)
+   `(mapl (lambda (x y &aux (yc (car y))) (setf (car x) (seqval yc (car y) ,i))) ,vals ,ns)))
+
+(defun map (rt f seq &rest sqs &aux (f (tofn f)) (l (listp seq)) (sl (seqend seq sqs))(x (when rt (make-sequence rt sl))))
+  (declare (optimize (safety 2)) (:dynamic-extent sqs))
+  (check-type rt type-spec)
+  (check-type f fn)
+  (check-type seq sequence)
+  (labels ((ml (i xp seq ns vals) 
+	       (when (and (< i sl) seq)
+		 (let ((tmp (apply f (if l (car seq) (aref seq i)) (seqvals vals ns i))))
+		   (cond (xp (setf (car xp) tmp)) (rt (setf (aref x i) tmp))))
+		 (ml (1+ i) (cdr xp) (if l (cdr seq) seq) ns vals))))
+	  (ml 0 (when (consp x) x) seq (dyncpl sqs) (dyncpl sqs)) x))
+
+;; (defun map (rt f seq &rest sqs &aux (seqs (cons seq sqs)) (l (length seqs)) (vals (make-list l)))
+;;   (declare (optimize (safety 2)))
+;;   (declare (:dynamic-extent sqs seqs vals))
+;;   (let ((sl (reduce (lambda (y x) (min y (length x))) seqs :initial-value array-dimension-limit)))
+;;     (do* ((x (when rt (make-sequence rt sl)))(xc (consp x))(xp x)(i 0 (1+ i)))
+;; 	 ((or (when xc (endp xp)) (>= i sl)) x)
+;; 	 (mapl (lambda (x y &aux (z (car x)))
+;; 		 (setf (car y) (if (listp z) (pop (car x)) (aref z i)))) seqs vals)
+;; 	 (let ((tmp (apply f vals)))
+;; 	   (cond (xc (setf (car xp) tmp xp (cdr xp))) (rt (setf (aref x i) tmp)))))))
 
 (defun map-into (rs g &rest seqs &aux 
 		    (h rs) (lp (unless (listp rs) (array-total-size rs))) 

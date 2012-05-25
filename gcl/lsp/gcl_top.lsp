@@ -520,8 +520,7 @@
           ((or (> fi *frs-top*) (> (frs-bds fi) bi)))
         (print-frs fi)
         (incf fi))
-      (format *debug-io* "~&BDS[~d]: ~s = ~s"
-              bi (bds-var bi) (bds-val bi)))))
+      (format *debug-io* "~&BDS[~d]: ~s = ~s" bi (bds-var bi) (let ((x (bds-val bi))) (if (zerop x) "unbound" (nani x)))))))
 
 (defun simple-backtrace ()
   (princ "Backtrace: " *debug-io*)

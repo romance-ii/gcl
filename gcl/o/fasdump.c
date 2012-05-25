@@ -1352,7 +1352,7 @@ read_fasd1(int i, object *loc)
 	    vs_base=base;
 	    vs_top = p;
 #define str(a_) ({string_register->st.st_fillp=string_register->st.st_dim=sizeof(a_)-1;string_register->st.st_self=(a_);string_register;})
-	    funcall(find_symbol(str("MAKE_STRUCTURE"),system_package));
+	    funcall(find_symbol(str("MAKE-STRUCTURE"),system_package));
 	    /* siLmake_structure(); */
 	    *loc = vs_base[0];
 	    vs_top=vs_base=base;

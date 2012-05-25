@@ -55,12 +55,19 @@
     (typecase 
      a
      ((or function cons array))
-     (otherwise 
-      (unless (eq a +opaque+)
-	(if (when (symbolp a) (get a 'tmp)) ;FIXME cdr
-	    (let ((a (get-var a)))
-	      (when a (c1var a)))
-	  (c1constant-value a (when (symbolp a) (symbol-package a)))))))))
+     (otherwise (c1constant-value a (when (symbolp a) (symbol-package a)))))))
+
+;; (defun atomic-type-constant-value (atp &aux (a (car atp)))
+;;   (when atp
+;;     (typecase 
+;;      a
+;;      ((or function cons array))
+;;      (otherwise 
+;;       (unless (eq a +opaque+)
+;; 	(if (when (symbolp a) (get a 'tmp)) ;FIXME cdr
+;; 	    (let ((a (get-var a)))
+;; 	      (when a (c1var a)))
+;; 	  (c1constant-value a (when (symbolp a) (symbol-package a)))))))))
 
 ;; (defun atomic-type-constant-value (atp &aux (a (car atp)))
 ;;   (when atp
@@ -1061,9 +1068,22 @@
 	 (nm (if (symbolp nm) nm (tmpsym)))
 	 (s (with-output-to-string (s) (princ cl s))))
     (assert (and (eq (car fm) 'let*) (not args)))
-    (if (member (car nargs) '(lit var))
-	(setf (fourth nargs) (string-concatenate (fourth nargs) (if *annotate* (string-concatenate "/* " s " */") "")) nargs nargs)
-      (list 'inline (copy-info (cadr nargs)) nm s nargs))))
+    (cond ((eq (car nargs) 'lit)
+	   (setf (fourth nargs) (string-concatenate (fourth nargs) (if *annotate* (string-concatenate "/* " s " */") "")) nargs nargs))
+	  ((eq (car nargs) 'var) nargs)
+	  ((list 'inline (copy-info (cadr nargs)) nm s nargs)))))
+
+;; (defun c1inline (args env inls)
+;;   (let* ((cl (pop args))
+;; 	 (fm (pop args))
+;; 	 (nargs (under-env env (c1let-* (cdr fm) t inls)))
+;; 	 (nm (car cl))
+;; 	 (nm (if (symbolp nm) nm (tmpsym)))
+;; 	 (s (with-output-to-string (s) (princ cl s))))
+;;     (assert (and (eq (car fm) 'let*) (not args)))
+;;     (if (member (car nargs) '(lit var))
+;; 	(setf (fourth nargs) (string-concatenate (fourth nargs) (if *annotate* (string-concatenate "/* " s " */") "")) nargs nargs)
+;;       (list 'inline (copy-info (cadr nargs)) nm s nargs))))
 
 ;; (defun c1inline (args env inls)
 ;;   (let* ((cl (pop args))
@@ -1482,24 +1502,62 @@
 	((and (consp tp) (eq (car tp) 'or)) (not (member-if-not 'discrete-tp (cdr tp))))))
 
 (defun bbump-tp (tp)
-  (cond ((type>= #tseqind tp) #tseqind)
+  (cond ((type>= #t(and seqind (not (integer 0 0))) tp) #t(and seqind (not (integer 0 0))))
+	((type>= #tseqind tp) #tseqind)
 	((discrete-tp tp) tp)
 	((bump-tp tp))))
 
 ;; (defun bbump-tp (tp)
+;;   (cond ((type>= #tseqind tp) #tseqind)
+;; 	((discrete-tp tp) tp)
+;; 	((bump-tp tp))))
+
+;; (defun bbump-tp (tp)
 ;;   (if (type>= #tseqind tp) #tseqind (bump-tp tp)))
 
-(defun prev-sir (sir &optional (s (append *src-inline-recursion* *prev-sri*)) (i 0))
-  (cond ;((not sp) (or (> (length s) 5) (prev-sir sir s)));FIXME
-	((atom s) nil)
-	((let* ((x (pop s))(x (car x)))
-	   (when (eq (car x) (car sir))
-	     (or (> (incf i) 15)
-		 (if (cdr x)
-		     (and (= (length (cdr x)) (length (cdr sir)));FIXME unroll strategy	       
-			  (every (lambda (x y) (type<= (bbump-tp x) (bbump-tp y))) (cdr x) (cdr sir)))
-		   (not (member-if 'atomic-tp (cdr sir))))))));FIXME all eq
-	((prev-sir sir s i))))
+(defun cln (x &optional (i 0))
+  (if (atom x) i (cln (cdr x) (1+ i))))
+
+(defun tm (ay ax &optional (i 0))
+  (cond ((eq ay ax) (< (cln ax) 15))
+	((consp ax) (tm ay (cdr ax) (1+ i)))))
+
+(defun arg-types-match (tps sir &optional ctp)
+  (if tps
+      (and (= (length tps) (length sir));FIXME unroll strategy	       
+	   (every (lambda (x y) 
+		    (or (type>= x y)
+			(and (type>= #tinteger x) (type>= #tinteger y))
+			(when ctp 
+			  (let ((ax (car (atomic-tp x)))(ay (car (atomic-tp y))))
+			    (when (consp ay) ;(setq aax ax aay ay) ;(print (list aax aay))(break)
+			      (not 
+			       (tm ay ax)
+;			       (when (and (consp ax) (<= (length ax) 15)) (tailp ay ax))
+			       )))))) tps sir))
+    (not (member-if 'atomic-tp sir))))
+
+(defun prev-sir (sir &aux (f (name-sir sir))(tp sir)(n (pop tp))(l (append *src-inline-recursion* *prev-sri*))
+		     (p (member n l :key 'caar))(pp (member n (cdr p) :key 'caar)))
+  (when p
+    (if pp
+	(if (or (member f *c1exit*) (not (member-if-not 'atomic-tp tp)))
+	    (member-if (lambda (x) (when (eq n (caar x)) (arg-types-match (cdar x) tp t))) p)
+;	  t)
+	  (let ((tag (sir-tag sir))) (if tag (throw tag nil) t)))
+      (arg-types-match (cdaar p) tp))))
+
+;; (defun prev-sir (sir &optional (s (append *src-inline-recursion* *prev-sri*)) (i 0))
+;;   (cond ;((not sp) (or (> (length s) 5) (prev-sir sir s)));FIXME
+;; 	((atom s) nil)
+;; 	((let* ((x (pop s))(x (car x)))
+;; 	   (when (eq (car x) (car sir))
+;; 	     (or (> (incf i) 15)
+;; 		 (if (cdr x)
+;; 		     (and (= (length (cdr x)) (length (cdr sir)));FIXME unroll strategy	       
+;; 			  (every (lambda (x y) (type<= (bbump-tp x) (bbump-tp y))) (cdr x) (cdr sir)))
+;; 		   (not (member-if 'atomic-tp (cdr sir))))))));FIXME all eq
+;; 	((prev-sir sir s i))))
 
 ;; (defun prev-sir (sir &optional (s (append *src-inline-recursion* *prev-sri*)))
 ;;   (cond ;((not sp) (or (> (length s) 5) (prev-sir sir s)));FIXME
@@ -1530,7 +1588,7 @@
 (dolist (l '(upgraded-array-element-type row-major-aref row-major-aset si::set-array array-element-type))
   (setf (get l 'consider-inline) t))
 
-(defun maybe-inline-src (fun fms src &aux (ll (cadr src)))
+(defun maybe-inline-src (fun fms src)
   (when src
     (or
      (not (symbolp fun))
@@ -1547,14 +1605,25 @@
 (defun mi3 (fun args la fms ttag envl inls &aux (src (under-env (pop envl) (inline-src fun))) (env (car envl)))
   (when (maybe-inline-src fun fms src)
     (let ((sir (cons (sir-name fun) (mapcar (lambda (x) (when x (info-type (cadr x)))) fms))))
-      (if (prev-sir sir)
-	  (let ((tag (sir-tag sir))) (when tag (throw tag nil)))
+      (unless (prev-sir sir)
 	(let* ((tag (tmpsym))
 	       (tsrc (ttl-tag-src src tag))
 	       (*src-inline-recursion* (maybe-cons-sir sir tag ttag src env)))
 	  (with-restore-vars
 	   (prog1 (catch tag (mi4 fun args la tsrc env inls))
 	     (keep-vars))))))))
+
+;; (defun mi3 (fun args la fms ttag envl inls &aux (src (under-env (pop envl) (inline-src fun))) (env (car envl)))
+;;   (when (maybe-inline-src fun fms src)
+;;     (let ((sir (cons (sir-name fun) (mapcar (lambda (x) (when x (info-type (cadr x)))) fms))))
+;;       (if (prev-sir sir)
+;; 	  (let ((tag (sir-tag sir))) (when tag (throw tag nil)))
+;; 	(let* ((tag (tmpsym))
+;; 	       (tsrc (ttl-tag-src src tag))
+;; 	       (*src-inline-recursion* (maybe-cons-sir sir tag ttag src env)))
+;; 	  (with-restore-vars
+;; 	   (prog1 (catch tag (mi4 fun args la tsrc env inls))
+;; 	     (keep-vars))))))))
 
 ;; (defun mi3 (fun args la fms ttag envl inls &aux (src (under-env (pop envl) (inline-src fun))) (env (car envl)))
 ;;   (when src
@@ -1662,7 +1731,8 @@
 	 (tag (cadr sir))
 	 (targs (if la (append args (list la)) args))
 	 (inl (mi3 fun args la fms tag envl (mapcar 'cons targs fms))))
-    (cond (inl (keyed-cmpnote (list 'inline fun) "inlining ~s ~s ~s" fun args la)
+    (cond (inl (keyed-cmpnote (list 'inline (if (fun-p fun) (fun-name fun) fun))
+			      "inlining ~s ~s ~s" fun (mapcar (lambda (x) (info-type (cadr x))) fms) la)
 	   inl)
 	  ((and sir (member fun *c1exit*))
 	   (keyed-cmpnote (list 'tail-recursion fun) "tail recursive call to ~s replaced with iteration" fun)
@@ -1832,7 +1902,17 @@
 ;;     (list 'ordinary (cadr e) e)))
 
 
+(defun or-ccb-assignments (fms)
+  (mapc (lambda (x &aux (i (cadr x))) 
+	  (mapc (lambda (v)
+		  (when (var-p v) 
+		    (let ((tp (get (var-store v) 'ccb-tp)));FIXME setq tp nil?
+		      (when tp
+			(do-setq-tp v '(ccb-ref) (type-or1 (var-type v) (get (var-store v) 'ccb-tp)))
+			(setf (var-store v) +opaque+))))) (append (info-ref-ccb i) (info-ref-clb i)))) fms))
+
 (defun mi6 (fn fms)
+  (or-ccb-assignments fms)
   (unless (and (symbolp fn) (get fn 'c1no-side-effects))
     (dolist (f fms)
       (when (and (consp f) (eq (car f) 'var))
@@ -1841,6 +1921,16 @@
 	       (p (when (and p (type>= #tproper-cons ft)) #tproper-cons)))
 	  (when (and p (not (type>= ft p)))
 	    (bump-pcons (caaddr f) p)))))))
+
+;; (defun mi6 (fn fms)
+;;   (unless (and (symbolp fn) (get fn 'c1no-side-effects))
+;;     (dolist (f fms)
+;;       (when (and (consp f) (eq (car f) 'var))
+;; 	(let* ((ft (info-type (cadr f)))
+;; 	       (p (when (and ft (type>= #tcons ft)) #tcons))
+;; 	       (p (when (and p (type>= #tproper-cons ft)) #tproper-cons)))
+;; 	  (when (and p (not (type>= ft p)))
+;; 	    (bump-pcons (caaddr f) p)))))))
 
 
 (defun mi5 (fn info fms la &aux (ll (when la (list (length fms)))) fd)
@@ -2273,6 +2363,7 @@
 	(multiple-value-bind
 	 (doc decls ctps body)
 	 (parse-body-header body)
+	 (declare (ignore doc))
 	 (unless rr (when np (push `(declare (:dynamic-extent ,lvp)) decls)))
 	 (when post (post))
 	 (when keb (push `(declare (ignore ,ke)) decls))

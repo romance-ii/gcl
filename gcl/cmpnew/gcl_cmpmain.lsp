@@ -867,5 +867,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	(delete-file init)
 	image))))
 
-(defun cdebug nil 
-  (setq *default-system-p* t *default-c-file* t *default-data-file* t *default-h-file* t *keep-gaz* t *annotate* t))
+(defun cdebug (&optional a) 
+  (setq *default-system-p* t *default-c-file* t *default-data-file* t *default-h-file* t *keep-gaz* a *annotate* a))
+
+(defun fle (x) (function-lambda-expression (symbol-function x)))

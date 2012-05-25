@@ -102,7 +102,7 @@
 
 
 (defmacro with-open-stream ((var stream) . body)
-  (declare (optimize (safety 2)))
+;  (declare (optimize (safety 2)))
   (multiple-value-bind 
    (ds b)
    (find-declarations body)
@@ -116,7 +116,7 @@
 
 
 (defmacro with-input-from-string ((var string &key index start end) . body)
-  (declare (optimize (safety 2)))
+;  (declare (optimize (safety 2)))
   (multiple-value-bind 
    (ds b)
    (find-declarations body)
@@ -130,7 +130,7 @@
 
 
 (defmacro with-output-to-string ((var &optional string &key element-type) . body)
-  (declare (optimize (safety 2)))
+;  (declare (optimize (safety 2)))
   (multiple-value-bind 
    (ds b)
    (find-declarations body)
@@ -262,7 +262,7 @@
       (unwind-protect (progn ,@body) (progn (close ,s) (delete-file ,s))))))
 
 (defmacro with-open-file ((stream . filespec) . body)
-  (declare (optimize (safety 2)))
+;  (declare (optimize (safety 2)))
   (multiple-value-bind 
    (ds b)
    (find-declarations body)

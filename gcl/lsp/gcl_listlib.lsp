@@ -551,11 +551,18 @@
 ;; 	(when (consp tmp) (setq rp (last tmp))))))
 
 
-(defun append (&rest l)
+(defun append (&rest l &aux r rp)
   (declare (optimize (safety 2))(:dynamic-extent l))
-  (do (r rp (l l (cdr l))) ((endp (cdr l)) (cond (rp (rplacd rp (car l)) r) ((car l))))
-      (do ((c (car l) (cdr c))) ((endp c))
-	  (let ((tmp (cons (car c) nil))) (collect r rp tmp)))))
+  (mapl (lambda (x &aux (y (car x)))
+	  (if (cdr x)
+	      (mapc (lambda (x) (collect r rp (cons x nil))) y)
+	    (collect r rp y))) l) r)
+
+;; (defun append (&rest l)
+;;   (declare (optimize (safety 2))(:dynamic-extent l))
+;;   (do (r rp (l l (cdr l))) ((endp (cdr l)) (cond (rp (rplacd rp (car l)) r) ((car l))))
+;;       (do ((c (car l) (cdr c))) ((endp c))
+;; 	  (let ((tmp (cons (car c) nil))) (collect r rp tmp)))))
 
 (defun revappend (list tail)
   (declare (optimize (safety 2)))
@@ -602,3 +609,4 @@
 	((endp (setq s (cdr l))) (error "Bad plist"))
 	((getf (cdr s) i d))))
 
+(defun identity (x) x)

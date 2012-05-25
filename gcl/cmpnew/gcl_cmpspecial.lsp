@@ -177,23 +177,23 @@
 ;;     (setf (gethash fun *fun-id-hash*) id)
 ;;     fun))
 
-(defun portable-closure-src (fn) ;FIXME
-  (let* ((lam nil); (when (si::interpreted-function-p fn) (si::interpreted-function-lambda fn)))
-	 (src (when lam (function-lambda-expression fn)))
-	 (p (car (member-if-not 
-		 (lambda (x) 
-		   (eq x (car (member (var-name x) *vars* :key (lambda (x) (when (var-p x) (var-name x)))))))
-		 (cadr lam)))))
-    (if p (keyed-cmpnote '(closure inline)
-			 "Not inlining ~s due to redefinition of closure variable ~s." src (var-name p))
-      src)))
+;; (defun portable-closure-src (fn) ;FIXME
+;;   (let* ((lam nil); (when (si::interpreted-function-p fn) (si::interpreted-function-lambda fn)))
+;; 	 (src (when lam (function-lambda-expression fn)))
+;; 	 (p (car (member-if-not 
+;; 		 (lambda (x) 
+;; 		   (eq x (car (member (var-name x) *vars* :key (lambda (x) (when (var-p x) (var-name x)))))))
+;; 		 (cadr lam)))))
+;;     (if p (keyed-cmpnote '(closure inline)
+;; 			 "Not inlining ~s due to redefinition of closure variable ~s." src (var-name p))
+;;       src)))
 
 (defun coerce-to-funid (fn)
   (cond ((symbolp fn) fn)
 	((not (functionp fn)) nil)
 	((fn-get fn 'id))
-	((si::function-name fn))
-	((portable-closure-src fn))))
+	((si::function-name fn))))
+;	((portable-closure-src fn))
 
 (defun find-special-var (l f &aux v)
   (labels ((ccar (x) (when (listp x) (car x))))

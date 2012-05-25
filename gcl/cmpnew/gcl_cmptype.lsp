@@ -45,7 +45,7 @@
 ;;;	SHORT-FLOAT	float
 ;;;	LONG-FLOAT	double
 
-(defmacro infer-tp (x y z) z)
+(defmacro infer-tp (x y z) (declare (ignore x y)) z)
 
 (defmacro t-to-nil (x) (let ((s (tmpsym))) `(let ((,s ,x)) (if (eq ,s t) nil ,s))))
 (defmacro nil-to-t (x) `(or ,x t))
@@ -739,8 +739,10 @@
 (dolist (l '(si::number-plus si::number-minus si::number-times + - * exp atan tanh sinh asinh))
   (si::putprop l 'super-range 'type-propagator))
 
-(defun float-propagator (f t1 &optional (t2 #tnull))
-  (super-range f (type-and #treal t1) (type-and #t(or nil float) t2)))
+(defun float-propagator (f t1 &optional (t2 #tnull t2p))
+  (if (eq t2 #tnull)
+      (super-range f (type-and #treal t1))
+    (super-range f (type-and #treal t1) (type-and #tfloat t2))))
 (setf (get 'float 'type-propagator) 'float-propagator)
 
 (defun bit-type (tp)
@@ -755,8 +757,9 @@
 	   (l (if (< l 0) (- (1- (ash 1 (integer-length l)))) 0)))
       (cmp-norm-tp `(integer ,l ,h))))))
 
-(defun logand-propagator (f &optional (t1 nil t1p) (t2 nil t2p))
-  (cond (t2p (when (and (type>= #tfixnum t2) (type>= #tfixnum t1)) 
+(defun logand-propagator (f &optional (t1 nil t1p) (t2 nil t2p) &rest r)
+  (cond (r (apply 'logand-propagator f (logand-propagator f t1 t2) (car r) (cdr r)))
+	(t2p (when (and (type>= #tfixnum t2) (type>= #tfixnum t1)) 
 	       (let ((t1 (bit-type t1))(t2 (bit-type t2)))
 		 (type-or1
 		  (super-range f (type-and #t(integer 0) t1) (type-and #t(integer 0) t2))
@@ -767,6 +770,19 @@
 		    (super-range f (type-and #t(integer * (0)) t1) (type-and #t(integer * (0)) t2))))))))
 	(t1p (when (type>= #tfixnum t1) (super-range f t1)))
 	((not t1p) (super-range f))))
+
+;; (defun logand-propagator (f &optional (t1 nil t1p) (t2 nil t2p))
+;;   (cond (t2p (when (and (type>= #tfixnum t2) (type>= #tfixnum t1)) 
+;; 	       (let ((t1 (bit-type t1))(t2 (bit-type t2)))
+;; 		 (type-or1
+;; 		  (super-range f (type-and #t(integer 0) t1) (type-and #t(integer 0) t2))
+;; 		  (type-or1
+;; 		   (super-range f (type-and #t(integer * (0)) t1) (type-and #t(integer 0) t2))
+;; 		   (type-or1
+;; 		    (super-range f (type-and #t(integer 0) t1) (type-and #t(integer * (0)) t2))
+;; 		    (super-range f (type-and #t(integer * (0)) t1) (type-and #t(integer * (0)) t2))))))))
+;; 	(t1p (when (type>= #tfixnum t1) (super-range f t1)))
+;; 	((not t1p) (super-range f))))
 (dolist (l '(logand logior logxor logeqv logandc1 logandc2 logorc1 logorc2 lognand lognor lognot))
   (si::putprop l 'logand-propagator 'type-propagator))
 
@@ -835,15 +851,24 @@
 	((and (consp tp) (eq (car tp) 'cons) 
 	      (cddr tp) (not (cdddr tp))) (last-cons-type (caddr tp) t))))
 
-(defun cdr-propagator (f t1)
-  (let ((t1 (type-and #tlist t1)))
-    (cond ((and (consp t1) (eq (car t1) 'or))
-	   (reduce 'type-or1 (mapcar (lambda (x) (nil-to-t (cdr-propagator f x))) (cdr t1)) :initial-value nil))
-	  ((type>= #tnull t1) t1) ;FIXME clb ccb do-setq-tp
-	  ((let ((a1 (atomic-tp t1)))
-	     (when a1 (let ((tp (cdar a1))) (unless (eq tp +opaque+) (object-type tp))))))
-	  ((and (consp t1) (eq (car t1) 'cons)) (caddr t1))
-	  ((type>= #tproper-list t1) #tproper-list))))
+(defun cdr-propagator (f t1 &aux (t1 (type-and #tlist t1)))
+  (cond ((and (consp t1) (eq (car t1) 'or))
+	 (reduce 'type-or1 (mapcar (lambda (x) (nil-to-t (cdr-propagator f x))) (cdr t1)) :initial-value nil))
+	((type>= #tnull t1) t1) ;FIXME clb ccb do-setq-tp
+	((let ((a1 (atomic-tp t1)))
+	   (when a1 (let ((tp (cdar a1))) (unless (or (eq tp +opaque+) (when (symbolp tp) (get tp 'tmp))) (object-type tp))))))
+	((and (consp t1) (eq (car t1) 'cons)) (caddr t1))
+	((type>= #tproper-list t1) #tproper-list)))
+
+;; (defun cdr-propagator (f t1)
+;;   (let ((t1 (type-and #tlist t1)))
+;;     (cond ((and (consp t1) (eq (car t1) 'or))
+;; 	   (reduce 'type-or1 (mapcar (lambda (x) (nil-to-t (cdr-propagator f x))) (cdr t1)) :initial-value nil))
+;; 	  ((type>= #tnull t1) t1) ;FIXME clb ccb do-setq-tp
+;; 	  ((let ((a1 (atomic-tp t1)))
+;; 	     (when a1 (let ((tp (cdar a1))) (unless (eq tp +opaque+) (object-type tp))))))
+;; 	  ((and (consp t1) (eq (car t1) 'cons)) (caddr t1))
+;; 	  ((type>= #tproper-list t1) #tproper-list))))
 
 ;; (defun cdr-propagator (f t1)
 ;;   (let ((t1 (type-and #tlist t1)))
@@ -887,8 +912,7 @@
 	(mapc (lambda (x) (bump-pcons x p)) (var-aliases v))))))
 
 (defun bump-pconsa (v ctp)
-  (let ((tp (cons-propagator 'cons ctp 
-			       (cdr-propagator 'cdr (var-type v)))))
+  (let ((tp (cons-propagator 'cons ctp (cdr-propagator 'cdr (var-type v)))))
     (unless (type>= (var-type v) tp)
       (do-setq-tp v nil tp)
       (mapc (lambda (x) (bump-pconsa x ctp)) (var-aliases v)))))
@@ -1017,13 +1041,31 @@
 	(#tcons)))
 (si::putprop 'cons 'cons-propagator 'type-propagator)
 
-(defun car-propagator (f t1)
+(defun co1carcdr (f x)
+  (let* ((tp (car (atomic-tp (info-type (cadr (with-restore-vars (c1arg (car x))))))))
+	 (tp (when (consp tp) (funcall f tp)))
+	 (tp (when (symbolp tp) (when (get tp 'tmp) (unless (eq tp +opaque+) (get-var tp))))))
+    (when tp (c1var tp))))
+
+(setf (get 'car 'co1) 'co1carcdr)
+(setf (get 'cdr 'co1) 'co1carcdr)
+
+(defun car-propagator (f t1 &aux (t1 (type-and #tlist t1)))
   (declare (ignore f))
-  (let ((t1 (type-and #tlist t1)))
-    (cond ((type>= #tnull t1) t1) ;FIXME clb ccb do-setq-tp
-	  ((let ((a1 (atomic-tp t1)))
-	     (when a1 (let ((tp (caar a1))) (unless (eq tp +opaque+) (object-type tp))))))
-	  ((and (consp t1) (eq (car t1) 'cons)) (cadr t1)))))
+  (cond ((and (consp t1) (eq (car t1) 'or))
+	 (reduce 'type-or1 (mapcar (lambda (x) (nil-to-t (car-propagator f x))) (cdr t1)) :initial-value nil))
+	((type>= #tnull t1) t1) ;FIXME clb ccb do-setq-tp
+	((let ((a1 (atomic-tp t1)))
+	   (when a1 (let ((tp (caar a1))) (unless (or (eq tp +opaque+) (when (symbolp tp) (get tp 'tmp))) (object-type tp))))))
+	((and (consp t1) (eq (car t1) 'cons)) (cadr t1))))
+
+;; (defun car-propagator (f t1)
+;;   (declare (ignore f))
+;;   (let ((t1 (type-and #tlist t1)))
+;;     (cond ((type>= #tnull t1) t1) ;FIXME clb ccb do-setq-tp
+;; 	  ((let ((a1 (atomic-tp t1)))
+;; 	     (when a1 (let ((tp (caar a1))) (unless (eq tp +opaque+) (object-type tp))))))
+;; 	  ((and (consp t1) (eq (car t1) 'cons)) (cadr t1)))))
 
 ;; (defun car-propagator (f t1)
 ;;   (declare (ignore f))
@@ -1233,9 +1275,11 @@
 (si::putprop 'acosh 'acosh-propagator 'type-propagator)
 
 (defun make-vector-propagator (f et st &rest r)
+  (declare (ignore r f))
   (cmp-norm-tp `(vector ,(or (car (atomic-tp et)) '*) ,(or (car (atomic-tp st)) '*))))
 (si::putprop 'si::make-vector 'make-vector-propagator 'type-propagator)
 (defun make-array1-propagator (f &rest r)
+  (declare (ignore f))
   (cmp-norm-tp `(array ,(or (car (atomic-tp (car r))) '*) ,(or (car (atomic-tp (sixth r))) '*))))
 (si::putprop 'si::make-array1 'make-array1-propagator 'type-propagator)
 
@@ -1410,12 +1454,12 @@
 		  ((type>= tp #tnull) (type-or1 #tnull (bump-tp (type-and #t(not null) tp))))
 		  ((car (member tp +useful-types+ :test 'type<=)))))))
 
-(defun reset-info-type (info)
-  (if (info-type info)
-      (let ((info1 (copy-info info)))
-           (setf (info-type info1) t)
-           info1)
-      info))
+;; (defun reset-info-type (info)
+;;   (if (info-type info)
+;;       (let ((info1 (copy-info info)))
+;;            (setf (info-type info1) t)
+;;            info1)
+;;       info))
 
 (defun and-form-type (type form original-form &aux type1)
   (setq type1 (type-and type (info-type (cadr form))))
@@ -1464,7 +1508,7 @@
    `(progn
       (defun array-eltsize-propagator (f x)
 	(cond
-	 ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-eltsize-propagator f x)) (cdr x))))
+	 ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-eltsize-propagator f x)) (cdr x)) :initial-value nil))
 	 ,@(mapcar (lambda (x)
 		     `((type>= (load-time-value (cmp-norm-tp '(array ,(pop x)))) x) 
 		       (load-time-value (cmp-norm-tp ',(object-type (cadr x)))))) si::*array-type-info*)
@@ -1473,14 +1517,14 @@
       (setf (get 'c-array-eltsize 'type-propagator) 'array-eltsize-propagator)
       (defun array-elttype-propagator (f x)
 	(cond
-	 ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-elttype-propagator f x)) (cdr x))))
+	 ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-elttype-propagator f x)) (cdr x)) :initial-value nil))
 	 ,@(mapcar (lambda (x)
 		     `((type>= (load-time-value (cmp-norm-tp '(array ,(pop x)))) x) 
 		       (load-time-value (cmp-norm-tp ',(object-type (car x)))))) si::*array-type-info*)))
       (setf (get 'c-array-elttype 'type-propagator) 'array-elttype-propagator)
       (defun array-rank-propagator (f x)
 	(cond
-	 ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-rank-propagator f x)) (cdr x))))
+	 ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-rank-propagator f x)) (cdr x)) :initial-value nil))
 	 ((type>= #tvector x) (object-type 1))
 	 ((and (consp x) (eq (car x) 'array)) 
 	  (let ((x (caddr x))) (typecase x (rnkind (object-type x)) (list (object-type (length x))) (otherwise #trnkind))))))

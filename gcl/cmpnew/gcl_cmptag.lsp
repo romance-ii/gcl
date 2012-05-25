@@ -155,7 +155,7 @@
 
 (defun tst (y x &aux (z (eq (car x) y))) 
   (unless z
-    (keyed-cmpnote (list 'tagbody-iteration) "Iterating tagbody on ~s conflicts" (length x))
+    (keyed-cmpnote (list 'tagbody-iteration) "Iterating tagbody at ~s ~x on ~s conflicts" (tag-name y) (address y) (length x))
     (mapc (lambda (x &aux (v (pop x))) 
 	    (keyed-cmpnote (list (var-name v) 'tagbody-iteration)
 			   "    Iterating tagbody: setting ~s type ~s to ~s, store ~s to ~s"
@@ -163,11 +163,20 @@
 	    (setf (var-type v) (car x) (var-store v) (cadr x))) x))
   (when z x))
 
-(defun pt (y x) 
-  (or (tst y (with-restore-vars (catch y (prog1 (cons y (pr x)) (keep-vars))))) (pt y x)))
+(defun pt (y x) (or (tst y (with-restore-vars (catch y (prog1 (cons y (pr x)) (keep-vars))))) (pt y x)))
+
+;; (defun pt (y x &optional (ws *warning-note-stack*))
+;;   (or (tst y (with-restore-vars (catch y (prog1 (cons y (pr x)) (keep-vars))))) (pt y x (setq *warning-note-stack* ws))))
+
+(defun lvars (&aux (v (member-if-not 'var-p *vars*)))
+  (if v (ldiff *vars* v) *vars*))
 
 (defun mch nil
-  (mapcar (lambda (x) (list x (var-type x) (var-store x))) (remove-if-not 'var-p *vars*)))
+;  (mapcar (lambda (x) (list x (var-type x) (var-store x) (mcpt (var-type x)))) (lvars)))
+  (mapcar (lambda (x) (list x (var-type x) (var-store x) (mcpt (var-type x)))) (remove-if-not 'var-p *vars*)))
+
+;; (defun mch nil
+;;   (mapcar (lambda (x) (list x (var-type x) (var-store x))) (remove-if-not 'var-p *vars*)))
 
 (defun pr (x &aux (y (member-if 'tag-p x))) 
   (nconc (mapcar 'c1arg (ldiff x y)) 
@@ -1065,13 +1074,27 @@
     (let ((*unwind-exit* (cons label *unwind-exit*)))
       (c2tagbody-body body))))
 
+(defun mcpt (tp)
+  (when (consp (car (atomic-tp tp)))
+    (list (pop tp) (copy-list (car tp)))))
+
 (defun tag-throw (tag)
-  (let ((v (remove-if (lambda (x &aux (v (pop x))(tp (pop x))(st (car x))) 
-			(and (type>= tp (var-type v)) (eq st (var-store v))))
+  (let ((v (remove-if (lambda (x &aux (v (pop x))(tp (pop x))(st (pop x))(m (car x))) 
+			(and (type>= (type-and (var-dt v) tp) (var-type v)) (eq st (var-store v)) (if m (equal tp m) t)))
 		      (cdr (assoc tag *bt*)))))
-    (when v (throw tag (mapc (lambda (x &aux (v (pop x))(y x)(tp (pop x))(st (car x)))
-			       (setf (car y) (bbump-tp (type-or1 tp (var-type v))) y (cdr y)
-				     (car y) (if (eq st (var-store v)) st +opaque+))) v)))))
+    (when v (throw tag (mapc (lambda (x &aux (v (pop x))(y x)(tp (pop x))(st (pop x))(m (car x))
+					(t1 (type-and (var-dt v) (bbump-tp (type-or1 (or m tp) (var-type v))))))
+			       (setf (car y) t1 y (cdr y)
+				     (car y) (if (eq st (var-store v)) st +opaque+) y (cdr y)
+				     (car y) (mcpt t1))) v)))))
+
+;; (defun tag-throw (tag)
+;;   (let ((v (remove-if (lambda (x &aux (v (pop x))(tp (pop x))(st (car x))) 
+;; 			(and (type>= tp (var-type v)) (eq st (var-store v))))
+;; 		      (cdr (assoc tag *bt*)))))
+;;     (when v (throw tag (mapc (lambda (x &aux (v (pop x))(y x)(tp (pop x))(st (car x)))
+;; 			       (setf (car y) (bbump-tp (type-or1 tp (var-type v))) y (cdr y)
+;; 				     (car y) (if (eq st (var-store v)) st +opaque+))) v)))))
 
 (defun c1go (args &aux (name (car args)) ccb clb inner)
   (cond ((endp args) (too-few-args 'go 1 0))
@@ -1198,74 +1221,110 @@
 (defun wt-switch-case (x)
   (cond (x (wt-nl (if (typep x #tfixnum) "case " "") x ":"))))
 
-(defun c1switch(form  &aux (*tags* *tags*) st ls)
-  (let* ((switch-op  (car form))
-	 (body (cdr form))
-	 (info (make-info :type #tnull))
-	 (switch-op-1 (c1arg switch-op info)))
-    (cond ((and (typep (second switch-op-1 ) 'info)
-		(type>= #tfixnum (setq st (info-type (second switch-op-1)))))
-	   ;;optimize into a C switch:
-	   ;;If we ever get GCC to do switch's with an enum arg,
-	   ;;which don't do bounds checking, then we will
-	   ;;need to carry over the restricted range.
-	   ;;more generally the compiler should carry along the original type
-	   ;;decl, not just the coerced one.  This needs another slot in
-	   ;;info.
-	   (or (member t body) (setq body (append body (list t))))
-	   ;; Remove duplicate tags in C switch statement -- CM 20031112
-	   (setq body
-		 (let (tags new-body)
-		   (dolist (b body)
-		     (cond ((or (symbolp b) (integerp b))
-			    (unless (member b tags)
-			      (push b tags)
-			      (push b new-body)))
-			   (t
-			    (push b new-body))))
-		   (nreverse new-body)))
-	   (setq body
-		 (let* (skip cs new-body dfp rt)
-		   (dolist (b body (nreverse new-body))
-		     (cond ((or (symbolp b) (integerp b))
-			    (unless cs (setq cs t skip t))
-			    (let* ((e (info-type (second (c1arg b))))
-				   (df (type>= #tsymbol e))
-				   (e (if df (cmp-norm-tp `(and integer (not ,rt))) e)))
-			      (cond ((and df dfp) (cmperr "default tag must be last~%"))
-				    ((type-and (info-type (second switch-op-1)) e)
-				     (setq skip nil dfp df rt (type-or1 rt e) 
-					   st (type-and st (cmp-norm-tp `(not ,e))))
-				     (push b new-body))
-				    ((keyed-cmpnote 'branch-elimination
-						    "Eliminating unreachable switch ~s" b)))))
-			   ((not skip) (setq cs nil) (push b new-body))))))
-	   (when (and (not st) 
-		      (not (cdr (setq ls (member-if 'consp body))))
-;		      (= 1 (count-if (lambda (x) (or (consp x) (symbolp x))) body));FIXME
-		      (ignorable-form switch-op-1))
-	     (return-from c1switch (c1expr (car ls))))
-	   (setq body
-		 (mapcar
-		  (lambda (x)
-		      (cond ((or (symbolp x) (integerp x))
-			     (let ((tag (make-tag :name x :ref
-						  nil
-						  :ref-ccb nil
-						  :ref-clb nil)))
-			       (cond((typep x #tfixnum)
-				     (setf (tag-ref tag) t)
-				     (setf (tag-switch tag) x))
-				    ((eq t x)
-				     (setf (tag-ref tag) t)
-				     (setf (tag-switch tag) "default")))
-			       tag))
-			    (t x)))
-		  body))
-	   (let ((d (c1arg `(tagbody ,@body) info)))
-	     (setf (info-type info) (info-type (cadr d)))
-	     (list* 'switch info switch-op-1 (cddr d))))
-	  ((c1expr (cmp-macroexpand-1 (cons 'switch form)))))))
+(defun or-branches (trv)
+  (mapc (lambda (x &aux (v (pop x))) 
+	  (setf (var-store v) (if (eq (var-store v) (cadr x)) (var-store v) +opaque+));FIXME *restore-vars*, centralize
+	  (do-setq-tp v (list 'or-branches nil) (type-or1 (var-type v) (car x))))
+	trv))
+
+(defun c1switch (body)
+  (flet ((tgs-p (x) (or (symbolp x) (integerp x)))) 
+	(let* ((switch-op (pop body))
+	       (info (make-info :type #tnil))
+	       (switch-op-1 (c1arg switch-op info))
+	       (st (info-type (cadr switch-op-1)))
+	       (st (if (type>= #tfixnum st) st (baboon)))
+	       tags
+	       (body (remove-if (lambda (x) (when (tgs-p x) (prog1 (member x tags) (push x tags)))) body))
+	       skip cs dfp rt
+	       (body (remove-if-not (lambda (b)
+				      (cond ((tgs-p b)
+					     (unless cs (setq cs t skip t rt nil))
+					     (let* ((e (object-type b))(df (type>= #tsymbol e))(e (if df st e)))
+					       (cond ((and df dfp) (cmperr "default tag must be last~%"))
+						     ((type-and st e) (setq skip nil dfp (or df dfp) rt (type-or1 rt e)))
+						     ((keyed-cmpnote 'branch-elimination "Eliminating unreachable switch ~s" b)))))
+					    ((not skip) (when cs (setq st (type-and st (cmp-norm-tp `(not ,rt))) cs nil)) t))) body))
+	       (body (mapcar (lambda (x) (if (tgs-p x) (make-tag :name x :ref t :switch (if (typep x #tfixnum) x "default")) x)) body))
+	       trv
+	       (body (mapcar (lambda (x) (if (tag-p x) x (let ((x (c1branch t nil (list nil x) info))) 
+							   (prog1 (pop x) (setq trv (append trv (car x))))))) body))
+	       (ls (member-if 'consp body)))
+	  (or-branches trv)
+	  (when st (baboon))
+	  (mapc (lambda (x) (assert (or (tag-p x) (not (info-type (cadr x)))))) body)
+	  (if (unless (cdr ls) (ignorable-form switch-op-1))
+	      (car ls)
+	    (list 'switch info switch-op-1 body)))))
+
+;; (defun c1switch(form &aux (*tags* *tags*) st ls)
+;;   (let* ((switch-op  (car form))
+;; 	 (body (cdr form))
+;; 	 (info (make-info :type #tnull))
+;; 	 (switch-op-1 (c1arg switch-op info)))
+;;     (cond ((and (typep (second switch-op-1 ) 'info)
+;; 		(type>= #tfixnum (setq st (info-type (second switch-op-1)))))
+;; 	   ;;optimize into a C switch:
+;; 	   ;;If we ever get GCC to do switch's with an enum arg,
+;; 	   ;;which don't do bounds checking, then we will
+;; 	   ;;need to carry over the restricted range.
+;; 	   ;;more generally the compiler should carry along the original type
+;; 	   ;;decl, not just the coerced one.  This needs another slot in
+;; 	   ;;info.
+;; 	   (or (member t body) (setq body (append body (list t))))
+;; 	   ;; Remove duplicate tags in C switch statement -- CM 20031112
+;; 	   (setq body
+;; 		 (let (tags new-body)
+;; 		   (dolist (b body)
+;; 		     (cond ((or (symbolp b) (integerp b))
+;; 			    (unless (member b tags)
+;; 			      (push b tags)
+;; 			      (push b new-body)))
+;; 			   (t
+;; 			    (push b new-body))))
+;; 		   (nreverse new-body)))
+;; 	   (setq body
+;; 		 (let* (skip cs new-body dfp rt)
+;; 		   (dolist (b body (nreverse new-body))
+;; 		     (cond ((or (symbolp b) (integerp b))
+;; 			    (unless cs (setq cs t skip t))
+;; 			    (let* ((e (info-type (second (c1arg b))))
+;; 				   (df (type>= #tsymbol e))
+;; 				   (e (if df (cmp-norm-tp `(and integer (not ,rt))) e)))
+;; 			      (cond ((and df dfp) (cmperr "default tag must be last~%"))
+;; 				    ((type-and (info-type (second switch-op-1)) e)
+;; 				     (setq skip nil dfp df rt (type-or1 rt e) 
+;; 					   st (type-and st (cmp-norm-tp `(not ,e))))
+;; 				     (push b new-body))
+;; 				    ((keyed-cmpnote 'branch-elimination
+;; 						    "Eliminating unreachable switch ~s" b)))))
+;; 			   ((not skip) (setq cs nil) (push b new-body))))))
+;; 	   (when (and (not st) 
+;; 		      (not (cdr (setq ls (member-if 'consp body))))
+;; ;		      (= 1 (count-if (lambda (x) (or (consp x) (symbolp x))) body));FIXME
+;; 		      (ignorable-form switch-op-1))
+;; 	     (return-from c1switch (c1expr (car ls))))
+;; 	   (setq body
+;; 		 (mapcar
+;; 		  (lambda (x)
+;; 		      (cond ((or (symbolp x) (integerp x))
+;; 			     (let ((tag (make-tag :name x :ref
+;; 						  nil
+;; 						  :ref-ccb nil
+;; 						  :ref-clb nil)))
+;; 			       (cond((typep x #tfixnum)
+;; 				     (setf (tag-ref tag) t)
+;; 				     (setf (tag-switch tag) x))
+;; 				    ((eq t x)
+;; 				     (setf (tag-ref tag) t)
+;; 				     (setf (tag-switch tag) "default")))
+;; 			       tag))
+;; 			    (t x)))
+;; 		  body))
+;; 	   (let ((d (c1arg `(tagbody ,@body) info)))
+;; 	     (setf (info-type info) (info-type (cadr d)))
+;; 	     (list* 'switch info switch-op-1 (cddr d))))
+;; 	  ((c1expr (cmp-macroexpand-1 (cons 'switch form)))))))
 
 ;; (defun c1switch(form  &aux (*tags* *tags*) st ls)
 ;;   (let* ((switch-op  (car form))
@@ -1406,16 +1465,25 @@
 ;; 	     ))
 ;; 	  (t (c1expr (cmp-macroexpand-1 (cons 'switch form)))))))
 
-(defun c2switch (op ref-clb ref-ccb body &aux  (*inline-blocks* 0)(*vs* *vs*))
-  (let ((args (inline-args (list op ) `(,#tfixnum ))))
+(defun c2switch (op body &aux (*inline-blocks* 0)(*vs* *vs*))
+  (let ((args (inline-args (list op) `(,#tfixnum))))
     (wt-nl "")
     (wt-inline-loc "switch(#0){" args)
-    (cond (ref-ccb (c2tagbody-ccb body))
-	  (ref-clb (c2tagbody-clb body))
-	  (t (c2tagbody-local body)))
+    (c2tagbody-local body)
     (wt "}")
     (unwind-exit nil)
     (close-inline-blocks)))
+
+;; (defun c2switch (op ref-clb ref-ccb body &aux (*inline-blocks* 0)(*vs* *vs*))
+;;   (let ((args (inline-args (list op) `(,#tfixnum))))
+;;     (wt-nl "")
+;;     (wt-inline-loc "switch(#0){" args)
+;;     (cond (ref-ccb (c2tagbody-ccb body))
+;; 	  (ref-clb (c2tagbody-clb body))
+;; 	  (t (c2tagbody-local body)))
+;;     (wt "}")
+;;     (unwind-exit nil)
+;;     (close-inline-blocks)))
 	
 
 
@@ -1465,7 +1533,7 @@
   (dolist  (v body)
     (cond ((integerp v) (push `(if (eql ,v ,test) (go ,v) nil) cases))))
   `(tagbody
-     ,@  (nreverse cases)
+     ,@(nreverse cases)
      (go t)
      ,@ body
      ,@ (if (member t body) nil '(t))
