@@ -426,7 +426,7 @@
     ;;   (check-type f (not (integer 0 0)))
     ;;   (check-type m (integer 0 0))
     ;;   (the function (nani f))))))
-(declaim (inline tofn))
+(putprop 'tofn t 'compiler::cmp-inline)
 
 (deftype fn nil `(satisfies fnp))
 (defun fnp (x)
@@ -436,7 +436,7 @@
    ((and symbol (not boolean))
     (and (= 0 (c::symbol-mflag x))
 	 (/= 0 (address (c::symbol-gfdef x)))))))
-(declaim (inline fnp))
+(putprop 'fnp t 'compiler::cmp-inline)
 
 (defun reduce (f s &key key from-end (start 0) end (initial-value nil ivp) 
 		 &aux (key (if key (tofn key) #'identity))(f (tofn f))
