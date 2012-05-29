@@ -163,12 +163,12 @@
 	   (car arg)))
    t))
 
-(si::putprop 'si::define-structure 'c1define-structure 't1)
+;; (si::putprop 'si::define-structure 'c1define-structure 't1)
 
-(defun c1define-structure (arg)
-  (eval (cons 'si::define-structure arg))
-  (add-object2 (cons '|#,| (cons 'si::define-structure arg)))
-  nil)
+;; (defun c1define-structure (arg)
+;;   (eval (cons 'si::define-structure arg))
+;;   (add-object2 (cons '|#,| (cons 'si::define-structure arg)))
+;;   nil)
 
 (defun flags-pos (flag &aux (i 0))
   (declare (fixnum i))
