@@ -97,11 +97,28 @@
 				    (var-name v) (var-type v) tp)
 		     (setf (var-type v) tp (var-store v) st)) (ldiff *restore-vars* ,rv))))
 	   (prog1
-	       (let (*restore-vars* (*restore-vars-env* *vars*))
-		 (unwind-protect 
-		     (progn ,@body)
-		   (pop-restore-vars)))
+	       (let (*restore-vars* (*restore-vars-env* (union *vars* *restore-vars-env*)))
+		 (unwind-protect (progn ,@body) (pop-restore-vars)))
 	     (mapc (lambda (l) (when (member (car l) *restore-vars-env*) (pushnew l *restore-vars* :key 'car))) ,rv)))))
+
+;; (defmacro with-restore-vars (&rest body &aux (rv (sgen "WRV-"))(wns (sgen "WRVW-")))
+;;   `(let (,rv (,wns *warning-note-stack*))
+;;      (declare (ignorable ,rv))
+;;      (flet ((keep-vars nil (setq ,rv *restore-vars* ,wns *warning-note-stack*))
+;; 	    (pop-restore-vars 
+;; 	     nil
+;; 	     (setq *warning-note-stack* ,wns)
+;; 	     (mapc (lambda (l &aux (v (pop l))(tp (pop l))(st (car l))) 
+;; 		     (keyed-cmpnote (list (var-name v) 'type-propagation 'type)
+;; 				    "Restoring var type on ~s from ~s to ~s"
+;; 				    (var-name v) (var-type v) tp)
+;; 		     (setf (var-type v) tp (var-store v) st)) (ldiff *restore-vars* ,rv))))
+;; 	   (prog1
+;; 	       (let (*restore-vars* (*restore-vars-env* *vars*))
+;; 		 (unwind-protect 
+;; 		     (progn ,@body)
+;; 		   (pop-restore-vars)))
+;; 	     (mapc (lambda (l) (when (member (car l) *restore-vars-env*) (pushnew l *restore-vars* :key 'car))) ,rv)))))
 
 ;; (defmacro with-restore-vars (&rest body &aux (rv (sgen "WRV-")))
 ;;   `(let (,rv)
