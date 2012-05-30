@@ -123,21 +123,50 @@
 (defun coerce (object type &aux ntype (atp (listp type)) (ctp (if atp (car type) type)) (tp (when atp (cdr type))))
   (declare (optimize (safety 2)))
   (check-type type type-spec)
-  (when (typep object type)
-    (return-from coerce object))
   (case ctp
-	(function (if (symbolp object) (symbol-function object) (values (eval `(function ,object)))));FIXME
-	((list cons vector array member) (replace (make-sequence type (length object)) object))
+	(function
+	 (let ((object object))
+	   (check-type object (or function (and symbol (not boolean)) (cons (member lambda) t)))
+	   (typecase
+	    object
+	    (function object) 
+	    ((and symbol (not boolean)) 
+	     (let* ((f (c::symbol-gfdef object))(fi (address f))(m (c::symbol-mflag object)))
+	       (check-type fi (and fixnum (not (integer 0 0))))
+	       (check-type m  (integer 0 0))
+	       f))
+	    (cons (the function (eval object))))))
+	((list cons vector array member) (if (typep object type) object (replace (make-sequence type (length object)) object)))
 	(character (character object))
 	(short-float (float object 0.0S0))
 	(long-float (float object 0.0L0))
 	(float (float object))
-	(complex
+	(complex (if (typep object type) object
 	 (let ((rtp (or (car tp) t)))
-	   (complex (coerce (realpart object) rtp) (coerce (imagpart object) rtp))))
+	   (complex (coerce (realpart object) rtp) (coerce (imagpart object) rtp)))))
 	(otherwise 
-	 (cond ((setq ntype (expand-deftype type)) (coerce object ntype))
+	 (cond ((typep object type) object)
+	       ((setq ntype (expand-deftype type)) (coerce object ntype))
 	       ((check-type-eval object type))))))
+
+;; (defun coerce (object type &aux ntype (atp (listp type)) (ctp (if atp (car type) type)) (tp (when atp (cdr type))))
+;;   (declare (optimize (safety 2)))
+;;   (check-type type type-spec)
+;;   (when (typep object type)
+;;     (return-from coerce object))
+;;   (case ctp
+;; 	(function (if (symbolp object) (symbol-function object) (values (eval `(function ,object)))));FIXME
+;; 	((list cons vector array member) (replace (make-sequence type (length object)) object))
+;; 	(character (character object))
+;; 	(short-float (float object 0.0S0))
+;; 	(long-float (float object 0.0L0))
+;; 	(float (float object))
+;; 	(complex
+;; 	 (let ((rtp (or (car tp) t)))
+;; 	   (complex (coerce (realpart object) rtp) (coerce (imagpart object) rtp))))
+;; 	(otherwise 
+;; 	 (cond ((setq ntype (expand-deftype type)) (coerce object ntype))
+;; 	       ((check-type-eval object type))))))
 
 ;; (defun coerce (object type &aux ntype (atp (listp type)) (ctp (if atp (car type) type)) (tp (when atp (cdr type))))
 ;;   (declare (optimize (safety 2)))

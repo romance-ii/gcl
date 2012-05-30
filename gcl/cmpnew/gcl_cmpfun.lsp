@@ -396,6 +396,7 @@
 
 (setf (get 'cons 'c1no-side-effects) t)
 (setf (get 'make-list 'c1no-side-effects) t)
+(setf (get 'si::make-vector 'c1no-side-effects) t)
 
 
 ;;bound type comparisons

@@ -225,10 +225,11 @@
 	     (when x (setf (cdr x) (fmla-if1 nil (cdr x) (fmla-infer-tp (seventh fmla)))))))
 	  (switch
 	   (mapc 'fmla-infer-tp (fourth fmla)) nil);FIXME
-	  (infer-tp (let ((tp (info-type (cadr (fifth fmla))))
-			  (v (car (third (third fmla)))))
-		      (cond ((type>= #tnull tp) (list (list* v nil (fourth fmla))))
-			    ((type>= #t(not null) tp) (list (list* v (fourth fmla) nil))))))
+	  (infer-tp (let* ((tp (info-type (cadr (fifth fmla))))
+			   (v (car (third (third fmla))))
+			   (i (cond ((type>= #tnull tp) (list (list* v nil (fourth fmla))))
+				    ((type>= #t(not null) tp) (list (list* v (fourth fmla) nil))))))
+		      (append i (fmla-infer-tp (fifth fmla)))))
 	  (if (apply 'fmla-if (cddr fmla)))
 	  (var (when (vlp fmla) (list (cons (car (third fmla)) (cons #t(not null) #tnull)))))
 	  (setq (fmla-infer-tp (fourth fmla)));FIXME set var too, and in call global
@@ -256,6 +257,61 @@
 	   (cond ((consp (car fmla)) (fmla-infer-tp (car fmla)))
 		 ((type>= #tnull (info-type (cadr fmla))) *gen-nil*)
 		 ((type>= #t(not null) (info-type (cadr fmla))) *gen-t*))))))
+
+;; (defun fmla-infer-tp (fmla)
+;;   (when (unless *compiler-new-safety* (listp fmla))
+;;     (case (car fmla)
+;; 	  (inline (fmla-infer-tp (fifth fmla)))
+;; 	  ((let let*) (remove-if (lambda (x) (member (car x) (third fmla))) (fmla-infer-tp (fifth fmla))))
+;; 	  (tagbody (mapc 'fmla-infer-tp (fifth fmla)) nil);FIXME need catch/throw here, and make this an ecase 
+;; 	  (block 
+;; 	   (let* ((tp (info-type (cadr (fourth fmla))))
+;; 		  (gen (list (cons +gen+ (cons (when (type-and #t(not null) tp) t) (when (type-and #tnull tp) t)))))
+;; 		  (*infer-tags* (cons (cons (third fmla) gen) *infer-tags*)))
+;; 	     (fmla-infer-tp (fourth fmla))
+;; 	     (labels ((fmla-walk (f) (cond ((atom f));FIXME now that this is in, maybe remove mapc in tagbody and switch
+;; 					   ((eq (car f) 'return-from) (fmla-infer-tp f))
+;; 					   (t (fmla-walk (car f)) (fmla-walk (cdr f))))))
+;; 		     (fmla-walk (fourth fmla)))
+;; 	     (cdar *infer-tags*)))
+;; 	  (progn (fmla-infer-tp (car (last (third fmla)))))
+;; 	  (decl-body (fmla-infer-tp (fourth fmla)))
+;; 	  (return-from 
+;; 	   (let ((x (assoc (third fmla) *infer-tags*)))
+;; 	     (when x (setf (cdr x) (fmla-if1 nil (cdr x) (fmla-infer-tp (seventh fmla)))))))
+;; 	  (switch
+;; 	   (mapc 'fmla-infer-tp (fourth fmla)) nil);FIXME
+;; 	  (infer-tp (let ((tp (info-type (cadr (fifth fmla))))
+;; 			  (v (car (third (third fmla)))))
+;; 		      (cond ((type>= #tnull tp) (list (list* v nil (fourth fmla))))
+;; 			    ((type>= #t(not null) tp) (list (list* v (fourth fmla) nil))))))
+;; 	  (if (apply 'fmla-if (cddr fmla)))
+;; 	  (var (when (vlp fmla) (list (cons (car (third fmla)) (cons #t(not null) #tnull)))))
+;; 	  (setq (fmla-infer-tp (fourth fmla)));FIXME set var too, and in call global
+;; 	  (call-global
+;; 	   (let* ((fn (third fmla)) (rfn (cdr (assoc fn +bool-inf-op-list+)))
+;; 		  (sfn (cdr (assoc fn +bool-inf-sop-list+)))
+;; 		  (srfn (cdr (assoc sfn +bool-inf-op-list+)))
+;; 		  (args (if (eq (car fmla) 'inline) (fourth (fifth fmla)) (fourth fmla)))
+;; 		  (l (length args))
+;; 		  (pt (get fn 'si::predicate-type)));FIXME +cmp-type-alist+
+;; 	     (cond ((and (= l 1) (vlp (first args)) pt) 
+;; 		    (list (cons (car (third (first args))) (cons (cmp-norm-tp pt) (cmp-norm-tp `(not ,pt))))))
+;; 		   ((and (= l 2) (eq fn 'typep) (vlp (first args))
+;; 			 (let ((tp (cmp-norm-tp (get-object-value (second args)))))
+;; 			   (when tp (list (cons (car (third (first args))) (cons tp (cmp-norm-tp `(not ,tp)))))))))
+;; 		   ((and (= l 2) rfn)
+;; 		    (nconc
+;; 		     (when (vlp (first args))
+;; 		       (list (cons (car (third (first args)))
+;; 				   (tppra (vl-type (first args)) (second args) fn rfn))))
+;; 		     (when (vlp (second args))
+;; 		       (list (cons (car (third (second args)))
+;; 				   (tppra (vl-type (second args)) (first args) sfn srfn)))))))))
+;; 	  (otherwise
+;; 	   (cond ((consp (car fmla)) (fmla-infer-tp (car fmla)))
+;; 		 ((type>= #tnull (info-type (cadr fmla))) *gen-nil*)
+;; 		 ((type>= #t(not null) (info-type (cadr fmla))) *gen-t*))))))
 
 ;; (defun fmla-infer-tp (fmla)
 ;;   (when (unless *compiler-new-safety* (listp fmla))

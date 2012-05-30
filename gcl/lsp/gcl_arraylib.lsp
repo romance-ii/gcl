@@ -219,8 +219,16 @@
   (check-type x array)
   (check-type i rnkind)
   (let ((r (c-array-rank x)));FIXME
-    (let ((*dim* r)(i i))(check-type i (satisfies array-dimension-index-less-than-rank)))
+    (unless (< i r) (let ((*dim* r)(i i))(check-type i (satisfies array-dimension-index-less-than-rank))))
     (if (= 1 r) (c-array-dim x) (the seqind (*fixnum (c-array-dims x) i nil nil)))))
+
+;; (defun array-dimension (x i)
+;;   (declare (optimize (safety 2)))
+;;   (check-type x array)
+;;   (check-type i rnkind)
+;;   (let ((r (c-array-rank x)));FIXME
+;;     (let ((*dim* r)(i i))(check-type i (satisfies array-dimension-index-less-than-rank)))
+;;     (if (= 1 r) (c-array-dim x) (the seqind (*fixnum (c-array-dims x) i nil nil)))))
 
 ;; (defun array-dimension (x i)
 ;;   (declare (optimize (safety 1)))

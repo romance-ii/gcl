@@ -957,9 +957,12 @@
   (setq name1 (c1vref name))
   (when (member (var-kind (car name1)) '(special global));FIXME
     (setf (info-flags info) (logior (iflags side-effects) (info-flags info))))
-  (push-changed (car name1) info)
+;  (push-changed (car name1) info)
   (add-vref name1 info t)
   (setq form1 (c1arg form info))
+
+  (unless (and (eq (car form1) 'var) (eq (car name1) (caaddr form1)))
+    (push-changed (car name1) info))
 
   (when (eq (car form1) 'var)
     (unless (eq (caaddr form1) (car name1))
