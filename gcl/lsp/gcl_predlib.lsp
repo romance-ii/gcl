@@ -292,6 +292,9 @@
 
 ;;; Some DEFTYPE definitions.
 
+(deftype function-designator nil `(or (and symbol (not boolean)) function))
+(deftype extended-function-designator nil `(or function-designator (cons (member setf) (cons t null))))
+
 (deftype hash-table nil `(or hash-table-eq hash-table-eql hash-table-equal hash-table-equalp))
 (deftype compiler::funcallable-symbol nil `(satisfies compiler::funcallable-symbol-p));FIXME
 
