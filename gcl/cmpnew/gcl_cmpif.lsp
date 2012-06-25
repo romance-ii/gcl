@@ -48,18 +48,26 @@
 (defconstant +gen+ (make-var :name (gensym)))
 ;(defconstant +gen+ (gensym))
 
-(defun tp-reduce (f1 f2 l1 l2 &optional r)
-  (labels ((m (l1 l2) (cdr (or (assoc (caar l1) l2) (assoc +gen+ l2) 
-			       (when (eq (caar l1) +gen+) (car l1)) '(nil t . t))))
-	   (c (l1 l2 &aux (c (car l1))(d (cdr c))(m (m l1 l2)))
-	      (cons (car c) 
-		    (cons 
-		     (funcall f1 (car m) (car d))
-		     (funcall f2 (cdr m) (cdr d))))))
-	(cond (l1 (tp-reduce f1 f2 (cdr l1) l2 (cons (c l1 l2) r)))
-	      ((assoc (caar l2) r) (tp-reduce f1 f2 l1 (cdr l2) r))
-	      (l2 (tp-reduce f1 f2 l1 (cdr l2) (cons (c l2 r) r)))
-	      (r))))
+(defun tp-reduce (f1 f2 l1 l2)
+  (labels ((c1 (c l2 &aux (d (cdr c))(m (cdr (or (assoc (car c) l2) (assoc +gen+ l2) '(nil t . t)))))
+	       (cons (car c) (cons (funcall f1 (car m) (car d)) (funcall f2 (cdr m) (cdr d))))))
+	  (remove-duplicates
+	   (append
+	    (mapcar (lambda (x) (c1 x l2)) l1)
+	    (mapcar (lambda (x) (c1 x l1)) l2)) :key 'car)))
+
+;; (defun tp-reduce (f1 f2 l1 l2 &optional r)
+;;   (labels ((m (l1 l2) (cdr (or (assoc (caar l1) l2) (assoc +gen+ l2) 
+;; 			       (when (eq (caar l1) +gen+) (car l1)) '(nil t . t))))
+;; 	   (c (l1 l2 &aux (c (car l1))(d (cdr c))(m (m l1 l2)))
+;; 	      (cons (car c) 
+;; 		    (cons 
+;; 		     (funcall f1 (car m) (car d))
+;; 		     (funcall f2 (cdr m) (cdr d))))))
+;; 	(cond (l1 (tp-reduce f1 f2 (cdr l1) l2 (cons (c l1 l2) r)))
+;; 	      ((assoc (caar l2) r) (tp-reduce f1 f2 l1 (cdr l2) r))
+;; 	      (l2 (tp-reduce f1 f2 l1 (cdr l2) (cons (c l2 r) r)))
+;; 	      (r))))
 
 (defconstant +bool-inf-op-list+ '((> . <=) (>= . <) (< . >=) (<= . >) (= . /=) (/= . =)))
 (defconstant +bool-inf-sop-list+ '((> . <) (< . >) (<= . >=) (>= . <=) (= . =) (/= . /=)))
@@ -99,7 +107,8 @@
 (defmacro vl-name (x) `(var-name (car (third ,x))))
 (defmacro vl-type (x) `(var-type (car (third ,x))))
 (defmacro itp (x) `(info-type (second ,x)))
-(defmacro vlp (x) `(and (eq 'var (car ,x)) (eq (var-kind (car (third ,x))) 'lexical)))
+(defmacro vlp (x) `(and (eq 'var (car ,x)) (member (car (third ,x)) *vars*)))
+;(defmacro vlp (x) `(and (eq 'var (car ,x)) (eq (var-kind (car (third ,x))) 'lexical)))
 
 (defun get-object-value (c1x)
   (when (and (eq 'location (car c1x)) (eq 'vv (caaddr c1x)))
@@ -108,48 +117,65 @@
 ;;   (when (and (eq 'location (car c1x)) (eq 'vv (caaddr c1x)))
 ;;     (values (gethash (cadr (caddr c1x)) *objects-rev*))))
 
-(defvar *gen-nil* (list (cons +gen+ (cons nil t))))
-(defvar *gen-t*   (list (cons +gen+ (cons t nil))))
-(defvar *inferred-tps* nil)
-(defvar *inferred-op* nil)
-(defvar *inferred-iop* nil)
+;; (defvar *gen-nil* (list (cons +gen+ (cons nil t))))
+;; (defvar *gen-t*   (list (cons +gen+ (cons t nil))))
+;; (defvar *inferred-tps* nil)
+;; (defvar *inferred-op* nil)
+;; (defvar *inferred-iop* nil)
 
-(defun fmla-chain (op iop fx fy &optional res)
-  (let* ((*inferred-tps* res)
-	 (*inferred-op* op)
-	 (*inferred-iop* iop)
-	 (r (tp-reduce op iop fx fy))
-	 (r (if *inferred-tps* (tp-reduce op iop r *inferred-tps*) r)))
-    (cond ((and (not (cdr fx)) (not (cdr fy))) r)
-	  ((equal r res) r)
-	  ((fmla-chain op iop fx fy r)))))
+;; (defun fmla-chain (op iop fx fy &optional res)
+;;   (let* ((*inferred-tps* res)
+;; 	 (*inferred-op* op)
+;; 	 (*inferred-iop* iop)
+;; 	 (r (tp-reduce op iop fx fy))
+;; 	 (r (if *inferred-tps* (tp-reduce op iop r *inferred-tps*) r)))
+;;     (cond ((and (not (cdr fx)) (not (cdr fy))) r)
+;; 	  ((equal r res) r)
+;; 	  ((fmla-chain op iop fx fy r)))))
 
-(defun intp (sym tp tf)
-  (let* ((a (if tf 'cadr 'cddr))
-	 (itp (funcall a (assoc sym *inferred-tps*))))
-    (if itp (funcall (if tf *inferred-op* *inferred-iop*) tp itp)
-      tp)))
+;; (defun intp (sym tp tf)
+;;   (let* ((a (if tf 'cadr 'cddr))
+;; 	 (itp (funcall a (assoc sym *inferred-tps*))))
+;;     (if itp (funcall (if tf *inferred-op* *inferred-iop*) tp itp)
+;;       tp)))
 
 (defun tppra (tp arg f r)
-  (let* ((x (info-type (cadr arg)))
-	 (s (cmp-norm-tp x))
-	 (sym (when (vlp arg) (vl-name arg))))
-    (cons (type-and tp (two-tp-inf f (intp sym s t)))
-	  (type-and tp (two-tp-inf r (intp sym s nil))))))
+  (let ((s (cmp-norm-tp (info-type (cadr arg)))))
+    (cons (type-and tp (two-tp-inf f s)) (type-and tp (two-tp-inf r s)))))
+
+;; (defun tppra (tp arg f r)
+;;   (let* ((x (info-type (cadr arg)))
+;; 	 (s (cmp-norm-tp x))
+;; 	 (sym (when (vlp arg) (vl-name arg))))
+;;     (cons (type-and tp (two-tp-inf f (intp sym s t)))
+;; 	  (type-and tp (two-tp-inf r (intp sym s nil))))))
 
 (defun fmla-if1 (f tf ff)
   (let* ((nf (mapcar (lambda (x) (cons (car x) (cons (cddr x) (cadr x)))) f))    
-	 (r1 (fmla-chain 'type-and 'type-or1 f  tf));FIXME rewrite to carry only desired branch
-	 (r2 (fmla-chain 'type-and 'type-or1 nf ff))
-	 (tr (fmla-chain 'type-or1 'type-and r1 r2))
-	 (r1 (fmla-chain 'type-or1 'type-and nf tf))
-	 (r2 (fmla-chain 'type-or1 'type-and f  ff))
-	 (fr (fmla-chain 'type-and 'type-or1 r1 r2))
-	 (tr (mapc (lambda (x) (setf (cddr x) (cddr (assoc (car x) fr)))) tr)));FIXME? check here?
-    (delete +gen+ tr :key 'car)))
+	 (r1 (tp-reduce 'type-and 'type-or1 f  tf));FIXME rewrite to carry only desired branch
+	 (r2 (tp-reduce 'type-and 'type-or1 nf ff))
+	 (tr (tp-reduce 'type-or1 'type-and r1 r2))
+	 (r1 (tp-reduce 'type-or1 'type-and nf tf))
+	 (r2 (tp-reduce 'type-or1 'type-and f  ff))
+	 (fr (tp-reduce 'type-and 'type-or1 r1 r2)))
+    (mapc (lambda (x) (setf (cddr x) (cddr (assoc (car x) fr)))) tr)))
+
+;; (defun fmla-if1 (f tf ff)
+;;   (let* ((nf (mapcar (lambda (x) (cons (car x) (cons (cddr x) (cadr x)))) f))    
+;; 	 (r1 (fmla-chain 'type-and 'type-or1 f  tf));FIXME rewrite to carry only desired branch
+;; 	 (r2 (fmla-chain 'type-and 'type-or1 nf ff))
+;; 	 (tr (fmla-chain 'type-or1 'type-and r1 r2))
+;; 	 (r1 (fmla-chain 'type-or1 'type-and nf tf))
+;; 	 (r2 (fmla-chain 'type-or1 'type-and f  ff))
+;; 	 (fr (fmla-chain 'type-and 'type-or1 r1 r2))
+;; 	 (tr (mapc (lambda (x) (setf (cddr x) (cddr (assoc (car x) fr)))) tr)));FIXME? check here?
+;;     (delete +gen+ tr :key 'car)))
 
 (defun fmla-if (f tf ff)
-  (fmla-if1 (fmla-infer-tp f) (fmla-infer-tp tf) (fmla-infer-tp ff)))
+  (fmla-clean (fmla-if1 (fmla-infer-tp f) (fmla-infer-tp tf) (fmla-infer-tp ff))))
+
+;; (defun fmla-if (f tf ff)
+;;   (fmla-if1 (fmla-infer-tp f) (fmla-infer-tp tf) (fmla-infer-tp ff)))
 
 ;; (defun fmla-if (f tf ff)
 ;;   (let* ((f (fmla-infer-tp f))
@@ -202,36 +228,36 @@
 	
 (defvar *infer-tags* nil)
 
+(defun fmla-default (fmla &aux (tp (info-type (cadr fmla)))(nn (type-and tp #t(not null)))(n (type-and tp #tnull)))
+  (unless (and nn n)
+    (list (cons +gen+ (cons (when nn t) (when n t))))))
+
+(defun fmla-clean (fmla)
+  (delete +gen+ fmla :key 'car))
+
 (defun fmla-infer-tp (fmla)
   (when (unless *compiler-new-safety* (listp fmla))
     (case (car fmla)
-	  (inline (fmla-infer-tp (fifth fmla)))
-	  ((let let*) (remove-if (lambda (x) (member (car x) (third fmla))) (fmla-infer-tp (fifth fmla))))
-	  (tagbody (mapc 'fmla-infer-tp (fifth fmla)) nil);FIXME need catch/throw here, and make this an ecase 
+	  ((inline decl-body let let*) (fmla-infer-tp (car (last fmla))))
 	  (block 
-	   (let* ((tp (info-type (cadr (fourth fmla))))
-		  (gen (list (cons +gen+ (cons (when (type-and #t(not null) tp) t) (when (type-and #tnull tp) t)))))
-		  (*infer-tags* (cons (cons (third fmla) gen) *infer-tags*)))
-	     (fmla-infer-tp (fourth fmla))
-	     (labels ((fmla-walk (f) (cond ((atom f));FIXME now that this is in, maybe remove mapc in tagbody and switch
+	   (let ((*infer-tags* (cons (cons (third fmla) (fmla-infer-tp (fourth fmla))) *infer-tags*)))
+	     (labels ((fmla-walk (f) (cond ((atom f))
 					   ((eq (car f) 'return-from) (fmla-infer-tp f))
 					   (t (fmla-walk (car f)) (fmla-walk (cdr f))))))
 		     (fmla-walk (fourth fmla)))
-	     (cdar *infer-tags*)))
+	     (fmla-clean (cdar *infer-tags*))))
 	  (progn (fmla-infer-tp (car (last (third fmla)))))
-	  (decl-body (fmla-infer-tp (fourth fmla)))
 	  (return-from 
 	   (let ((x (assoc (third fmla) *infer-tags*)))
-	     (when x (setf (cdr x) (fmla-if1 nil (cdr x) (fmla-infer-tp (seventh fmla)))))))
-	  (switch
-	   (mapc 'fmla-infer-tp (fourth fmla)) nil);FIXME
+	     (when x (let ((y (fmla-infer-tp (seventh fmla)))) (setf (cdr x) (fmla-if1 nil (cdr x) y))))))
 	  (infer-tp (let* ((tp (info-type (cadr (fifth fmla))))
 			   (v (car (third (third fmla))))
-			   (i (cond ((type>= #tnull tp) (list (list* v nil (fourth fmla))))
-				    ((type>= #t(not null) tp) (list (list* v (fourth fmla) nil))))))
+			   (i (when (member v *vars*)
+				(cond ((type>= #tnull tp) (list (list* v nil (fourth fmla))))
+				    ((type>= #t(not null) tp) (list (list* v (fourth fmla) nil)))))))
 		      (append i (fmla-infer-tp (fifth fmla)))))
 	  (if (apply 'fmla-if (cddr fmla)))
-	  (var (when (vlp fmla) (list (cons (car (third fmla)) (cons #t(not null) #tnull)))))
+	  (var (when (member (car (third fmla)) *vars*) (list (cons (car (third fmla)) (cons #t(not null) #tnull)))))
 	  (setq (fmla-infer-tp (fourth fmla)));FIXME set var too, and in call global
 	  (call-global
 	   (let* ((fn (third fmla)) (rfn (cdr (assoc fn +bool-inf-op-list+)))
@@ -252,11 +278,65 @@
 				   (tppra (vl-type (first args)) (second args) fn rfn))))
 		     (when (vlp (second args))
 		       (list (cons (car (third (second args)))
-				   (tppra (vl-type (second args)) (first args) sfn srfn)))))))))
-	  (otherwise
-	   (cond ((consp (car fmla)) (fmla-infer-tp (car fmla)))
-		 ((type>= #tnull (info-type (cadr fmla))) *gen-nil*)
-		 ((type>= #t(not null) (info-type (cadr fmla))) *gen-t*))))))
+				   (tppra (vl-type (second args)) (first args) sfn srfn))))))
+		   ((fmla-default fmla)))))
+	  (otherwise (fmla-default fmla)))))
+
+;; (defun fmla-infer-tp (fmla)
+;;   (when (unless *compiler-new-safety* (listp fmla))
+;;     (case (car fmla)
+;; 	  (inline (fmla-infer-tp (fifth fmla)))
+;; 	  ((let let*) (remove-if (lambda (x) (member (car x) (third fmla))) (fmla-infer-tp (fifth fmla))))
+;; 	  (tagbody (mapc 'fmla-infer-tp (fifth fmla)) nil);FIXME need catch/throw here, and make this an ecase 
+;; 	  (block 
+;; 	   (let* ((tp (info-type (cadr (fourth fmla))))
+;; 		  (gen (list (cons +gen+ (cons (when (type-and #t(not null) tp) t) (when (type-and #tnull tp) t)))))
+;; 		  (*infer-tags* (cons (cons (third fmla) gen) *infer-tags*)))
+;; 	     (fmla-infer-tp (fourth fmla))
+;; 	     (labels ((fmla-walk (f) (cond ((atom f));FIXME now that this is in, maybe remove mapc in tagbody and switch
+;; 					   ((eq (car f) 'return-from) (fmla-infer-tp f))
+;; 					   (t (fmla-walk (car f)) (fmla-walk (cdr f))))))
+;; 		     (fmla-walk (fourth fmla)))
+;; 	     (cdar *infer-tags*)))
+;; 	  (progn (fmla-infer-tp (car (last (third fmla)))))
+;; 	  (decl-body (fmla-infer-tp (fourth fmla)))
+;; 	  (return-from 
+;; 	   (let ((x (assoc (third fmla) *infer-tags*)))
+;; 	     (when x (setf (cdr x) (fmla-if1 nil (cdr x) (fmla-infer-tp (seventh fmla)))))))
+;; 	  (switch
+;; 	   (mapc 'fmla-infer-tp (fourth fmla)) nil);FIXME
+;; 	  (infer-tp (let* ((tp (info-type (cadr (fifth fmla))))
+;; 			   (v (car (third (third fmla))))
+;; 			   (i (cond ((type>= #tnull tp) (list (list* v nil (fourth fmla))))
+;; 				    ((type>= #t(not null) tp) (list (list* v (fourth fmla) nil))))))
+;; 		      (append i (fmla-infer-tp (fifth fmla)))))
+;; 	  (if (apply 'fmla-if (cddr fmla)))
+;; 	  (var (when (vlp fmla) (list (cons (car (third fmla)) (cons #t(not null) #tnull)))))
+;; 	  (setq (fmla-infer-tp (fourth fmla)));FIXME set var too, and in call global
+;; 	  (call-global
+;; 	   (let* ((fn (third fmla)) (rfn (cdr (assoc fn +bool-inf-op-list+)))
+;; 		  (sfn (cdr (assoc fn +bool-inf-sop-list+)))
+;; 		  (srfn (cdr (assoc sfn +bool-inf-op-list+)))
+;; 		  (args (if (eq (car fmla) 'inline) (fourth (fifth fmla)) (fourth fmla)))
+;; 		  (l (length args))
+;; 		  (pt (get fn 'si::predicate-type)));FIXME +cmp-type-alist+
+;; 	     (cond ((and (= l 1) (vlp (first args)) pt) 
+;; 		    (list (cons (car (third (first args))) (cons (cmp-norm-tp pt) (cmp-norm-tp `(not ,pt))))))
+;; 		   ((and (= l 2) (eq fn 'typep) (vlp (first args))
+;; 			 (let ((tp (cmp-norm-tp (get-object-value (second args)))))
+;; 			   (when tp (list (cons (car (third (first args))) (cons tp (cmp-norm-tp `(not ,tp)))))))))
+;; 		   ((and (= l 2) rfn)
+;; 		    (nconc
+;; 		     (when (vlp (first args))
+;; 		       (list (cons (car (third (first args)))
+;; 				   (tppra (vl-type (first args)) (second args) fn rfn))))
+;; 		     (when (vlp (second args))
+;; 		       (list (cons (car (third (second args)))
+;; 				   (tppra (vl-type (second args)) (first args) sfn srfn)))))))))
+;; 	  (otherwise
+;; 	   (cond ((consp (car fmla)) (fmla-infer-tp (car fmla)))
+;; 		 ((type>= #tnull (info-type (cadr fmla))) *gen-nil*)
+;; 		 ((type>= #t(not null) (info-type (cadr fmla))) *gen-t*))))))
 
 ;; (defun fmla-infer-tp (fmla)
 ;;   (when (unless *compiler-new-safety* (listp fmla))
@@ -632,7 +712,7 @@
         (otherwise
          (setq info (make-info))
 	 (let* ((fmla (c1fmla f info))
-		(inf (delete +gen+ (fmla-infer-tp fmla) :key 'car))
+		(inf (fmla-clean (fmla-infer-tp fmla)))
 		(inf (remove-if (lambda (x) (fmla-is-changed (car x) fmla)) inf))
 		(fmlae (fmla-eval-const fmla))
 		(fmlae (if (notevery 'cadr inf) nil fmlae))
@@ -679,6 +759,71 @@
 
 		 (dolist (l r)
 		   (setf (var-type (car l)) (cadr l))))))))))
+
+;; (defun c1if (args &aux info f)
+;;   (when (or (endp args) (endp (cdr args)))
+;;         (too-few-args 'if 2 (length args)))
+;;   (unless (or (endp (cddr args)) (endp (cdddr args)))
+;;           (too-many-args 'if 3 (length args)))
+;;   (setq f (c1fmla-constant (car args)))
+
+;;   (case f
+;;         ((t) 
+;; 	 (when (caddr args) (note-branch-elimination (car args) t (caddr args)))
+;; 	 (c1expr (cadr args)))
+;;         ((nil) 
+;; 	 (note-branch-elimination (car args) nil (cadr args))
+;; 	 (if (endp (cddr args)) (c1nil) (c1expr (caddr args))))
+;;         (otherwise
+;;          (setq info (make-info))
+;; 	 (let* ((fmla (c1fmla f info))
+;; 		(inf (delete +gen+ (fmla-infer-tp fmla) :key 'car))
+;; 		(inf (remove-if (lambda (x) (fmla-is-changed (car x) fmla)) inf))
+;; 		(fmlae (fmla-eval-const fmla))
+;; 		(fmlae (if (notevery 'cadr inf) nil fmlae))
+;; 		(fmlae (if (notevery 'cddr inf) t   fmlae)))
+;; 	   (when inf 
+;; 	     (keyed-cmpnote (list* 'type-inference (mapcar (lambda (x) (var-name (car x))) inf))
+;; 			  "inferring types on form ~s, ~s" f inf))
+;; 	   (if (not (eq fmlae 'boolean))
+
+;;  	       (cond (fmlae 
+;;   		      (when (caddr args) (note-branch-elimination (car args) t (caddr args)))
+;; 		      (maybe-progn-fmla fmla (cadr args) info))
+;;   		     (t (note-branch-elimination (car args) nil (cadr args)) 
+;; 			(maybe-progn-fmla fmla (caddr args) info)))
+	     
+;; 	     (let (r)
+;; 	       (dolist (l inf)
+;; 		 (let ((v (car l)))
+;; 		   (when v
+;; 		     (push (list v (var-type v) (cdr l)) r))))
+;; 	       (unwind-protect
+
+;; 		   (let* ((tbl (c1branch t   r args info))
+;; 			  (fbl (c1branch nil r args info))
+;; 			  (tb (car tbl))
+;; 			  (fb (car fbl))
+;; 			  (trv (append (cadr tbl) (cadr fbl))))
+
+;; 		     (setf (info-type info) (type-or1 (info-type (cadr tb)) (info-type (cadr fb))))
+
+;; 		     (do (rv) ((not (setq rv (pop r))))
+;; 			 (setf (var-type (car rv)) (cadr rv))
+;; 			 (if (info-type (cadr fb))
+;; 			     (unless (info-type (cadr tb))
+;; 			       (do-setq-tp (car rv) nil (type-and (cdr (caddr rv)) (var-type (car rv)))))
+;; 			   (when (info-type (cadr tb))
+;; 			     (do-setq-tp (car rv) nil (type-and (car (caddr rv)) (var-type (car rv)))))))
+
+;; 		     (do (rv) ((not (setq rv (pop trv))))
+;; 			 (setf (var-store (car rv)) (if (eq (var-store (car rv)) (caddr rv)) (var-store (car rv)) +opaque+))
+;; 			 (do-setq-tp (car rv) (list args nil) (type-or1 (var-type (car rv)) (cadr rv))))
+
+;; 		     (list 'if info fmla tb fb))
+
+;; 		 (dolist (l r)
+;; 		   (setf (var-type (car l)) (cadr l))))))))))
 
 ;; (defun c1if (args &aux info f)
 ;;   (when (or (endp args) (endp (cdr args)))

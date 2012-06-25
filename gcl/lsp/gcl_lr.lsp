@@ -135,7 +135,6 @@
 	      (mpz_mul_2exp x y)))))
     (if (< x 0) -1 0)))
 
-
 (defun integer-length (x)
   (declare (optimize (safety 1)))
   (check-type x integer)
@@ -166,7 +165,8 @@
 
 (defun immfixp (x)
   (lit :boolean "is_imm_fixnum(" (:object x) ")"))
-(declaim (inline immfixp))
+(putprop 'immfixp t 'compiler::cmp-inline)
+;(declaim (inline immfixp))
 (setf (get 'immfix 'si::type-predicate) 'immfixp)
 (setf (get 'immfixp 'si::predicate-type) 'immfix)
 
@@ -174,17 +174,20 @@
   (declare (optimize (safety 1)))
   (check-type x bignum)
   (lit :fixnum "mpz_sgn(&(" (:object x) "->big.big_mpz_t))"))
-(declaim (inline mpz_sgn))
+(putprop 'mpz_sgn t 'compiler::cmp-inline)
+;(declaim (inline mpz_sgn))
 (defun mpz_odd_p (x)
   (declare (optimize (safety 1)))
   (check-type x bignum)
   (lit :fixnum "mpz_odd_p(&(" (:object x) "->big.big_mpz_t))"))
-(declaim (inline mpz_odd_p))
+(putprop 'mpz_odd_p t 'compiler::cmp-inline)
+;(declaim (inline mpz_odd_p))
 (defun mpz_even_p (x)
   (declare (optimize (safety 1)))
   (check-type x bignum)
   (lit :fixnum "mpz_even_p(&(" (:object x) "->big.big_mpz_t))"))
-(declaim (inline mpz_even_p))
+(putprop 'mpz_even_p t 'compiler::cmp-inline)
+;(declaim (inline mpz_even_p))
 
 (defun plusp (x)
   (declare (optimize (safety 1)))

@@ -16,6 +16,7 @@
   (defmacro mfff nil
    `(progn
       (idefun address (x) (lit :fixnum "((fixnum)" (:object x) ")"))
+      (idefun ~ (x) (declare (fixnum x)) (lit :fixnum "(~" (:fixnum x) ")"))
       ,@(mapcar (lambda (x &aux (c (consp x))(n (if c (car x) x))(s (string (if c (cdr x) x))))
 		  `(idefun ,n (x y) (declare (fixnum x y)) (lit :fixnum "(" (:fixnum x) ,s (:fixnum y) ")")))
 		'(& \| ^ >> << (c+ . +) (c* . *) (c- . -) (c/ . /) %)))))

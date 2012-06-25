@@ -32,7 +32,7 @@
      (dolist (l '(proclaimed-function proclaimed-arg-types proclaimed-return-type))
        (remprop s l))))
 
-  (declaim (notinline error cerror warn break coerce));FIXME
+  (declaim (notinline error cerror warn break));FIXME
 
   (dolist (l (append (let (r) (do-symbols (s 'c r) (unless (search "SET-" (string s)) (push s r))))
 		   (list 'list 'list* 'si::cons-car 'si::cons-cdr 'compiler::unbox 'si::clzl 

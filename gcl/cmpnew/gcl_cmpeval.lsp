@@ -800,7 +800,8 @@
   (let* ((n (pop args))
 	 (v (c1vref n))
 	 (x (car v))
-	 (tpi (cmp-norm-tp (pop args)))
+	 (tpi (pop args))
+	 (tpi (if (atomic-tp tpi) tpi (cmp-norm-tp tpi)))
 	 (tp (type-and (var-type x) tpi))
 	 (info (make-info))
 	 (v1 (c1arg n))
@@ -1918,6 +1919,14 @@
 ;; 	 (*inline-forms* (list (cons g fn)))
 ;; 	 (e (c1expr `(let* ((,s ,g)) (if (symbolp ,s) (fsf ,s) ,s)))))
 ;;     (list 'ordinary (cadr e) e)))
+
+;; (defun or-ccb-assignments (fms)
+;;   (mapc (lambda (v)
+;; 	  (when (var-p v) 
+;; 	    (let ((tp (get (var-store v) 'ccb-tp)));FIXME setq tp nil?
+;; 	      (when tp
+;; 		(do-setq-tp v '(ccb-ref) (type-or1 (var-type v) (get (var-store v) 'ccb-tp)))
+;; 		(setf (var-store v) +opaque+))))) *vars*))
 
 
 (defun or-ccb-assignments (fms)
