@@ -70,39 +70,59 @@ typedef union {
 } D2ul;
 
 
-static unsigned long
+static ufixnum rtb[256];
+
+#define MASK(n) (~(~0L << (n)))
+
+static ufixnum
+ufixhash(ufixnum g) {
+  ufixnum i,h;
+  for (h=i=0;i<sizeof(g);g>>=CHAR_SIZE,i++)
+    h^=rtb[g&MASK(CHAR_SIZE)];
+  return h;
+}
+
+static ufixnum
+uarrhash(void *v,void *ve,uchar off,uchar bits) {
+
+  uchar *c=v,*ce=ve-(bits+(off ? off : CHAR_SIZE)>CHAR_SIZE ? 1 : 0),i;
+  ufixnum h=0,*u=v,*ue=u+(ce-c)/sizeof(*u);
+  
+  if (!off)
+    for (;u<ue;) h^=ufixhash(*u++);
+
+  for (c=(void *)u;c+(off ? 1 : 0)<ce;c++)
+    h^=rtb[(uchar)(((*c)<<off)|(off ? c[1]>>(CHAR_SIZE*sizeof(*c)-off) : 0))];
+
+  for (i=off;bits--;i=(i+1)%CHAR_SIZE,c=i ? c : c+1)
+    h^=rtb[((*c)>>(CHAR_SIZE-1-i))&0x1];
+
+  return h;
+
+}
+
+
+static ufixnum
 hash_eql(object x) {
 
-  unsigned long h = 0;
+  ufixnum h;
 
   switch (type_of(x)) {
 
-  case t_cons:
-  case t_symbol:
-    h = (unsigned long) x;
-    break;
-
   case t_fixnum:
-/*     h=fix(x); */
-/*     h ^= (h >> 11); */
-/*     h ^= (h <<  7) & 0x9D2C5680U; */
-/*     h ^= (h << 15) & 0xEFC60000U; */
-/*     h ^= (h >> 18); */
-    h=fix(x)<<3;
+    h=ufixhash(fix(x));
     break;
 
   case t_character:
-    h = char_code(x);
+    h = rtb[char_code(x)];
     break;
     
   case t_bignum:
     { 
       MP_INT *mp = MP(x);
-      int l = mpz_size (mp);
-      mp_limb_t *u = mp->_mp_d;
-      if (l > 5) l = 5;
-      while (-- l >= 0) 
-	h += *u++;
+      void *v1=mp->_mp_d,*ve=v1+mpz_size(mp);
+
+      h=uarrhash(v1,ve,0,0);
     }
     break;
 
@@ -114,7 +134,7 @@ hash_eql(object x) {
     { 
       F2ul u;
       u.f=sf(x);
-      return(u.ul);
+      h=ufixhash(u.ul);
     }
     break;
     
@@ -122,7 +142,7 @@ hash_eql(object x) {
     { 
       D2ul u;
       u.d=lf(x);
-      return(u.ul[0]+u.ul[1]);
+      h=ufixhash(u.ul[0])^ufixhash(u.ul[1]);
     }
     break;
 
@@ -136,23 +156,17 @@ hash_eql(object x) {
 
   }
 
-  /* Randomization Code */
-  /*  h ^= (h >> 11);*/
-  /*  h ^= (h <<  7) & 0x9D2C5680U;*/
-  /*  h ^= (h << 15) & 0xEFC60000U;*/
-  /*  h ^= (h >> 18);*/
   return MHSH(h);
 
 }
 
+
 #define ihash_equal(a_,b_) ((type_of(a_)==t_symbol && (a_)->s.s_hash) ? (a_)->s.s_hash : ihash_equal1(a_,b_))
-unsigned long
+ufixnum
 ihash_equal1(object x,int depth) {
 
   enum type tx;
-  unsigned long h = 0;
-  long i;
-  char *s,*se;
+  ufixnum h=0;
   
   cs_check(x);
 
@@ -160,78 +174,37 @@ BEGIN:
   if (depth++ <=3)
     switch ((tx=type_of(x))) {
     case t_cons:
-      h += ihash_equal(x->c.c_car,depth);
+      h^=ihash_equal(x->c.c_car,depth);
       x = x->c.c_cdr;
       goto BEGIN;
       break;
     case t_symbol:
     case t_string:
-      {
-	long len=x->st.st_fillp;
-	s=x->st.st_self;
-	se=s+len;
-	for (len=sizeof(len);len-- && s!=se;)
-	  h+=(len&1 ? *s++ : *--se)<< CHAR_SIZE*len;
-	/* len=len>sizeof(len) ? sizeof(len) : len; */
-	/* for (s+=len-1;len--;s--) */
-	/*   h+= *s << CHAR_SIZE*len; */
-      }
+      h^=uarrhash(x->st.st_self,x->st.st_self+x->st.st_fillp,0,0);
       break;
-
     case t_package: 
       break;
     case t_bitvector:
       {
-	static char ar[10];
-	i = x->bv.bv_fillp;
-	h += i;
-	i = i/8;
-	if (i > 10) i= 10;
-	s = x->bv.bv_self;
-	if (x->bv.bv_offset) {
-	  long k,j,e=i;
-	  s = ar;
-	  /* 8 should be CHAR_SIZE but this needs to be changed
-	     everywhere .. */
-	  e = e * 8;
-	  bzero(ar,sizeof(ar));
-	  for (k = x->bv.bv_offset, j = 0;  k < e;  k++, j++)
-	    if (x->bv.bv_self[k/8]&(0200>>k%8))
-	      ar[j/8]  |= 0200>>j%8;
-	}
-	for (;  i > 0;  --i, s++)
-	  h += (*s & 0377)*12345 + 1;
+	ufixnum l=x->bv.bv_offset+x->bv.bv_fillp;
+	void *v1=x->bv.bv_self+x->bv.bv_offset/CHAR_SIZE,*ve=v1+l/CHAR_SIZE+(x->bv.bv_fillp && l%CHAR_SIZE ? 1 : 0);
+	h^=uarrhash(v1,ve,x->bv.bv_offset%CHAR_SIZE,x->bv.bv_fillp%CHAR_SIZE);
       }
       break;
     case t_pathname:
-      h += ihash_equal(x->pn.pn_host,depth);
-      h += ihash_equal(x->pn.pn_device,depth);
-      h += ihash_equal(x->pn.pn_directory,depth);
-      h += ihash_equal(x->pn.pn_name,depth);
-      h += ihash_equal(x->pn.pn_type,depth);
+      h^=ihash_equal(x->pn.pn_host,depth);
+      h^=ihash_equal(x->pn.pn_device,depth);
+      h^=ihash_equal(x->pn.pn_directory,depth);
+      h^=ihash_equal(x->pn.pn_name,depth);
+      h^=ihash_equal(x->pn.pn_type,depth);
       /* version is ignored unless logical host */
       if ((type_of(x->pn.pn_host) == t_string) &&
 	  (pathname_lookup(x->pn.pn_host,sSApathname_logicalA) != Cnil))
-	h += ihash_equal(x->pn.pn_version,depth);
-      h += ihash_equal(x->pn.pn_version,depth);
+	h^=ihash_equal(x->pn.pn_version,depth);
+      h^=ihash_equal(x->pn.pn_version,depth);
       break;
-/*  CLTLII says don't descend into structures
-	case t_structure:
-		{unsigned char *s_type;
-		 struct s_data *def;
-		 def=S_DATA(x->str.str_def);
-		 s_type= & SLOT_TYPE(x->str.str_def,0);
-		 h += ihash_equal(def->name,depth);
-		 for (i = 0;  i < def->length;  i++)
-		   if (s_type[i]==0)
-		     h += ihash_equal(x->str.str_self[i],depth);
-		   else
-		     h += ((int)x->str.str_self[i]) + depth++;
-		 return(h);}
-*/
-
     default:
-      h +=  hash_eql(x);
+      h^=hash_eql(x);
       break;
     }
   
@@ -240,10 +213,7 @@ BEGIN:
 }
 
 	
-DEFUN("HASH-EQUAL",object,fShash_equal,SI
-	  ,2,2,NONE,OO,IO,OO,OO,(object x,fixnum depth),"") {
-/* static object */
-/* FFN(hash_equal)(object x,int depth) { */
+DEFUN("HASH-EQUAL",object,fShash_equal,SI,2,2,NONE,OO,IO,OO,OO,(object x,fixnum depth),"") {
   RETURN1(make_fixnum(ihash_equal(x,depth)));
 }
 
@@ -254,7 +224,6 @@ ihash_equalp1(object x,int depth) {
   enum type tx;
   unsigned long h = 0,j;
   long i;
-  char *s;
   
   cs_check(x);
 
@@ -268,98 +237,72 @@ BEGIN:
       break;
     case t_symbol:
       {
-	long len=x->st.st_fillp;
-	s=x->st.st_self;
-	len=len>sizeof(len) ? sizeof(len) : len;
-	for (s+=len-1;len--;s--)
-	  h+= toupper(*s) << CHAR_SIZE*len;
+	ufixnum len=x->st.st_fillp;
+	uchar *s=(void *)x->st.st_self;
+	for (;len--;)
+	  h^=rtb[toupper(*s++)];
       }
       break;
 
     case t_package: 
       break;
-/*     case t_bitvector: */
-/*       { */
-/* 	static char ar[10]; */
-/* 	i = x->bv.bv_fillp; */
-/* 	h += i; */
-/* 	i = i/8; */
-/* 	if (i > 10) i= 10; */
-/* 	s = x->bv.bv_self; */
-/* 	if (x->bv.bv_offset) { */
-/* 	  long k,j,e=i; */
-/* 	  s = ar; */
-	  /* 8 should be CHAR_SIZE but this needs to be changed
-	     everywhere .. */
-/* 	  e = e * 8; */
-/* 	  bzero(ar,sizeof(ar)); /\*FIXME is this not a generic copy? *\/ */
-/* 	  for (k = x->bv.bv_offset, j = 0;  k < e;  k++, j++) */
-/* 	    if (x->bv.bv_self[k/8]&(0200>>k%8)) */
-/* 	      ar[j/8]  |= 0200>>j%8; */
-/* 	} */
-/* 	for (;  i > 0;  --i, s++) */
-/* 	  h += (*s & 0377)*12345 + 1; */
-/*       } */
-/*       break; */
 
     case t_string:
     case t_bitvector:
     case t_vector:
-      j=x->v.v_fillp;
-      h+=j*12345;
+      h^=ufixhash(j=x->v.v_fillp);
       j=j>10 ? 10 : j;
       for (i=0;i<j;i++)
-	h+=ihash_equalp(aref(x,i),depth);
+	h^=ihash_equalp(aref(x,i),depth);
       break;
 			
     case t_array:
-      j=x->a.a_rank;
-      h+=j*12345;
+      h^=ufixhash(j=x->a.a_rank);
       for (i=0;i<j-1;i++)
-	h+=x->a.a_dims[i]*54321;
+	h^=ufixhash(x->a.a_dims[i]);
       j=x->a.a_dim;
       j=j>10 ? 10 : j;
       for (i=0;i<j;i++)
-	h+=ihash_equalp(aref(x,i),depth);
+	h^=ihash_equalp(aref(x,i),depth);
       break;
 			
     case t_hashtable:
-      j=x->ht.ht_nent;
-      h+=j*12345+x->ht.ht_test*54321;
+      h^=ufixhash(j=x->ht.ht_nent);
+      h^=ufixhash(x->ht.ht_test);
       j=j>10 ? 10 : j;
       for (i=0;i<j;i++)
 	if (x->ht.ht_self[i].hte_key!=OBJNULL)
 	  switch (x->ht.ht_test) {
 	  case htt_eq:
-	    h+=(((unsigned long)x->ht.ht_self[i].hte_key)>>3) +
+	    h^=(((unsigned long)x->ht.ht_self[i].hte_key)>>3) ^
 	      ihash_equalp(x->ht.ht_self[i].hte_value,depth);
 	    break;
 	  case htt_eql:
-	    h+=hash_eql(x->ht.ht_self[i].hte_key) +
+	    h^=hash_eql(x->ht.ht_self[i].hte_key) ^
 	      ihash_equalp(x->ht.ht_self[i].hte_value,depth);
 	    break;
 	  case htt_equal:
-	    h+=ihash_equal(x->ht.ht_self[i].hte_key,depth) +
+	    h^=ihash_equal(x->ht.ht_self[i].hte_key,depth) ^
 	      ihash_equalp(x->ht.ht_self[i].hte_value,depth);
 	    break;
 	  case htt_equalp:
-	    h+=ihash_equalp(x->ht.ht_self[i].hte_key,depth) +
+	    h^=ihash_equalp(x->ht.ht_self[i].hte_key,depth) ^
 	      ihash_equalp(x->ht.ht_self[i].hte_value,depth);
 	    break;
 	  }
       break;
 
     case t_pathname:
-      h += ihash_equalp(x->pn.pn_host,depth);
-      h += ihash_equalp(x->pn.pn_device,depth);
-      h += ihash_equalp(x->pn.pn_directory,depth);
-      h += ihash_equalp(x->pn.pn_name,depth);
-      h += ihash_equalp(x->pn.pn_type,depth);
+      h^=ihash_equalp(x->pn.pn_host,depth);
+      h^=ihash_equalp(x->pn.pn_device,depth);
+      h^=ihash_equalp(x->pn.pn_directory,depth);
+      h^=ihash_equalp(x->pn.pn_name,depth);
+      h^=ihash_equalp(x->pn.pn_type,depth);
       /* version is ignored unless logical host */
       if ((type_of(x->pn.pn_host) == t_string) &&
 	  (pathname_lookup(x->pn.pn_host,sSApathname_logicalA) != Cnil))
-	h += ihash_equalp(x->pn.pn_version,depth);
-      h += ihash_equalp(x->pn.pn_version,depth);
+	h^=ihash_equalp(x->pn.pn_version,depth);
+      h^=ihash_equalp(x->pn.pn_version,depth);
       break;
 
     case t_structure:
@@ -368,12 +311,12 @@ BEGIN:
 	struct s_data *def;
 	def=S_DATA(x->str.str_def);
 	s_type= & SLOT_TYPE(x->str.str_def,0);
-	h += ihash_equalp(def->name,depth);
-	for (i = 0;  i < def->length;  i++)
+	h^=ihash_equalp(def->name,depth);
+	for (i=0;i<def->length;i++)
 	  if (s_type[i]==aet_object)
-	    h += ihash_equalp(x->str.str_self[i],depth);
+	    h^=ihash_equalp(x->str.str_self[i],depth);
 	  else
-	    h += ((long)x->str.str_self[i]) + depth++;
+	    h^=ufixhash((long)x->str.str_self[i]);
 	break;
       }
 
@@ -387,7 +330,7 @@ BEGIN:
 	x=vs_base[0];
 	vs_base=base;
 	vs_reset;
-	h +=  hash_eql(x);
+	h^=hash_eql(x);
 	break;
       }
       
@@ -397,11 +340,11 @@ BEGIN:
     case t_shortfloat:
     case t_longfloat:
 
-      h+=hash_eql(make_longfloat(number_to_double(x)));
+      h^=hash_eql(make_longfloat(number_to_double(x)));
       break;
 
     default:
-      h +=  hash_eql(x);
+      h^=hash_eql(x);
       break;
     }
   
@@ -410,10 +353,7 @@ BEGIN:
 }
 
 	
-DEFUN("HASH-EQUALP",object,fShash_equalp,SI
-	  ,2,2,NONE,OO,IO,OO,OO,(object x,fixnum depth),"") {
-/* static object */
-/* FFN(hash_equalp)(object x,int depth) { */
+DEFUN("HASH-EQUALP",object,fShash_equalp,SI,2,2,NONE,OO,IO,OO,OO,(object x,fixnum depth),"") {
   RETURN1(make_fixnum(ihash_equalp(x,depth)));
 }
 
@@ -986,6 +926,8 @@ DEFUN("HASH-TABLE-REHASH-THRESHOLD",object,fLhash_table_rehash_threshold,LISP,1,
 void
 gcl_init_hash() {
 
+  ufixnum i;
+
   sLeq = make_ordinary("EQ");
   sLeql = make_ordinary("EQL");
   sLequal = make_ordinary("EQUAL");
@@ -996,6 +938,16 @@ gcl_init_hash() {
   sKrehash_threshold = make_keyword("REHASH-THRESHOLD");
   
   make_function("MAKE-HASH-TABLE", Lmake_hash_table);
+  
+  {
+    object x=find_symbol(make_simple_string("MOST-NEGATIVE-FIXNUM"),find_package(make_simple_string("SI")));
+    x=number_negate(x->s.s_dbind);
+    for (i=0;i<sizeof(rtb)/sizeof(*rtb);i++) {
+      vs_push(x);
+      Lrandom();
+      rtb[i]=fixint(vs_pop);
+    }
+  }
 /*   make_function("HASH-TABLE-P", Lhash_table_p); */
 /*   /\* 	make_function("GETHASH", Lgethash); *\/ */
 /*   make_function("REMHASH", Lremhash); */

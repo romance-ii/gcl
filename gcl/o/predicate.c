@@ -221,8 +221,8 @@ equal1(register object x, register object y) {
       ox = BV_OFFSET(x);
       oy = BV_OFFSET(y);
       for (i = 0;  i < x->bv.bv_fillp;  i++)
-	if((x->bv.bv_self[(i+ox)/8] & (0200>>(i+ox)%8))
-	   !=(y->bv.bv_self[(i+oy)/8] & (0200>>(i+oy)%8)))
+	if(((x->bv.bv_self[(i+ox)/8] & (0200>>(i+ox)%8)) ? 1 : 0)
+	   !=((y->bv.bv_self[(i+oy)/8] & (0200>>(i+oy)%8)) ? 1 : 0))
 	  return(FALSE);
       return(TRUE);
     }
