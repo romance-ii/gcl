@@ -331,76 +331,99 @@ write_base(void)
 
 object sSAprint_nansA;
 
+#include <string.h>
+
+static int
+char_inc(char *b,char *p) {
+
+  if (b==p) {
+    if (*p=='-') {
+      p++;
+      memmove(p+1,p,strlen(p)+1);
+    }
+    *p='1';
+  } else if (*p=='9') {
+    *p='0';
+    char_inc(b,p-1);
+  } else if (*p=='.')
+    char_inc(b,p-1);
+  else (*p)++;
+
+  return 1;
+
+}
+
+#define COMP(a_,b_,c_,d_) ((d_) ? strtod((a_),(b_))==(c_) : strtof((a_),(b_))==(float)(c_))
+
+static int
+truncate_double(char *b,double d,int dp) {
+
+  char c[FPRC+9],c1[FPRC+9],*p,*pp,*n;
+  int j,k;
+
+  n=b;
+  k=strlen(n);
+
+  strcpy(c1,b);
+  for (p=c1;*p && *p!='e';p++);
+  pp=p>c1 && p[-1]!='.' ? p-1 : p;
+  for (;pp>c1 && pp[-1]=='0';pp--);
+  strcpy(pp,p);
+  if (pp!=p && COMP(c1,&pp,d,dp))
+    k=truncate_double(n=c1,d,dp);
+
+  strcpy(c,n);
+  for (p=c;*p && *p!='e';p++);
+  if (p[-1]!='.' && char_inc(c,p-1) && COMP(c,&pp,d,dp)) {
+    j=truncate_double(c,d,dp);
+    if (j<k) {
+      k=j;
+      n=c;
+    }
+  }
+
+  if (n!=b) strcpy(b,n);
+  return k;
+
+}
+
 void
-edit_double(n, d, sp, s, ep)
-int n;
-double d;
-char *s;
-int *sp;
-int *ep;
-{
-	char *p, buff[FPRC + 9];
-	int i;
+edit_double(int n, double d, int *sp, char *s, int *ep) {
 
-#ifdef IEEEFLOAT
-/*	if ((*((int *)&d +HIND) & 0x7ff00000) == 0x7ff00000)*/
-	if (!ISFINITE(d))
-           {if (sSAprint_nansA->s.s_dbind !=Cnil)
-	      {sprintf(s, "%e",d);
-	       *sp = 2;
-	       return;
-	     }
-	   else
-		FEerror("Can't print a non-number.",
-			0);}
-	else
-		sprintf(buff, "%*.*e",FPRC+8,FPRC, d);
-	if (buff[FPRC+3] != 'e') {
-		sprintf(buff, "%*.*e",FPRC+7,FPRC,d);
-		*ep = (buff[FPRC+5]-'0')*10 + (buff[FPRC+6]-'0');
-	} else
-		*ep = (buff[FPRC+5]-'0')*100 +
-		  (buff[FPRC+6]-'0')*10 + (buff[FPRC+7]-'0');
-	*sp = 1;
-	if (buff[0] == '-')
-		*sp *= -1;
-#else
-	sprintf(buff, "%*.*e",FPRC+7,FPRC, d);
-	/*  "-D.MMMMMMMMMMMMMMMe+EE"  */
-	/*   0123456789012345678901   */
-	*sp = 1;
-	if (buff[0] == '-')
-		*sp *= -1;
-	*ep = (buff[FPRC+5]-'0')*10 + (buff[FPRC+6]-'0');
-#endif
+  char *p, b[FPRC + 9];
+  int i;
+  
+  if (!ISFINITE(d)) {
+    if (sSAprint_nansA->s.s_dbind !=Cnil) {
+      sprintf(s, "%e",d);
+      *sp = 2;
+      return;
+    }
+    else
+      FEerror("Can't print a non-number.",0);}
+  else
+    sprintf(b, "%*.*e",FPRC+8,FPRC, d);
+  if (b[FPRC+3] != 'e') {
+    sprintf(b, "%*.*e",FPRC+7,FPRC,d);
+    *ep = (b[FPRC+5]-'0')*10 + (b[FPRC+6]-'0');
+  } else
+    *ep = (b[FPRC+5]-'0')*100 + (b[FPRC+6]-'0')*10 + (b[FPRC+7]-'0');
+  *sp = 1;
+  if (b[0] == '-')
+    *sp *= -1;
+  if (b[FPRC+4] == '-')
+    *ep *= -1;
 
-	if (buff[FPRC+4] == '-')
-		*ep *= -1;
-	buff[2] = buff[1];
-	p = buff + 2;
-	if (n < FPRC+1) {
-		if (p[n] >= '5') {
-			for (i = n - 1;  i >= 0;  --i)
-				if (p[i] == '9')
-					p[i] = '0';
-				else {
-					p[i]++;
-					break;
-				}
-			if (i < 0) {
-				*--p = '1';
-				(*ep)++;
-			}
-		}
-		for (i = 0;  i < n;  i++)
-			s[i] = p[i];
-	} else {
-		for (i = 0;  i < FPRC+1;  i++)
-			s[i] = p[i];
-		for (;  i < n;  i++)
-			s[i] = '0';
-	}
-	s[n] = '\0';
+  truncate_double(b,d,n!=7);
+
+  if (b[2]=='0') (*ep)++;
+  b[2] = b[1];
+  p = b + 2;
+  for (i=0;i<n && i<FPRC+1 && isdigit(p[i]);i++)
+      s[i] = p[i];
+  for (;i<n;i++)
+    s[i] = '0';
+  s[n] = '\0';
 }
 
 static void
@@ -433,7 +456,7 @@ bool shortp;
 			for (i = 0;  i < exp;  i++)
 				write_ch('0');
 			for (;  n > 0;  --n)
-				if (buff[n-1] != '0')
+				if (buff[n-1] != '0' && buff[n-1])
 					break;
 			if (exp == 0 && n == 0)
 				n = 1;
@@ -453,7 +476,7 @@ bool shortp;
 				write_ch('0');
 			i++;
 			for (;  n > i;  --n)
-				if (buff[n-1] != '0')
+				if (buff[n-1] != '0' && buff[n-1])
 					break;
 			for (;  i < n;  i++)
 				write_ch(buff[i]);
@@ -464,7 +487,7 @@ bool shortp;
 		write_ch('.');
 		write_ch(buff[1]);
 		for (;  n > 2;  --n)
-			if (buff[n-1] != '0')
+			if (buff[n-1] != '0' && buff[n-1])
 				break;
 		for (i = 2;  i < n;  i++)
 			write_ch(buff[i]);
