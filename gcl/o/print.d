@@ -414,7 +414,7 @@ edit_double(int n, double d, int *sp, char *s, int *ep) {
   if (b[FPRC+4] == '-')
     *ep *= -1;
 
-  truncate_double(b,d,n!=7);
+  truncate_double(b,d,n!=9);
 
   if (b[2]=='0') (*ep)++;
   b[2] = b[1];
