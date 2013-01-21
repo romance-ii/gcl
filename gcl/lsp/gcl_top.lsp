@@ -233,7 +233,7 @@
 	   (file (cdr (assoc :compile compile)))
 	   (o (cdr (assoc :o compile)))
 	   (compile (remove :o (remove :compile compile :key 'car) :key 'car))
-	   (compile (cons (cons :output-file (or o file)) compile))
+	   (compile (if o (cons (cons :output-file (or o file)) compile) compile))
 	   (result (system:error-set `(apply 'compile-file ,file ',(mapcan (lambda (x) (list (car x) (cdr x))) compile)))))
       (bye (if (or *error-p* (equal result '(nil))) 1 0)))))
 
@@ -835,6 +835,7 @@ First directory is checked for first name and all extensions etc."
   (dotimes (j i) (push (argv j) tem))
   (setq *command-args* (nreverse tem))
   (setq tem *lib-directory*)
+  (process-some-args *command-args*)
   (let ((dir (getenv "GCL_LIBDIR")))
     (unless (set-dir '*lib-directory* "-libdir")
       (when dir (setq *lib-directory* (coerce-slash-terminated dir))))
