@@ -88,12 +88,12 @@ gcl_init_system(object no_init)
   lsp_init("../lsp/gcl_callhash.lsp");
   lsp_init("../lsp/gcl_assert.lsp");
 /*   lsp_init("../lsp/gcl_listlib.lsp"); */
-  lsp_init("../lsp/gcl_mislib.lsp");
   lsp_init("../lsp/gcl_setf.lsp");
   lsp_init("../lsp/gcl_arraylib.lsp");
 
   lsp_init("../lsp/gcl_seq.lsp");
   lsp_init("../lsp/gcl_seqlib.lsp");
+  lsp_init("../lsp/gcl_mislib.lsp");
   lsp_init("../lsp/gcl_nr.lsp");
   lsp_init("../lsp/gcl_bnum.lsp");
   lsp_init("../lsp/gcl_numlib.lsp");
