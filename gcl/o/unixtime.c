@@ -62,8 +62,6 @@ int usleep ( unsigned int microseconds );
 
 #  endif
 
-static void FFN(siLget_system_time_zone)(void);
-
 #endif /* __MINGW32__ or  !defined NO_SYSTEM_TIME_ZONE */
 
 #ifdef BSD
@@ -233,32 +231,19 @@ DEFUN("GET-INTERNAL-REAL-TIME",object,fLget_internal_real_time,LISP,0,0,NONE,OO,
 #endif
 }
 
-#if defined __MINGW32__ || !defined NO_SYSTEM_TIME_ZONE
-DEFVAR("*DEFAULT-TIME-ZONE*",sSAdefault_time_zoneA,SI,make_fixnum ( system_time_zone_helper() ),"");
-#else
-DEFVAR("*DEFAULT-TIME-ZONE*",sSAdefault_time_zoneA,SI,make_fixnum(TIME_ZONE),"");
-#endif
 
 void
-gcl_init_unixtime(void)
-{
-/* #ifdef BSD */
-/* 	ftime(&beginning); */
-/* #endif */
+gcl_init_unixtime(void) {
 #ifdef ATT
-	beginning = time(0);
+  beginning = time(0);
 #endif
-#  if defined __MINGW32__
-        ftime(&t0);
-#  endif        
-
-	make_constant("INTERNAL-TIME-UNITS-PER-SECOND", make_fixnum(HZ1));
-
-	make_function("SLEEP", Lsleep);
-/* 	make_function("GET-INTERNAL-RUN-TIME", Lget_internal_run_time); */
-#if defined __MINGW32__   || !defined NO_SYSTEM_TIME_ZONE
-	make_si_function("GET-SYSTEM-TIME-ZONE", siLget_system_time_zone);
+#if defined __MINGW32__
+  ftime(&t0);
 #endif        
+  
+  make_constant("INTERNAL-TIME-UNITS-PER-SECOND", make_fixnum(HZ1));
+  make_function("SLEEP", Lsleep);
+
 }
 
 #ifdef __MINGW32__
@@ -268,46 +253,40 @@ int usleep ( unsigned int microseconds )
     return ( SleepEx ( milliseconds, TRUE ) );
 }
 
-int system_time_zone_helper(void)
-{
-    TIME_ZONE_INFORMATION tzi;
-    DWORD TZResult;
-    int tz=0;
-
-    TZResult = GetTimeZoneInformation ( &tzi );
-
-    /* Now UTC = (local time + bias), in units of minutes, so */
-    /*fprintf ( stderr, "Bias = %ld\n", tzi.Bias );*/
-    tz = (int) (tzi.Bias / 60);
-    return ( tz );                                    
-}
 #endif
 
-/* At GCC 3.2, Mingw struct tm does not include tm_gmtoff so avoid this version */
-#if !defined ( NO_SYSTEM_TIME_ZONE ) && !defined ( __MINGW32__ )
-int system_time_zone_helper(void){
+
+DEFUN("CURRENT-TIMEZONE",fixnum,fScurrent_timezone,SI,0,0,NONE,IO,OO,OO,OO,(void),"") {
+
+#if defined(__MINGW32__)
+
+  TIME_ZONE_INFORMATION tzi;
+  DWORD TZResult;
   
-  struct tm *local;
-  time_t TIME;
-  int nsecs;
-
-  TIME = time(0);
-  local = localtime(&TIME);
-  nsecs = local->tm_gmtoff;
-  if (nsecs == 0)
-    return (nsecs);
-  else
-    return(- (nsecs / 60 / 60));
-}
-#endif /* !defined NO_SYSTEM_TIME_ZONE */
-
-#if defined __MINGW32__ || !defined NO_SYSTEM_TIME_ZONE
-
-static void
-FFN(siLget_system_time_zone)(void)
-{
-  check_arg(0);
-  vs_push ( make_fixnum ( system_time_zone_helper() ) );
+  TZResult = GetTimeZoneInformation ( &tzi );
+  
+  /* Now UTC = (local time + bias), in units of minutes, so */
+  /*fprintf ( stderr, "Bias = %ld\n", tzi.Bias );*/
+  return tzi.Bias/60;                                    
+  
+#elif defined NO_SYSTEM_TIME_ZONE
+  return 0;
+#else
+  fixnum _t=time(0);
+  return -localtime(&_t)->tm_gmtoff/3600;
+#endif
 }
 
-#endif /*__MINGW32__ or !defined NO_SYSTEM_TIME_ZONE */
+DEFUN("CURRENT-DSTP",object,fScurrent_dstp,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+
+#if defined(__MINGW32__)
+
+  return Cnil;
+
+#elif defined NO_SYSTEM_TIME_ZONE /*solaris*/
+  return Cnil;
+#else
+  fixnum _t=time(0);
+  return localtime(&_t)->tm_isdst > 0 ? Ct : Cnil;
+#endif
+}

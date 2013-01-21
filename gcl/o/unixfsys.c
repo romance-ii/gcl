@@ -169,7 +169,10 @@ coerce_to_filename1(object pathname, char *p,unsigned sz) {
     for (n=1;n<namestring->st.st_fillp && q[n]!='/'; n++);
     if (n==1)
 
-      ASSERT(!getpwuid_r(getuid(),&pw,b,r,&pwent));
+      if ((pw.pw_dir=getenv("HOME")))
+	pwent=&pw;
+      else
+	ASSERT(!getpwuid_r(getuid(),&pw,b,r,&pwent));
 
     else {
 

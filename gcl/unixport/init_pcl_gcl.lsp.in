@@ -78,11 +78,6 @@
   (unintern 'user)
   (when (fboundp 'si::init-cmp-anon) (fmakunbound 'si::init-cmp-anon))
   
-  (eval-when (load)
-	     (if (fboundp 'get-system-time-zone)
-		 (setf system:*default-time-zone* (get-system-time-zone))
-	       (setf system:*default-time-zone* 6)))
-  
   (si::set-up-top-level)
   (if (fboundp 'si::user-init) (si::user-init))
   
