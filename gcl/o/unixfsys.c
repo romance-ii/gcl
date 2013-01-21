@@ -655,30 +655,12 @@ LFD(Lfile_author)(void)
 static void
 FFN(Luser_homedir_pathname)(void)
 {
-#if !defined(NO_PWD_H) && !defined(STATIC_LINKING)
-	struct passwd *pwent;
-	char filename[MAXPATHLEN];
-	register int i;
-#ifndef __STDC__
-	extern struct passwd *getpwuid();
-#endif
+  char filename[MAXPATHLEN];
 
-	if (vs_top - vs_base > 1)
-		too_many_arguments();
-	pwent = getpwuid(getuid());
-	strcpy(filename, pwent->pw_dir);
-	i = strlen(filename);
-	if (filename[i-1] != '/') {
-		filename[i++] = '/';
-		filename[i] = '\0';
-	}
-#else
-	 char *filename= "~/" ;
-#endif	
-	vs_base[0] = make_simple_string(filename);
-	vs_top = vs_base+1;
-	vs_base[0] = coerce_to_pathname(vs_base[0]);
-	
+  coerce_to_filename(make_simple_string("~/"),filename);
+  vs_base[0]=coerce_to_pathname(make_simple_string(filename));
+  vs_top = vs_base+1; 
+
 }
 
 #ifdef BSD
