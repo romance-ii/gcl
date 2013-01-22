@@ -47,7 +47,7 @@
 (defun sxhash (x)
   (declare (optimize (safety 1)))
   (typecase x
-	    (symbol (c::symbol-hash x))
+	    (symbol (c-ymbol-hash x))
 	    (otherwise (c::sxhash-int x))))
 
 (setf (symbol-function 'hash-table-count) (symbol-function 'c::hashtable-nent))

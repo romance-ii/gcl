@@ -588,13 +588,13 @@
 (defun rplaca (x y)
   (declare (optimize (safety 1)))
   (check-type x cons)
-  (c::set-cons-car y x)
+  (c-set-cons-car x y)
   x)
 
 (defun rplacd (x y)
   (declare (optimize (safety 1)))
   (check-type x cons)
-  (c::set-cons-cdr y x)
+  (c-set-cons-cdr x y)
   x)
 
 (defun listp (x) (typecase x (list t)))

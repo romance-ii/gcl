@@ -415,7 +415,7 @@
   (declare (ignore env))
   (typecase 
    x
-   (symbol (= 1 (c::symbol-stype x)))
+   (symbol (= 1 (c-symbol-stype x)))
    (cons (eq 'quote (car x)))
    (otherwise t)))
 

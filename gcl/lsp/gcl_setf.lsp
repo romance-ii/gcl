@@ -253,7 +253,7 @@
 (defsetf sbit (x &rest r) (v) `(si::aset ,v ,x ,@r))
 (defsetf fill-pointer si:fill-pointer-set)
 ;(defsetf symbol-plist si:set-symbol-plist)
-(defsetf symbol-plist (x) (y) `(c::set-symbol-plist ,y ,x))
+(defsetf symbol-plist (x) (y) `(c-set-symbol-plist ,x ,y))
 (defsetf gethash (k h &optional d) (v) `(si:hash-set ,k ,h ,v))
 (defsetf row-major-aref si::aset1)
 (defsetf readtable-case si::set-readtable-case)

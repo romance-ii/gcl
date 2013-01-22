@@ -70,7 +70,7 @@
 	 (ss  (if (stringp fas) (open-fasd (make-string-input-stream fas) :input 'eof nil) fas))
 	 (out (if (vectorp ss) (read-fasd-top ss) ss))
 	 (es  (when (eq (car out) 'lambda-closure) (mapcar 'car (cadr out))))
-	 (env (when es (c::function-env fun 0))))
+	 (env (when es (s::*object (s::c-function-env fun) 0 nil nil))));(c::function-env fun 0)FIXME
     (when env
 ;      (assert (= (length env) (length es))) ;FIXME closure var order
       (setf (cadr out) (mapcar 'list es env)))

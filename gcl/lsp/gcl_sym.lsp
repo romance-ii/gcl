@@ -14,7 +14,7 @@
 (defun special-operator-p (x)
   (declare (optimize (safety 1)))
   (check-type x symbol)
-  (when (/= (address nil) (c::symbol-sfdef x)) t))
+  (when (/= (address nil) (c-symbol-sfdef x)) t))
 
 (defun find-symbol (s &optional (p *package*) &aux r)
   (declare (optimize (safety 1)))
@@ -49,13 +49,13 @@
 (defun symbol-value (s)
   (declare (optimize (safety 1)))
   (check-type s symbol)
-  (if (boundp s) (c::symbol-dbind s)
+  (if (boundp s) (c-symbol-dbind s)
     (error 'unbound-variable :name s)))
 
 (defun boundp (s)
   (declare (optimize (safety 1)))
   (check-type s symbol)
-  (not (eq (nani 0) (c::symbol-dbind s))))
+  (not (eq (nani 0) (c-symbol-dbind s))))
 
 
 (defun symbol-name (s)
@@ -84,13 +84,13 @@
 (defun makunbound (s)
   (declare (optimize (safety 1)))
   (check-type s symbol)
-  (c::set-symbol-dbind (nani 0) s)
+  (c-set-symbol-dbind s (nani 0))
   s)
 
 (defun set (s y)
   (declare (optimize (safety 1)))
   (check-type s symbol)
-  (c::set-symbol-dbind y s))
+  (c-set-symbol-dbind s y))
 
 (defun get (s y &optional d)
   (declare (optimize (safety 1)))
@@ -101,5 +101,5 @@
 #+pre-gcl(defun symbolp (x) (typecase x (list (not x)) (symbol t)))
 (defun keywordp (x) (typecase x (keyword t)))
 
-(setf (symbol-function 'symbol-plist)   (symbol-function 'c::symbol-plist))
-(setf (symbol-function 'symbol-package) (symbol-function 'c::symbol-hpack))
+;; (setf (symbol-function 'symbol-plist)   (symbol-function 'c::symbol-plist))
+;; (setf (symbol-function 'symbol-package) (symbol-function 'c::symbol-hpack))

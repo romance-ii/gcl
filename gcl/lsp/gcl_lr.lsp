@@ -116,7 +116,7 @@
 (defbltin parityl)
 (defbltin ffsl)
 
-(defun ash (x y &aux (lw #.(logxor -1 (integer-length most-positive-fixnum))))
+(defun ash (x y &aux (lw #.(- fixnum-length)))
   (declare (optimize (safety 1)))
   (check-type x integer)
   (check-type y shft-integer)
@@ -141,7 +141,7 @@
   (if (typep x 'fixnum)
       (let ((x (if (minusp x) (lognot x) x)))
 	(if (= x 0) x
-	  (- #.(- (logxor -1 (integer-length most-positive-fixnum))) (clzl x))))
+	  (- fixnum-length (clzl x))))
       (mpz_sizeinbase (if (minusp x) (lognot x) x) 2)))
   
 (defun logcount (x)
