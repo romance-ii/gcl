@@ -9,7 +9,7 @@
   (cond ((when env
 	   (let* ((l (cdr (assoc x (cadr env)))))
 	     (when (eq (car l) 'macro) (cadr l)))))
-	((when (/= 0 (c::symbol-mflag x)) (c::symbol-gfdef x)))))
+	((when (/= 0 (c-symbol-mflag x)) (c-symbol-gfdef x)))))
 
 (defun special-operator-p (x)
   (declare (optimize (safety 1)))
@@ -69,12 +69,12 @@
 (defun symbol-function (s)
   (declare (optimize (safety 1)))
   (check-type s symbol)
-  (or (let ((x (c::symbol-sfdef s)))
+  (or (let ((x (c-symbol-sfdef s)))
 	(when (nani x) (cons 'special x)))
-      (let ((x (c::symbol-gfdef s)))
+      (let ((x (c-symbol-gfdef s)))
 	(when (zerop (address x))
 	  (error 'undefined-function :name s))
-	(if (zerop (c::symbol-mflag s)) x (cons 'macro x)))))
+	(if (zerop (c-symbol-mflag s)) x (cons 'macro x)))))
 
 (defun remprop (s i)
   (declare (optimize (safety 1)))

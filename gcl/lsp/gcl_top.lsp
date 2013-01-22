@@ -606,7 +606,7 @@
   (let ((fun (ihs-fun ihs-index)))
     (cond ((symbolp fun) fun)
 	  ((when (compiled-function-p fun) (compiled-function-name fun)));FIXME
-	  ((functionp fun) (name fun))
+	  ((functionp fun) (sixth (c-function-plist fun)));(name fun)
 	   ;; (multiple-value-bind ;FIXME faster
 	   ;;  (x y fun) 
 	   ;;  (function-lambda-expression fun)

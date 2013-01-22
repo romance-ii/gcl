@@ -427,7 +427,7 @@
   (etypecase 
    o
    (function o) 
-   (otherwise (the function (c::symbol-gfdef o)))))
+   (otherwise (the function (c-symbol-gfdef o)))))
     ;; (let ((f (address (c::symbol-gfdef o)))(m (c::symbol-mflag o)))
     ;;   (check-type f (not (integer 0 0)))
     ;;   (check-type m (integer 0 0))
@@ -440,8 +440,8 @@
    x
    (function t)
    ((and symbol (not boolean))
-    (and (= 0 (c::symbol-mflag x))
-	 (/= 0 (address (c::symbol-gfdef x)))))))
+    (and (= 0 (c-symbol-mflag x))
+	 (/= 0 (address (c-symbol-gfdef x)))))))
 (putprop 'fnp t 'compiler::cmp-inline)
 
 (defun reduce (f s &key key from-end (start 0) end (initial-value nil ivp) 

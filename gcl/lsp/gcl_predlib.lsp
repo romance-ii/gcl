@@ -131,7 +131,7 @@
 	    object
 	    (function object) 
 	    ((and symbol (not boolean)) 
-	     (let* ((f (c::symbol-gfdef object))(fi (address f))(m (c::symbol-mflag object)))
+	     (let* ((f (c-symbol-gfdef object))(fi (address f))(m (c-symbol-mflag object)))
 	       (check-type fi (and fixnum (not (integer 0 0))))
 	       (check-type m  (integer 0 0))
 	       f))

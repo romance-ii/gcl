@@ -194,16 +194,16 @@
 
 (defun funcallable-symbol-p (s)
   (and (symbolp s)
-       (/= (si::address (c::symbol-gfdef s)) 0)
-       (= (c::symbol-mflag s) 0)
-       (= (c::symbol-sfdef s) (si::address nil))))
+       (/= (si::address (c-symbol-gfdef s)) 0)
+       (= (c-symbol-mflag s) 0)
+       (= (c-symbol-sfdef s) (si::address nil))))
 (setf (get 'funcallable-symbol-p 'cmp-inline) t)
 
 (defun fsf (s)
   (declare (optimize (safety 1)))
 ;  (check-type s funcallable-symbol); FIXME
   (assert (funcallable-symbol-p s))
-  (the function (c::symbol-gfdef s)));FIXME
+  (the function (c-symbol-gfdef s)));FIXME
 (setf (get 'fsf 'cmp-inline) t)
 
 (defun tt3 (x) (lit :fixnum "fto(" (:object x) ")"))

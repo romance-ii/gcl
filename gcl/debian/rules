@@ -28,25 +28,14 @@ endif
 #endif
 
 #RELOC=locbfd
-RELOC?=statsysbfd
-
-#FIXME upstream bfd data structures are read-only
-ifeq ($(ARCHT),alpha)
-RELOC=locbfd
-endif
-ifeq ($(ARCHT),mips)
-RELOC=locbfd
-endif
-ifeq ($(ARCHT),mipsel)
-RELOC=locbfd
-endif
-
+#RELOC?=statsysbfd
+RELOC?=custreloc
 ifeq ($(ARCHT),ia64)
 RELOC=dlopen
 endif
-ifeq ($(ARCHT),hppa)
-RELOC=dlopen
-endif
+#ifeq ($(ARCHT),hppa)
+#RELOC=dlopen
+#endif
 
 GMP?=
 
