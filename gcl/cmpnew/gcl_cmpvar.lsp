@@ -224,7 +224,8 @@
   (let* ((info (make-info))
 	 (vref (c1vref name))
 	 (c1fv (when (cadr vref) (c1inner-fun-var))))
-    (setf (info-type info) (if (or (cadr vref) (caddr vref)) (var-dt (car vref)) (var-type (car vref))))
+    (setf (info-type info) (if (or (cadr vref) (caddr vref)) (var-dt (car vref)) (var-type (car vref)))
+	  (var-mt (car vref)) (type-or1 (info-type info) (var-mt (car vref))))
     (add-vref vref info)
     (when c1fv
       (add-info info (cadr c1fv)))
