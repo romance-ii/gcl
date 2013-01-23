@@ -238,9 +238,7 @@ EXPORT_GMP_CALL(2,void,set_si,1,mpz_t,gmp_lint)
   MEM_GMP_CALL(1,double,mpz_get_d,0,mpz_t)
 EXPORT_GMP_CALL(1,gmp_lint,get_si,0,mpz_t)
 EXPORT_GMP_CALL(1,gmp_lint,get_ui,0,mpz_t)
-  /* MEM_GMP_CALL(3,gmp_char_star,__gmpz_get_strp,0,gmp_char_star_star,int,mpz_t) */
-  /* MEM_GMP_CALL(3,gmp_char_star,mpz_get_str,1,gmp_char_star,int,mpz_t) */
-MEM_GMP_CALL(3,gmp_char_star,mpz_get_str,0,char *,int,mpz_t)
+MEM_GMP_CALL(3,gmp_char_star,mpz_get_str,0,gmp_char_star,int,mpz_t)
 EXPORT_GMP_CALL(1,int,fits_sint_p,0,mpz_t)
 EXPORT_GMP_CALL(1,int,fits_slong_p,0,mpz_t)
 EXPORT_GMP_CALL(1,int,fits_sshort_p,0,mpz_t)
