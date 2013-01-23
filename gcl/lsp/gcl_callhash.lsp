@@ -25,6 +25,7 @@
 	     (defvar *needs-recompile* nil);(make-array 10 :fill-pointer 0 :adjustable t))
 	     (defvar *us* nil)
 	     (defvar *cmr* nil)
+	     (defvar *keep-state* nil)
 	     (defvar *rfns* nil)
 	     (defvar *sfns* nil)
 	     (defvar *split-files* nil)
@@ -37,7 +38,7 @@
 		(h (call fn t :sig sig)))
 	   (when (symbolp fn)
 	     (let ((x (get fn 'state-function)))
-	       (when (and x (member-if (lambda (y) (not (eq (car y) x))) callees))
+	       (when (and x (not (eq x *keep-state*)));(member-if (lambda (y) (not (eq (car y) x))) callees))
 		 (break-state fn x))))
 	   (when sig
 	     (unless (eq sig (call-sig h))
@@ -87,8 +88,8 @@
 	     (dolist (l (call-callees h))
 	       (setf (get l 'callers) (delete sym (get l 'callers)))))
 
-	   (let ((x (when (compiled-function-p (symbol-to-function sym)) (get sym 'state-function))))
-	     (when x
+	   (let ((x (get sym 'state-function)))
+	     (when (and x (not (eq x *keep-state*)))
 	       (break-state sym x)))
 
 	   (let ((new (call code t :sig (when h (call-sig h)))))
@@ -267,6 +268,7 @@
     (when (and (remove sym syms) (member sym syms))
       (let* ((fns (mapcar 'function-src syms))
 	     (n (intern (symbol-name (gensym (symbol-name sym))) (symbol-package sym)))
+	     (*keep-state* n)
 	     (sts (let (sts) (dotimes (i (length syms) (nreverse sts)) (push i sts))))
 	     (ns (inlinef n syms sts fns)))
 	(when ns
@@ -291,7 +293,7 @@
       (do-symbols 
        (s p)
        (when (member s *cmr*)
-	 (let ((x (convert-to-state s)))
+	 (let* ((x (convert-to-state s))(*keep-state* x))
 	   (when x
 	     (compile x)
 	     (mapc 'compile (get x 'mutual-recursion-group)))))))))

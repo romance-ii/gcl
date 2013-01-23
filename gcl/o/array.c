@@ -1180,7 +1180,7 @@ DEFUN("REF",object,fSref,SI,5,5,NONE,OI,II,IO,OO,(fixnum addr,fixnum s,fixnum u,
   case 8:
     switch (u) {
 #if SIZEOF_LONG!=4
-    case aem_t:         RETURN1(nw(64,i,));
+    case aem_t:         RETURN1(nw(64,o,));
     case aem_signed:    RETURN1(make_fixnum(nw(64,i,fix)));
 #endif
     case aem_float:     RETURN1(make_longfloat(nw(64,f,lf)));

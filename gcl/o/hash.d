@@ -171,10 +171,10 @@ ihash_equal1(object x,int depth) {
   cs_check(x);
 
 BEGIN:
-  if (depth++ <=3)
+  if (depth++<=3)
     switch ((tx=type_of(x))) {
     case t_cons:
-      h^=ihash_equal(x->c.c_car,depth);
+      h^=ihash_equal(x->c.c_car,depth)^rtb[abs(depth%(sizeof(rtb)/sizeof(*rtb)))];
       x = x->c.c_cdr;
       goto BEGIN;
       break;

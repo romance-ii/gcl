@@ -42,7 +42,7 @@ make_cfun(void (*self)(), object name, object data, char *start, int size) {
      data->cfd.cfd_size=size; 
    } else if (size) FEerror("Bad call to make_cfun",0); 
 
-   return fSinit_function(list(6,Cnil,Cnil,make_fixnum((unsigned)self),Cnil,Cnil,name),
+   return fSinit_function(list(6,Cnil,Cnil,make_fixnum((fixnum)self),Cnil,Cnil,name),
 			  (void *)fSeval_src,data,Cnil,-1,0,(((1<<6)-1)<<6)|(((1<<5)-1)<<12)|(1<<17)); 
 
    /* object cf;  */

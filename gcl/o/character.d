@@ -602,7 +602,7 @@ gcl_init_character()
 	  x->ch.tt=((' ' <= i && i < '\177') || i == '\n');
 	  x->ch.ch_font = 0;
 	  x->ch.ch_bits = 0;
-	  x->ch.ch_self=&x->ch.ch_code;
+	  x->ch.ch_self=(void *)&x->ch.ch_code;
 	  x->ch.ch_fillp=1;
 	}
 /* #ifdef AV */
