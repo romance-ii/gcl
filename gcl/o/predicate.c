@@ -371,17 +371,17 @@ equalp1(register object x, register object y) {
   case t_hashtable:
     {
       unsigned i;
-      struct htent *e;
+      struct cons *e;
 
       if (x->ht.ht_nent!=y->ht.ht_nent)
 	return(FALSE);
       if (x->ht.ht_test!=y->ht.ht_test)
 	return(FALSE);
       for (i=0;i<x->ht.ht_size;i++) {
-	if (x->ht.ht_self[i].hte_key==OBJNULL)
+	if (x->ht.ht_self[i].c_cdr==OBJNULL)
 	  continue;
-	if ((e=gethash(x->ht.ht_self[i].hte_key,y))->hte_key==OBJNULL
-	   ||!equalp(x->ht.ht_self[i].hte_value,e->hte_value))
+	if ((e=gethash(x->ht.ht_self[i].c_cdr,y))->c_cdr==OBJNULL
+	   ||!equalp(x->ht.ht_self[i].c_car,e->c_car))
 	  return(FALSE);
       }
       return(TRUE);

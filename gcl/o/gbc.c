@@ -349,18 +349,18 @@ mark_object(object x) {
     if (x->ht.ht_self == NULL)
       break;
     for (i = 0, j = x->ht.ht_size;  i < j;  i++) {
-      mark_object(x->ht.ht_self[i].hte_key);
-      mark_object(x->ht.ht_self[i].hte_value);
+      mark_object(x->ht.ht_self[i].c_cdr);
+      mark_object(x->ht.ht_self[i].c_car);
     }
     if ((short)what_to_collect >= (short)t_contiguous) {
       if (inheap(x->ht.ht_self)) {
 	if (what_to_collect == t_contiguous)
 	  mark_contblock((char *)(x->ht.ht_self),
-			 j * sizeof(struct htent));
+			 j * sizeof(struct cons));
       } else
 	x->ht.ht_self =
 	  copy_relblock((char *)(x->ht.ht_self),
-			j * sizeof(struct htent));
+			j * sizeof(struct cons));
     }
     break;
     

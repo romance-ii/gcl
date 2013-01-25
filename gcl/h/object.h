@@ -135,6 +135,8 @@ typedef double longfloat;
 */
 typedef union lispunion *object;
 
+typedef struct cons * htent;
+
 typedef object (*ofunc)();
 typedef void   (*vfunc)();
 
@@ -292,9 +294,9 @@ struct stdesig {
 
   ufixnum           pad;
   ufixnum           pad1;
-  uchar             *sd_self;
+  uchar             *sd_sdself;
   ufixnum           pad2:4;
-  ufixnum           sd_fillp:LM4BITS;
+  ufixnum           sd_sdfillp:LM4BITS;
   ufixnum           pad3;
 
 };
@@ -413,16 +415,16 @@ enum httest {   /*  hash table key test function  */
   htt_equalp    /*  equalp  */
 };
 
-struct htent {      /*  hash table entry  */
-  object hte_key;   /*  key  */
-  object hte_value; /*  value  */
-};
+/* struct htent {      /\*  hash table entry  *\/ */
+/*   object hte_key;   /\*  key  *\/ */
+/*   object hte_value; /\*  value  *\/ */
+/* }; */
 
 struct hashtable {           /*  hash table header  */
 
   FIRSTWORD;
 
-  struct htent *ht_self;    /*  pointer to the hash table  */
+  htent         ht_self;    /*  pointer to the hash table  */
   real          ht_rhsize;  /*  rehash size  */
   real          ht_rhthresh;/*  rehash threshold  */
   ufixnum       ht_nent;    /*  number of entries  */

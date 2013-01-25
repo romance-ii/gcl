@@ -281,16 +281,16 @@ fasload(object faslfile) {
 
       } else {
 
-	struct htent *x;
+	struct cons *x;
 /* 	unsigned long ad; */
 
 	set_type_of(&st,t_string);
 	st.st.st_self=(char *)q[u]->name;
 	st.st.st_fillp=st.st.st_dim=strlen(st.st.st_self);
-	if ((x=gethash((object)&st,sSAlink_hash_tableA->s.s_dbind))->hte_key==OBJNULL)
+	if ((x=gethash((object)&st,sSAlink_hash_tableA->s.s_dbind))->c_cdr==OBJNULL)
 	  continue;
 
-	q[u]->value=fix(x->hte_value);
+	q[u]->value=fix(x->c_car);
 	q[u]->flags|=BSF_WEAK;
 
       }

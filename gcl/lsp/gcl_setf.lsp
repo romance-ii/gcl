@@ -83,8 +83,9 @@
 	 (unless (= (list-length (cadr rest)) 1)
 		 (error "(store-variable) expected."))
 	 (multiple-value-bind
-	  (doc decls body)
-	  (find-doc (cddr rest) nil)
+	  (doc decls ctps body)
+	  (parse-body-header (cddr rest))
+	  (declare (ignore ctps))
 	  `(eval-when (compile eval load)
 		      (si:putprop 
 		       ',access-fn 

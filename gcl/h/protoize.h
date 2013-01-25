@@ -1114,7 +1114,7 @@ siLhash_set(void);
 void
 Lgethash(void);
 
-struct htent *
+struct cons *
 gethash(object,object);
 
 void

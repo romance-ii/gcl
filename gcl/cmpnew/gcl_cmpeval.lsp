@@ -592,8 +592,9 @@
 		    (,#tkeyword . :a)
 		    (,#t(and symbol (not boolean) (not keyword)) . 'a)))
 
-(defvar *rep-lst1* (when (and (fboundp 'tt3) (compiled-function-p #'tt3))
-		     (mapcar (lambda (x) (list (car x) (tt3 (eval (cdr x))))) *rep-lst*)))
+;; (defvar *rep-lst1* (when (and (fboundp 'tt3) (compiled-function-p #'tt3))
+;; 		     (mapcar (lambda (x) (list (car x) (tt3 (eval (cdr x))))) *rep-lst*)))
+(defvar *rep-lst1* (mapcar (lambda (x) (list (car x) (tt3 (eval (cdr x))))) *rep-lst*))
 
 (defvar *rep-lst2* (when (and (fboundp 'tt32) (compiled-function-p #'tt32))
 		     (mapcar (lambda (x) (list (car x) (tt32 (eval (cdr x))))) *rep-lst*)))
@@ -1889,7 +1890,7 @@
 
 (defun make-ordinary (fn &aux *c1exit*);FIXME *c1exit*
   (let* ((s (tmpsym))(g (tmpsym))
-	 (e (c1let-* `(((,s ,g)) (etypecase ,s ((and symbol (not boolean)) (fsf ,s)) (function ,s))) t (list (cons g fn))))
+	 (e (c1let-* `(((,s ,g)) (etypecase ,s ((and symbol (not boolean)) (fsf ,s)) (function ,s))) t (list (cons g fn)))); (coerce ,s 'function)
 	 (info (make-info)))
     (add-info info (cadr e))
     (list 'ordinary info e)))

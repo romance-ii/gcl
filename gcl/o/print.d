@@ -1297,7 +1297,7 @@ int level;
 			y = x->c.c_car;
 			x = x->c.c_cdr;
 			write_object(y, level+1);
-			if (!consp(x)) {
+			if (!x || !consp(x)) {
 				if (x != Cnil) {
 					write_ch(INDENT);
 					write_str(". ");

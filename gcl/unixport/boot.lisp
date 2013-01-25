@@ -24,8 +24,8 @@
 
 (defun doit (ld?)
 
-  (dolist (l '(cp));c::>= object_to_dcomplex prob at safety 3
-    (doitf l "lsp" ld?))
+  ;; (dolist (l '(cp));c::>= object_to_dcomplex prob at safety 3
+  ;;   (doitf l "lsp" ld?))
   
   #+pre-gcl(declaim (optimize (safety 3)))
   

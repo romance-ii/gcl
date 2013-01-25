@@ -155,7 +155,7 @@ enum dump_type {
 
 object fas_stream;
 int dump_index;
-struct htent *gethash();
+/* struct htent *gethash(); */
 static void read_fasd1(int i, object *loc);
 object extended_read();
 
@@ -470,10 +470,10 @@ getd(str)
 
 static enum circ_ind
 do_hash(object obj, int dot)
-{    struct htent *e;
+{    struct cons *e;
      int i;
      e=gethash(obj,dump_hash_table); 
-     if (e->hte_key==OBJNULL) 
+     if (e->c_cdr==OBJNULL) 
 /* We won't index things unless they have  < -2 in the hash table */
   {   if(type_of(obj)!=t_package) return NOT_INDEXED;
       sethash(obj,dump_hash_table,make_fixnum(dump_index));
@@ -483,12 +483,12 @@ do_hash(object obj, int dot)
 	dump_index++;
 	return FIRST_INDEX;}
 	
-     i = fix(e->hte_value);
+     i = fix(e->c_car);
      if (i == -1) return NOT_INDEXED; /* don't want to index this baby */
      
      if (dot) PUT_OP(dot);
      if ( i < -1)
-       { e->hte_value = make_fixnum(dump_index);
+       { e->c_car = make_fixnum(dump_index);
 	 PUT_OP(d_new_indexed_item);
 	 DPRINTF("{dump_index=%d}",dump_index);
 	 dump_index++;
@@ -995,7 +995,7 @@ fasd_patch_sharp(object x, int depth)
 object sharing_table;
 static enum circ_ind
 is_it_there(object x)
-{ struct htent *e;
+{ struct cons *e;
   object table=sharing_table;
   switch(type_of(x)){
   case t_cons:
@@ -1005,14 +1005,14 @@ is_it_there(object x)
   case t_vector:
   case t_package:
   e= gethash(x,table);
-    if (e->hte_key ==OBJNULL)
+    if (e->c_cdr ==OBJNULL)
       {sethash(x,table,make_fixnum(-1));
        return FIRST_INDEX;
      }
     else
-      {int n=fix(e->hte_value);
+      {int n=fix(e->c_car);
        if (n <0)
-	 e->hte_value=make_fixnum(n-1);
+	 e->c_car=make_fixnum(n-1);
        return LATER_INDEX;}
   break;
  default:
@@ -1517,8 +1517,8 @@ clrhash(object table)
 {int i;
    if (table->ht.ht_nent > 0 )
      for(i = 0; i < table->ht.ht_size; i++) {
-       table->ht.ht_self[i].hte_key = OBJNULL;
-       table->ht.ht_self[i].hte_value = OBJNULL;}
+       table->ht.ht_self[i].c_cdr = OBJNULL;
+       table->ht.ht_self[i].c_car = OBJNULL;}
    table->ht.ht_nent =0;}
 
 

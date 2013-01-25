@@ -20,8 +20,8 @@
   (declare (optimize (safety 1)))
   (check-type s string)
   (check-type p (or package string symbol character))
-  (labels ((inb (h p) (c::package-internal p (mod h (c::package-internal_size p))))
-	   (exb (h p) (c::package-external p (mod h (c::package-external_size p))))
+  (labels ((inb (h p) (package-internal p (mod h (c-package-internal_size p))))
+	   (exb (h p) (package-external p (mod h (c-package-external_size p))))
 	   (coerce-to-package 
 	    (p)
 	    (cond ((packagep p) p)
@@ -39,7 +39,7 @@
 		 (values (car r) :internal))
 		((setq r (cns s (exb h p)))
 		 (values (car r) :external))
-		((dolist (p (c::package-uselist p))
+		((dolist (p (c-package-uselist p))
 		   (when (setq r (cns s (exb h p)))
 		     (return r)))
 		 (values (car r) :inherited))
@@ -101,5 +101,5 @@
 #+pre-gcl(defun symbolp (x) (typecase x (list (not x)) (symbol t)))
 (defun keywordp (x) (typecase x (keyword t)))
 
-;; (setf (symbol-function 'symbol-plist)   (symbol-function 'c::symbol-plist))
-;; (setf (symbol-function 'symbol-package) (symbol-function 'c::symbol-hpack))
+;; (setf (symbol-function 'symbol-plist)   (symbol-function 'c-symbol-plist))
+;; (setf (symbol-function 'symbol-package) (symbol-function 'c-symbol-hpack))

@@ -266,8 +266,9 @@ load_memory(Shdr *sec1,Shdr *sece,void *v1,ul **got,ul **gote) {
   memory=alloc_object(t_cfdata);
   memory->cfd.cfd_size=sz;
   memory->cfd.cfd_self=0;
+  memory->cfd.cfd_start=0;/*gc protect*/
+  memory->cfd.cfd_dlist=Cnil;
   memory->cfd.cfd_start=alloc_contblock(sz);
-  memory->cfd.cfd_dlist = Cnil;
 
   a=(ul)memory->cfd.cfd_start;
   a=(a+ma)&~ma;

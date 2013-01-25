@@ -426,7 +426,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 		       `(let* (,@(mapcar (lambda (x) (list (car x) `(tmpsym))) (reverse clo))
 			       (,o (fun-env ',name));FIXME share structure
 			       (,v ,form)
-			       (,f (c::symbol-gfdef ,v)))
+			       (,f (c-symbol-gfdef ,v)))
 			  (si::set-function-environment ,f ,o)
 			  ,v)) form) na))))))
 

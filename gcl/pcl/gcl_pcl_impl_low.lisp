@@ -3,13 +3,14 @@
           %compiled-function-name
           %set-compiled-function-name))
 (in-package :pcl)
+(use-package :s)
 (eval-when
  (compile eval load)
  (setq  *EVAL-WHEN-COMPILE* t))
 
 (defun %%allocate-instance--class (&aux wrapper slots)
   (let ((i (system:make-structure 'std-instance wrapper slots)))
-    (c::set-d-tt 1 i)
+    (c-set-t-tt i 1)
     i))
 
 (import '(si::memq) 'pcl)
@@ -46,14 +47,13 @@
 
 
 (defun %cclosure-env-nthcdr (n f)
-  (c::function-env f n))
+  (function-env f n))
 
 
 (defun cclosurep (x) (typecase x (compiled-function t)))
 
 (defun %cclosure-env (f)
-  (declare (inline c::fn-env))
-  (compiler::fn-env f))
+  (function-env f 0))
 
 
 
@@ -73,18 +73,18 @@
   (let ((fin (allocate-funcallable-instance-2))
 	(env (make-list funcallable-instance-closure-size :initial-element nil)))
     (si::set-function-environment fin env)
-    (c::set-d-tt 1 fin)
+    (c-set-t-tt fin 1)
     fin))
 
 (defun funcallable-instance-p (x)
-  (si::lit :boolean "fto(" (:object x) ")==" (:fixnum #.(let ((x (lambda nil nil))) (c::set-d-tt 1 x) (compiler::tt3 x)))))
+  (si::lit :boolean "fto(" (:object x) ")==" (:fixnum #.(let ((x (lambda nil nil))) (c-set-t-tt x 1) (compiler::tt3 x)))))
 (declaim (inline funcallable-instance-p))
 
 
 
 
 (defun si:%structure-name (x) (si::lit :object "(" (:object x) ")->str.str_def->str.str_self[0]"))
-(defun %fboundp (x) (/= 0 (si::address (c::symbol-gfdef x))))
+(defun %fboundp (x) (/= 0 (si::address (c-symbol-gfdef x))))
 (declaim (inline si:%structure-name %fboundp))
 
 
@@ -93,7 +93,7 @@
   (declare (ignore ignore))
   (cond ((compiled-function-p fn)
 	 (when (symbolp new-name) (pcl::proclaim-defmethod new-name nil))
-	 (setf (si::call-name (c::function-plist fn)) new-name))
+	 (setf (si::call-name (c-function-plist fn)) new-name))
         ((and (listp fn)
               (eq (car fn) 'lambda-block))
          (setf (cadr fn) new-name))
@@ -111,13 +111,13 @@
     (error "Bad fn 1"))
   (si::use-fast-links nil r)
   (progn (compiler::side-effects) (compiler::lit :object (:object r) "->fun.fun_self=" (:object v) "->fun.fun_self"));FIXME
-  (c::set-function-minarg (c::function-minarg v) r)
-  (c::set-function-maxarg (c::function-maxarg v) r)
-  (c::set-function-neval  (c::function-neval v) r)
-  (c::set-function-vv     (c::function-vv v) r)
-  (c::set-function-data   (c::function-data v) r)
-  (c::set-function-plist  (c::function-plist v) r)
-  (c::set-function-argd   (c::function-argd v) r)
+  (c-set-function-minarg r (c-function-minarg v))
+  (c-set-function-maxarg r (c-function-maxarg v))
+  (c-set-function-neval r  (c-function-neval v))
+  (c-set-function-vv r     (c-function-vv v))
+  (c-set-function-data r   (c-function-data v))
+  (c-set-function-plist r  (c-function-plist v))
+  (c-set-function-argd r   (c-function-argd v))
   (let* ((ve (%cclosure-env v))
 	 (l (- (length ve) s))
 	 (ve (if (> l 0) (butlast ve l) ve)))

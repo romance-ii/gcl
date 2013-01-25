@@ -531,8 +531,9 @@
 (*make-constant '+sfix+ (eql (truncate fixnum-length char-length) 4))
 
 (in-package :s)
-(si::import-internal 'si::(\| & ^ ~ c+ c* << >> string-concatenate strcat lit seqind fixnum-length char-length cref address c-function-plist))
-(si::import-internal 'compiler::(lisp-type cmp-norm-tp))
+(si::import-internal 'si::(\| & ^ ~ c+ c* << >> string-concatenate strcat lit seqind fixnum-length char-length cref address 
+			   package-internal package-external))
+(si::import-internal 'compiler::(lisp-type cmp-norm-tp fsf))
 
 
 (dolist (l '((:float      "make_shortfloat"      short-float     cnum)
@@ -550,8 +551,29 @@
 	     (:dcomplex   "make_dcomplex"        dcomplex        cnum)
 	     (:string     "make_simple_string"   string)
 	     (:object     ""                     t)
+
+	     (:stdesig    ""                     (or symbol string character))
+	     (:longfloat  ""                     long-float)
+	     (:shortfloat ""                     short-float)
+	     (:hashtable  ""                     hash-table)
+	     (:ocomplex   ""                     complex)
+	     (:bitvector  ""                     bit-vector)
+	     (:random     ""                     random-state)
+	     (:ustring    ""                     string)
+	     (:fixarray   ""                     (array fixnum))
+	     (:sfarray    ""                     (array short-float))
+	     (:lfarray    ""                     (array long-float))
+
+	     (:real       
+
 	     (:float*     nil                    nil             (array short-float) "->sfa.sfa_self")
 	     (:double*    nil                    nil             (array long-float)  "->lfa.lfa_self")
 	     (:long*      nil                    nil             (array fixnum)      "->fixa.fixa_self")
-	     (:void*      nil                    nil             (or array symbol character) "->v.v_self")))
+	     (:void*      nil                    nil             (or array symbol character) "->v.v_self"))))
   (setf (get (car l) 'lisp-type) (if (cadr l) (caddr l) (cadddr l))))
+
+(if (member :ansi-cl *features*)
+    (in-package :cl-user)
+  (in-package :user))
+
+(si::import-internal 'si::while)

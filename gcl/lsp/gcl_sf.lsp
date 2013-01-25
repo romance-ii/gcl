@@ -3,13 +3,11 @@
 (eval-when
  (eval compile) 
   
- (defmacro idefun (n &rest args) `(progn (defun ,n ,@args) (si::putprop ',n t 'compiler::cmp-inline) (export ',n)))
- 
  (defun foo-reader (stream subchar)
    (declare (ignore subchar) (optimize (safety 2)))
    (let ((x (read-delimited-list #\} stream)))
      (let (zz z r) 
-       (mapc (lambda (x) 
+       (mapc #'(lambda (x) 
 	       (cond ((member x '(|enum| |union| |struct| |unsigned|)) (setq zz x))
 		     ((not z) (setq z (if zz (list zz x) x)))
 		     ((integerp x) (setq r (cons (list z (cadar r) x) (cdr r))))
@@ -44,10 +42,10 @@
 	  (push (read-delimited-list #\; s) td)))))
  
  (defun td (k l)
-   (let* ((kn (when (symbolp k) (symbol-name k)))
-	  (kk (when kn (find-symbol (string-upcase kn) 'keyword)))
-	  (kk (when (get kk 'compiler::lisp-type) kk))
-	  (x (car (member k l :key (lambda (x) (car (last x)))))))
+   (let* ((kn (when (symbolp k) (string-upcase (symbol-name k))))
+	  (kk (when kn (mktp kn)))
+	  (kk (when kk (intern kn :keyword)))
+	  (x (car (member k l :key #'(lambda (x) (car (last x)))))))
      (cond (kk)
 	   ((not x) k)
 	   ((eq (car x) '|unsigned|) (cons (td (cadr x) l) (car x)))
@@ -55,21 +53,21 @@
 	   (x))))
  
  (defun mrin (f x &key key)
-   (mapcan 'identity (maplist (lambda (x) (when (funcall f (funcall key (car x))) (list (car x)))) x)))
+   (mapcan 'identity (maplist #'(lambda (x) (when (funcall f (funcall key (car x))) (list (car x)))) x)))
 
  (defun slist nil
    
    (let* ((com (get-com "../h/cmpinclude.h"))
 	  (td (cadr com))
 	  (com (car com))
-	  (u (car (member-if (lambda (x) (and (eq (car x) '|union|) (eq (cadr x) '|lispunion|))) com)))
+	  (u (car (member-if #'(lambda (x) (and (eq (car x) '|union|) (eq (cadr x) '|lispunion|))) com)))
 	  (u (mrin 'consp (caddr u) :key 'car)))
-     (mapcar (lambda (x) 
-	       (let ((y (car (member-if (lambda (z) 
+     (mapcar #'(lambda (x) 
+	       (let ((y (car (member-if #'(lambda (z) 
 					  (when (consp (car x))
 					    (and  (eq (caar x) (car z)) (eq (cadar x) (cadr z))))) com)))) 
 		 (list (car x) (cadr x)
-		       (mapcar (lambda (z) (cons (td (car z) td) (cdr z))) (caddr y))))) u)))
+		       (mapcar #'(lambda (z) (cons (td (car z) td) (cdr z))) (caddr y))))) u)))
  
  (defun bz (x) (ash 1 (+ x 3)))
  (defun ks (k &aux (x (or (cadr (assoc k +ks+)) +fl+))) (bz x))
@@ -85,8 +83,8 @@
 
  (defun mtpp (k y &aux (zz (car y))(z (if (consp zz) (car zz) zz))(u (when (consp zz) (eq (cdr zz) '|unsigned|))))
    (cond ((caddr y) (unless u (error "bar")) (cmp-norm-tpp `(unsigned-byte ,(caddr y))))
-	 ((when (keywordp z) (eq k :object))(get z 'lisp-type))
-	 ((get k 'lisp-type))
+	 ((when (keywordp z) (eq k :object)) (mktp z));(get z 'lisp-type))
+	 ((mktp k));((get k 'lisp-type))
 	 (t)))
  
  (defun pp (y &aux (n (string (cadr y)))) (when (eql #\* (aref n 0)) (list :fixnum (intern (subseq n 1)))))
@@ -100,19 +98,27 @@
  
  
  (defun gk (b y &aux (k (car y))(k (if (consp k) (car k) k)))
-   (cond ((< b (ks k)) (or (car (rassoc b +ks+ :key (lambda (x) (bz (car x))))) (baboon)))
+   (cond ((< b (ks k)) (or (car (rassoc b +ks+ :key #'(lambda (x) (bz (car x))))) (baboon)))
 	 ((car (assoc k +ks+)))
 	 ((keywordp k) :object)
 	 (:fixnum)))
  
- (defun btp (z) (or (cmp-norm-tpp (find-symbol (string-upcase z) :compiler)) t))
- 
- (defun afn (n tp body &optional ytp) 
-   `(idefun ,n (x ,@(when ytp `(y))) 
-	    (declare (optimize (safety 1)))
-	    ,@(unless (eq tp t) `((check-type x ,tp))),@(when ytp `((check-type y ,ytp)))
-	    ,@body))
- 
+(defun mktp (z &aux (z (string-upcase z))) (or (find-symbol z :cl) (get (find-symbol z :keyword) 'lisp-type)))
+
+(defun btp (z) (or (cmp-norm-tpp (mktp z)) t))
+
+(defun idefun (args &aux (n (pop args)))
+  `(progn
+     (defun ,n ,@args)
+     (si::putprop ',n t 'compiler::cmp-inline)
+     (export ',n)))
+
+(defun afn (n tp body &optional ytp) 
+  (idefun `(,n (x ,@(when ytp `(y))) 
+	       (declare (optimize (safety 1)))
+	       ,@(unless (eq tp t) `((check-type x ,tp))),@(when ytp `((check-type y ,ytp)))
+	       ,@body)))
+
  (defun gbe (f tp o s sz b a)  `((the ,tp ,(m& (m>> `(,f ,a ,o nil nil) s) (when (< (+ s sz) b) (mm (1- (ash 1 sz))))))))
  (defun sbe (f    o s sz b a) 
    `((,f ,a ,o t ,(m\| (m<< 'y s) (when (< sz b) `(& (,f ,a ,o nil nil) ,(~ (mm (ash (1- (ash 1 sz)) s))))))) y))
@@ -145,15 +151,20 @@
  
  (defun mrd (x &key test key)
    (mapcan 'identity
-	  (maplist (lambda (x) (unless (member (funcall key (car x)) (cdr x) :test test :key key) (list (car x)))) x)))
+	  (maplist #'(lambda (x) (unless (member (funcall key (car x)) (cdr x) :test test :key key) (list (car x)))) x)))
 
  (defun macc nil 
    (mrd
-    (mapcan (lambda (x &aux (c 0))
-	      (mapcan (lambda (y &aux (y (or (pp y) y))(sz (bs y))(c (prog1 c (incf c sz)))(x (fp c x y)))
-			(when x `((,(cadar x) ,(cadr x) ,c ,sz ,y)))) (caddr x))) (slist)) :test 'equal :key 'cddr))
- 
- (defmacro mac nil `(progn ,@(mapcan (lambda (x) (apply 'afn2 x)) (macc)))))
+    (mapcan #'(lambda (x &aux (c 0))
+	      (mapcan #'(lambda (y &aux (y (or (pp y) y))(sz (bs y))(c (prog1 c (incf c sz)))(x (fp c x y)))
+			(when x `((,(cadar x) ,(cadr x) ,c ,sz ,y)))) (caddr x))) (slist)) :test 'equal :key 'cddr)))
 
-(mac)
+#.`(progn ,@(mapcan #'(lambda (x) (apply 'afn2 x)) (macc)))
+
+#.(idefun `(stdesig-self (s i) (*char (c-stdesig-sdself s) i nil nil)))
+#.(idefun `(set-stdesig-self (s i j) (*char (c-stdesig-sdself s) i t j)))
+#.(idefun `(function-env (fun i) (*object (c-function-env fun) i nil nil)))
+#.(idefun `(package-internal (p i) (*object (c-package-internal p) i nil nil)))
+#.(idefun `(package-external (p i) (*object (c-package-external p) i nil nil)))
+#.(idefun `(hashtable-self (h i) (si::nani (c+ (c-hashtable-self h) (<< i #.(integer-length (/ si::fixnum-length si::char-length)))))))
 

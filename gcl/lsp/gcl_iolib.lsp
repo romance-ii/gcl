@@ -753,7 +753,3 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
 (defun load (f &rest args)
   (values (apply 'load1 f args)))
 
-;; (defun make-string-output-stream (&key element-type)
-;;   (declare (optimize (safety 1)))
-;;   (declare (ignore element-type))
-;;   (c::make-string-output-stream))

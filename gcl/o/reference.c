@@ -28,6 +28,13 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 
+DEFUN("TT3",fixnum,fStt3,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {
+  return fto(x);
+}
+DEFUN("TT30",object,fStt30,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  return fto0(x)?Cnil:Ct;
+}
+
 DEFUN("CFUN-CALL",object,fScfun_call,SI,1,1,NONE,OO,OO,OO,OO,(object fun),"") {
   if (!functionp(fun))
     TYPE_ERROR(fun,sLfunction);

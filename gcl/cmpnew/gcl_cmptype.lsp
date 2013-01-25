@@ -1535,4 +1535,4 @@
 (defun symbol-gfdef-propagator (f t1 &aux (a (atomic-tp t1)))
   (declare (ignore f))
   (if a (object-type (funid-to-fn (car a))) #tfunction));FIXME 0
-(setf (get 'c::symbol-gfdef 'type-propagator) 'symbol-gfdef-propagator)
+(setf (get 'c-symbol-gfdef 'type-propagator) 'symbol-gfdef-propagator)

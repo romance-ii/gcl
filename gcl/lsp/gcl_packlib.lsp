@@ -228,4 +228,4 @@
   (values))
 
 (defun package-name (p) 
-  (c::package-name (si::coerce-to-package p)))
+  (c-package-name (si::coerce-to-package p)))

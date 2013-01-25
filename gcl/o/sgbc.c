@@ -248,19 +248,19 @@ sgc_mark_object1(object x) {
       break;
     for (i = 0, j = x->ht.ht_size;  i < j;  i++) {
       if (ON_WRITABLE_PAGE(&x->ht.ht_self[i])) {
-	sgc_mark_object(x->ht.ht_self[i].hte_key);
-	sgc_mark_object(x->ht.ht_self[i].hte_value);
+	sgc_mark_object(x->ht.ht_self[i].c_cdr);
+	sgc_mark_object(x->ht.ht_self[i].c_car);
       }
     }
     if ((short)what_to_collect >= (short)t_contiguous) {
       if (inheap(x->ht.ht_self)) {
 	if (what_to_collect == t_contiguous)
 	  mark_contblock((char *)(x->ht.ht_self),
-			 j * sizeof(struct htent));
+			 j * sizeof(struct cons));
       } else if(SGC_RELBLOCK_P(x->ht.ht_self))
 	x->ht.ht_self =
 	  copy_relblock((char *)(x->ht.ht_self),
-			j * sizeof(struct htent));
+			j * sizeof(struct cons));
     }
     break;
     

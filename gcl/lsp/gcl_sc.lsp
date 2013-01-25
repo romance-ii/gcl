@@ -16,10 +16,15 @@
 
 (defun character-designator-p (s)
   (or (typep s 'fixnum)
-      (= (c::stdesig-fillp s) 1)))
+      (= (stdesig-fillp s) 1)))
 
 (deftype character-designator nil `(and string-designator (satisfies character-designator-p)))
 (deftype string-designator    nil `(or string symbol character (integer 0 255)))
+
+;; #.`(defun c-stdesig-self
+;;      ,@(cdr (sublis '((array . string-designator) (c-array-self . c-stdesig-self)) (function-src 'c-array-self))))
+;; #.`(defun c-stdesig-fillp 
+;;      ,@(cdr (sublis '((vector . string-designator) (c-vector-fillp . c-stdesig-fillp)) (function-src 'c-vector-fillp))))
 
 (eval-when
  (compile eval)
@@ -33,9 +38,9 @@
 	     (char-downcase (x) 
 			    (if (upper-case-p x)
 				(+ x #.(- (char-code #\a) (char-code #\A))) x))
-	     (aref (s i) (c::stdesig-self s i))
-	     (aset (v s i) (c::set-string-self v s i))
-	     (length (s) (c::stdesig-fillp s))
+	     (aref (s i) (stdesig-self s i))
+	     (aset (v s i) (set-stdesig-self s i v))
+	     (length (s) (c-stdesig-sdfillp s))
 	     (char= (x z) (= x z))
 	     (char< (x z) (< x z))
 	     (char> (x z) (> x z))
@@ -119,7 +124,7 @@
    c
    (character c)
    (unsigned-char (code-char c))
-   (otherwise (code-char (c::stdesig-self c 0)))))
+   (otherwise (code-char (stdesig-self c 0)))))
 
 
 (defun char-int (c)
@@ -393,12 +398,6 @@
 	      (if (and (= i 0) (= j l)) s (subseq s i (1+ j)))))))))
 
 
-(defun functionp (x)
-  (typecase x (function t)))
-
-(defun compiled-function-p (x)
-  (typecase x (compiled-function t)))
-
 ;FIXME
 ;; (defun interpreted-function-p (x) 
 ;;   (typecase x (interpreted-function t)))
@@ -418,6 +417,14 @@
    (symbol (= 1 (c-symbol-stype x)))
    (cons (eq 'quote (car x)))
    (otherwise t)))
+
+;; FIXME these functions cannot be loaded interpreted, cause an infinite loop on typep/fsf
+
+(defun functionp (x)
+  (typecase x (function t)))
+
+(defun compiled-function-p (x)
+  (typecase x (function (typep (caddr (c-function-plist x)) 'string))))
 
 (defun stringp (x)
   (typecase

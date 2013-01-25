@@ -4,15 +4,15 @@
 
 (in-package :si)
 
-(export '(blocked-body-name parse-body-header))
+;; (export '(blocked-body-name parse-body-header))
 
 
-(defun parse-body-header (x &optional doc decl ctps &aux (a (car x)))
-  (cond 
-   ((unless (or doc ctps) (and (stringp a) (cdr x))) (parse-body-header (cdr x) a decl ctps))
-   ((unless ctps (when (consp a) (eq (car a) 'declare)))  (parse-body-header (cdr x) doc (cons a decl) ctps))
-   ((when (consp a) (eq (car a) 'check-type)) (parse-body-header (cdr x) doc decl (cons a ctps)))
-   (t (values doc (nreverse decl) (nreverse ctps) x))))
+;; (defun parse-body-header (x &optional doc decl ctps &aux (a (car x)))
+;;   (cond 
+;;    ((unless (or doc ctps) (and (stringp a) (cdr x))) (parse-body-header (cdr x) a decl ctps))
+;;    ((unless ctps (when (consp a) (eq (car a) 'declare)))  (parse-body-header (cdr x) doc (cons a decl) ctps))
+;;    ((when (consp a) (eq (car a) 'check-type)) (parse-body-header (cdr x) doc decl (cons a ctps)))
+;;    (t (values doc (nreverse decl) (nreverse ctps) x))))
 
 ;; (defun parse-body-header (x &optional doc decl ctps)
 ;;   (let* ((a (car x))
@@ -23,9 +23,9 @@
 ;;    ((when (consp a) (eq (car a) 'check-type)) (parse-body-header (cdr x) doc decl (cons a ctps)))
 ;;    (t (values doc (nreverse decl) (nreverse ctps) x)))))
 
-(defun make-blocked-lambda (ll decls ctps body block)
-  (let ((body (if (eq block (blocked-body-name body)) body `((block ,block ,@body)))))
-    `(lambda ,ll ,@decls ,@ctps ,@body)))
+;; (defun make-blocked-lambda (ll decls ctps body block)
+;;   (let ((body (if (eq block (blocked-body-name body)) body `((block ,block ,@body)))))
+;;     `(lambda ,ll ,@decls ,@ctps ,@body)))
 
 (defun block-lambda (ll block body)
   (multiple-value-bind
@@ -34,18 +34,18 @@
    (declare (ignore doc))
    (make-blocked-lambda ll decls ctps body block)))
        
-(defun find-doc (x &optional y)
-  (declare (ignore y))
-  (multiple-value-bind
-   (doc decls ctps body)
-   (parse-body-header x)
-   (values doc decls (nconc ctps body))))
+;; (defun find-doc (x &optional y)
+;;   (declare (ignore y))
+;;   (multiple-value-bind
+;;    (doc decls ctps body)
+;;    (parse-body-header x)
+;;    (values doc decls (nconc ctps body))))
 
-(defun blocked-body-name (body)
-  (when (and (not (cdr body))
-	     (consp (car body))
-	     (eq (caar body) 'block))
-    (cadar body)))
+;; (defun blocked-body-name (body)
+;;   (when (and (not (cdr body))
+;; 	     (consp (car body))
+;; 	     (eq (caar body) 'block))
+;;     (cadar body)))
 
 (defun get-blocked-body-name (x)
   (multiple-value-bind
@@ -70,7 +70,7 @@
 	 (ss  (if (stringp fas) (open-fasd (make-string-input-stream fas) :input 'eof nil) fas))
 	 (out (if (vectorp ss) (read-fasd-top ss) ss))
 	 (es  (when (eq (car out) 'lambda-closure) (mapcar 'car (cadr out))))
-	 (env (when es (s::*object (s::c-function-env fun) 0 nil nil))));(c::function-env fun 0)FIXME
+	 (env (when es (function-env fun 0))));(*object (c-function-env fun) 0 nil nil)
     (when env
 ;      (assert (= (length env) (length es))) ;FIXME closure var order
       (setf (cadr out) (mapcar 'list es env)))

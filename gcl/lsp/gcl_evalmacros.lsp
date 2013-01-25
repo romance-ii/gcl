@@ -101,7 +101,7 @@
 (defun delete-package (p)
   (the boolean (values (delete-package-internal p))))
 
-(import 'while #+ansi-cl 'cl-user #-ansi-cl 'user)
+;(import 'while #+ansi-cl 'cl-user #-ansi-cl 'user)
 (defmacro while (test &rest forms)
   (declare (optimize (safety 2)))
  `(loop (unless ,test (return)) ,@forms))
@@ -166,7 +166,7 @@
 
 (defmacro defun (name lambda-list &rest body)
   (declare (optimize (safety 2)))
-  (let* ((doc (find-doc body))
+  (let* ((doc (parse-body-header body))
 	 (rs (funid-sym name))
 	 (bn (if (eq rs name) name (cadr name))))
     `(progn ,@(when doc `((setf (get ',rs 'function-documentation) ,doc)))

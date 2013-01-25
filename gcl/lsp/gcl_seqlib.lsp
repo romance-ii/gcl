@@ -428,10 +428,6 @@
    o
    (function o) 
    (otherwise (the function (c-symbol-gfdef o)))))
-    ;; (let ((f (address (c::symbol-gfdef o)))(m (c::symbol-mflag o)))
-    ;;   (check-type f (not (integer 0 0)))
-    ;;   (check-type m (integer 0 0))
-    ;;   (the function (nani f))))))
 (putprop 'tofn t 'compiler::cmp-inline)
 
 (deftype fn nil `(satisfies fnp))

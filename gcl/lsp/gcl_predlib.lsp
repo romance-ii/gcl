@@ -550,7 +550,7 @@
 
 (defun non-generic-compiled-function-p (x)
   (cond ((typep x 'generic-function) nil)
-	((compiled-function-p x))))
+	((typep x 'function) (typep (caddr (c-function-plist x)) 'string))));(compiled-function-p x)
 
 (defconstant +type-alist+ '((null . null)
 	  (not-type . not)

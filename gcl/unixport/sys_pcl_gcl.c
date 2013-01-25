@@ -62,7 +62,7 @@ gcl_init_init()
 
   lsp_init("../lsp/gcl_export.lsp");
 
-  ar_init(gcl_cp);
+  /* ar_init(gcl_cp); */
   ar_init(gcl_s);
   ar_init(gcl_sf);
   ar_init(gcl_dl);

@@ -2088,7 +2088,7 @@
   (push `(mflag ,n) *top-level-forms*))
 
 (defun t3mflag (n)
-  (add-init `(c::set-symbol-mflag 1 ',n)))
+  (add-init `(c-set-symbol-mflag ',n 1)))
 
 (defun c1fset (args)
   (let* ((info (make-info))

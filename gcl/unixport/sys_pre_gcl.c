@@ -62,16 +62,15 @@ gcl_init_init()
 
   lsp_init("../lsp/gcl_export.lsp");
 
-  lsp_init("../lsp/gcl_dl.lsp");
-  lsp_init("../lsp/gcl_fle.lsp");
-  lsp_init("../lsp/gcl_rm.lsp");
+  lsp_init("../lsp/gcl_s.lsp");
+  lsp_init("../lsp/gcl_sf.lsp");
 
   lsp_init("../lsp/gcl_defmacro.lsp");
   lsp_init("../lsp/gcl_evalmacros.lsp");
+
   lsp_init("../lsp/gcl_top.lsp");
   lsp_init("../lsp/gcl_module.lsp");
 
-  lsp_init("../lsp/gcl_autoload.lsp");
 
 }
 
@@ -82,8 +81,15 @@ gcl_init_system(object no_init)
   if (type_of(no_init)!=t_symbol)
     error("Supplied no_init is not of type symbol\n");
 
-  lsp_init("../lsp/gcl_s.lsp");
-  lsp_init("../lsp/gcl_sf.lsp");
+  lsp_init("../lsp/gcl_dl.lsp");
+  lsp_init("../lsp/gcl_rm.lsp");
+  lsp_init("../lsp/gcl_autoload.lsp");
+
+  lsp_init("../lsp/gcl_fle.lsp");
+
+
+  /* lsp_init("../lsp/gcl_s.lsp"); */
+  /* lsp_init("../lsp/gcl_sf.lsp"); */
   lsp_init("../lsp/gcl_predlib.lsp");
   lsp_init("../lsp/gcl_callhash.lsp");
   lsp_init("../lsp/gcl_assert.lsp");
