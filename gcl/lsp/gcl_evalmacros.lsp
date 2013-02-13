@@ -334,7 +334,7 @@
 	  `(let ((,key ,keyform))
 	     (declare (ignorable ,key))
 	     ,(let ((df (when (dfp (caar c)) (m (cdr (pop c)) 'progn))))
-		(reduce (lambda (y c &aux (a (pop c))(v (v a)))
+		(lreduce (lambda (y c &aux (a (pop c))(v (v a)))
 			  (when (dfp a) (error 'program-error "default case must be last"))
 			  `(if ,(if (when (eq a v) (listp v)) (m (mapcar #'sw v) 'or) (sw v)) ,(m c 'progn) ,y))
 			c :initial-value df)))))

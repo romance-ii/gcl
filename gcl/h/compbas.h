@@ -79,21 +79,20 @@ typedef double complex dcomplex;
 
 #define tp2(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? 2 : _x->d.e && _x->ff.ff<IM_FIX_BASE;})
 
-#define tp3(x) ({object _x=x;_x==Cnil ? 2 : ((((ufixnum)_x)>=IM_FIX_BASE) ? 3 : _x->d.e && _x->ff.ff<IM_FIX_BASE;;})
+#define tp3(x) ({object _x=x;_x==Cnil ? 2 : ((((ufixnum)_x)>=IM_FIX_BASE) ? 3 : _x->d.e && _x->ff.ff<IM_FIX_BASE);})
 
 #define tp4(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? t_fixnum : _x->d.e && _x->ff.ff<IM_FIX_BASE ? _x->d.t : 0;})
 
-#define tp5(x) ({object _x=x;_x==Cnil ? t_symbol : ((((ufixnum)_x)>=IM_FIX_BASE) ? t_fixnum : _x->d.e && _x->ff.ff<IM_FIX_BASE ? _x->d.t : 0;;})
+#define tp5(x) ({object _x=x;_x==Cnil ? t_symbol : ((((ufixnum)_x)>=IM_FIX_BASE) ? t_fixnum : (_x->d.e && _x->ff.ff<IM_FIX_BASE ? _x->d.t : 0));})
 
 
-#define tp6(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? (t_fixnum<<4)+1 : _x->d.e && _x->ff.ff<IM_FIX_BASE ? _x->fstp.tp : 0;})
+#define tp6(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? (t_fixnum<<4)+1 : (_x->d.e && _x->ff.ff<IM_FIX_BASE ? _x->fstp.tp : 0);})
 
 #define tp7(x) ({object _x=x;_x==Cnil ? (t_symbol<<4)+3 :\
       ((((ufixnum)_x)>=IM_FIX_BASE) ? (t_fixnum<<4)+1 :\
-       _x->d.e && _x->ff.ff<IM_FIX_BASE ? _x->fstp.tp : 0;;})
+       (_x->d.e && _x->ff.ff<IM_FIX_BASE ? _x->fstp.tp : 0));})
 
-#define tp8(x) ({object _x=x;(((ufixnum)_x)>=IM_FIX_BASE) ? t_end :  _x->d.e && _x->ff.ff<IM_FIX_BASE ? _x->d.t : t_end;1;})
-
+#define tp8(x) ({object _x=x;((((ufixnum)_x)>=IM_FIX_BASE) ? t_end :  (_x->d.e && _x->ff.ff<IM_FIX_BASE ? _x->d.t : t_end));})
 
 /* #define immnum_comp(x,y,c) (fimf(((ufixnum)x)&((ufixnum)y)) ? (x c y) : (number_compare(x,y) c 0)) */
 #define immnum_comp(x,y,c) ({register object _x=x,_y=y;\

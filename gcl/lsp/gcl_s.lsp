@@ -25,19 +25,17 @@
       ,@(mapcar (lambda (x &aux (c (consp x))(n (if c (car x) x))(s (string (if c (cdr x) x))))
 		  `(idefun ,n (x y) (declare (fixnum x y)) (lit :fixnum "(" (:fixnum x) ,s (:fixnum y) ")")))
 		'(& \| ^ >> << (c+ . +) (c* . *) (c- . -) (c/ . /) %))
-      (in-package :compiler)
-      (defun funcallable-symbol-p (s)
-	(and (symbolp s)
-	     (/= (si::address (c-symbol-gfdef s)) 0)
-	     (= (c-symbol-mflag s) 0)
-	     (= (c-symbol-sfdef s) (si::address nil))))
-      (setf (get 'funcallable-symbol-p 'cmp-inline) t)
-      
-      (defun fsf (s)
-	(declare (optimize (safety 1)))
-	(assert (funcallable-symbol-p s));  (check-type s funcallable-symbol); FIXME
-	(the function (c-symbol-gfdef s)));FIXME
-      (setf (get 'fsf 'cmp-inline) t))))
+      ;; (idefun tt3 (x) (lit :fixnum  "tt3(" (:object x) ")"))
+      ;; (idefun tt30 (x) (lit :fixnum  "tt30(" (:object x) ")"))
+      (idefun tp0 (x) (lit :fixnum  "tp0(" (:object x) ")"))
+      (idefun tp1 (x) (lit :fixnum  "tp1(" (:object x) ")"))
+      (idefun tp2 (x) (lit :fixnum  "tp2(" (:object x) ")"))
+      (idefun tp3 (x) (lit :fixnum  "tp3(" (:object x) ")"))
+      (idefun tp4 (x) (lit :fixnum  "tp4(" (:object x) ")"))
+      (idefun tp5 (x) (lit :fixnum  "tp5(" (:object x) ")"))
+      (idefun tp6 (x) (lit :fixnum  "tp6(" (:object x) ")"))
+      (idefun tp7 (x) (lit :fixnum  "tp7(" (:object x) ")"))
+      (idefun tp8 (x) (lit :fixnum  "tp8(" (:object x) ")")))))
 
 (eval-when 
   (eval)

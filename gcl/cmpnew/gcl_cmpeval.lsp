@@ -498,311 +498,12 @@
     form))
 (si::putprop 'zerop 'zerop-compiler-macro 'si::compiler-macro-prop)
 
-(defvar *rl* `((,#timmfix . 1) 
-	       (,#t(and fixnum (not immfix))  . (1+ (caddr #t(immfix))))
-	       (,#tbignum . (1+ most-positive-fixnum))
-	       (,#tratio . 1/2) 
-	       (,#tshort-float . 1.0s0) 
-	       (,#tlong-float . 1.0) 
-	       (,#t(complex integer) . #c(1 1)) 
-	       (,#t(complex ratio) . #c(1/2 1/2))
-	       (,#tfcomplex . #c(1.0s0 1)) 
-	       (,#tdcomplex . #c(1.0 1)) 
-	       (,#tstandard-char . #\a)
-	       (,#t(and character (not standard-char)) . #\^a)
-	       (,#tstructure . (make-var)) 
-	       (,#tpathname . #p".") ;FIXME
-	       (,#thash-table-eq . (make-hash-table :test 'eq))
-	       (,#thash-table-eql . (make-hash-table :test 'eql))
-	       (,#thash-table-equal . (make-hash-table :test 'equal))
-	       (,#thash-table-equalp . (make-hash-table :test 'equalp))
-	       (,#tpackage . *package*) 
-	       (,#tstream . *standard-input*) ;FIXME
-	       (,#trandom-state . (make-random-state)) 
-	       (,#treadtable . (si::standard-readtable)) 
-	       (,#tcompiled-function . (function eq)) ;FIXME old
-;	       (,#told-compiled-function . (function si::file-column)) ;FIXME old
-;	       (,#tinterpreted-function . (lambda nil nil)) 
-	       ,@(mapcar (lambda (x)
-			   `(,(cmp-norm-tp `(array ,x (*))) . 
-			     (make-array 1 :element-type ',x))) si::+array-types+)
-	       ,@(mapcar (lambda (x)
-			   `(,(cmp-norm-tp `(and (array ,x *) (not vector))) . 
-			     (make-array '(1 1) :element-type ',x))) si::+array-types+)
-	       (,#tcons . '(1)) 
-	       (,#tnull . nil) 
-	       (,#t(member t) . t)
-	       (,#tkeyword . :a)
-	       (,#t(and symbol (not boolean) (not keyword)) . 'a)))
-
-(defvar *tfns* '(ttn tt31 tt3 tt32 tt33))
-(defvar *rls* (mapcar (lambda (x) 
-			(cons x 
-			      (mapcar (lambda (y) 
-					(cons (pop y) (when (and (fboundp x) (compiled-function-p (symbol-function x)))
-							(funcall x (eval y))))) *rl*))) *tfns*))
-
-
-
-(defvar *rep-lst* `((,#timmfix . 1) 
-		    (,#t(and fixnum (not immfix))  . (1+ (caddr #t(immfix))))
-		    (,#tbignum . (1+ most-positive-fixnum))
-		    (,#tratio . 1/2) 
-		    (,#tshort-float . 1.0s0) 
-		    (,#tlong-float . 1.0) 
-		    (,#t(complex integer) . #c(1 1)) 
-		    (,#t(complex ratio) . #c(1/2 1/2))
-		    (,#tfcomplex . #c(1.0s0 1)) 
-		    (,#tdcomplex . #c(1.0 1)) 
-		    (,#tstandard-char . #\a)
-		    (,#tnon-standard-base-char . #\Return)
-		    (,#tstructure . (make-var)) 
-		    (,#tstd-structure . (set-d-tt 1 (make-var))) 
-		    (,#tnon-logical-pathname . #p".")
-		    (,#tlogical-pathname . (set-d-tt 1 #p"."))
-		    (,#thash-table-eq . (make-hash-table :test 'eq))
-		    (,#thash-table-eql . (make-hash-table :test 'eql))
-		    (,#thash-table-equal . (make-hash-table :test 'equal))
-		    (,#thash-table-equalp . (make-hash-table :test 'equalp))
-		    (,#tpackage . *package*) 
-		    (,#tfile-input-stream . ,(with-open-file (s "/dev/null" :direction :input) s))
-		    (,#tfile-output-stream . ,(with-open-file (s "/dev/null" :direction :output) s))
-		    (,#tfile-io-stream . ,(with-open-file (s "/dev/null" :direction :io) s))
-		    (,#tfile-probe-stream . ,(with-open-file (s "/dev/null" :direction :probe) s))
-		    (,#tsynonym-stream . *standard-output*)
-		    (,#tbroadcast-stream . ,(make-broadcast-stream))
-		    (,#tconcatenated-stream . ,(make-concatenated-stream))
-		    (,#ttwo-way-stream . *terminal-io*)
-		    (,#techo-stream . ,(make-echo-stream *standard-input* *standard-output*))
-		    (,#tstring-input-stream . ,(make-string-input-stream ""))
-		    (,#tstring-output-stream . ,(make-string-output-stream));FIXME user defined, socket
-		    (,#trandom-state . (make-random-state)) 
-		    (,#treadtable . (si::standard-readtable)) 
-		    (,#tnon-generic-compiled-function . (function eq))
-		    (,#tgeneric-function . (set-d-tt 1 (lambda nil nil)))
-		    ,@(mapcar (lambda (x)
-				`(,(cmp-norm-tp `(array ,x (*))) . 
-				  (make-array 1 :element-type ',x))) si::+array-types+)
-		    ,@(mapcar (lambda (x)
-				`(,(cmp-norm-tp `(and (array ,x *) (not vector))) . 
-				  (make-array '(1 1) :element-type ',x))) si::+array-types+)
-		    (,#tlist . '(1)) 
-;		    (,#tnull . nil) 
-		    (,#t(member t) . t)
-		    (,#tkeyword . :a)
-		    (,#t(and symbol (not boolean) (not keyword)) . 'a)))
-
-;; (defvar *rep-lst1* (when (and (fboundp 'tt3) (compiled-function-p #'tt3))
-;; 		     (mapcar (lambda (x) (list (car x) (tt3 (eval (cdr x))))) *rep-lst*)))
-(defvar *rep-lst1* (mapcar (lambda (x) (list (car x) (tt3 (eval (cdr x))))) *rep-lst*))
-
-(defvar *rep-lst2* (when (and (fboundp 'tt32) (compiled-function-p #'tt32))
-		     (mapcar (lambda (x) (list (car x) (tt32 (eval (cdr x))))) *rep-lst*)))
-
-(defun duplicates (l &optional res)
-  (if (atom l) (remove-duplicates (nreverse res))
-    (let ((x (pop l)))
-      (duplicates l (if (member x l) (cons x res) res)))))
-
-;(assert (null (duplicates (mapcar 'cadr *rep-lst1*))))
-
-(defvar *hs* nil)
-
-(defun memoize1 (fn tst)
-  (let ((h (cdar (push (cons fn (make-hash-table :test tst)) *hs*)))
-	(o (symbol-function fn)))
-    (setf (get fn 'unmemoize) o)
-    (setf (symbol-function fn)
-	  (lambda (x) (or (gethash x h) (setf (gethash x h) (funcall o x)))))))
-
-(defun unmemoize1 (fn)
-  (setf (symbol-function fn) (get fn 'unmemoize))
-  (remprop fn 'unmemoize)
-  (setq *hs* (remove fn *hs* :key 'car)))
-
-(defun ints-tt3 (ints &aux (ints (if (listp ints) ints (list ints))))
-  (reduce 'type-or1
-	  ints :key (lambda (x) (car (rassoc x *rep-lst1* :key 'car))) :initial-value nil))
-(memoize1 'ints-tt3 'equal)
-
-(defun ints-tt32 (ints)
-  (reduce 'type-or1
-	  ints :key (lambda (x) (car (rassoc x *rep-lst2* :key 'car))) :initial-value nil))
-
-(defun make-branch (f ints ttfs)
-  (let* ((tp (ints-tt3 ints))
-	 (ttfs (remove-if-not (lambda (x) (intersection ints (car x))) ttfs))
-	 (b (mapcar (lambda (x) `(,(if (type>= (min-ftp (cadr x)) tp) t
-				     `(typep ,f ',(type-and tp (cadr x))))
-				  ,@(or (cddr x) (list nil)))) ttfs)))
-    (when b `((,ints (infer-tp ,f ,(if (and (= 1 (length b)) (eq t (caar b))) (cadar ttfs) tp) (cond ,@b)))))));FIXME
-
-;; (defun make-branch (f ints ttfs)
-;;   (let* ((tp (ints-tt3 ints))
-;; 	 (ttfs (remove-if-not (lambda (x) (intersection ints (car x))) ttfs))
-;; 	 (b (mapcar (lambda (x) `(,(if (type>= (min-ftp (cadr x)) tp) t
-;; 				     `(typep ,f ',(type-and tp (cadr x))))
-;; 				  ,@(or (cddr x) (list nil)))) ttfs)))
-;;     (when b `((,ints (infer-tp ,f ,tp (cond ,@b)))))))
-
-
-(defun typecase-compiler-macro2 (form env)
-  (declare (ignore env))
-  (let* ((x (cadr form))
-	 (bind (unless (symbolp x) (list (tmpsym) x)))
-	 (f (or (car bind) x))
-	 (ff (cddr form))
-	 (o (member-if (lambda (x) (or (eq (car x) t) (eq (car x) 'otherwise))) ff))
-	 (ff (if o (ldiff ff o) ff))
-;	 (o (when o (list (cons t (cdar o)))))
-	 (o (list (cons t (cdar o))))
-	 (ff (nconc ff o))
-	 (ff (mapcar (lambda (x &aux (tp (car x)) y)
-		       (if (and (consp tp) (eq (car tp) 'and)
-				(setq y (car (member 'satisfies tp :key (lambda (x) (when (listp x) (car x)))))));FIXME fragile
-			   (cons (remove y tp) `((when (,(cadr y) ,f) ,@(cdr x)))) x)) ff))
-	 (tps (mapcar 'cmp-norm-tp (mapcar 'car ff)))
-	 (tps (let (z) (mapcar (lambda (x)
-				 (prog1 (type-and x (cmp-norm-tp `(not ,z)))
-				   (setq z (type-or1 x z)))) tps)))
-	 (t3 (mapcar 'tt3-ints tps))
-	 (dups (mapcar (lambda (x y) (remove y x :key 'ints-tt3 :test 'type>=)) t3 tps))
-	 (dups (reduce 'union dups :initial-value nil))
-	 (ttf (mapcar 'list* t3 tps (mapcar 'cdr ff)))
-	 (df (mapcan (lambda (x) (make-branch f (list x) ttf)) dups))
-	 (rf (mapcan (lambda (x) (make-branch f (set-difference (car x) dups) (list x))) ttf))
-	 (af (nconc df rf))
-	 (ob (when (and t3 (not (cdr t3)) (not (cdar t3)) (car t3)) (caar t3)))
-	 (res (if ob
-		  `(when ,(if (= ob 0) `(tt30 ,f) `(= (tt3 ,f) ,ob)) ,@(cdar af)) 
-		`(case (tt3 ,f) ,@af)))
-	 (res (if bind `(let (,bind) ,res) res)))
-    (when (= (length (reduce 'union t3 :initial-value nil)) (length *rep-lst1*))
-      (setf (caar (last af)) 'otherwise))
-    res))
-
-;; (defun typecase-compiler-macro2 (form env)
-;;   (declare (ignore env))
-;;   (let* ((x (cadr form))
-;; 	 (bind (unless (symbolp x) (list (tmpsym) x)))
-;; 	 (f (or (car bind) x))
-;; 	 (ff (cddr form))
-;; 	 (o (member-if (lambda (x) (or (eq (car x) t) (eq (car x) 'otherwise))) ff))
-;; 	 (ff (if o (ldiff ff o) ff))
-;; 	 (o (when o (list (cons t (cdar o)))))
-;; 					;		(o (list (cons t (cdar o))))
-;; 	 (ff (nconc ff o))
-;; 	 (tps (mapcar 'cmp-norm-tp (mapcar 'car ff)))
-;; 	 (tps (let (z) (mapcar (lambda (x)
-;; 				 (prog1 (type-and x (cmp-norm-tp `(not ,z)))
-;; 				   (setq z (type-or1 x z)))) tps)))
-;; 	 (t3 (mapcar 'tt3-ints tps))
-;; 	 (dups (mapcar (lambda (x y) (remove y x :key 'ints-tt3 :test 'type>=)) t3 tps))
-;; 	 (dups (reduce 'union dups :initial-value nil))
-;; 	 (ttf (mapcar 'list* t3 ff))
-;; 	 (df (mapcan (lambda (x) (make-branch f (list x) ttf)) dups))
-;; 	 (rf (mapcan (lambda (x) (make-branch f (set-difference (car x) dups) (list x))) ttf))
-;; 	 (af (nconc df rf))
-;; 	 (ob (when (and t3 (not (cdr t3)) (not (cdar t3)) (car t3)) (caar t3)))
-;; 	 (res (if ob
-;; 		  `(when ,(if (= ob 0) `(tt30 ,f) `(= (tt3 ,f) ,ob)) ,@(cdar af)) 
-;; 		`(case (tt3 ,f) ,@af)))
-;; 	 (res (if bind `(let (,bind) ,res) res)))
-;;     (when (= (length (reduce 'union t3 :initial-value nil)) (length *rep-lst1*))
-;;       (setf (caar (last af)) 'otherwise))
-;;     res))
-
-
-(defun tps-ints (t1 rl)
-  (remove-duplicates (mapcar 'cdr (remove-if-not (lambda (x) (type-and t1 (car x))) rl)) :test '=))
-
-(defun ints-tps (ints rl &aux (ints (if (listp ints) ints (list ints))))
-  (reduce 'type-or1
-	  (mapcan (lambda (x) (mapcar 'car (remove x rl :key 'cdr :test '/=))) ints)
-	  :initial-value nil))
-
-(defun disc (tps fn &aux (rl (cdr (assoc fn *rls*))))
-  (let* ((t3 (mapcar (lambda (x) (tps-ints x rl)) tps))
-	 (dups (mapcar (lambda (x y) (remove y x :key (lambda (x) (ints-tps x rl)) :test 'type>=)) t3 tps))
-	 (dups (reduce 'union dups :initial-value nil))
-	 (all (apply 'append t3))
-	 (dups (remove-duplicates (nconc (duplicates all) dups) :test '=)))
-    (list fn dups t3 (remove-duplicates all :test '=))))
-
-
-(defun best-type-of (tps)
-  (reduce (lambda (y x) (cond ((not y) x)
-			      ((and (cadr y) (not (cadr x))) x)
-			      ((< (length (fourth x)) (length (fourth y))) x)
-			      (y)))
-	  (mapcar (lambda (x) (disc tps x)) *tfns*) :initial-value nil))
-
-
-;; (defun typecase-compiler-macro2 (form env)
-;;   (declare (ignore env))
-;;   (cond ((not *vars*) form)
-;; 	((let* ((x (cadr form))
-;; 		(bind (unless (symbolp x) (list (tmpsym) x)))
-;; 		(f (or (car bind) x))
-;; 		(ft (with-restore-vars (info-type (cadr (c1expr x)))))
-;; 		(ff (cddr form))
-;; 		(o (member-if (lambda (x) (or (eq (car x) t) (eq (car x) 'otherwise))) ff))
-;; 		(ff (if o (ldiff ff o) ff))
-;; 		(o (when o (list (cons t (cdar o)))))
-;; ;		(o (list (cons t (cdar o))))
-;; 		(ff (nconc ff o))
-;; 		(tps (mapcar (lambda (x) (type-and ft (cmp-norm-tp x))) (mapcar 'car ff)))
-;; 		(tps (let (z) (mapcar (lambda (x)
-;; 					(prog1 (type-and x (cmp-norm-tp `(not ,z)))
-;; 					  (setq z (type-or1 x z)))) tps)))
-;; 		(t3 (mapcar 'tt3-ints tps))
-;; 		(dups (duplicates (apply 'append t3)))
-;; 		(ttf (mapcar 'list* t3 ff))
-;; 		(df (mapcan (lambda (x) (make-branch f (list x) ttf)) dups))
-;; 		(rf (mapcan (lambda (x) (make-branch f (set-difference (car x) dups) (list x))) ttf))
-;; 		(af (nconc df rf))
-;; 		(ob (when (and t3 (not (cdr t3)) (not (cdar t3)) (car t3)) (caar t3)))
-;; 		(res (if ob
-;; 			 `(when ,(if (= ob 0) `(tt30 ,f) `(= (tt3 ,f) ,ob)) ,@(cdar af)) 
-;; 		       `(case (tt3 ,f) ,@af)))
-;; 		(res (if bind `(let (,bind) ,res) res)))
-;; 	   (when (= (length (reduce 'union t3 :initial-value nil)) (length *rep-lst1*))
-;; 	     (setf (caar (last af)) 'otherwise))
-;; 	   res))))
-(si::putprop 'typecase 'typecase-compiler-macro2 'si::compiler-macro-prop)
-
-(defun tt3-ints (t1)
-  (mapcar 'cadr (remove-if-not (lambda (x) (type-and t1 (car x))) *rep-lst1*)))
-(memoize1 'tt3-ints 'equal)
-
-(defun tt32-ints (t1)
-  (mapcar 'cadr (remove-if-not (lambda (x) (type-and t1 (car x))) *rep-lst2*)))
-
-(defun tt3-type-propagator (f t1)
-  (declare (ignore f))
-  (cmp-norm-tp (cons 'member (tt3-ints t1))))
-(si::putprop 'tt3 'tt3-type-propagator 'type-propagator)    
-(defun tt30-type-propagator (f t1)
-  (declare (ignore f))
-  (cond ((type>= #tlist t1) #t(member t))
-	((not (type-and #tlist t1)) #tnull)
-	(#tboolean)))
-(si::putprop 'tt30 'tt30-type-propagator 'type-propagator)    
-
-
-;; (defun c1infer-tp (args)
-;;   (let* ((x (car (member (pop args) *vars* :key (lambda (x) (when (var-p x) (var-name x))))))
-;; 	 (tp (cmp-norm-tp (pop args))))
-;;     (with-restore-vars
-;;      (do-setq-tp x nil (type-and tp (var-type x)))
-;;      (c1expr (car args)))))
-
 (defun c1infer-tp (args)
   (let* ((n (pop args))
 	 (v (c1vref n))
 	 (x (car v))
 	 (tpi (pop args))
-	 (tpi (if (atomic-tp tpi) tpi (cmp-norm-tp tpi)))
+	 (tpi (if (si::t-to-nil (car (atomic-tp tpi))) tpi (cmp-norm-tp tpi)));FIXME
 	 (tp (type-and (var-type x) tpi))
 	 (info (make-info))
 	 (v1 (c1arg n))
@@ -905,33 +606,6 @@
 			       (,#tfcomplex  . ,(1+ si::c-type-max))
 			       (,#tdcomplex  . ,(+ 2 si::c-type-max))
 			       (,#t(complex rational) . ,(c-type #c(0 1)))))
-
-(defun typecase-compiler-macro (form env)
-  (declare (ignore env))
-  (let ((x (cadr form)))
-    (let (r tp)
-      (dolist (f (cddr form) `(case (cnum-type ,x) ,@(nreverse r)))
-	(let ((z (cdr f)))
-	  (cond ((member (car f) '(t otherwise)) 
-		 (if (symbolp x)
-		     (push `(,(car f) (setq ,x (the (not (or ,@tp)) ,x)) ,@z) r)
-		   (push `(,(car f) ,@z) r)))
-		((let* ((q (cmp-norm-tp (car f)))
-			(i (mapcar 
-			    'cdr 
-			    (remove-if-not
-			     (lambda (x) 
-			       (when (type>= q (car x))
-				 (setq q (type-and q (cmp-norm-tp `(not ,(car x))))) t))
-			     +cnum-tp-alist+))))
-		   (when (or q (not i)) (return form))
-		   (push (car f) tp)
-		   (if (symbolp x)
-		       (push `(,i (setq ,x (the ,(car f) ,x)) ,@z) r)
-		     (push `(,i ,@z) r))))))))))
-
-;(si::putprop 'typecase 'typecase-compiler-macro 'si::compiler-macro-prop)
-
 
 (defconstant +hash-index-type+ #t(or (integer -1 -1) seqind))
 
@@ -1056,19 +730,37 @@
 (si::putprop 'comment 'c1comment 'c1)
 (si::putprop 'comment 'c2comment 'c2)
 
-(defun assert-safety (form)
-  (let* ((l (pop form))(b (pop form)))
-    (assert (eq 'let* l))
-    (multiple-value-bind
-     (doc decl ctps body)
-     (parse-body-header form)
-     `(,l ,b ,@(when doc `(doc)) 
-	  ,@(subst-if `(optimize (safety ,(this-safety-level))) 
-		      (lambda (x) (labels ((f (x y) (when (consp x) (eq (car x) y)))) 
-					  (or (f x 'safety) (and (f x 'optimize) (f (cadr x) 'safety)))))
-		      decl)
-	  ,@ctps
-	  ,@body))))
+(defun assert-safety (fun form &aux (l (pop form))(b (pop form))(lev (this-safety-level)))
+  (assert (eq 'let* l))
+  (labels ((f (x y) (when (consp x) (eq (car x) y)))
+	   (ff (x) (when (f x 'safety) 
+		     (when (> (cadr x) lev)
+		       (keyed-cmpnote (list l 'inline 'safety)
+				      "Reducing safety of ~s from ~s to ~s on inline" 
+				      fun (cadr x) lev) t))))
+	  (multiple-value-bind
+	   (doc decl ctps body)
+	   (parse-body-header form)
+	   `(,l ,b ,@(when doc `(doc)) 
+		,@(subst-if `(optimize (safety ,lev)) 
+			    (lambda (x) (or (ff x) (and (f x 'optimize) (ff (cadr x)))))
+			    decl)
+		,@ctps
+		,@body))))
+
+;; (defun assert-safety (form)
+;;   (let* ((l (pop form))(b (pop form)))
+;;     (assert (eq 'let* l))
+;;     (multiple-value-bind
+;;      (doc decl ctps body)
+;;      (parse-body-header form)
+;;      `(,l ,b ,@(when doc `(doc)) 
+;; 	  ,@(subst-if `(optimize (safety ,(this-safety-level))) 
+;; 		      (lambda (x) (labels ((f (x y) (when (consp x) (eq (car x) y)))) 
+;; 					  (or (f x 'safety) (and (f x 'optimize) (f (cadr x) 'safety)))))
+;; 		      decl)
+;; 	  ,@ctps
+;; 	  ,@body))))
 
 ;; (defun assert-safety (forms)
 ;;   (dolist (form (cddr forms))
@@ -1147,10 +839,6 @@
   (declare (ignore name))
   (when *annotate* (wt-nl "/*" comment "*/"))
   (c2expr expr)
-  ;; (let* ((tri (tail-recursion-info name nil expr))
-  ;; 	 (tri (when (cdr tri) tri))
-  ;; 	 (*unwind-exit* (if tri (cons 'tail-recursion-mark *unwind-exit*) *unwind-exit*)))
-  ;;   (c2expr expr))
   (when *annotate* (wt-nl "/* END " comment "*/")))
 (si::putprop 'inline 'c1inline 'c1)
 (si::putprop 'inline 'c2inline 'c2)
@@ -1504,8 +1192,13 @@
      
 (defun mi4 (fn args la src env inls &aux *callees*)
   (let* ((*compiler-check-args* (>= (this-safety-level) 2))
-	 (src (assert-safety (blla (cadr src) args la (cddr src)))))
+	 (src (assert-safety fn (blla (cadr src) args la (cddr src)))))
       (c1inline (list (cons fn (append args la)) src) env inls)))
+
+;; (defun mi4 (fn args la src env inls &aux *callees*)
+;;   (let* ((*compiler-check-args* (>= (this-safety-level) 2))
+;; 	 (src (assert-safety (blla (cadr src) args la (cddr src)))))
+;;       (c1inline (list (cons fn (append args la)) src) env inls)))
 
 ;; (defun mi4 (fn args la src env &aux *callees*)
 ;;   (let* ((*compiler-check-args* (>= (this-safety-level) 2))
@@ -1538,9 +1231,26 @@
 (defun cln (x &optional (i 0))
   (if (atom x) i (cln (cdr x) (1+ i))))
 
-(defun tm (ay ax &optional (i 0))
-  (cond ((eq ay ax) (< (cln ax) 15))
-	((consp ax) (tm ay (cdr ax) (1+ i)))))
+;; (defun tm (ay ax &optional (i 0))
+;;   (cond ((eq ay ax) (< (cln ax) 15))
+;; 	((consp ax) (tm ay (cdr ax) (1+ i)))
+;; 	(t)))
+
+(defun tmpsym-p (a)
+  (when (symbolp a) (get a 'tmp)))
+
+(defun new-type-p (a b)
+  (cond ((atom a) (unless (eql a b) (unless (tmpsym-p a) (unless (tmpsym-p b) t))))
+	((atom b))
+	((or (new-type-p (car a) (car b)) (new-type-p (cdr a) (cdr b))))))
+
+(defun tm (a b)
+  (when (< (cons-count a) 15)
+    (new-type-p a b)))
+
+;; (defun tm (ay ax &optional (i 0))
+;;   (cond ((eq ay ax) (< (cln ax) 15))
+;; 	((consp ax) (tm ay (cdr ax) (1+ i)))))
 
 (defun arg-types-match (tps sir &optional ctp)
   (if tps
@@ -1561,11 +1271,21 @@
 		     (p (member n l :key 'caar))(pp (member n (cdr p) :key 'caar)))
   (when p
     (if pp
-	(if (or (member f *c1exit*) (not (member-if-not 'atomic-tp tp)))
+	(if (or (member f *c1exit*) (member-if 'atomic-tp tp))
 	    (member-if (lambda (x) (when (eq n (caar x)) (arg-types-match (cdar x) tp t))) p)
 ;	  t)
 	  (let ((tag (sir-tag sir))) (if tag (throw tag nil) t)))
       (arg-types-match (cdaar p) tp))))
+
+;; (defun prev-sir (sir &aux (f (name-sir sir))(tp sir)(n (pop tp))(l (append *src-inline-recursion* *prev-sri*))
+;; 		     (p (member n l :key 'caar))(pp (member n (cdr p) :key 'caar)))
+;;   (when p
+;;     (if pp
+;; 	(if (or (member f *c1exit*) (not (member-if-not 'atomic-tp tp)))
+;; 	    (member-if (lambda (x) (when (eq n (caar x)) (arg-types-match (cdar x) tp t))) p)
+;; ;	  t)
+;; 	  (let ((tag (sir-tag sir))) (if tag (throw tag nil) t)))
+;;       (arg-types-match (cdaar p) tp))))
 
 ;; (defun prev-sir (sir &optional (s (append *src-inline-recursion* *prev-sri*)) (i 0))
 ;;   (cond ;((not sp) (or (> (length s) 5) (prev-sir sir s)));FIXME
@@ -1605,22 +1325,52 @@
       (fun-name f)
     f))
 
+(defun cons-count (f)
+  (cond ((atom f) 0)
+	((+ 1 (cons-count (car f)) (cons-count (cdr f))))))
+
+(defun type-fm (fun fms)
+  (case fun
+	((si::tpi typep coerce) (cadr fms))
+	(make-sequence (car fms))))
+
+(defun constant-type-p (tp)
+  (typecase
+   tp
+   (symbol (not (get tp 'tmp)))
+   (atom t)
+   (cons (and (constant-type-p (car tp)) (constant-type-p (cdr tp))))))
+
+(defun known-type-p (fm)
+  (let ((tp (atomic-tp (info-type (cadr fm)))))
+    (when tp (constant-type-p (car tp)))))
+
+(defun maybe-inline-src (fun fms src &aux fm)
+  (when src
+    (cond ((setq fm (type-fm fun fms)) (known-type-p fm))
+	  ((< (cons-count src) 100))
+	  ((not (symbolp fun)))
+	  ((local-fun-p fun))
+	  ((intersection '(&key &rest) (cadr src)))
+	  ((member-if-not (lambda (x) (type>= (car x) (cdr x))) 
+			  (mapcar (lambda (x y) (cons (info-type (cadr x)) (coerce-to-one-value y))) fms (get-arg-types fun)))))))
+
 (dolist (l '(upgraded-array-element-type row-major-aref row-major-aset si::set-array array-element-type))
   (setf (get l 'consider-inline) t))
 
-(defun maybe-inline-src (fun fms src)
-  (when src
-    (or
-     (not (symbolp fun))
-     (inline-asserted fun)
-     (not (get fun 'consider-inline))
-     (let* ((y (get-arg-types fun))
-	    (y (or (car y) #tt))
-	    (y (if (eq y '*) #tt y))
-	    (x (info-type (cadar fms)))
-	    (x (if (eq x #tvector) #tarray x))
-	    (x (if (or (type>= #tarray x) (atomic-tp x)) x #tt)));FIXME
-       (not (type>= x y))))))
+;; (defun maybe-inline-src (fun fms src)
+;;   (when src
+;;     (or
+;;      (not (symbolp fun))
+;;      (inline-asserted fun)
+;;      (not (get fun 'consider-inline))
+;;      (let* ((y (get-arg-types fun))
+;; 	    (y (or (car y) #tt))
+;; 	    (y (if (eq y '*) #tt y))
+;; 	    (x (info-type (cadar fms)))
+;; 	    (x (if (eq x #tvector) #tarray x))
+;; 	    (x (if (or (type>= #tarray x) (atomic-tp x)) x #tt)));FIXME
+;;        (not (type>= x y))))))
 
 (defun mi3 (fun args la fms ttag envl inls &aux (src (under-env (pop envl) (inline-src fun))) (env (car envl)))
   (when (maybe-inline-src fun fms src)
@@ -1890,7 +1640,8 @@
 
 (defun make-ordinary (fn &aux *c1exit*);FIXME *c1exit*
   (let* ((s (tmpsym))(g (tmpsym))
-	 (e (c1let-* `(((,s ,g)) (etypecase ,s ((and symbol (not boolean)) (fsf ,s)) (function ,s))) t (list (cons g fn)))); (coerce ,s 'function)
+	 (e (c1let-* `(((,s ,g)) (check-type ,s (not list)) (coerce ,s 'function)) t (list (cons g fn)))); (coerce ,s 'function)
+;	 (e (c1let-* `(((,s ,g)) (etypecase ,s ((and symbol (not boolean)) (fsf ,s)) (function ,s))) t (list (cons g fn)))); (coerce ,s 'function)
 	 (info (make-info)))
     (add-info info (cadr e))
     (list 'ordinary info e)))

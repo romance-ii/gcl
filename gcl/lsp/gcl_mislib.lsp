@@ -250,12 +250,6 @@
   (heaprep)
   (values))
 
-(defun funcallable-symbol-function (x) 
-  (check-type x symbol)
-  (let ((x (symbol-function x))) 
-    (check-type x function)
-    x))
-
 (defvar *call-stack* nil)
 (defvar *prof-list* nil)
 (defvar *profiling* nil)

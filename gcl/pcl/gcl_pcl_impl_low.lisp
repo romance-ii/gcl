@@ -76,10 +76,12 @@
     (c-set-t-tt fin 1)
     fin))
 
-(defun funcallable-instance-p (x)
-  (si::lit :boolean "fto(" (:object x) ")==" (:fixnum #.(let ((x (lambda nil nil))) (c-set-t-tt x 1) (compiler::tt3 x)))))
+(defun funcallable-instance-p (x) (typep x 'generic-function))
+;  (si::lit :boolean "fto(" (:object x) ")==" (:fixnum #.(let ((x (lambda nil nil))) (c-set-t-tt x 1) (compiler::tt3 x)))))
 (declaim (inline funcallable-instance-p))
-
+(defun std-instance-p (x) (typep x 'si::std-structure))
+(declaim (inline std-instance-p))
+(remprop 'std-instance-p 'compiler::co1)
 
 
 

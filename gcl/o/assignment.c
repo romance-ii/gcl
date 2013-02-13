@@ -329,10 +329,29 @@ setf(object place, object form)
 	  setq(place, result=Ieval1(form));
 	  return result;
 	}
+	
 	fun = place->c.c_car;
 	if (type_of(fun) != t_symbol)
 		goto OTHERWISE;
 	args = place->c.c_cdr;
+
+	{
+	  object p=find_package(make_simple_string("COMMON-LISP"));
+	  char *s;
+
+	  if (fun->s.s_hpack==p && fun->s.s_self[0]=='C' && fun->s.s_self[fun->s.s_fillp-1]=='R' && fun->s.s_fillp!=3) {
+
+	    s=alloca(fun->s.s_fillp);
+	    s[0]='C';
+	    memcpy(s+1,fun->s.s_self+2,fun->s.s_fillp);
+	    s[fun->s.s_fillp]=0;
+	    
+	    fun=sLcar;
+	    args=MMcons(MMcons(find_symbol(make_simple_string(s),p),MMcons(args->c.c_car,Cnil)),Cnil);
+
+	  }
+	}
+	  
 	if (fun == sLget) {
             object sym,val,key,deflt1;
 	  sym = Ieval1(car(args));
@@ -346,6 +365,8 @@ setf(object place, object form)
 
 #define str(a_) ({string_register->st.st_fillp=string_register->st.st_dim=sizeof(a_)-1;string_register->st.st_self=(a_);string_register;})
 	
+	if (fun == find_symbol(make_simple_string("SYMBOL-FUNCTION"),find_package(make_simple_string("COMMON-LISP"))))
+	  return Ieval1(MMcons(find_symbol(str("FSET"),system_package),MMcons(MMcar(args),MMcons(form,Cnil))));
 	if (fun == sLaref) 
 	  return Ieval1(MMcons(find_symbol(str("ASET"),system_package),MMcons(form,args)));
 	if (fun == sLsvref)
@@ -355,6 +376,8 @@ setf(object place, object form)
 	if (fun == sLschar) { f = siLchar_set; goto EVAL; }
 	if (fun == sLfill_pointer) 
 	  return Ieval1(MMcons(find_symbol(str("FILL-POINTER-SET"),system_package),append(args,MMcons(form,Cnil))));
+	if (fun == sLgethash) 
+	  return Ieval1(MMcons(find_symbol(str("HASH-SET"),system_package),append(args,MMcons(form,Cnil))));
 	if (fun == sLcar) {
 		x = Ieval1(Mcar(args));
 		result = Ieval1(form);

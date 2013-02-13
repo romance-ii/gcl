@@ -721,8 +721,8 @@ DEFUN("HASH-TABLE-EQUALP-P",object,fShash_table_equalp_p,SI,1,1,NONE,OO,OO,OO,OO
   RETURN1(type_of(x)==t_hashtable && x->ht.ht_test==htt_equalp  ? Ct : Cnil);
 }
 
-DEFUN("GETHASH-INT",object,fSgethash_int,SI,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
-  return (object)gethash(x,y);
+DEFUN("GETHASH-INT",fixnum,fSgethash_int,SI,2,2,NONE,IO,OO,OO,OO,(object x,object y),"") {
+  return (fixnum)gethash(x,y);
 }
 
 DEFUNM("GETHASH",object,fLgethash,LISP,2,3,NONE,OO,OO,OO,OO,(object x,object y,...),"") {

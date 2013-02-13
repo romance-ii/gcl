@@ -106,6 +106,7 @@ DEFUN("INIT-FUNCTION",object,fSinit_function,SI,7,7,NONE,OO,OO,OI,II, \
            closure.") { 
 
   object s,d,m,i,fun,c;
+  fixnum z;
 
   m=sSPmemory;
   m=m ? m->s.s_dbind : m;
@@ -114,6 +115,8 @@ DEFUN("INIT-FUNCTION",object,fSinit_function,SI,7,7,NONE,OO,OO,OI,II, \
   i=sSPinit;
   i=i ? i->s.s_dbind : i;
   s=i && type_of(addr)==t_fixnum ? i->v.v_self[fix(addr)] : addr;
+  z=type_of(sc)==t_cons && sc->c.c_car==sLmacro; /*FIXME limited no. of args.*/
+  sc=z ? sc->c.c_cdr : sc;
   c=type_of(sc)==t_symbol ? Cnil : sc;
 
   fun=make_fun(s,d,c,env,argd,sizes);
@@ -121,8 +124,11 @@ DEFUN("INIT-FUNCTION",object,fSinit_function,SI,7,7,NONE,OO,OO,OI,II, \
   if (i && key>=0 && d)
     set_key_struct((void *)i->v.v_self[key],d);
 
-  if (sc!=c)
+  if (sc!=c) {
     fSfset(sc,fun);
+    if (z) sc->s.s_mflag=TRUE;
+  }
+  
   
   return fun;
 

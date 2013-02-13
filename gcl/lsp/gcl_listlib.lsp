@@ -443,7 +443,7 @@
       (do* (p (oitem (car l1))(k (do-key key key-comp oitem))(c2 l2 (cdr c2)))
 	   ((not (setq c2 (member k c2 :test test :test-not test-not :key key)))
 	    (unless p (collect r rp (cons oitem nil))))
-	   (setq rr (delete (car c2) rr :test 'eq) p t))))
+	   (setq rr (ldelete (car c2) rr :test 'eq) p t))))
 
 (defllist nset-exclusive-or (l1 l2 t)
   (do (r rp (rr (copy-list l2)) (l1 l1 (cdr l1)))
@@ -451,7 +451,7 @@
       (do (p (k (do-key key key-comp (car l1)))(c2 l2 (cdr c2)))
 	  ((not (setq c2 (member k c2 :test test :test-not test-not :key key)))
 	   (unless p (collect r rp l1)))
-	  (setq rr (delete (car c2) rr :test 'eq) p t))))
+	  (setq rr (ldelete (car c2) rr :test 'eq) p t))))
 
 (defllist subsetp (l1 l2 t)
   (do ((l1 l1 (cdr l1)))
@@ -597,7 +597,7 @@
   (c-set-cons-cdr x y)
   x)
 
-(defun listp (x) (typecase x (list t)))
+;(defun listp (x) (typep x 'list));(typecase x (list t)))
 (defun consp (x) (when x (listp x)))
 (defun atom (x) (not (consp x)))
 

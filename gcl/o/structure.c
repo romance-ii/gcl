@@ -181,6 +181,18 @@ structure_to_list(object x)
 	return(vs_pop);
 }
 
+DEFUN("MAKE-DUMMY-STRUCTURE",object,fSmake_dummy_structure,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+  
+  object x;
+
+  BEGIN_NO_INTERRUPT;
+  x = alloc_object(t_structure);
+  x->str.str_def=NULL;
+  x->str.str_self=NULL;
+  END_NO_INTERRUPT;
+  return x;
+}
+
 DEFUN("MAKE-STRUCTURE",object,fSmake_structure,SI,1,63,NONE,OO,OO,OO,OO,(object name,...),"") {/*FIXME*/
 
   fixnum narg=INIT_NARGS(1),i,size;
@@ -357,7 +369,7 @@ FFN(siLmake_s_data_structure)(void)
  raw=vs_base[1];
  y=alloc_object(t_structure);
  y->str.str_def=y;
- y->str.str_self = (object *)( x->v.v_self);
+ y->str.str_self = (object *)(x->v.v_self);
  S_DATA(y)->name  =sSs_data;
  S_DATA(y)->length=(raw->v.v_dim);
  S_DATA(y)->raw   =raw;

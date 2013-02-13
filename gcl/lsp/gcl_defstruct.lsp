@@ -278,8 +278,7 @@
 	  (t res))))
 
 (defvar *standard-slot-positions*
-  (let ((ar (make-array 50 :element-type 'unsigned-short
-			:static t))) 
+  (let ((ar (make-array 50 :element-type 'unsigned-short :static t))) 
     (dotimes (i 50)
 	     (declare (fixnum i))
 	     (setf (aref ar i)(*  (size-of t) i)))
@@ -694,7 +693,7 @@
 ;; s_data (see object.h).
 
 
-(defstruct s-data name
+(defstruct s-data (name nil :type symbol)
 		 (length 0 :type fixnum)
 		 raw
 		 included

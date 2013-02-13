@@ -62,7 +62,6 @@ gcl_init_init()
 
   lsp_init("../lsp/gcl_export.lsp");
 
-  ar_init(gcl_cp);
   ar_init(gcl_s);
   ar_init(gcl_sf);
   ar_init(gcl_dl);
@@ -72,6 +71,7 @@ gcl_init_init()
   ar_init(gcl_evalmacros);
   ar_init(gcl_c);
   ar_init(gcl_predlib);
+  ar_init(gcl_typecase);
   ar_init(gcl_listlib);
   ar_init(gcl_top);
   ar_init(gcl_module);
@@ -97,7 +97,6 @@ gcl_init_system(object no_init)
   /* ar_check_init(gcl_setf,no_init); */
   /* lsp_init("../lsp/gcl_autoload.lsp"); */
   ar_check_init(gcl_sc,no_init);
-/*   ar_check_init(gcl_cp,no_init); */
   ar_check_init(gcl_assert,no_init);
   ar_check_init(gcl_defstruct,no_init);
   ar_check_init(gcl_describe,no_init);

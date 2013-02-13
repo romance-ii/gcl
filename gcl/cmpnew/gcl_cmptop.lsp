@@ -1452,13 +1452,13 @@
 	((eq (car tp) 'returns-exactly) (- 2 (length tp)))
 	((- (length tp) 2))))
 
-(defun wt-if-proclaimed (fname cfun lambda-expr)
+(defun wt-if-proclaimed (fname cfun lambda-expr macro-p)
   (when (fast-link-proclaimed-type-p fname);(and  (not (member '* (get-arg-types fname))))
     (let* ((sig (lam-e-to-sig lambda-expr))
 	   (at (pop sig))
 	   (rt (car sig)))
       (cond ((assoc fname *inline-functions*)
-	     (add-init `(si::init-function ',fname
+	     (add-init `(si::init-function ',(if macro-p (cons 'macro fname) fname)
 					   ,(add-address (c-function-name "LI" cfun fname))
 					   nil nil -1 ,(new-proclaimed-argd at rt)
 					   ,(argsizes at rt (xa lambda-expr)))))
@@ -1626,23 +1626,41 @@
 (defun si::add-debug (fname x)
   (si::putprop fname x  'si::debugger))
 
-(defun t3init-fun (fname cfun lambda-expr doc)
+(defun t3init-fun (fname cfun lambda-expr doc macro-p)
 
   (when doc (add-init `(putprop ',fname ,doc 'function-documentation)))
 
-  (unless (wt-if-proclaimed fname cfun lambda-expr)
+  (unless (wt-if-proclaimed fname cfun lambda-expr macro-p)
     (assert (numberp cfun))
     (let* ((sig (lam-e-to-sig lambda-expr))
 	   (at (mapcar 'global-type-bump (pop sig)))
 	   (rt (global-type-bump (car sig))))
       (add-init `(init-function
-		  ',fname
+		  ',(if macro-p (cons 'macro fname) fname)
 		  ,(add-address (c-function-name "LI" (format nil "~a" cfun) fname))
 		  nil nil -1 ,(new-proclaimed-argd at rt)
 		  ,(argsizes at rt (xa lambda-expr))))))
 
   (when *compiler-auto-proclaim*
     (add-init `(si::add-hash ',fname ,@(mapcar (lambda (x) `(quote ,x)) (export-call (gethash fname *sigs*)))))))
+
+;; (defun t3init-fun (fname cfun lambda-expr doc)
+
+;;   (when doc (add-init `(putprop ',fname ,doc 'function-documentation)))
+
+;;   (unless (wt-if-proclaimed fname cfun lambda-expr)
+;;     (assert (numberp cfun))
+;;     (let* ((sig (lam-e-to-sig lambda-expr))
+;; 	   (at (mapcar 'global-type-bump (pop sig)))
+;; 	   (rt (global-type-bump (car sig))))
+;;       (add-init `(init-function
+;; 		  ',fname
+;; 		  ,(add-address (c-function-name "LI" (format nil "~a" cfun) fname))
+;; 		  nil nil -1 ,(new-proclaimed-argd at rt)
+;; 		  ,(argsizes at rt (xa lambda-expr))))))
+
+;;   (when *compiler-auto-proclaim*
+;;     (add-init `(si::add-hash ',fname ,@(mapcar (lambda (x) `(quote ,x)) (export-call (gethash fname *sigs*)))))))
 
 ;; (defun t3init-fun (fname cfun lambda-expr doc)
 
@@ -1662,6 +1680,7 @@
 ;;     (add-init `(si::add-hash ',fname ,@(mapcar (lambda (x) `(quote ,x)) (export-call (gethash fname *sigs*)))))))
 
 (defun t3defun (fname cfun lambda-expr doc sp &aux inline-info 
+		      (macro-p (equal `(mflag ,fname) (cadr (member *current-form* *top-level-forms*))))
 		      (*current-form* (list 'defun fname))
 		      (*volatile* (volatile (second lambda-expr))))
 
@@ -1702,9 +1721,55 @@
 		   fname cfun lambda-expr sp inline-info))
      ((baboon)))
     
-    (t3init-fun fname cfun lambda-expr doc)
+    (t3init-fun fname cfun lambda-expr doc macro-p)
 
     (add-debug-info fname lambda-expr)))
+
+;; (defun t3defun (fname cfun lambda-expr doc sp &aux inline-info 
+;; 		      (macro-p (equal `(mflag ,fname) (cadr (member *current-form* *top-level-forms*))))
+;; 		      (*current-form* (list 'defun fname))
+;; 		      (*volatile* (volatile (second lambda-expr))))
+
+;;   (declare (ignore doc))
+
+;;   (let ((*compiler-check-args* *compiler-check-args*)
+;;         (*safe-compile* *safe-compile*)
+;;         (*compiler-push-events* *compiler-push-events*)
+;;         (*compiler-new-safety* *compiler-new-safety*)
+;;         (*notinline* *notinline*)
+;;         (*space* *space*)
+;;         (*debug* *debug*))
+    
+;;     (when (eq (car (caddr (cddr lambda-expr))) 'decl-body)
+;;       (local-compile-decls (caddr (caddr (cddr lambda-expr)))))
+
+;;     (cond
+;;      ((dolist (v *inline-functions*)
+;; 	(or (si::fixnump (nth 3 v))
+;; 	    (error "Old style inline"))
+;; 	(and (eq (car v) fname)
+;; 	     (not (nth 5 v)) ; ie.not  'link-call or 'ifuncall
+;; 	     (return (setq inline-info v))))
+      
+;;     ;;; Add global entry information.
+;; ;; 	(push (list fname cfun (cadr inline-info) (caddr inline-info))
+;; ;; 	      *global-entries*))
+    
+;;     ;;; Local entry
+;;       (analyze-regs (cadr lambda-expr) 0)
+
+;;       (mapc (lambda (x) (setf (var-type x) (global-type-bump (var-type x)))) (caaddr lambda-expr))
+;;       (setf (info-type (cadr (fifth lambda-expr))) (global-type-bump (info-type (cadr (fifth lambda-expr)))))
+;;       (setf (caddr inline-info) (global-type-bump (cadr (lam-e-to-sig lambda-expr))))
+
+;;       (t3defun-aux 't3defun-local-entry
+;; 		   (or (cdr (assoc (promoted-c-type (caddr inline-info)) +return-alist+)) 'return-object)
+;; 		   fname cfun lambda-expr sp inline-info))
+;;      ((baboon)))
+    
+;;     (t3init-fun fname cfun lambda-expr doc macro-p)
+
+;;     (add-debug-info fname lambda-expr)))
 
 ;; (defun t3defun (fname cfun lambda-expr doc sp &aux inline-info 
 ;; 		      (*current-form* (list 'defun fname))
@@ -2082,13 +2147,20 @@
 ;;     (or (cdr (assoc z +wt-c-rep-alist+)) "object ")))
 
 
-(defun t1defmacro (args &aux (w args) (n (pop args)) (ll (pop args)))
-  (t1expr `(defun ,n ,@(cdr (si::defmacro-lambda n ll args))))
+;; (defun t1defmacro (args &aux (w args) (n (pop args)) (ll (pop args)))
+;;   (t1expr `(defun ,n ,@(cdr (si::defmacro-lambda n ll args))))
+;;   (maybe-eval (not (macro-function n)) (cons 'defmacro w));FIXME?
+;;   (push `(mflag ,n) *top-level-forms*))
+
+(defun t1defmacro (args &aux (w args)(n (pop args))
+			(macp (when (listp n) (eq 'macro (car n))))(n (if macp (cdr n) n)))
+  (t1expr `(defun ,n ,@(if macp args (cdr (si::defmacro-lambda n (pop args) args)))))
   (maybe-eval (not (macro-function n)) (cons 'defmacro w));FIXME?
   (push `(mflag ,n) *top-level-forms*))
 
-(defun t3mflag (n)
-  (add-init `(c-set-symbol-mflag ',n 1)))
+(defun t3mflag (n) nil)
+;; (defun t3mflag (n)
+;;   (add-init `(c-set-symbol-mflag ',n 1)))
 
 (defun c1fset (args)
   (let* ((info (make-info))

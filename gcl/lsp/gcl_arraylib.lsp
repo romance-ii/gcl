@@ -220,7 +220,7 @@
   (check-type i rnkind)
   (let ((r (c-array-rank x)));FIXME
     (unless (< i r) (let ((*dim* r)(i i))(check-type i (satisfies array-dimension-index-less-than-rank))))
-    (if (= 1 r) (c-array-dim x) (the seqind (*fixnum (c-array-dims x) i nil nil)))))
+    (if (= 1 r) (c-array-dim x) (array-dims x i))));(the seqind (*fixnum (c-array-dims x) i nil nil))
 
 ;; (defun array-dimension (x i)
 ;;   (declare (optimize (safety 2)))
@@ -249,14 +249,14 @@
   (check-type x array)
   (= (c-array-hasfillp x) 1))
 
-(defun upgraded-array-element-type (type &optional environment)
-  (declare (ignore environment) (optimize (safety 1)))
-  (cond ((not type))
-	((eq type '*) '*)
-	((car (member type +array-types+)))
-	((car (member type +array-types+ :test 'subtypep1)))
-	((subtypep1 type 'float) 'long-float)
-	(t)))
+;; (defun upgraded-array-element-type (type &optional environment)
+;;   (declare (ignore environment) (optimize (safety 1)))
+;;   (cond ((not type))
+;; 	((eq type '*) '*)
+;; 	((car (member type +array-types+)))
+;; 	((car (member type +array-types+ :test 'subtypep1)))
+;; 	((subtypep1 type 'float) 'long-float)
+;; 	(t)))
 
 (defun fill-pointer (x)
   (declare (optimize (safety 2)))

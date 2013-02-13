@@ -161,10 +161,54 @@
 
 #.`(progn ,@(mapcan #'(lambda (x) (apply 'afn2 x)) (macc)))
 
-#.(idefun `(stdesig-self (s i) (*char (c-stdesig-sdself s) i nil nil)))
-#.(idefun `(set-stdesig-self (s i j) (*char (c-stdesig-sdself s) i t j)))
-#.(idefun `(function-env (fun i) (*object (c-function-env fun) i nil nil)))
-#.(idefun `(package-internal (p i) (*object (c-package-internal p) i nil nil)))
-#.(idefun `(package-external (p i) (*object (c-package-external p) i nil nil)))
-#.(idefun `(hashtable-self (h i) (si::nani (c+ (c-hashtable-self h) (<< i #.(integer-length (/ si::fixnum-length si::char-length)))))))
 
+;;FIXME these automatic, *c-stdesig-sdself, etc.
+#.(idefun `(stdesig-self (s i) 
+			 (declare (optimize (safety 1)))
+			 (check-type i seqind)
+			 (*char (c-stdesig-sdself s) i nil nil)))
+#.(idefun `(set-stdesig-self (s i j) 
+			     (declare (optimize (safety 1)))
+			     (check-type i seqind)
+			     (check-type j seqind)
+			     (*char (c-stdesig-sdself s) i t j)))
+#.(idefun `(function-env (fun i) 
+			 (declare (optimize (safety 1)))
+			 (check-type i seqind)
+			 (*object (c-function-env fun) i nil nil)))
+#.(idefun `(package-internal (p i) 
+			     (declare (optimize (safety 1)))
+			     (check-type i seqind)
+			     (*object (c-package-internal p) i nil nil)))
+#.(idefun `(package-external (p i) 
+			     (declare (optimize (safety 1)))
+			     (check-type i seqind)
+			     (*object (c-package-external p) i nil nil)))
+#.(idefun `(hashtable-self (h i) 
+			   (declare (optimize (safety 1)))
+			   (check-type i seqind)
+			   (c+ (c-hashtable-self h) (<< i #.(integer-length (/ si::fixnum-length si::char-length))))))
+#.(idefun `(array-dims (s i) 
+		       (declare (optimize (safety 1)))
+		       (check-type i seqind)
+		       (the seqind (*fixnum (c-array-dims s) i nil nil))))
+#.(idefun `(set-array-dims (s i j)
+			   (declare (optimize (safety 1)))
+			   (check-type i seqind)
+			   (check-type j seqind)
+			   (the seqind (*fixnum (c-array-dims s) i t j))))
+
+
+
+;; #.(idefun `(funcallable-symbol-p 
+;; 	    (s)
+;; 	    (and (symbolp s)
+;; 		 (/= (si::address (c-symbol-gfdef s)) 0)
+;; 		 (= (c-symbol-mflag s) 0)
+;; 		 (= (c-symbol-sfdef s) (si::address nil)))))
+
+;; #.(idefun `(fsf
+;; 	    (s)
+;; 	    (declare (optimize (safety 1)))
+;; 	    (assert (funcallable-symbol-p s));  (check-type s funcallable-symbol); FIXME
+;; 	    (the function (c-symbol-gfdef s))));FIXME

@@ -500,6 +500,8 @@
 
 (unless (find-package :s)
   (make-package :s :use '(:cl)))
+;; (unless (find-package :type)
+;;   (make-package :type :use '(:cl :s :si)))
 
 (in-package :si)
 
@@ -532,9 +534,9 @@
 
 (in-package :s)
 (si::import-internal 'si::(\| & ^ ~ c+ c* << >> string-concatenate strcat lit seqind fixnum-length char-length cref address 
-			   package-internal package-external))
-(si::import-internal 'compiler::(lisp-type cmp-norm-tp fsf))
-
+			   package-internal package-external array-dims cmp-norm-tp tp0 tp1 tp2 tp3 tp4 tp5 tp6 tp7))
+;(si::import-internal 'compiler::(lisp-type cmp-norm-tp fsf))
+(export 'lisp-type)
 
 (dolist (l '((:float      "make_shortfloat"      short-float     cnum)
 	     (:double     "make_longfloat"       long-float      cnum)
@@ -577,3 +579,4 @@
   (in-package :user))
 
 (si::import-internal 'si::while)
+
