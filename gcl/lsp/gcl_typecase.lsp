@@ -219,7 +219,10 @@
       n)))
 
 (defmacro infer-tp (x y z) (declare (ignore x y)) z)
-
+(defun infer-type (x y z) (declare (ignore x y)) z);avoid macroexpansion in bootstrap
+(setf (get 'infer-type 'compiler::cmp-inline) t)
+(define-compiler-macro infer-type (x y z)
+  `(infer-tp ,(compiler::cmp-eval x) ,(compiler::cmp-eval y) ,z))
 
 
 
@@ -244,6 +247,9 @@
 
 (eval-when
  (compile load eval)
+ (defun mkinf (f tp z &aux (z (if (cdr z) `(progn ,@z) (car z))))
+   `(infer-type ',f ',tp ,z))
+
  (defconstant +ctps+ (mapcar (lambda (x) (list x (intern (string-concatenate "COMPLEX-" (string x))))) +range-types+))
  (defconstant +vtps+ (mapcar (lambda (x) (list x (intern (string-concatenate "VECTOR-"  (string x))))) +array-types+))
  (defconstant +atps+ (mapcar (lambda (x) (list x (intern (string-concatenate "ARRAY-"   (string x))))) +array-types+)))
@@ -361,7 +367,7 @@
 		    (setf (get ',x 'compiler::type-propagator) ',s)
 		    (setf (get ',s 'compiler::cmp-inline) t))) +tfns1+))
 
-(defun listp (x) (if (eql 0 (tp2 x)) (infer-tp x list t) (infer-tp x (not list) nil)));FIXME
+#.`(defun listp (x) (if (eql 0 (tp2 x)) ,(mkinf 'x 'list '(t)) ,(mkinf 'x '(not list) '(nil))));FIXME
 
 
 
@@ -437,8 +443,8 @@
 	  (a (type-and-list (list nc)))(c (calist2 a))
 	  (f (best-type-of c)))
      `(case (,f o)
-	    (,(tps-ints a (cdr (assoc f +rs+))) (infer-tp o ,nc ,code))
-	    (otherwise (infer-tp o (not ,nc) nil)))))
+	    (,(tps-ints a (cdr (assoc f +rs+))) ,(mkinf 'o nc (list code)))
+	    (otherwise ,(mkinf 'o `(not ,nc) '(nil))))))
   (defun mksubb (o tp x)
    (case x
 	 ((integer ratio single-float double-float short-float long-float float rational real) `(ibb ,o ,tp))
@@ -540,9 +546,6 @@
 
 (defun sub-p1 (tp a)
   (member-if (lambda (x) (when (eq (pop x) tp) (not (eq (pop x) (car x))))) a))
-
-(defun mkinf (f tp z &aux (z (if (cdr z) `(progn ,@z) (car z))))
-  `(infer-tp ,f ,tp ,z))
 
 (defun branch (tpsff x a f &aux (z (cdr (assoc x tpsff)))(tp (pop z)))
   (if (sub-p1 x a) `((typep ,f ',tp),(mkinf f tp z)) z))
