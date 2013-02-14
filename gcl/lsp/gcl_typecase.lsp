@@ -221,10 +221,6 @@
 (defmacro infer-tp (x y z) (declare (ignore x y)) z)
 (defun infer-type (x y z) (declare (ignore x y)) z);avoid macroexpansion in bootstrap
 (setf (get 'infer-type 'compiler::cmp-inline) t)
-(define-compiler-macro infer-type (x y z)
-  `(infer-tp ,(compiler::cmp-eval x) ,(compiler::cmp-eval y) ,z))
-
-
 
 
 

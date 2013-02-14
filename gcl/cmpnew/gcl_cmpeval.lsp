@@ -498,10 +498,6 @@
     form))
 (si::putprop 'zerop 'zerop-compiler-macro 'si::compiler-macro-prop)
 
-(define-compiler-macro infer-type (x y z)
-  `(infer-tp ,(cmp-eval x) ,(cmp-eval y) ,z))
-
-
 (defun c1infer-tp (args)
   (let* ((n (pop args))
 	 (v (c1vref n))
@@ -2955,6 +2951,10 @@
 (defun si::undef-compiler-macro (name)
   (let ((name (si::funid-sym name)))
     (remprop name 'si::compiler-macro-prop)))
+
+(define-compiler-macro infer-type (x y z)
+  `(infer-tp ,(cmp-eval x) ,(cmp-eval y) ,z))
+
 
 (defvar *compiler-temps*
         '(tmp0 tmp1 tmp2 tmp3 tmp4 tmp5 tmp6 tmp7 tmp8 tmp9))
