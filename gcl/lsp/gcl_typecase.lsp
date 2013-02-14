@@ -578,5 +578,5 @@
 (defun funcallable-symbol-function (x) (c-symbol-gfdef x))
 
 (define-compiler-macro infer-type (x y z)
-  `(infer-tp ,(cmp-eval x) ,(cmp-eval y) ,z))
+  `(infer-tp ,(compiler::cmp-eval x) ,(compiler::cmp-eval y) ,z));FIXME
 

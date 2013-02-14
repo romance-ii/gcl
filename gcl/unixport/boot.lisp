@@ -8,7 +8,7 @@
   (defun mc nil (si::make-anonymous-closure))
 ;  (compile 'compiler::function-symbol)
 ;  (mapc 'compile 'si::(funid-sym funid-sym-p funid funid-p funid-to-sym tpi ibb ib <= typep < > >= + - set-array concatenate))
-  (mapc 'compile 'si::(listp tpi ibb ib <= typep coerce < > >= + - set-array concatenate mta mtv eql-is-eq))
+  (mapc 'compile 'si::(listp typep ibb ib <= coerce < > >= + - set-array concatenate mta mtv eql-is-eq))
   (mapc 'compile '(info-p info-ref info-type info-flags info-ch info-ref-ccb info-ref-clb c1constant-value-object))
   (mapc 'compile '(var-p var-name var-kind var-ref var-ref-ccb var-loc var-dt var-type var-mt var-tag var-store))
   (mapc 'compile '(c-array-rank c-array-dim c-array-elttype c-array-eltsize c-array-self c-array-hasfillp))
