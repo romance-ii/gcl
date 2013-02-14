@@ -222,8 +222,6 @@
 (defun infer-type (x y z) (declare (ignore x y)) z);avoid macroexpansion in bootstrap
 (setf (get 'infer-type 'compiler::cmp-inline) t)
 
-
-
 (defun expand-array-element-type (type)
   (cond
    ((car (member type +array-types+ :test 'subtypep1)))
@@ -245,7 +243,8 @@
  (compile load eval)
  (defun mkinf (f tp z &aux (z (if (cdr z) `(progn ,@z) (car z))))
    `(infer-type ',f ',tp ,z))
-
+ (defun mkinfm (f tp z &aux (z (if (cdr z) `(progn ,@z) (car z))))
+   `(infer-tp ,f ,tp ,z))
  (defconstant +ctps+ (mapcar (lambda (x) (list x (intern (string-concatenate "COMPLEX-" (string x))))) +range-types+))
  (defconstant +vtps+ (mapcar (lambda (x) (list x (intern (string-concatenate "VECTOR-"  (string x))))) +array-types+))
  (defconstant +atps+ (mapcar (lambda (x) (list x (intern (string-concatenate "ARRAY-"   (string x))))) +array-types+)))
@@ -356,10 +355,7 @@
 		 `(progn 
 		    (defun ,s (f x &aux (rl (load-time-value (cdr (assoc ',x +rs+)))))
 		      (declare (ignore f))
-		      (cmp-norm-tp;FIXME?
-		       (cons 'member (tps-ints (type-and-list (list x)) rl)))
-;		      (cmp-norm-tp (cons 'member (tps-ints1 x (cdr (assoc ',x +rs+)))))
-		      )
+		      (cmp-norm-tp (cons 'member (tps-ints (type-and-list (list x)) rl))))
 		    (setf (get ',x 'compiler::type-propagator) ',s)
 		    (setf (get ',s 'compiler::cmp-inline) t))) +tfns1+))
 
@@ -375,7 +371,7 @@
 (setf (get 'ib 'compiler::cmp-inline) t)
 
 (defun db (o tp)
-  (let* ((b (pop tp))(i -1))
+  (let* ((b (car tp))(i -1))
     (cond ((not b))
 	  ((eq b '*))
 	  ((not (listp b)) (eql (c-array-rank o) b))
@@ -383,7 +379,7 @@
 	 
 
 (defun dbv (o tp)
-  (let* ((b (pop tp))(b (if (listp b) (car b) b)))
+  (let* ((b (car tp))(b (if (listp b) (car b) b)))
      (cond ((not b))
 	   ((eq b '*))
 	   ((eql (c-array-dim o) b)))))
@@ -392,7 +388,7 @@
 
 
 (defun ibb (o tp)
-  (and (ib o (pop tp) t) (ib o (car tp))))
+  (and (ib o (car tp) t) (ib o (cadr tp))))
 (setf (get 'ibb 'compiler::cmp-inline) t)
 
 (defun get-included (name)
@@ -445,10 +441,10 @@
    (case x
 	 ((integer ratio single-float double-float short-float long-float float rational real) `(ibb ,o ,tp))
 	 (proper-cons `(unless (improper-consp ,o) t))
-	 ((structure structure-object) `(when (member (structure-name ,o) tp) t))
-	 (mod `(let ((s (pop ,tp))) (<= 0 ,o (1- s))))
-	 (signed-byte `(let* ((s (pop ,tp))(s (when s (ash 1 (1- s))))) (or (not s) (<= (- s) ,o (1- s)))))
-	 (cons `(and (tpi (pop ,o) (pop ,tp)) (tpi ,o (car ,tp)) t))
+	 ((structure structure-object) `(if tp (when (member (structure-name ,o) tp) t) t))
+	 (mod `(let ((s (pop ,tp))) (<= 0 ,o (1- s))));FIXME error null tp
+	 (signed-byte `(if tp (let* ((s (pop ,tp))(s (when s (ash 1 (1- s))))) (or (not s) (<= (- s) ,o (1- s)))) t))
+	 (cons `(if tp (and (typep (pop ,o) (pop ,tp)) (typep ,o (car ,tp)) t) t))
 	 (otherwise t))))
 
 
@@ -456,7 +452,7 @@
      (case (when ctp (upgraded-complex-part-type ctp))
 	   ,@(mapcar (lambda (x &aux (n (pop x)))
 			 `(,n ,(cfn (car x) `(and (ibb (realpart o) tp) (ibb (imagpart o) tp))))) +ctps+)
-	   (otherwise ,(cfn 'complex '(if tp (and (tpi (realpart o) otp) (tpi (imagpart o) otp)) t)))))
+	   (otherwise ,(cfn 'complex '(if tp (and (typep (realpart o) otp) (typep (imagpart o) otp)) t)))))
 (setf (get 'mtc 'compiler::cmp-inline) t)
 		       
 
@@ -492,39 +488,30 @@
 	       (unless (eq ctp (if (listp ntype) (car ntype) ntype))
 		 ntype)))))))
 
+					;	   (and (not (member-if-not (lambda (x) (typep o x)) tp)))
+					;	   (or  (when (member-if (lambda (x) (typep o x)) tp) t))
 
-
-#.`(defun tpi (o otp &aux (lp (listp otp)) (ctp (if lp (car otp) otp)) (tp (when lp (cdr otp)))
-		 (ctp (if (when (eq ctp 'array) (vtp tp)) 'vector ctp)))
-     
-     (when (or (eq ctp 'values) (when lp (eq ctp 'function)))
-       (error 'type-error :datum otp :expected-type 'type-spec))
-     
-     (case ctp
-	   ,@(mapcar (lambda (x) 
-		       (let* ((c (if (atom x) x (car x)))
-			      (code (mksubb 'o 'tp c))
-			      (code (or (eq code t) `(if tp ,code t))))
-			 `(,c ,(cfn c code))))
-		     (append +s+ +rr+))
-	   (member (when (if (cdr tp) (member o tp) (eql o (car tp))) t));FIXME
-	   (eql (eql o (car tp)))
-	   (complex (mtc o tp))
-	   (vector (mtv o tp))
-	   (array (mta o tp))
-	   (and (not (member-if-not (lambda (x) (tpi o x)) tp)))
-	   (or  (when (member-if (lambda (x) (tpi o x)) tp) t))
-	   (not (not (tpi o (car tp))))
-	   (satisfies (when (funcall (car tp) o) t))
-	   ((nil t) (when ctp t))
-	   (otherwise
-	    (let ((tem (expand-deftype otp)))
-	      (when tem (tpi o tem))))))
-(setf (get 'tpi 'compiler::cmp-inline) t)
-
-(defun typep (o tp &optional env)
-  (declare (ignore env))
-  (tpi o tp))
+#.`(defun typep (o otp &optional env &aux (lp (listp otp)))
+     (declare (ignore env))
+     (labels ((tpi (o ctp tp &aux (ctp (if (when (eq ctp 'array) (vtp tp)) 'vector ctp)))
+		   (when (or (eq ctp 'values) (when tp (eq ctp 'function)))
+		     (error 'type-error :datum (cons ctp tp) :expected-type 'type-spec))
+		   (case ctp
+			 ,@(mapcar (lambda (x &aux (c (if (atom x) x (car x)))(code (mksubb 'o 'tp c))) 
+				     `(,c ,(cfn c code))) (append +s+ +rr+))
+			 (member (when (if (cdr tp) (member o tp) (eql o (car tp))) t));FIXME
+			 (eql (eql o (car tp)))
+			 (complex (mtc o tp))
+			 (vector (mtv o tp))
+			 (array (mta o tp))
+			 (or (when tp (or (typep o (car tp)) (tpi o 'or (cdr tp)))))
+			 (and (if tp (and (typep o (car tp)) (tpi o 'and (cdr tp))) t))
+			 (not (not (typep o (car tp))))
+			 (satisfies (when (funcall (car tp) o) t))
+			 ((nil t) ctp)
+			 (otherwise (let ((tem (expand-deftype otp))) (when tem (typep o tem)))))))
+	     
+	     (tpi o (if lp (car otp) otp) (when lp (cdr otp)))))
 
 
 
@@ -544,22 +531,35 @@
   (member-if (lambda (x) (when (eq (pop x) tp) (not (eq (pop x) (car x))))) a))
 
 (defun branch (tpsff x a f &aux (z (cdr (assoc x tpsff)))(tp (pop z)))
-  (if (sub-p1 x a) `((typep ,f ',tp),(mkinf f tp z)) z))
+  (if (sub-p1 x a) `((typep ,f ',tp) ,(mkinfm f tp z)) z))
 
 (defun branch1 (x a tpsff f o)
   (let* ((z (mapcar (lambda (x) (branch tpsff x a f)) (cdr x)))
 	 (s (add-t-p x a tpsff))
-	 (z (if s (nconc z `((t ,(mkinf f `(not ,s) (cdar o))))) z)))
+	 (z (if s (nconc z `((t ,(mkinfm f `(not ,s) (cdar o))))) z)))
     (if (member-if (lambda (x) (when (listp x) (cdr x))) z) `(cond ,@z) (caar z))));FIXME
 
 
 (defun branches (f a tpsff fnl o c)
   (mapcar (lambda (x)
 	    `(,(lremove-duplicates (mapcar (lambda (x) (cdr (assoc x fnl))) (car x)))
-	      ,(mkinf f (if (cdar x) (cons 'or (car x)) (caar x)) (list (branch1 x a tpsff f o))))) c ))
+	      ,(mkinfm f (if (cdar x) (cons 'or (car x)) (caar x)) (list (branch1 x a tpsff f o))))) c ))
 
 
-(defmacro typecase (&whole w x &rest ff)
+(defmacro typecase (keyform &rest clauses &aux (key (if (symbolp keyform) keyform (sgen))))
+  (declare (optimize (safety 2)))
+  (labels ((l (x &aux (c (pop x))(tp (pop c))(fm (if (cdr c) (cons 'progn c) (car c)))(y (when x (l x))))
+	      (if (or (eq tp t) (eq tp 'otherwise)) fm `(if (typep ,key ',tp) ,fm ,y))))
+	  (let ((x (l clauses)))
+	    (if (eq key keyform) x `(let ((,key ,keyform)) ,x)))))
+
+(defmacro etypecase (keyform &rest clauses &aux (key (if (symbolp keyform) keyform (gensym))))
+  (declare (optimize (safety 2)))
+  (check-type clauses (list-of proper-list))
+  (let ((tp `(or ,@(mapcar 'car clauses))))
+    `(typecase ,keyform ,@clauses (t (error 'type-error :datum ,key :expected-type ',tp)))))
+
+(define-compiler-macro typecase (&whole w x &rest ff)
   (let* ((bind (unless (symbolp x) (list (list (gensym) x))));FIXME sgen?
 	 (f (or (caar bind) x))
 	 (o (member-if (lambda (x) (or (eq (car x) t) (eq (car x) 'otherwise))) ff))
@@ -571,7 +571,12 @@
 	 (fn (best-type-of c))
 	 (fm `(case (,fn ,f)
 		    ,@(branches f a (mapcar 'cons tps ff) (cdr (assoc fn +rs+)) o c)
-		    (otherwise ,(mkinf f `(not (or ,@(mapcan 'car c))) (cdar o))))))
+		    (otherwise ,(mkinfm f `(not (or ,@(mapcan 'car c))) (cdar o))))))
     (if bind `(let ,bind ,fm) fm)))
 
+
 (defun funcallable-symbol-function (x) (c-symbol-gfdef x))
+
+(define-compiler-macro infer-type (x y z)
+  `(infer-tp ,(cmp-eval x) ,(cmp-eval y) ,z))
+

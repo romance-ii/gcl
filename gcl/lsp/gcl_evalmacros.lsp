@@ -535,3 +535,23 @@
 	  (dolist (,c ,c) (si::kill ,c 0))
 	  (return-from ,top t)))
        nil)))
+
+
+(defmacro define-compiler-macro (name vl &rest body)
+  (declare (optimize (safety 2)))
+  (let ((n (funid-sym name)))
+    `(progn (putprop ',n
+		     ,(defmacro-lambda (if (eq n name) name (cadr name)) vl body)
+		     'compiler-macro-prop)
+	    ',name)))
+
+(defun compiler-macro-function (name)
+  (let ((name (funid-sym name)))
+    (get name 'compiler-macro-prop)))
+
+(defun undef-compiler-macro (name)
+  (let ((name (funid-sym name)))
+    (remprop name 'compiler-macro-prop)))
+
+
+

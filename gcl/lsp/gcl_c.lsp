@@ -9,12 +9,16 @@
 (defun car (x)
   (declare (optimize (safety 2)))
   (check-type x list)
-  (lit :object (:object x) "->c.c_car"));  (cons-car x)
+;  (*object (address x) 1 nil nil)
+  (lit :object (:object x) "->c.c_car")
+  );  (cons-car x)
 
 (defun cdr (x)
   (declare (optimize (safety 2)))
   (check-type x list)
-  (lit :object (:object x) "->c.c_cdr"));  (cons-cdr x)
+;  (*object (address x) 0 nil nil)
+  (lit :object (:object x) "->c.c_cdr")
+ );  (cons-cdr x)
 
 (defun cadr (x)
   (declare (optimize (safety 2)))

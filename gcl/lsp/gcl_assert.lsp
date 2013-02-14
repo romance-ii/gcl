@@ -66,11 +66,11 @@
 (defun clause-type (clauses)
   `(or ,@(mapcan (lambda (x) (mapcar (lambda (y) `(eql ,y)) (if (listp (car x)) (car x) (list (car x))))) clauses)))
 	
-(defmacro etypecase (keyform &rest clauses &aux (key (if (symbolp keyform) keyform (gensym))))
-  (declare (optimize (safety 2)))
-  (check-type clauses (list-of proper-list))
-  (let ((tp `(or ,@(mapcar 'car clauses))))
-    `(typecase ,keyform ,@clauses (t (error 'type-error :datum ,key :expected-type ',tp)))))
+;; (defmacro etypecase (keyform &rest clauses &aux (key (if (symbolp keyform) keyform (gensym))))
+;;   (declare (optimize (safety 2)))
+;;   (check-type clauses (list-of proper-list))
+;;   (let ((tp `(or ,@(mapcar 'car clauses))))
+;;     `(typecase ,keyform ,@clauses (t (error 'type-error :datum ,key :expected-type ',tp)))))
 
 (defmacro ctypecase (keyform &rest clauses &aux (key (gensym)))
   (declare (optimize (safety 2)))

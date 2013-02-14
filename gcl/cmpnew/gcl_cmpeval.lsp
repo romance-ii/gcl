@@ -2935,27 +2935,6 @@
 ;;     (list 'LOCATION (make-info :type (object-type val)) (list 'VV (add-object val))))))
 					;FIXME check readability
 
-
-(defmacro si::define-compiler-macro (name vl &rest body)
-  (declare (optimize (safety 2)))
-  (let ((n (si::funid-sym name)))
-    `(progn (si:putprop ',n
-			,(si::defmacro-lambda (if (eq n name) name (cadr name)) vl body)
-			'si::compiler-macro-prop)
-	    ',name)))
-
-(defun si::compiler-macro-function (name)
-  (let ((name (si::funid-sym name)))
-    (get name 'si::compiler-macro-prop)))
-
-(defun si::undef-compiler-macro (name)
-  (let ((name (si::funid-sym name)))
-    (remprop name 'si::compiler-macro-prop)))
-
-(define-compiler-macro infer-type (x y z)
-  `(infer-tp ,(cmp-eval x) ,(cmp-eval y) ,z))
-
-
 (defvar *compiler-temps*
         '(tmp0 tmp1 tmp2 tmp3 tmp4 tmp5 tmp6 tmp7 tmp8 tmp9))
 

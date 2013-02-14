@@ -1173,9 +1173,11 @@
 (setf (get 'si::structure-name 'type-propagator) 'structure-name-propagator)
 
 
-(defun expand-type-propagator (f t1 &aux (a (atomic-tp t1))(b (car a))(b (when (constant-type-p b) (funcall f b))));FIXME organization
+(defun expand-type-propagator (f t1 &aux (a (atomic-tp t1))(b (car a)));FIXME organization
   (declare (ignore t2))
-  (when (and a b) (object-type (funcall f b))))
+  (when a
+    (when (constant-type-p b)
+      (object-type (funcall f b)))))
 (dolist (l 'si::(expand-array-element-type expand-deftype))
   (setf (get l 'compiler::c1no-side-effects) t)
   (setf (get l 'compiler::type-propagator) 'compiler::expand-type-propagator))
