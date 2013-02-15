@@ -280,11 +280,12 @@
 (defvar *vaddress-list*)   ;; hold addresses of C functions, and other data
 (defvar *vind*)            ;; index in the VV array where the address is.
 (defvar *Inits*)
+(defvar *add-hash-calls*)
 (defun ctop-write (name &aux
 			def
 		(*function-links* nil) *c-vars* (*volatile* " VOL ")
 		*vaddress-list* (*vind* 0)  *inits*
-		*current-form* *vcs-used*)
+		*current-form* *vcs-used* *add-hash-calls*)
   (declare (special *current-form* *vcs-used*))
 
 ;;  #+gprof(add-libc "mcount")
@@ -332,6 +333,9 @@
   (dolist* (x *function-links*)
 	   (setq *vcs-used* nil)
 	   (wt-function-link x))
+
+  (mapc (lambda (x) (add-init x)) *add-hash-calls*)
+
   #+sgi3d
   (progn
     (wt-nl1 "" "static void Init_Links () {")
@@ -1642,7 +1646,7 @@
 		  ,(argsizes at rt (xa lambda-expr))))))
 
   (when *compiler-auto-proclaim*
-    (add-init `(si::add-hash ',fname ,@(mapcar (lambda (x) `(quote ,x)) (export-call (gethash fname *sigs*)))))))
+    (push `(si::add-hash ',fname ,@(mapcar (lambda (x) `(quote ,x)) (export-call (gethash fname *sigs*)))) *add-hash-calls*)))
 
 ;; (defun t3init-fun (fname cfun lambda-expr doc)
 
