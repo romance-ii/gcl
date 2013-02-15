@@ -127,7 +127,7 @@
 
 (defun coerce (object type &aux ntype (atp (listp type)) (ctp (if atp (car type) type)) (tp (when atp (cdr type))))
   (declare (optimize (safety 2))) ;(print (list 'coerce object type))
-  (check-type type type-spec)
+  (check-type type (or (member function) type-spec));FIXME
   (case ctp
 	(function
 	 (let ((object object))

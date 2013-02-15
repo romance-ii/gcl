@@ -316,7 +316,7 @@
 			 stream 
 			 double-float single-float
 			 structure-object ;FIXME
-					;		      unsigned-byte
+			 unsigned-byte
 			 signed-byte))
  (defconstant +rr+ (lremove-if (lambda (x) (type-and (cmp-norm-tp '(or complex array)) (cmp-norm-tp (car x)))) +r+)))
 
@@ -443,7 +443,8 @@
 	 (proper-cons `(unless (improper-consp ,o) t))
 	 ((structure structure-object) `(if tp (when (member (structure-name ,o) tp) t) t))
 	 (mod `(let ((s (pop ,tp))) (<= 0 ,o (1- s))));FIXME error null tp
-	 (signed-byte `(if tp (let* ((s (pop ,tp))(s (when s (ash 1 (1- s))))) (or (not s) (<= (- s) ,o (1- s)))) t))
+	 (signed-byte `(if tp (let* ((s (pop ,tp))(s (when s (ash 1 (1- s))))) (<= (- s) ,o (1- s))) t))
+	 (unsigned-byte `(if tp (let* ((s (pop ,tp))(s (when s (ash 1 s)))) (<= 0 ,o (1- s))) t))
 	 (cons `(if tp (and (typep (pop ,o) (pop ,tp)) (typep ,o (car ,tp)) t) t))
 	 (otherwise t))))
 
