@@ -149,7 +149,7 @@
 		     (let ((*value-to-go* (list 'cvar fv))) (set-loc loc))
 		     (wt-nl "}"))
 		    ((set-loc loc)))
-	      (when (or (eq loc 'fun-val)
+	      (when (or (eq loc 'fun-val) ;FIXME this can lead to a value stack leak on vs_top, e.g. typep with local mvfun tpi
 			(and (consp loc)
 			     (rassoc (car loc) +inline-types-alist+)
 			     (flag-p (cadr loc) sets-vs-top)))

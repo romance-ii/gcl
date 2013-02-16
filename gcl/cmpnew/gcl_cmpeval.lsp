@@ -1640,7 +1640,9 @@
 
 (defun make-ordinary (fn &aux *c1exit*);FIXME *c1exit*
   (let* ((s (tmpsym))(g (tmpsym))
-	 (e (c1let-* `(((,s ,g)) (check-type ,s (not list)) (coerce ,s 'function)) t (list (cons g fn)))); (coerce ,s 'function)
+	 (e (c1let-* `(((,s ,g)) 
+		       ;(check-type ,s (not list)) FIXME bootstrap
+		       (coerce ,s 'function)) t (list (cons g fn)))); (coerce ,s 'function)
 ;	 (e (c1let-* `(((,s ,g)) (etypecase ,s ((and symbol (not boolean)) (fsf ,s)) (function ,s))) t (list (cons g fn)))); (coerce ,s 'function)
 	 (info (make-info)))
     (add-info info (cadr e))
