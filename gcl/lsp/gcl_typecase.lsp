@@ -508,8 +508,7 @@
 			 (not (not (typep o (car tp))))
 			 (satisfies (when (funcall (car tp) o) t))
 			 ((nil t) ctp)
-			;FIXME the mutual recursion on typep prevents return type determination
-			 (otherwise (let ((tem (expand-deftype otp))) (when tem (when (typep o tem) t)))))))
+			 (otherwise (let ((tem (expand-deftype otp))) (when tem (typep o tem)))))))
 	     
 	     (tpi o (if lp (car otp) otp) (when lp (cdr otp)))))
 
