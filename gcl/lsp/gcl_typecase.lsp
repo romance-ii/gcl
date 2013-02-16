@@ -453,7 +453,8 @@
      (case (when ctp (upgraded-complex-part-type ctp))
 	   ,@(mapcar (lambda (x &aux (n (pop x)))
 			 `(,n ,(cfn (car x) `(and (ibb (realpart o) tp) (ibb (imagpart o) tp))))) +ctps+)
-	   (otherwise ,(cfn 'complex '(if tp (and (typep (realpart o) otp) (typep (imagpart o) otp)) t)))))
+	   (otherwise ,(cfn 'complex '(if tp (and (typep (realpart o) otp) (typep (imagpart o) otp) t) t)))))
+					;FIXME the mutual recursion on typep prevents return type determination
 (setf (get 'mtc 'compiler::cmp-inline) t)
 		       
 
@@ -489,9 +490,6 @@
 	       (unless (eq ctp (if (listp ntype) (car ntype) ntype))
 		 ntype)))))))
 
-					;	   (and (not (member-if-not (lambda (x) (typep o x)) tp)))
-					;	   (or  (when (member-if (lambda (x) (typep o x)) tp) t))
-
 #.`(defun typep (o otp &optional env &aux (lp (listp otp)))
      (declare (ignore env))
      (labels ((tpi (o ctp tp &aux (ctp (if (when (eq ctp 'array) (vtp tp)) 'vector ctp)))
@@ -510,7 +508,8 @@
 			 (not (not (typep o (car tp))))
 			 (satisfies (when (funcall (car tp) o) t))
 			 ((nil t) ctp)
-			 (otherwise (let ((tem (expand-deftype otp))) (when tem (typep o tem)))))))
+			;FIXME the mutual recursion on typep prevents return type determination
+			 (otherwise (let ((tem (expand-deftype otp))) (when tem (when (typep o tem) t)))))))
 	     
 	     (tpi o (if lp (car otp) otp) (when lp (cdr otp)))))
 
