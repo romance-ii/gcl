@@ -69,6 +69,7 @@ gcl_init_init()
   ar_init(gcl_defmacro);
   ar_init(gcl_evalmacros);
   ar_init(gcl_predlib);
+  ar_init(gcl_typep);
   ar_init(gcl_typecase);
   ar_init(gcl_c);
   ar_init(gcl_listlib);
