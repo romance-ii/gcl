@@ -486,7 +486,8 @@
 		(ha (mapcar (lambda (x) `',x) (export-call cl)))
 		(clc `(let ((si::f #'(lambda nil nil)))
 			(si::add-hash si::f ,@ha)
-			(si::call si::f))))
+;			(si::call si::f)
+			si::f)))
 	   
 	   (pushnew (list 'closure (if (null *clink*) nil (cons 0 0)) *ccb-vs* fun lam)
 		    *local-funs* :key 'fourth)
