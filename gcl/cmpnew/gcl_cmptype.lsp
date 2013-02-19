@@ -352,7 +352,14 @@
     (when v
       (list (promote-ratio v) (unconv-bnd (cadr tp)) (unconv-bnd (caddr tp))))))
 
-(defun super-range (f &optional (t1 nil t1p) (t2 nil t2p))
+(defun complex-atomic-type-fixup (tp &aux (a (car (atomic-tp tp))))
+  (if (typep a 'complex)
+    (let* ((r (realpart a))(i (imagpart a)))
+      `(complex (,(typecase r (integer 'integer) (ratio 'ratio) (short-float 'short-float) (long-float 'long-float))
+		 ,(min r i) ,(max r i)))) tp))
+
+(defun super-range (f &optional (t1 nil t1p) (t2 nil t2p) &aux (t1 (complex-atomic-type-fixup t1));FIXME
+		      (t2 (complex-atomic-type-fixup t2)))
 
   (when (and t2p (consp t2) (eq (car t2) 'or))
     (return-from super-range (reduce 'type-or1 (mapcar (lambda (x) (super-range f t1 x)) (cdr t2)) :initial-value nil)))
