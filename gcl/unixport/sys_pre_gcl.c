@@ -85,6 +85,7 @@ gcl_init_system(object no_init)
   /* lsp_init("../lsp/gcl_sf.lsp"); */
   lsp_init("../lsp/gcl_predlib.lsp");
   lsp_init("../lsp/gcl_typecase.lsp");
+  lsp_init("../lsp/gcl_typep.lsp");
   lsp_init("../lsp/gcl_callhash.lsp");
   lsp_init("../lsp/gcl_assert.lsp");
   /* lsp_init("../lsp/gcl_seq.lsp"); */
