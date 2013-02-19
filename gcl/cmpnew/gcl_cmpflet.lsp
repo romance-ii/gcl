@@ -514,7 +514,8 @@
 	(setf (fun-vv fun) 
 	      (cons '|#,| `(let ((si::f #'(lambda nil nil)))
 			     (si::add-hash si::f ,@(mapcar (lambda (x) `',x) (export-call cl)))
-			     (si::call si::f))))
+;			     (si::call si::f)
+			     si::f)))
 
 	(wt-make-cclosure (fun-cfun fun) (fun-name fun) 
 			  (fun-vv fun) (new-proclaimed-argd at rt) (argsizes at rt (xa lam)) *clink*)
