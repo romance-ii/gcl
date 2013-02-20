@@ -24,7 +24,7 @@
 
 (defun doit (ld? cmpl?)
 
-  (dolist (l '(s sf c listlib predlib typep typecase arraylib seq seqlib bnum fle dl rm nr lr sym hash))
+  (dolist (l '(s sf c listlib predlib type typep typecase arraylib seq seqlib bnum fle dl rm nr lr sym hash))
     (doitf l "lsp" ld? cmpl?))
   
   (dolist (l '(cmptype cmpeval cmpvar cmpwt cmpif cmplet cmptag cmpinline cmpenv cmplam cmptop

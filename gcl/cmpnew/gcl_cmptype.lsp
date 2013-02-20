@@ -228,9 +228,9 @@
 				  character structure package hash-table function
 				  t))
 (defconstant +useful-types+ (mapcar (lambda (x) (load-time-value (cmp-norm-tp x))) +useful-type-list+))
-(mapc (lambda (x) 
-	(setf (gethash x *and-tp-hash*) (make-hash-table :test 'eq :size 256))
-	(setf (gethash x  *or-tp-hash*) (make-hash-table :test 'eq :size 256))) +useful-types+)
+;; (mapc (lambda (x) 
+;; 	(setf (gethash x *and-tp-hash*) (make-hash-table :test 'eq :size 256))
+;; 	(setf (gethash x  *or-tp-hash*) (make-hash-table :test 'eq :size 256))) +useful-types+)
 
 
 

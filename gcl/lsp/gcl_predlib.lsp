@@ -308,6 +308,7 @@
 (defconstant +ift+ (when (> #.+ifr+ 0) '(integer #.(- +ifr+) #.(1- +ifr+))))
 
 (deftype immfix () +ift+)
+(deftype bfix nil `(and fixnum (not immfix)))
 (deftype eql-is-eq-tp () `(or #.+ift+ (not number)))
 (deftype equal-is-eq-tp () `(or #.+ift+ (not (or cons string bit-vector pathname number))))
 (deftype equalp-is-eq-tp () `(not (or array hash-table structure cons string
@@ -1389,6 +1390,20 @@
    ((eq (car type) 'or)   (lreduce 'ntp-or (mapcar (lambda (x) (nprocess-type x)) (cdr type))))
    ((eq (car type) 'not)  (ntp-not (nprocess-type (cadr type))))
    ((ntp-load type))))
+
+(defun expand-array-element-type (type)
+  (cond
+   ((car (member type +array-types+ :test 'subtypep1)))
+   ((subtypep1 type 'float) 'long-float)
+   (t)))
+
+#.`(defun upgraded-array-element-type (type &optional environment)
+     (declare (ignore environment) (optimize (safety 1)))
+     (case type
+	   ((nil t) t)
+	   ,@(mapcar (lambda (x) `(,x type)) (cons '* (lremove t +array-types+)))
+	   (otherwise (expand-array-element-type type))))
+
 
 (defun normalize-type-int (type ar &aux tem)
   (cond ((atom type) (normalize-type-int (list type) ar))

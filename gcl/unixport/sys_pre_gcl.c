@@ -81,15 +81,12 @@ gcl_init_system(object no_init)
   if (type_of(no_init)!=t_symbol)
     error("Supplied no_init is not of type symbol\n");
 
-  /* lsp_init("../lsp/gcl_s.lsp"); */
-  /* lsp_init("../lsp/gcl_sf.lsp"); */
   lsp_init("../lsp/gcl_predlib.lsp");
-  lsp_init("../lsp/gcl_typecase.lsp");
+  lsp_init("../lsp/gcl_type.lsp");
   lsp_init("../lsp/gcl_typep.lsp");
+  lsp_init("../lsp/gcl_typecase.lsp");
   lsp_init("../lsp/gcl_callhash.lsp");
   lsp_init("../lsp/gcl_assert.lsp");
-  /* lsp_init("../lsp/gcl_seq.lsp"); */
-  /* lsp_init("../lsp/gcl_seqlib.lsp"); */
 
 
   lsp_init("../lsp/gcl_dl.lsp");
@@ -99,7 +96,6 @@ gcl_init_system(object no_init)
   lsp_init("../lsp/gcl_fle.lsp");
 
 
-/*   lsp_init("../lsp/gcl_listlib.lsp"); */
   lsp_init("../lsp/gcl_setf.lsp");
   lsp_init("../lsp/gcl_arraylib.lsp");
 

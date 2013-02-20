@@ -3004,26 +3004,3 @@
   (wt-nl clines))
 (si::putprop 'clines 'c1clines 'c1)
 (si::putprop 'clines 'c2clines 'c2)
-
-
-
-
-(in-package :si)
-
-(define-compiler-macro typecase (&whole w x &rest ff)
-  (let* ((bind (unless (symbolp x) (list (list (gensym) x))));FIXME sgen?
-	 (f (or (caar bind) x))
-	 (o (member-if (lambda (x) (or (eq (car x) t) (eq (car x) 'otherwise))) ff))
-	 (ff (if o (ldiff ff o) ff))
-	 (o (list (cons t (cdar o))))
-	 (tps (mapcar 'cmp-norm-tp (mapcar 'car ff)))
-	 z (tps (mapcar (lambda (x) (prog1 (type-and x (cmp-norm-tp `(not ,z))) (setq z (type-or1 x z)))) tps))
-	 (a (type-and-list tps))(c (calist2 a))
-	 (fn (best-type-of c))
-	 (fm `(case (,fn ,f)
-		    ,@(branches f a (mapcar 'cons tps ff) (cdr (assoc fn +rs+)) o c)
-		    (otherwise ,(mkinfm f `(not (or ,@(mapcan 'car c))) (cdar o))))))
-    (if bind `(let ,bind ,fm) fm)))
-
-(define-compiler-macro si::infer-type (x y z)
-  `(infer-tp ,(compiler::cmp-eval x) ,(compiler::cmp-eval y) ,z));FIXME

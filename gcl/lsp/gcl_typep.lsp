@@ -1,9 +1,13 @@
 (in-package :si)
 
-#.`(defun listp (x) (if (eql 0 (tp2 x)) ,(mkinf 'x 'list '(t)) ,(mkinf 'x '(not list) '(nil))));FIXME
-
 (defun infer-type (x y z) (declare (ignore x y)) z);avoid macroexpansion in bootstrap
-(setf (get 'infer-type 'compiler::cmp-inline) t)
+(define-compiler-macro infer-type (x y z)
+  `(infer-tp ,(compiler::cmp-eval x) ,(compiler::cmp-eval y) ,z))
+
+(defun mkinf (f tp z &aux (z (if (cdr z) `(progn ,@z) (car z))))
+  `(infer-type ',f ',tp ,z))
+
+#.`(defun listp (x) (if (eql 0 (tp2 x)) ,(mkinf 'x 'list '(t)) ,(mkinf 'x '(not list) '(nil))));FIXME
 
 (defun ib (o l &optional f)
   (let* ((a (atom l))
@@ -109,6 +113,20 @@
 	     (let ((ntype (apply tem tp)))
 	       (unless (eq ctp (if (listp ntype) (car ntype) ntype))
 		 ntype)))))))
+
+(eval-when
+ (compile eval)
+ (defconstant +s+ `(list sequence function symbol boolean 
+			 proper-cons
+			 fixnum integer rational float real number;complex
+			 character
+			 hash-table pathname
+			 stream 
+			 double-float single-float
+			 structure-object ;FIXME
+			 unsigned-byte
+			 signed-byte))
+ (defconstant +rr+ (lremove-if (lambda (x) (type-and (cmp-norm-tp '(or complex array)) (cmp-norm-tp (car x)))) +r+)))
 
 #.`(defun typep (o otp &optional env &aux (lp (listp otp)))
      (declare (ignore env))

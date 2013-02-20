@@ -114,46 +114,11 @@
 	    (symbol-name funid))
 	   (load-time-value (or (find-package 'setf) (make-package 'setf))))))
 
-(defmacro funid-sym (funid)
-  (let ((s (sgen "FUNID-SYM")))
-    `(let ((,s ,funid))
-       (declare (ignorable ,s))
-       (etypecase
-	,s
-	(symbol ,s)
-	((cons (member setf) (cons symbol null)) (setf-sym (cadr ,s)))))))
-
-(defmacro funid-sym-p (funid)
-  (let ((s (sgen  "FUNID-SYM-P")))
-    `(let ((,s ,funid))
-       (declare (ignorable ,s))
-       (typecase
-	,s
-	(symbol ,s)
-	((cons (member setf) (cons symbol null)) (setf-sym (cadr ,s)))))))
-
-(defmacro funid (funid)
-  (let ((s (sgen "FUNID")))
-    `(let ((,s ,funid))
-       (declare (ignorable ,s))
-       (etypecase
-	,s
-	(symbol ,s)
-	((cons (member lambda) t) ,s)
-	((cons (member setf) (cons symbol null)) (setf-sym (cadr ,s)))))))
-
-(defmacro funid-p (funid)
-  (let ((s (sgen "FUNID-P")))
-    `(let ((,s ,funid))
-       (declare (ignorable ,s))
-       (typecase
-	,s
-	(symbol ,s)
-	((cons (member lambda) t) ,s)
-	((cons (member setf) (cons symbol null)) (setf-sym (cadr ,s)))))))
-
-(defun funid-to-sym (funid)
-  (funid-sym funid))
+(defun funid-sym (funid) funid)
+(defun funid-sym-p (funid) t)
+(defun funid (funid) funid)
+(defun funid-p (funid) t)
+(defun funid-to-sym (funid) (funid-sym funid))
 
 (defmacro defmacro (name vl &rest body)
   (declare (optimize (safety 2)))
