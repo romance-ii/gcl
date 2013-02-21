@@ -220,25 +220,7 @@
       n)))
 
 
-(defun type-and-list (tps)
-  (mapcan (lambda (x) (mapcan (lambda (y &aux (z (type-and x y))) (when z `((,x ,y ,z)))) +kt+)) tps))
 
-(defun best-type-of (c &aux (r (lreduce 'set-difference c :key 'car :initial-value +kt+))(tps (nconc (mapcar 'car c) (list r))))
-  (or (caar (member-if (lambda (x &aux (f (pop x))
-				  (z (mapcan (lambda (y) (lremove-duplicates (mapcar (lambda (z) (cdr (assoc z x))) y))) tps)))
-			 (eq z (lremove-duplicates z))) +rs+))
-      (caar +rs+)))
-
-(defun malist (car cadr a)
-  (mapcar (lambda (x) (cons x (mapcar car (lremove-if-not (lambda (z) (eq (funcall cadr z) x)) a)))) (lremove-duplicates (mapcar cadr a))))
-
-(defun calist2 (a)
-  (let* ((b (malist 'car 'cadr a))
-	 (b (mapcar 'cdr (malist 'car 'cadr b))))
-    (mapcar (lambda (x) (cons x (lremove-duplicates (mapcar 'car (lremove-if-not (lambda (z) (member (cadr z) x)) a))))) b)))
-
-(defun tps-ints (a rl)
-  (lremove-duplicates (mapcar (lambda (x) (cdr (assoc (cadr x) rl))) a)))
 
 
 (defconstant +ctps+ (mapcar (lambda (x) (list x (intern (string-concatenate "COMPLEX-" (string x))))) +range-types+))
@@ -320,3 +302,40 @@
 (mapc (lambda (x) 
 	(setf (gethash x *and-tp-hash*) (make-hash-table :test 'eq :size 256))
 	(setf (gethash x  *or-tp-hash*) (make-hash-table :test 'eq :size 256))) +kt+)
+
+
+(defun type-and-list (tps)
+  (mapcan (lambda (x) (mapcan (lambda (y &aux (z (type-and x y))) (when z `((,x ,y ,z)))) +kt+)) tps))
+
+(defun best-type-of (c &aux (r (lreduce 'set-difference c :key 'car :initial-value +kt+))(tps (nconc (mapcar 'car c) (list r))))
+  (or (caar (member-if (lambda (x &aux (f (pop x))
+				  (z (mapcan (lambda (y) (lremove-duplicates (mapcar (lambda (z) (cdr (assoc z x))) y))) tps)))
+			 (eq z (lremove-duplicates z))) +rs+))
+      (caar +rs+)))
+
+(defun malist (car cadr a)
+  (mapcar (lambda (x) (cons x (mapcar car (lremove-if-not (lambda (z) (eq (funcall cadr z) x)) a)))) (lremove-duplicates (mapcar cadr a))))
+
+(defun calist2 (a)
+  (let* ((b (malist 'car 'cadr a))
+	 (b (mapcar 'cdr (malist 'car 'cadr b))))
+    (mapcar (lambda (x) (cons x (lremove-duplicates (mapcar 'car (lremove-if-not (lambda (z) (member (cadr z) x)) a))))) b)))
+
+(defun tps-ints (a rl)
+  (lremove-duplicates (mapcar (lambda (x) (cdr (assoc (cadr x) rl))) a)))
+
+
+;; (import 'si::bfix :compiler);FIXME
+;; (defconstant +et+ (mapcar (lambda (x) (cons (cmp-norm-tp x) x)) 
+;; 			  '(list cons proper-list proper-sequence sequence boolean null true array vector number immfix bfix bignum integer
+;; 				 ratio short-float long-float float real number pathname hash-table function)))
+
+;; (defun export-type (tp) (or (cdr (assoc tp +et+)) tp))
+;; (defun export-sig (sig) (list (mapcar 'export-type (car sig)) (export-type (cadr sig))))
+;; (defun unexport-type (tp) (or (car (rassoc tp +et+)) tp))
+;; (defun unexport-sig (sig) (list (mapcar 'unexport-type (car sig)) (unexport-type (cadr sig))))
+
+;; (defun unique-sigs (sig)
+;;   (let ((sig (list (mapcar (lambda (x) (cmp-norm-tp x)) (car sig))
+;; 		   (cmp-norm-tp (cadr sig))))(sig (export-sig sig)))
+;;     (or (gethash sig *unique-sigs*) (setf (gethash sig *unique-sigs*) sig))))

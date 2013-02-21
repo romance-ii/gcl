@@ -106,7 +106,7 @@
 
 
 (defun expand-deftype (type &aux (atp (listp type)) (ctp (if atp (car type) type)) (tp (when atp (cdr type))))
-  (cond ((si-classp ctp) (si-class-name ctp))
+  (cond ((si-classp ctp) (the symbol (si-class-name ctp)));FIXME pcl funcall miss-fn
 	((get ctp 's-data) `(structure ,@(get-included ctp)))
 	((let ((tem (get ctp 'deftype-definition)))
 	   (when tem
@@ -145,7 +145,7 @@
 			 (and (if tp (and (typep o (car tp)) (tpi o 'and (cdr tp))) t))
 			 (not (not (typep o (car tp))))
 			 (satisfies (when (funcall (car tp) o) t))
-			 ((nil t) ctp)
+			 ((nil t) (when ctp t));FIXME ctp not inferred here
 			 (otherwise (let ((tem (expand-deftype otp))) (when tem (typep o tem)))))))
 	     
 	     (tpi o (if lp (car otp) otp) (when lp (cdr otp)))))

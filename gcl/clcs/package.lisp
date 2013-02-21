@@ -36,6 +36,14 @@
 			     package-error package-error-package
 			     division-by-zero floating-point-overflow floating-point-underflow))
 
+(import '(with-simple-restart abort continue compute-restarts
+	  *debug-level* *debug-restarts* *number-of-debug-restarts*
+	  *debug-abort* *debug-continue* *debug-condition* *debug-eval*
+	  find-restart invoke-restart invoke-restart-interactively invoke-debugger
+	  restart-name ignore-errors show-restarts conditionp signal store-value
+	  read-evaluated-form restart-case muffle-warning)
+	:si)
+
 (defvar *this-package* (find-package :conditions))
 
 

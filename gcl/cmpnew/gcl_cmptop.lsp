@@ -561,8 +561,8 @@
      (portable-source `(lambda ,nal
 			 ,@(when doc `(,doc))
 			 ,@(nconc (nreverse (cadr dd)) (cadr cc))
-			 ,@(let* ((r args)
-				  (r (if (eq fname (blocked-body-name r)) (cddar r) r))
+			 ,@(let* ((r args)(bname (blocked-body-name r))(fname (if (eq fname 'lambda) bname fname))
+				  (r (if (eq fname bname) (cddar r) r))
 				  (r (if (or al (car dd)) `((let* ,al ,@(append (car dd) (car cc)) ,@r)) r)))
 			     `((block ,fname ,@r))))))))
 
@@ -1330,7 +1330,7 @@
     (keyed-cmpnote (list 'return-type fname) "~s return type ~s" fname (c1retnote lambda-expr))
     
     (unless (or (equal osig sig) (eq fname 'cmp-anon));FIXME
-      (cmpwarn "signature change on function ~s, ~s -> ~s~%" fname osig sig)
+      (cmpwarn "signature change on function ~s~%, ~s -> ~s~%" fname osig sig)
       (setq *new-sigs-in-file* 
 	    (some
 	     (lambda (x) 
@@ -2166,21 +2166,49 @@
 ;; (defun t3mflag (n)
 ;;   (add-init `(c-set-symbol-mflag ',n 1)))
 
-(defun c1fset (args)
+(define-compiler-macro fset (&whole form &rest args)
   (let* ((info (make-info))
-	 (nargs (c1args (cdr args) info)))
-    (list* 'fset info (car args) nargs)))
-(defun c2fset (sym f)
-  (let* ((fun (car f))
-	 (lam (cadr f))
+	 (nargs (with-restore-vars (c1args args info)))
+	 (ff (cadr nargs)))
+    (if (and (car (atomic-tp (info-type (cadar nargs)))) (eq (car ff) 'function))
+	(let* ((fun (caaddr ff))
+	       (cl (fun-call fun)))
+	  (when *sig-discovery* (apply 'si::add-hash (cmp-eval (car args)) (export-call cl)))
+	  (list* 'fset1 info (car args) (cdr nargs))) form)))
+
+(defun c1fset1 (args) (cons 'fset1 args))
+(defun c2fset1 (sym ff)
+  (let* ((fun (caaddr ff))
 	 (cl (fun-call fun))
 	 (at (caar cl))
 	 (rt (cadar cl)))
+    (c2expr f)
     (add-init `(si::init-function 
-		',sym
+		,sym
 		,(add-address (c-function-name "&LC" (fun-cfun fun) (fun-name fun)))
 		nil nil -1 ,(new-proclaimed-argd at rt)
-		,(argsizes at rt (xa lam))))))
+		,(argsizes at rt (xa (cadr ff)))))
+    (add-init `(si::add-hash ,sym ,@(mapcar (lambda (x) `',x) (export-call cl))))))
+
+;; (setf (get 'fset1 'c1) 'c1fset1)
+;; (setf (get 'fset1 'c2) 'c2fset1)
+
+;; (defun c1fset (args)
+;;   (let* ((info (make-info))
+;; 	 (nargs (c1args (cdr args) info)))
+;;     (list* 'fset info (car args) nargs)))
+;; (defun c2fset (sym f &aux (ff (if (eq 'function (car f)) (caddr f) f)))
+;;   (let* ((fun (car ff))
+;; 	 (lam (cadr ff))
+;; 	 (cl (fun-call fun))
+;; 	 (at (caar cl))
+;; 	 (rt (cadar cl)))
+;;     (c2expr f)
+;;     (add-init `(si::init-function 
+;; 		,sym
+;; 		,(add-address (c-function-name "&LC" (fun-cfun fun) (fun-name fun)))
+;; 		nil nil -1 ,(new-proclaimed-argd at rt)
+;; 		,(argsizes at rt (xa lam))))))
 
 (defun tlclp (form)
   (cond ((atom form) nil)

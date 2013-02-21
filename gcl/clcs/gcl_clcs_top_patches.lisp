@@ -1,15 +1,15 @@
 
-(in-package :CONDITIONS)
+(in-package :conditions)
 
-(import '(with-simple-restart abort continue compute-restarts
-	  *debug-level* *debug-restarts* *number-of-debug-restarts*
-	  *debug-abort* *debug-continue* *debug-condition* *debug-eval*
-	  find-restart invoke-restart invoke-restart-interactively invoke-debugger
-	  restart-name ignore-errors show-restarts conditionp signal store-value
-	  read-evaluated-form restart-case muffle-warning)
-	"SYSTEM")
+;; (import '(with-simple-restart abort continue compute-restarts
+;; 	  *debug-level* *debug-restarts* *number-of-debug-restarts*
+;; 	  *debug-abort* *debug-continue* *debug-condition* *debug-eval*
+;; 	  find-restart invoke-restart invoke-restart-interactively invoke-debugger
+;; 	  restart-name ignore-errors show-restarts conditionp signal store-value
+;; 	  read-evaluated-form restart-case muffle-warning)
+;; 	:si)
 
-(in-package :SYSTEM)
+(in-package :si)
 
 (defvar *abort-restarts* nil)
 

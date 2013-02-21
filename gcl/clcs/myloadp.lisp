@@ -6,5 +6,5 @@
 (load "../clcs/gcl_clcs_conditions.lisp")
 (load "../clcs/gcl_clcs_condition_definitions.lisp")
 (load "../clcs/gcl_clcs_kcl_cond.lisp")
-(load "../clcs/gcl_clcs_top_patches.lisp")
+;(load "../clcs/gcl_clcs_top_patches.lisp")
 ;(load "../clcs/gcl_clcs_install.lisp")
