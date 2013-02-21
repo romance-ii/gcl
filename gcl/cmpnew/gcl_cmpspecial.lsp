@@ -483,11 +483,7 @@
 		(sig (car cl))
 		(at (car sig))
 		(rt (cadr sig))
-		(ha (mapcar (lambda (x) `',x) (export-call cl)))
-		(clc `(let ((si::f #'(lambda nil nil)))
-			(si::add-hash si::f ,@ha)
-;			(si::call si::f)
-			si::f)))
+		(clc (export-call-struct cl)))
 	   
 	   (pushnew (list 'closure (if (null *clink*) nil (cons 0 0)) *ccb-vs* fun lam)
 		    *local-funs* :key 'fourth)
@@ -509,6 +505,47 @@
 					nil nil
 					-1 ,(new-proclaimed-argd at rt) ,(argsizes at rt (xa lam))))))
 		  (unwind-exit (list 'vv (fun-vv fun)))))))))
+
+;; (defun c2function (funob);FIXME
+;;   (case (car funob)
+;;         (call-global
+;;          (unwind-exit (list 'symbol-function (add-symbol (caddr funob)))))
+;;         (call-local
+;; 	 (let* ((funob (caddr funob))(fun (pop funob)))
+;; 	   (unwind-exit (if (cadr funob) (list 'ccb-vs (fun-ref-ccb fun)) (list 'vs* (fun-ref fun))))))
+;;         (otherwise
+;; 	 (let* ((fun (pop funob))
+;; 		(lam (car funob))
+;; 		(cl (fun-call fun))
+;; 		(sig (car cl))
+;; 		(at (car sig))
+;; 		(rt (cadr sig))
+;; 		(ha (mapcar (lambda (x) `',x) (export-call cl)))
+;; 		(clc `(let ((si::f #'(lambda nil nil)))
+;; 			(si::add-hash si::f ,@ha)
+;; ;			(si::call si::f)
+;; 			si::f)))
+	   
+;; 	   (pushnew (list 'closure (if (null *clink*) nil (cons 0 0)) *ccb-vs* fun lam)
+;; 		    *local-funs* :key 'fourth)
+	   
+;; 	   (cond (*clink*
+;; 		  (let ((clc (cons '|#,| clc)))
+;; 		    (unwind-exit (list 'make-cclosure (fun-cfun fun) (fun-name fun) 
+;; 				       (or (fun-vv fun) clc)
+;; 				       (new-proclaimed-argd at rt) (argsizes at rt (xa lam))
+;; 				       *clink*))
+;; 		    (unless (fun-vv fun)
+;; 		      (setf (fun-vv fun) clc))))
+;; 		 (t  
+;; 		  (unless (fun-vv fun)
+;; 		    (setf (fun-vv fun)
+;; 			  (cons '|#,| `(init-function 
+;; 					,clc
+;; 					,(add-address (c-function-name "&LC" (fun-cfun fun) (fun-name fun)))
+;; 					nil nil
+;; 					-1 ,(new-proclaimed-argd at rt) ,(argsizes at rt (xa lam))))))
+;; 		  (unwind-exit (list 'vv (fun-vv fun)))))))))
 
 ;; (defun c2function (funob);FIXME
 ;;   (case (car funob)

@@ -332,7 +332,7 @@
 
 (defmacro symbol-to-function (sym)
   (let* ((n (gensym))
-	 (gf (find-symbol "SYMBOL-GFDEF" (find-package "C"))))
+	 (gf (find-symbol "C-SYMBOL-GFDEF" (find-package :s))))
     `(when (symbolp ,sym)
        ,(if (fboundp gf) `(let ((,n (address (,gf ,sym))))
 			    (unless (= 0 ,n) (nani ,n)))
@@ -341,14 +341,10 @@
 	     (unless (consp ,n) ,n))))))
 
 (defmacro call (sym &optional f &rest keys) ;FIXME macro
-  (let* ((fnf (gensym))(n (gensym))
-	 (cc (find-symbol "CFUN-CALL" (find-package "C")))
-	 (cc (if (fboundp cc) cc 'cfun-call))
-	 (sc (find-symbol "SET-CFUN-CALL" (find-package "C")))
-	 (sc (if (fboundp sc) sc  'set-cfun-call)))
-    `(let* ((,fnf (if (functionp ,sym) ,sym (symbol-to-function ,sym))))
-       (or (when ,fnf (,cc ,fnf))
+  (let* ((fnf (gensym))(n (gensym)))
+    `(let* ((,fnf (if (functionp ,sym) ,sym (symbol-to-function ,sym))));(coerce ,sym 'function)
+       (or (when ,fnf (cfun-call ,fnf))
 	   (when ,f
 	     (let ((,n (make-call ,@keys)))
-	       (when ,fnf (,sc ,n ,fnf))
+	       (when ,fnf (set-cfun-call ,n ,fnf))
 	       ,n))))))

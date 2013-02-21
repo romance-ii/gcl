@@ -512,10 +512,7 @@
 	(wt "=")
 
 	(setf (fun-vv fun) 
-	      (cons '|#,| `(let ((si::f #'(lambda nil nil)))
-			     (si::add-hash si::f ,@(mapcar (lambda (x) `',x) (export-call cl)))
-;			     (si::call si::f)
-			     si::f)))
+	      (cons '|#,| (export-call-struct cl)))
 
 	(wt-make-cclosure (fun-cfun fun) (fun-name fun) 
 			  (fun-vv fun) (new-proclaimed-argd at rt) (argsizes at rt (xa lam)) *clink*)
@@ -523,6 +520,55 @@
 	(wt-nl))))
 
   (c2expr body))
+
+;; (defun c2flet-labels (labels local-funs closures body
+;; 			     &aux (*vs* *vs*) (oclink *clink*) (*clink* *clink*) 
+;; 			     (occb-vs *ccb-vs*) (*ccb-vs* *ccb-vs*))
+
+;;   (mapc (lambda (def &aux (fun (car def)))
+;; 	  (setf (fun-ref fun) (vs-push))
+;; 	  (clink (fun-ref fun))
+;; 	  (setf (fun-ref-ccb fun) (ccb-vs-push))) closures)
+
+;;   (mapc (lambda (def &aux (fun (car def)))
+;; 	  (when (eq (fun-ref fun) t) (setf (fun-ref fun) (vs-push)))) local-funs)
+  
+;;   (let ((*clink*  (if labels *clink*  oclink))
+;; 	(*ccb-vs* (if labels *ccb-vs* occb-vs)))
+
+;;     (mapc (lambda (def &aux (fun (pop def)))
+;; 	    (setf (fun-level fun) *level*)
+;; 	    (push (list nil *clink* *ccb-vs* fun (car def) *initial-ccb-vs*) *local-funs*)) local-funs)
+    
+;;     (when (or local-funs closures) (base-used));fixme
+    
+;;     (dolist (def closures)
+      
+;;       (let* ((fun (pop def))
+;; 	     (lam (car def))
+;; 	     (cl (fun-call fun))
+;; 	     (sig (car cl))
+;; 	     (at (car sig))
+;; 	     (rt (cadr sig)))
+	
+;; 	(push (list 'closure (if (null *clink*) nil (cons 0 0)) *ccb-vs* fun lam) *local-funs*)
+      
+;; 	(wt-nl)
+;; 	(wt-vs* (fun-ref fun))
+;; 	(wt "=")
+
+;; 	(setf (fun-vv fun) 
+;; 	      (cons '|#,| `(let ((si::f #'(lambda nil nil)))
+;; 			     (si::add-hash si::f ,@(mapcar (lambda (x) `',x) (export-call cl)))
+;; ;			     (si::call si::f)
+;; 			     si::f)))
+
+;; 	(wt-make-cclosure (fun-cfun fun) (fun-name fun) 
+;; 			  (fun-vv fun) (new-proclaimed-argd at rt) (argsizes at rt (xa lam)) *clink*)
+;; 	(wt ";")
+;; 	(wt-nl))))
+
+;;   (c2expr body))
 
 ;; (defun c2flet-labels (labels local-funs closures body
 ;; 			     &aux (*vs* *vs*) (oclink *clink*) (*clink* *clink*) 

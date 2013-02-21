@@ -1462,10 +1462,11 @@
 	   (at (pop sig))
 	   (rt (car sig)))
       (cond ((assoc fname *inline-functions*)
-	     (add-init `(si::init-function ',(if macro-p (cons 'macro fname) fname)
-					   ,(add-address (c-function-name "LI" cfun fname))
-					   nil nil -1 ,(new-proclaimed-argd at rt)
-					   ,(argsizes at rt (xa lambda-expr)))))
+	     (add-init `(fset ',(if macro-p (cons 'macro fname) fname)
+			      (init-function ,(export-call-struct (gethash fname *sigs*))
+					     ,(add-address (c-function-name "LI" cfun fname))
+					     nil nil -1 ,(new-proclaimed-argd at rt)
+					     ,(argsizes at rt (xa lambda-expr))))))
 	    ((let ((arg-c (length (car (lambda-list lambda-expr))))
 		   (arg-p (length at))
 		   (va (member '* at)))
@@ -1483,6 +1484,34 @@
 		       " ~a is proclaimed but not in *inline-functions* ~
         ~%T1defun could not assure suitability of args for C call" fname)))
 	       nil))))))
+
+;; (defun wt-if-proclaimed (fname cfun lambda-expr macro-p)
+;;   (when (fast-link-proclaimed-type-p fname);(and  (not (member '* (get-arg-types fname))))
+;;     (let* ((sig (lam-e-to-sig lambda-expr))
+;; 	   (at (pop sig))
+;; 	   (rt (car sig)))
+;;       (cond ((assoc fname *inline-functions*)
+;; 	     (add-init `(si::init-function ',(if macro-p (cons 'macro fname) fname)
+;; 					   ,(add-address (c-function-name "LI" cfun fname))
+;; 					   nil nil -1 ,(new-proclaimed-argd at rt)
+;; 					   ,(argsizes at rt (xa lambda-expr)))))
+;; 	    ((let ((arg-c (length (car (lambda-list lambda-expr))))
+;; 		   (arg-p (length at))
+;; 		   (va (member '* at)))
+;; 	       (cond (va
+;; 		      (or (>= arg-c (- arg-p (length va)))
+;; 			  (cmpwarn "~a needs ~a args. ~a supplied." fname (- arg-p (length va)) arg-c)))
+;; 		     ((not (eql arg-c arg-p))
+;; 		      (cmpwarn
+;; 		       "~%;; ~a Number of proclaimed args was ~a. ~
+;;                           ~%;;Its definition had ~a." fname arg-p arg-c))
+;; 					;((>= arg-c 10.)) ;checked above 
+;; 					;(cmpwarn " t1defun only likes 10 args ~
+;; 					;            ~%for proclaimed functions")
+;; 		     (t (cmpwarn
+;; 		       " ~a is proclaimed but not in *inline-functions* ~
+;;         ~%T1defun could not assure suitability of args for C call" fname)))
+;; 	       nil))))))
 
 ;; (defun wt-if-proclaimed (fname cfun lambda-expr)
 ;;   (when (fast-link-proclaimed-type-p fname);(and  (not (member '* (get-arg-types fname))))
@@ -1639,14 +1668,29 @@
     (let* ((sig (lam-e-to-sig lambda-expr))
 	   (at (mapcar 'global-type-bump (pop sig)))
 	   (rt (global-type-bump (car sig))))
-      (add-init `(init-function
-		  ',(if macro-p (cons 'macro fname) fname)
-		  ,(add-address (c-function-name "LI" (format nil "~a" cfun) fname))
-		  nil nil -1 ,(new-proclaimed-argd at rt)
-		  ,(argsizes at rt (xa lambda-expr))))))
+      (add-init `(fset ',(if macro-p (cons 'macro fname) fname) 
+		       (init-function ,(export-call-struct (gethash fname *sigs*))
+				      ,(add-address (c-function-name "LI" (format nil "~a" cfun) fname))
+				      nil nil -1 ,(new-proclaimed-argd at rt)
+				      ,(argsizes at rt (xa lambda-expr))))))))
 
-  (when *compiler-auto-proclaim*
-    (push `(si::add-hash ',fname ,@(mapcar (lambda (x) `(quote ,x)) (export-call (gethash fname *sigs*)))) *add-hash-calls*)))
+;; (defun t3init-fun (fname cfun lambda-expr doc macro-p)
+
+;;   (when doc (add-init `(putprop ',fname ,doc 'function-documentation)))
+
+;;   (unless (wt-if-proclaimed fname cfun lambda-expr macro-p)
+;;     (assert (numberp cfun))
+;;     (let* ((sig (lam-e-to-sig lambda-expr))
+;; 	   (at (mapcar 'global-type-bump (pop sig)))
+;; 	   (rt (global-type-bump (car sig))))
+;;       (add-init `(init-function
+;; 		  ',(if macro-p (cons 'macro fname) fname)
+;; 		  ,(add-address (c-function-name "LI" (format nil "~a" cfun) fname))
+;; 		  nil nil -1 ,(new-proclaimed-argd at rt)
+;; 		  ,(argsizes at rt (xa lambda-expr))))))
+
+;;   (when *compiler-auto-proclaim*
+;;     (push `(si::add-hash ',fname ,@(mapcar (lambda (x) `(quote ,x)) (export-call (gethash fname *sigs*)))) *add-hash-calls*)))
 
 ;; (defun t3init-fun (fname cfun lambda-expr doc)
 
@@ -2162,36 +2206,37 @@
   (maybe-eval (not (macro-function n)) (cons 'defmacro w));FIXME?
   (push `(mflag ,n) *top-level-forms*))
 
-(defun t3mflag (n) nil)
+(defun t3mflag (n) (declare (ignore n)) nil)
 ;; (defun t3mflag (n)
 ;;   (add-init `(c-set-symbol-mflag ',n 1)))
 
-(define-compiler-macro fset (&whole form &rest args)
-  (let* ((info (make-info))
-	 (nargs (with-restore-vars (c1args args info)))
-	 (ff (cadr nargs)))
-    (if (and (car (atomic-tp (info-type (cadar nargs)))) (eq (car ff) 'function) (fun-p (caaddr ff)));FIXME
-	(let* ((fun (caaddr ff))
-	       (cl (fun-call fun)))
-	  (when *sig-discovery* (apply 'si::add-hash (cmp-eval (car args)) (export-call cl)))
-	  (list* 'fset1 info (car args) (cdr nargs))) form)))
+;; (define-compiler-macro fset (&whole form &rest args)
+;;   (let* ((info (make-info))
+;; 	 (nargs (with-restore-vars (c1args args info)))
+;; 	 (ff (cadr nargs)))
+;;     (if (and (car (atomic-tp (info-type (cadar nargs)))) (eq (car ff) 'function) (fun-p (caaddr ff)));FIXME
+;; 	(let* ((fun (caaddr ff))
+;; 	       (cl (fun-call fun)))
+;; 	  (when *sig-discovery* (apply 'si::add-hash (cmp-eval (car args)) (export-call cl)))
+;; 	  (list* 'fset1 info (car args) (cdr nargs))) form)))
 
-(defun c1fset1 (args) (cons 'fset1 args))
-(defun c2fset1 (sym ff)
-  (let* ((fun (caaddr ff))
-	 (cl (fun-call fun))
-	 (at (caar cl))
-	 (rt (cadar cl)))
-    (c2expr f)
-    (add-init `(si::init-function 
-		,sym
-		,(add-address (c-function-name "&LC" (fun-cfun fun) (fun-name fun)))
-		nil nil -1 ,(new-proclaimed-argd at rt)
-		,(argsizes at rt (xa (cadr ff)))))
-    (add-init `(si::add-hash ,sym ,@(mapcar (lambda (x) `',x) (export-call cl))))))
+;; (defun c1fset1 (args) (cons 'fset1 args))
+;; (defun c2fset1 (sym ff)
+;;   (let* ((fl (caddr ff))
+;; 	 (fun (car fl))
+;; 	 (cl (fun-call fun))
+;; 	 (at (caar cl))
+;; 	 (rt (cadar cl)))
+;;     (c2expr ff)
+;;     (add-init `(si::init-function 
+;; 		,sym
+;; 		,(add-address (c-function-name "&LC" (fun-cfun fun) (fun-name fun)))
+;; 		nil nil -1 ,(new-proclaimed-argd at rt)
+;; 		,(argsizes at rt (xa (cadr fl)))))
+;;     (push `(si::add-hash ,sym ,@(mapcar (lambda (x) `',x) (export-call cl))) *add-hash-calls*)))
 
-(setf (get 'fset1 'c1) 'c1fset1)
-(setf (get 'fset1 'c2) 'c2fset1)
+;; (setf (get 'fset1 'c1) 'c1fset1)
+;; (setf (get 'fset1 'c2) 'c2fset1)
 
 ;; (defun c1fset (args)
 ;;   (let* ((info (make-info))

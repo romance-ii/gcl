@@ -130,7 +130,6 @@ DEFUN("INIT-FUNCTION",object,fSinit_function,SI,7,7,NONE,OO,OO,OI,II, \
     if (z) sc->s.s_mflag=TRUE;
   }
   
-  
   return fun;
 
 }

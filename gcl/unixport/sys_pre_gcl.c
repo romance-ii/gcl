@@ -85,7 +85,6 @@ gcl_init_system(object no_init)
   lsp_init("../lsp/gcl_type.lsp");
   lsp_init("../lsp/gcl_typep.lsp");
   lsp_init("../lsp/gcl_typecase.lsp");
-  lsp_init("../lsp/gcl_callhash.lsp");
   lsp_init("../lsp/gcl_assert.lsp");
 
 
@@ -107,6 +106,7 @@ gcl_init_system(object no_init)
   lsp_init("../lsp/gcl_numlib.lsp");
 
   lsp_init("../lsp/gcl_defstruct.lsp");
+  lsp_init("../lsp/gcl_callhash.lsp");
   lsp_init("../lsp/gcl_describe.lsp");
 #ifdef HAVE_JAPI_H
   lsp_init("../mod/gcl_japi.lsp");
