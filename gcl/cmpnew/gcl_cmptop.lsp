@@ -2170,7 +2170,7 @@
   (let* ((info (make-info))
 	 (nargs (with-restore-vars (c1args args info)))
 	 (ff (cadr nargs)))
-    (if (and (car (atomic-tp (info-type (cadar nargs)))) (eq (car ff) 'function))
+    (if (and (car (atomic-tp (info-type (cadar nargs)))) (eq (car ff) 'function) (fun-p (caaddr ff)));FIXME
 	(let* ((fun (caaddr ff))
 	       (cl (fun-call fun)))
 	  (when *sig-discovery* (apply 'si::add-hash (cmp-eval (car args)) (export-call cl)))
@@ -2190,8 +2190,8 @@
 		,(argsizes at rt (xa (cadr ff)))))
     (add-init `(si::add-hash ,sym ,@(mapcar (lambda (x) `',x) (export-call cl))))))
 
-;; (setf (get 'fset1 'c1) 'c1fset1)
-;; (setf (get 'fset1 'c2) 'c2fset1)
+(setf (get 'fset1 'c1) 'c1fset1)
+(setf (get 'fset1 'c2) 'c2fset1)
 
 ;; (defun c1fset (args)
 ;;   (let* ((info (make-info))
