@@ -92,13 +92,12 @@
 (defun unex-type (tp) (or (car (rassoc tp +et+)) tp))
 (defun unex-sig (sig) (list (mapcar 'unex-type (car sig)) (unex-type (cadr sig))))
 
-(defvar *uniq-sigs* (make-hash-table :test 'equal))
-(defun uniq-sigs (sig)
-  (let ((sig (ex-sig sig)))
-    (or (gethash sig *uniq-sigs*) (setf (gethash sig *uniq-sigs*) sig))))
+;; (defvar *uniq-sigs* (make-hash-table :test 'equal))
+;; (defun uniq-sigs (sig)
+;;   (or (gethash sig *uniq-sigs*) (setf (gethash sig *uniq-sigs*) sig)))
 
 (defun export-call-struct (l)
-  `(make-call :sig (uniq-sigs ',(pop l)) :callees ',(mapcar 'car (pop l)) :src ,(apply 'compress-fle (pop l)) 
+  `(make-call :sig (ex-sig ',(pop l)) :callees ',(mapcar 'car (pop l)) :src ,(apply 'compress-fle (pop l)) 
 	      :file ,(pop l) :props ,(car l)))
 
 (defun add-recompile (fn why assumed-sig actual-sig)

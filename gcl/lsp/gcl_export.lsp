@@ -532,6 +532,16 @@
 (*make-constant '+array-types+ (si::aelttype-list))
 (*make-constant '+sfix+ (eql (truncate fixnum-length char-length) 4))
 
+(defun ex-type (tp) tp)
+(defun ex-sig (sig) (list (mapcar 'ex-type (car sig)) (ex-type (cadr sig))))
+(*make-special '*uniq-sigs*)
+(setq *uniq-sigs* (make-hash-table :test 'equal))
+(defun uniq-sigs (sig)
+  (let ((sig (ex-sig sig)))
+    (or (gethash sig *uniq-sigs*) (setf (gethash sig *uniq-sigs*) sig))))
+(defun make-call (&key sig callees src file props name);FIXME
+  (list sig callees src file props name))
+
 (in-package :s)
 (si::import-internal 'si::(\| & ^ ~ c+ c* << >> string-concatenate strcat lit seqind fixnum-length char-length cref address 
 			   package-internal package-external array-dims cmp-norm-tp tp0 tp1 tp2 tp3 tp4 tp5 tp6 tp7))

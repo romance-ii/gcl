@@ -749,6 +749,7 @@ struct pathname {
 };
 
 EXTER object def_env1[2],*def_env;
+EXTER object src_env1[2],*src_env;
 
 struct function {
 

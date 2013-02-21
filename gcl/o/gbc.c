@@ -665,7 +665,7 @@ mark_object(object x) {
   case t_function:	
     mark_object(x->fun.fun_data);
     mark_object(x->fun.fun_plist);
-    if (x->fun.fun_env != def_env) {
+    if (x->fun.fun_env != def_env && x->fun.fun_env != src_env) {
       mark_object(x->fun.fun_env[0]);
       if (what_to_collect >= t_contiguous) {
 	object *p=x->fun.fun_env-1;

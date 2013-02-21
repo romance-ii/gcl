@@ -422,6 +422,10 @@ gcl_main(int argc, char **argv, char **envp)
     def_env1[1]=Cnil;
     def_env=def_env1+1;
 
+    src_env1[0]=(object)1;/*FIXME better place*/
+    src_env1[1]=Cnil;
+    src_env=src_env1+1;
+
     initlisp();
 
     vs_base = vs_top;

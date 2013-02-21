@@ -89,20 +89,14 @@ gcl_init_system(object no_init)
   if (type_of(no_init)!=t_symbol)
     error("Supplied no_init is not of type symbol\n");
 
-  /* ar_check_init(gcl_evalmacros,no_init); */
-  /* ar_check_init(gcl_predlib,no_init); */
-  /* ar_init(gcl_listlib); */
-  ar_check_init(gcl_callhash,no_init);
   ar_check_init(gcl_arraylib,no_init);
   ar_check_init(gcl_seq,no_init);
   ar_check_init(gcl_serror,no_init);
   ar_check_init(gcl_seqlib,no_init);
-  /* ar_check_init(gcl_setf,no_init); */
-  /* lsp_init("../lsp/gcl_autoload.lsp"); */
   ar_check_init(gcl_sc,no_init);
-/*   ar_check_init(gcl_cp,no_init); */
   ar_check_init(gcl_assert,no_init);
   ar_check_init(gcl_defstruct,no_init);
+  ar_check_init(gcl_callhash,no_init);
   ar_check_init(gcl_describe,no_init);
 #ifdef HAVE_JAPI_H
   lsp_init("../mod/gcl_japi.lsp");  /* Needed for package declaration when compiling later. */

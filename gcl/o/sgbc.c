@@ -593,7 +593,7 @@ sgc_mark_object1(object x) {
   case t_function:	
     sgc_mark_object(x->fun.fun_data);
     sgc_mark_object(x->fun.fun_plist);
-    if (x->fun.fun_env != def_env) {
+    if (x->fun.fun_env != def_env && x->fun.fun_env != src_env) {
       sgc_mark_object(x->fun.fun_env[0]);
       if (what_to_collect >= t_contiguous) {
 	object *p=x->fun.fun_env-1;

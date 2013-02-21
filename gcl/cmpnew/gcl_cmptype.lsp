@@ -1181,7 +1181,6 @@
 
 
 (defun expand-type-propagator (f t1 &aux (a (atomic-tp t1))(b (car a)));FIXME organization
-  (declare (ignore t2))
   (when a
     (when (constant-type-p b)
       (object-type (funcall f b)))))
