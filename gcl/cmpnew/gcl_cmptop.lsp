@@ -561,7 +561,7 @@
      (portable-source `(lambda ,nal
 			 ,@(when doc `(,doc))
 			 ,@(nconc (nreverse (cadr dd)) (cadr cc))
-			 ,@(let* ((r args)(bname (blocked-body-name r))(fname (if (eq fname 'lambda) bname fname))
+			 ,@(let* ((r args)(bname (blocked-body-name r))(fname (if (when bname (eq fname 'lambda)) bname fname))
 				  (r (if (eq fname bname) (cddar r) r))
 				  (r (if (or al (car dd)) `((let* ,al ,@(append (car dd) (car cc)) ,@r)) r)))
 			     `((block ,fname ,@r))))))))
