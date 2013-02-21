@@ -1466,7 +1466,7 @@
 					     ,(add-address (c-function-name "LI" cfun fname))
 					     nil nil -1 ,(new-proclaimed-argd at rt)
 					     ,(argsizes at rt (xa lambda-expr)))))
-	       (add-init `(fset ',fname ,(if macro-p (cons 'macro finit) finit)))))
+	       (add-init `(fset ',fname ,(if macro-p `(cons 'macro ,finit) finit)))))
 	    ((let ((arg-c (length (car (lambda-list lambda-expr))))
 		   (arg-p (length at))
 		   (va (member '* at)))
