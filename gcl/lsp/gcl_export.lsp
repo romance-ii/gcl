@@ -535,8 +535,6 @@
 (*make-special '*uniq-sigs*)
 (setq *uniq-sigs* (make-hash-table :test 'equal))
 (defun uniq-sig (sig) (or (gethash sig *uniq-sigs*) (setf (gethash sig *uniq-sigs*) sig)))
-(defun make-call (&key sig callees src file props name);FIXME
-  (list sig callees src file props name))
 
 (*make-special '*lists*)
 (*make-special '*boot*)
