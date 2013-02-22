@@ -546,6 +546,9 @@
 		   (mapc #'(lambda (x) (rplaca x (norm-sig (car x)))) *lists*) (setq *boot* t *lists* nil)))
 		((car (push (cons (uniq-sig (pop args)) args) *lists*))))))
 
+(defun make-call (&key sig callees src file props name)
+  (make-function-plist sig callees src file props name))
+
 (in-package :s)
 (si::import-internal 'si::(\| & ^ ~ c+ c* << >> string-concatenate strcat lit seqind fixnum-length char-length cref address 
 			   package-internal package-external array-dims cmp-norm-tp tp0 tp1 tp2 tp3 tp4 tp5 tp6 tp7))
