@@ -538,8 +538,8 @@
 (defun make-call (&key sig callees src file props name);FIXME
   (list sig callees src file props name))
 
-(*make-special *lists*)
-(*make-special *boot*)
+(*make-special '*lists*)
+(*make-special '*boot*)
 (setq *lists* nil *boot* nil)
 (defun make-function-plist (&rest args);FIXME
   (labels ((norm-sig (sig) (uniq-sig (list (mapcar 'cmp-norm-tp (car sig)) (cmp-norm-tp (cadr sig))))))
