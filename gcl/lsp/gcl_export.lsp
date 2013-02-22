@@ -540,14 +540,11 @@
 (*make-special '*boot*)
 (setq *lists* nil *boot* nil)
 (defun make-function-plist (&rest args);FIXME
-  (labels ((norm-sig (sig) (uniq-sig (list (mapcar 'cmp-norm-tp (car sig)) (cmp-norm-tp (cadr sig))))))
+  (labels ((norm-sig (sig) (list (mapcar 'cmp-norm-tp (car sig)) (cmp-norm-tp (cadr sig)))))
 	  (cond (*boot* (cons (uniq-sig (norm-sig (pop args))) args))
 		((when (fboundp 'cmp-norm-tp) 
 		   (mapc #'(lambda (x) (rplaca x (norm-sig (car x)))) *lists*) (setq *boot* t *lists* nil)))
 		((car (push (cons (uniq-sig (pop args)) args) *lists*))))))
-
-(defun make-call (&key sig callees src file props name)
-  (make-function-plist sig callees src file props name))
 
 (in-package :s)
 (si::import-internal 'si::(\| & ^ ~ c+ c* << >> string-concatenate strcat lit seqind fixnum-length char-length cref address 

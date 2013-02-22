@@ -1245,7 +1245,8 @@
     (setf (car e) (export-sig (car e))
 	  (third e) (list src clv name)
 	  (fourth e) (unless *compiler-compile* (namestring (truename (pathname *compiler-input*))))
-	  (fifth e) (if (= (length clv) 0) 1 0))
+	  (fifth e) (if (= (length clv) 0) 1 0)
+	  (sixth e) name)
     l))
 
 ;; (defun do-fun (name src e vis b)
@@ -1319,7 +1320,7 @@
 	 (cfun (next-cfun))
 	 (oal (get-arg-types fname)) (ort (get-return-type fname))
 	 (osig (export-sig (list oal ort)))
-	 (e (or (gethash fname *sigs*) (setf (gethash fname *sigs*) (make-list 5))))
+	 (e (or (gethash fname *sigs*) (setf (gethash fname *sigs*) (make-list 6))))
 	 (setjmps *setjmps*)
 	 (lambda-expr (do-fun fname args e t nil))
 	 (sig (car e))

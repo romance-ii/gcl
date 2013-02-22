@@ -55,7 +55,7 @@
 	                        ;;;     (let ((v9 a)) (- (%f8) v9))))
 	                        ;;;           (defun foo (a) (flet ((%f8 nil (setq a 2)))
                                 ;;;     (* a (%f8))))
-	   (call (make-list 5))
+	   (call (make-list 6));FIXME
 	   vv src c1 c1cb fn)
 
 (defun local-fun-fn (id)
