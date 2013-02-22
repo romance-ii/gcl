@@ -97,8 +97,7 @@
 ;;   (or (gethash sig *uniq-sigs*) (setf (gethash sig *uniq-sigs*) sig)))
 
 (defun export-call-struct (l)
-  `(make-call :sig (ex-sig ',(pop l)) :callees ',(mapcar 'car (pop l)) :src ,(apply 'compress-fle (pop l)) 
-	      :file ,(pop l) :props ,(car l)))
+  `(make-function-plist ',(ex-sig (pop l))  ',(mapcar 'car (pop l))  ,(apply 'compress-fle (pop l))  ,(pop l) ,(car l)))
 
 (defun add-recompile (fn why assumed-sig actual-sig)
   (let* ((q (car (member fn *needs-recompile* :key 'car))))

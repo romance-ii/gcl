@@ -532,15 +532,21 @@
 (*make-constant '+array-types+ (si::aelttype-list))
 (*make-constant '+sfix+ (eql (truncate fixnum-length char-length) 4))
 
-(defun ex-type (tp) tp)
-(defun ex-sig (sig) (list (mapcar 'ex-type (car sig)) (ex-type (cadr sig))))
 (*make-special '*uniq-sigs*)
 (setq *uniq-sigs* (make-hash-table :test 'equal))
-(defun uniq-sigs (sig)
-  (let ((sig (ex-sig sig)))
-    (or (gethash sig *uniq-sigs*) (setf (gethash sig *uniq-sigs*) sig))))
+(defun uniq-sig (sig) (or (gethash sig *uniq-sigs*) (setf (gethash sig *uniq-sigs*) sig)))
 (defun make-call (&key sig callees src file props name);FIXME
   (list sig callees src file props name))
+
+(*make-special *lists*)
+(*make-special *boot*)
+(setq *lists* nil *boot* nil)
+(defun make-function-plist (&rest args);FIXME
+  (labels ((norm-sig (sig) (uniq-sig (list (mapcar 'cmp-norm-tp (car sig)) (cmp-norm-tp (cadr sig))))))
+	  (cond (*boot* (cons (uniq-sig (norm-sig (pop args))) args))
+		((when (fboundp 'cmp-norm-tp) 
+		   (mapc #'(lambda (x) (rplaca x (norm-sig (car x)))) *lists*) (setq *boot* t *lists* nil)))
+		((car (push (cons (uniq-sig (pop args)) args) *lists*))))))
 
 (in-package :s)
 (si::import-internal 'si::(\| & ^ ~ c+ c* << >> string-concatenate strcat lit seqind fixnum-length char-length cref address 
