@@ -865,6 +865,8 @@ First directory is checked for first name and all extensions etc."
 
 (defvar si::*lib-directory* (namestring (make-pathname :directory (list :parent))))
 
+(defvar *tmp-dir*)
+
 (defun set-up-top-level ( &aux (i (argc)) tem)
   (declare (fixnum i))
   (reset-lib-syms)

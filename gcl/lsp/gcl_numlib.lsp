@@ -39,8 +39,17 @@
 (in-package :system)
 
 
-(defconstant imag-one #C(0 1))
+(defun rational (x)
+  (etypecase x
+    (float	  
+      (multiple-value-bind
+       (i e s) (integer-decode-float x)
+       (let ((x (if (>= e 0) (ash i e) (/ i (ash 1 (- e))))))
+	 (if (>= s 0) x (- x)))))
+    (rational x)))
+(setf (symbol-function 'rationalize) (symbol-function 'rational))
 
+(defconstant imag-one #C(0 1))
 
 (defun isqrt (i)
        (unless (and (integerp i) (>= i 0))
@@ -195,17 +204,7 @@
 ;; 	   y)))
 
 
-(defun rational (x)
-  (etypecase x
-    (float	  
-      (multiple-value-bind
-       (i e s) (integer-decode-float x)
-       (let ((x (if (>= e 0) (ash i e) (/ i (ash 1 (- e))))))
-	 (if (>= s 0) x (- x)))))
-    (rational x)))
 
-
-(setf (symbol-function 'rationalize) (symbol-function 'rational))
 
 ;; although the following is correct code in that it approximates the
 ;; x to within eps, it does not preserve (eql (float (rationalize x) x) x)

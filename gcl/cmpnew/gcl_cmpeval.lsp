@@ -3004,3 +3004,16 @@
   (wt-nl clines))
 (si::putprop 'clines 'c1clines 'c1)
 (si::putprop 'clines 'c2clines 'c2)
+
+
+;; (define-compiler-macro typep (&whole form &rest args &aux (info (make-info))(nargs (c1args args info)))
+;;   (let* ((info (make-info))
+;; 	 (nargs (with-restore-vars (c1args args info)))
+;; 	 (tp (info-type (cadar nargs)))
+;; 	 (a (atomic-tp (info-type (cadadr nargs))))
+;; 	 (c (cmp-norm-tp (car a))))
+;;     (if (when a (constant-type-p (car a)))
+;; 	(cond ((type>= c tp) (print (list c tp t)) t)
+;; 	      ((not (type-and c tp)) (print (list c tp nil)) nil)
+;; 	      (form));FIXME hash here
+;;       form)))

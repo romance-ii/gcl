@@ -1247,6 +1247,12 @@
 	  (fourth e) (unless *compiler-compile* (namestring (truename (pathname *compiler-input*))))
 	  (fifth e) (if (= (length clv) 0) 1 0)
 	  (sixth e) name)
+    (when *sig-discovery*
+      (si::clear-compiler-properties 
+       name
+       (let ((f (lambda nil nil))) 
+	 (c-set-function-plist f (si::make-function-plist (car e) (mapcar 'car (cadr e)) nil nil nil nil))
+	 f)))
     l))
 
 ;; (defun do-fun (name src e vis b)
@@ -1352,10 +1358,7 @@
     (push (list 'defun fname cfun lambda-expr doc nil) *top-level-forms*)
     (push (cons fname cfun) *global-funs*)
 
-    (output-warning-note-stack)
-
-    (when *sig-discovery*
-      (si::add-hash fname (car e) (cadr e) nil nil))))
+    (output-warning-note-stack)))
 
 ;; (defun t1defun (args)
 

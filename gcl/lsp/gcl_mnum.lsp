@@ -1,12 +1,5 @@
 ;; -*-Lisp-*-
-;; (in-package 'lisp)
-
-;; (export 'abs)
-
 (in-package :si)
-
-(import 'compiler::defdlfun 'si)
-(import 'compiler::strcat 'si)
 
 #+c99
 (progn

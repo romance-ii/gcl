@@ -29,6 +29,23 @@
  (system:init-system) 
  (gbc t)
 
+ (in-package :si)
+ (use-package :gmp)
+ (do-symbols 
+  (s) 
+  (when (get s 'proclaimed-function)
+    (unless (sig s)
+      (clear-compiler-properties 
+       s
+       (let ((f (lambda nil nil))) 
+	 (c-set-function-plist
+	  f
+	  (make-function-plist
+	   (list (get s 'proclaimed-arg-types) (get s 'proclaimed-return-type))
+	   nil nil nil nil nil)) f)))
+    (dolist (l '(proclaimed-function proclaimed-arg-types proclaimed-return-type))
+      (remprop s l))))
+
  (in-package "USER")
 
  (or si::*link-array*

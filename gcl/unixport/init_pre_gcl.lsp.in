@@ -40,7 +40,7 @@
 
 (progn 
 
-  (in-package 'si)
+  (in-package :si)
   (use-package :gmp)
 
   (system:init-system) 
@@ -50,7 +50,15 @@
   (do-symbols 
    (s) 
    (when (get s 'proclaimed-function)
-     (add-hash s (list (get s 'proclaimed-arg-types) (get s 'proclaimed-return-type)) nil nil nil)
+     (unless (sig s)
+       (clear-compiler-properties 
+	s
+	(let ((f (lambda nil nil))) 
+	  (c-set-function-plist
+	   f
+	   (make-function-plist
+	    (list (get s 'proclaimed-arg-types) (get s 'proclaimed-return-type))
+	    nil nil nil nil nil)) f)))
      (dolist (l '(proclaimed-function proclaimed-arg-types proclaimed-return-type))
        (remprop s l))))
 
