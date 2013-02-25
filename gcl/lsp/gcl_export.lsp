@@ -542,7 +542,8 @@
 (defun norm-sig (sig) (uniq-sig (list (mapcar 'cmp-norm-tp (car sig)) (cmp-norm-tp (cadr sig)))))
 (defun normalize-function-plist (plist)
   (setf (car plist) (norm-sig (car plist)))
-  (mapc #'(lambda (x) (setf (cdr x) (norm-sig (cdr x)))) (cadr plist)))
+  (mapc #'(lambda (x) (setf (cdr x) (norm-sig (cdr x)))) (cadr plist))
+  plist)
 
 (defun uniq-function-plist (plist)
   (list* (uniq-sig (pop plist))
