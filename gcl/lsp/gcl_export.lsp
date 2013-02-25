@@ -536,9 +536,6 @@
 (setq *uniq-sigs* (make-hash-table :test 'equal))
 (defun uniq-sig (sig) (or (gethash sig *uniq-sigs*) (setf (gethash sig *uniq-sigs*) sig)))
 
-(*make-special '*lists*)
-(*make-special '*boot*)
-(setq *lists* nil *boot* nil)
 (defun norm-sig (sig) (uniq-sig (list (mapcar 'cmp-norm-tp (car sig)) (cmp-norm-tp (cadr sig)))))
 (defun normalize-function-plist (plist)
   (setf (car plist) (norm-sig (car plist)))
@@ -546,9 +543,9 @@
   plist)
 
 (let (boot lists)
-  (defun make-function-plist (&rest args);FIXME
+  (defun make-function-plist (&rest args)
     (cond (boot (normalize-function-plist args))
-	  ((fboundp 'cmp-norm-tp) (mapc 'normalize-function-plist *lists*) (setq boot t lists nil) (apply 'make-function-plist args))
+	  ((fboundp 'cmp-norm-tp) (mapc 'normalize-function-plist lists) (setq boot t lists nil) (apply 'make-function-plist args))
 	  ((car (push args lists))))))
 
 (in-package :s)
