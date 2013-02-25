@@ -2436,7 +2436,7 @@
   `(defun ,n ,syms 
      (declare (optimize (safety 2)))
      ,@(mapcar (lambda (x y) `(check-type ,x ,(get y 'lisp-type))) syms tps)
-     (lit ,rt 
+     (lit ,(if (eq rt :void) :object rt)
 	  "({" ,decl 
 	  ,@(when (eq rt :void) `("("))
 	  ,m "("

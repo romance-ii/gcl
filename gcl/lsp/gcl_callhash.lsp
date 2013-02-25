@@ -247,7 +247,7 @@
 		(push s r))))))))))
 
 
-(defun do-recomp (&aux r *sig-discovery-props*)
+(defun do-recomp (&aux r *sig-discovery-props* *compile-verbose*)
   (labels ((d (&aux (*sig-discovery* t)) (when (mapc (lambda (x) (compile (car x))) (mapcan 'needs-recompile r)) (d))))
 	  (do-all-symbols (s) (push s r))(d)
 	  (let* ((fl (remove-duplicates (mapcar (lambda (x) (file (car x))) *sig-discovery-props*) :test 'string=))
