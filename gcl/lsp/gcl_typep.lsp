@@ -106,7 +106,7 @@
 
 
 (defun expand-deftype (type &aux (atp (listp type)) (ctp (if atp (car type) type)) (tp (when atp (cdr type))))
-  (cond ((si-classp ctp) `(std-structure ,ctp))
+  (cond ((unless (symbolp ctp) (si-classp ctp)) `(std-structure ,ctp));FIXME classp loop, also accept s-data?
 	((setq tem (get ctp 's-data)) `(structure ,tem))
 	((let ((tem (get ctp 'deftype-definition)))
 	   (when tem
