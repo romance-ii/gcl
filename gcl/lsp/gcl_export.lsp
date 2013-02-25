@@ -551,8 +551,8 @@
 
 (defun make-function-plist (&rest args);FIXME
   (cond (*boot* (normalize-function-plist args))
-	((when (fboundp 'cmp-norm-tp) (mapc 'normalize-function-plist *lists*) (setq *boot* t *lists* nil)))
-	((car (push (uniq-function-plist args) *lists*)))))
+;	((when (fboundp 'cmp-norm-tp) (mapc 'normalize-function-plist *lists*) (setq *boot* t *lists* nil)))
+	((car (push args *lists*)))))
 
 ;; (defun make-function-plist (&rest args);FIXME
 ;;   (labels ((norm-sig (sig) (list (mapcar 'cmp-norm-tp (car sig)) (cmp-norm-tp (cadr sig)))))
