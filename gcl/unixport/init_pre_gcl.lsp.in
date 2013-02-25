@@ -41,6 +41,7 @@
 (progn 
 
   (in-package :si)
+  (mapc 'normalize-function-plist *lists*) (setq *boot* t *lists* nil);FIXME
   (use-package :gmp)
 
   (system:init-system) 

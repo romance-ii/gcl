@@ -1716,22 +1716,22 @@
       (values (not (car rt))  (not (cadr rt))))))
 
 
-(defun type-of (object)
-  (cond ((not object) 'null)
-	((eq object t) 'boolean)
-	((keywordp object) 'keyword)
-	((symbolp object) 'symbol);;to get around pcl bootstrap problems
-	((typep object 'standard-object)
-	 (let* ((c (si-class-of object))
-		(n (si-class-name c)))
-	     (if (and n (eq c (si-find-class n nil))) n c)))
-	((let ((tp (type-of-c object)))
-	   (cond ((member tp '(vector array));FIXME
-		  `(,tp ,(upgraded-array-element-type (array-element-type object))))
-		 ((and (symbolp tp) (string= "STD-INSTANCE" (symbol-name tp)) ;FIXME import pcl::std-instance-p
-		       (string= "PCL" (package-name (symbol-package tp))))
-		  (si-class-of object))
-		 (tp))))))
+;; (defun type-of (object)
+;;   (cond ((not object) 'null)
+;; 	((eq object t) 'boolean)
+;; 	((keywordp object) 'keyword)
+;; 	((symbolp object) 'symbol);;to get around pcl bootstrap problems
+;; 	((typep object 'standard-object)
+;; 	 (let* ((c (si-class-of object))
+;; 		(n (si-class-name c)))
+;; 	     (if (and n (eq c (si-find-class n nil))) n c)))
+;; 	((let ((tp (type-of-c object)))
+;; 	   (cond ((member tp '(vector array));FIXME
+;; 		  `(,tp ,(upgraded-array-element-type (array-element-type object))))
+;; 		 ((and (symbolp tp) (string= "STD-INSTANCE" (symbol-name tp)) ;FIXME import pcl::std-instance-p
+;; 		       (string= "PCL" (package-name (symbol-package tp))))
+;; 		  (si-class-of object))
+;; 		 (tp))))))
 
 
 ;; set by unixport/init_kcl.lsp

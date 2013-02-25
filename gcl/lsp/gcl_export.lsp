@@ -539,12 +539,27 @@
 (*make-special '*lists*)
 (*make-special '*boot*)
 (setq *lists* nil *boot* nil)
+(defun norm-sig (sig) (uniq-sig (list (mapcar 'cmp-norm-tp (car sig)) (cmp-norm-tp (cadr sig)))))
+(defun normalize-function-plist (plist)
+  (setf (car plist) (norm-sig (car plist)))
+  (mapc #'(lambda (x) (setf (cdr x) (norm-sig (cdr x)))) (cadr plist)))
+
+(defun uniq-function-plist (plist)
+  (list* (uniq-sig (pop plist))
+	 (mapcar #'(lambda (x) (cons (car x) (uniq-sig (cdr x)))) (pop plist))
+	 plist))
+
 (defun make-function-plist (&rest args);FIXME
-  (labels ((norm-sig (sig) (list (mapcar 'cmp-norm-tp (car sig)) (cmp-norm-tp (cadr sig)))))
-	  (cond (*boot* (cons (uniq-sig (norm-sig (pop args))) args))
-		((when (fboundp 'cmp-norm-tp) 
-		   (mapc #'(lambda (x) (rplaca x (norm-sig (car x)))) *lists*) (setq *boot* t *lists* nil)))
-		((car (push (cons (uniq-sig (pop args)) args) *lists*))))))
+  (cond (*boot* (normalize-function-plist args))
+	((when (fboundp 'cmp-norm-tp) (mapc 'normalize-function-plist *lists*) (setq *boot* t *lists* nil)))
+	((car (push (uniq-function-plist args) *lists*)))))
+
+;; (defun make-function-plist (&rest args);FIXME
+;;   (labels ((norm-sig (sig) (list (mapcar 'cmp-norm-tp (car sig)) (cmp-norm-tp (cadr sig)))))
+;; 	  (cond (*boot* (cons (uniq-sig (norm-sig (pop args))) args))
+;; 		((when (fboundp 'cmp-norm-tp) 
+;; 		   (mapc #'(lambda (x) (rplaca x (norm-sig (car x)))) *lists*) (setq *boot* t *lists* nil)))
+;; 		((car (push (cons (uniq-sig (pop args)) args) *lists*))))))
 
 (in-package :s)
 (si::import-internal 'si::(\| & ^ ~ c+ c* << >> string-concatenate strcat lit seqind fixnum-length char-length cref address 

@@ -49,7 +49,7 @@
 (defun c1declare (args)
   (cmperr "The declaration ~s was found in a bad place." (cons 'declare args)))
 
-(defun c1the (args &aux info form type dtype)
+(defun c1the (args &aux info form type dtype);FIXME rethink this whole function
   (when (or (endp args) (endp (cdr args)))
     (too-few-args 'the 2 (length args)))
   (unless (endp (cddr args))
@@ -58,6 +58,7 @@
   (setq info (copy-info (cadr form)))
   (setq dtype (max-vtp (car args)))
   (when *compiler-new-safety* (setq dtype t))
+  (when (exit-to-fmla-p) (setq dtype (type-or1 (when (type-and #tnull dtype) #tnull) (when (type-and #t(not null) dtype) #ttrue))));FIXME
   (when (eq dtype #tboolean) 
     (unless (type>= dtype (info-type info))
       (return-from c1the (c1expr `(when ,(cadr args) t)))))
@@ -74,6 +75,32 @@
   (if (type>= #tboolean dtype) (setf (info-type (cadr form)) type) (set-form-type form type))
 ;  (setf (info-type info) type)
   form)
+
+;; (defun c1the (args &aux info form type dtype)
+;;   (when (or (endp args) (endp (cdr args)))
+;;     (too-few-args 'the 2 (length args)))
+;;   (unless (endp (cddr args))
+;;     (too-many-args 'the 2 (length args)))
+;;   (setq form (c1expr (cadr args)))
+;;   (setq info (copy-info (cadr form)))
+;;   (setq dtype (max-vtp (car args)))
+;;   (when *compiler-new-safety* (setq dtype t))
+;;   (when (eq dtype #tboolean) 
+;;     (unless (type>= dtype (info-type info))
+;;       (return-from c1the (c1expr `(when ,(cadr args) t)))))
+;;   (setq type (type-and dtype (info-type info)))
+;;   (when (null type)
+;;     (when (eq (car form) 'var)
+;;       (do-setq-tp (car (third form)) nil dtype))
+;;     (setq type dtype)
+;;     (unless (not (and dtype (info-type info)))
+;;       (cmpwarn "Type mismatch was found in ~s.~%Modifying type ~s to ~s."
+;; 	       (cons 'the args) (info-type info) type)))
+
+;;   (setq form (list* (car form) info (cddr form)))
+;;   (if (type>= #tboolean dtype) (setf (info-type (cadr form)) type) (set-form-type form type))
+;; ;  (setf (info-type info) type)
+;;   form)
 
 ;; (defun c1the (args &aux info form type dtype)
 ;;   (when (or (endp args) (endp (cdr args)))

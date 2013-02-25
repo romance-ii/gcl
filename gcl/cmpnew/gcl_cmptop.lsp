@@ -1248,11 +1248,7 @@
 	  (fifth e) (if (= (length clv) 0) 1 0)
 	  (sixth e) name)
     (when *sig-discovery*
-      (si::clear-compiler-properties 
-       name
-       (let ((f (lambda nil nil))) 
-	 (c-set-function-plist f (si::make-function-plist (car e) (mapcar 'car (cadr e)) nil nil nil nil))
-	 f)))
+      (when (symbol-package name) (unless (eq name 'lambda) (push (cons name (apply 'si::make-function-plist e)) si::*sig-discovery-props*))))
     l))
 
 ;; (defun do-fun (name src e vis b)

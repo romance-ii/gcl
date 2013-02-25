@@ -117,6 +117,11 @@
 
 (defvar *sigs* (make-hash-table :test 'eq))
 (defvar *new-sigs-in-file* nil)
+
+(defun setup-sigs nil
+  (clrhash *sigs*)
+  (mapc (lambda (x) (setf (gethash (car x) *sigs*) (cdr x))) si::*sig-discovery-props*))
+
 (defun compile-file  (filename &rest args
 			    &aux (*print-pretty* nil)
 			    (*package* *package*) (*split-files* *split-files*)
@@ -137,7 +142,8 @@
 
   (loop 
 
-   (clrhash *sigs*)
+   (setup-sigs)
+;   (clrhash *sigs*)
 ;   (purge-member-types)
 
    (do nil ((not (eq (setq tem (let (*new-sigs-in-file*) (apply 'compile-file1 filename args))) 'again))))

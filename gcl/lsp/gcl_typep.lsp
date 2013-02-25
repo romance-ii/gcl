@@ -68,7 +68,7 @@
 	 ((structure structure-object) `(if tp (when (member (structure-name ,o) tp) t) t))
 	 (mod `(let ((s (pop ,tp))) (<= 0 ,o (1- s))));FIXME error null tp
 	 (signed-byte `(if tp (let* ((s (pop ,tp))(s (when s (ash 1 (1- s))))) (<= (- s) ,o (1- s))) t))
-	 (unsigned-byte `(if tp (let* ((s (pop ,tp))(s (when s (ash 1 s)))) (<= 0 ,o (1- s))) t))
+	 (unsigned-byte `(if tp (let* ((s (pop ,tp))(s (when s (ash 1 s)))) (<= 0 ,o (1- s))) (<= 0 ,o)))
 	 (cons `(if tp (and (typep (pop ,o) (pop ,tp)) (typep ,o (car ,tp)) t) t))
 	 (otherwise t))))
 

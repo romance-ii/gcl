@@ -23,6 +23,7 @@
  (gbc t)
 
  (in-package :si)
+ (mapc 'normalize-function-plist *lists*) (setq *boot* t *lists* nil);FIXME
  (use-package :gmp)
  (do-symbols 
   (s) 

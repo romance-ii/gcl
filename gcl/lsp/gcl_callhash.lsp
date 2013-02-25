@@ -97,7 +97,29 @@
 ;;   (or (gethash sig *uniq-sigs*) (setf (gethash sig *uniq-sigs*) sig)))
 
 (defun export-call-struct (l)
-  `(apply 'make-function-plist ',(ex-sig (pop l))  ',(mapcar 'car (pop l))  ,(apply 'compress-fle (pop l)) ',l))
+  `(apply 'make-function-plist ',(ex-sig (pop l))  ',(pop l)  ,(apply 'compress-fle (pop l)) ',l))
+
+;; (defun export-call-struct (l)
+;;   `(apply 'make-function-plist ',(ex-sig (pop l))  ',(mapcar 'car (pop l))  ,(apply 'compress-fle (pop l)) ',l))
+
+(defvar *sig-discovery-props* nil)
+
+(defun symbol-function-plist (sym &aux (fun (symbol-to-function sym)))
+  (when fun (c-function-plist fun)))
+
+(defun sym-plist (sym)
+  (or (cdr (assoc sym *sig-discovery-props*)) (symbol-function-plist sym)))
+				  
+(defun needs-recompile (sym)
+  (let* ((plist (sym-plist sym))
+	 (sig (pop plist))
+	 (callees (car plist)))
+    (mapc (lambda (x &aux (s (car x)) (cmp-sig (cdr x))(act-sig (sig s))) 
+	    (unless (eq sym s)
+	      (when act-sig
+		(unless (eq cmp-sig act-sig)
+		  (return-from needs-recompile (list (list sym s cmp-sig act-sig))))))) callees)
+    nil))
 
 (defun add-recompile (fn why assumed-sig actual-sig)
   (let* ((q (car (member fn *needs-recompile* :key 'car))))
@@ -108,30 +130,30 @@
 (defun remove-recompile (fn)
   (setq *needs-recompile* (remove fn *needs-recompile* :key 'car)))
 
-(defun clear-compiler-properties (sym code)
-  (cond ((not code))
-	((eq (symbol-to-function sym) code))
-	((let ((h (call sym)))
-	   (remove-recompile sym)
-	   (when h
-	     (dolist (l (call-callees h))
-	       (setf (get l 'callers) (delete sym (get l 'callers)))))
+;; (defun clear-compiler-properties (sym code)
+;;   (cond ((not code))
+;; 	((eq (symbol-to-function sym) code))
+;; 	((let ((h (call sym)))
+;; 	   (remove-recompile sym)
+;; 	   (when h
+;; 	     (dolist (l (call-callees h))
+;; 	       (setf (get l 'callers) (delete sym (get l 'callers)))))
 
-	   (let ((x (get sym 'state-function)))
-	     (when (and x (not (eq x *keep-state*)))
-	       (break-state sym x)))
+;; 	   (let ((x (get sym 'state-function)))
+;; 	     (when (and x (not (eq x *keep-state*)))
+;; 	       (break-state sym x)))
 
-	   (let ((new (call code t :sig (when h (call-sig h)))))
+;; 	   (let ((new (call code t :sig (when h (call-sig h)))))
 	     
-	     (let ((nr (member code *needs-recompile* :key (lambda (x) (symbol-to-function x)))))
-	       (when nr (add-recompile sym (cadr nr) (caddr nr) (cadddr nr))))
-	     (when h
-	       (let ((ns (call-sig new)))
-		 (unless (eq ns (call-sig h))
-		   (dolist (l (get sym 'callers))
-		     (add-recompile l sym (call-sig h) ns)))))
-	     (dolist (l (call-callees new)) 
-	       (pushnew sym (get l 'callers) :test 'eq)))))))
+;; 	     (let ((nr (member code *needs-recompile* :key (lambda (x) (symbol-to-function x)))))
+;; 	       (when nr (add-recompile sym (cadr nr) (caddr nr) (cadddr nr))))
+;; 	     (when h
+;; 	       (let ((ns (call-sig new)))
+;; 		 (unless (eq ns (call-sig h))
+;; 		   (dolist (l (get sym 'callers))
+;; 		     (add-recompile l sym (call-sig h) ns)))))
+;; 	     (dolist (l (call-callees new)) 
+;; 	       (pushnew sym (get l 'callers) :test 'eq)))))))
 
 ;; (defun clear-compiler-properties (sym code)
 ;;   (cond ((not (eq *boot* t)) (push `(clear-compiler-properties ',sym nil) *pahl*))
@@ -358,6 +380,16 @@
 	      (unless (get s 'callers)
 		(push s r))))))))))
 
+
+(defun do-recomp (&aux r *sig-discovery-props*)
+  (labels ((d (&aux (*sig-discovery* t)) (when (mapc (lambda (x) (compile (car x))) (mapcan 'needs-recompile r)) (d))))
+	  (do-all-symbols (s) (push s r))(d)
+	  (let* ((fl (remove-duplicates (mapcar (lambda (x) (file (car x))) *sig-discovery-props*) :test 'string=))
+		 (fl (set-difference fl '("pcl" "clcs_install") :test (lambda (x y) (search y x)))))
+	    (make-package :user :use '(:cl-user))
+	    (make-package :lisp :use '(:cl))
+	    (compiler::cdebug)
+	    (mapc 'compile-file (remove nil fl)))))
 
 (defun do-recompile (&optional (pn nil pnp))
 

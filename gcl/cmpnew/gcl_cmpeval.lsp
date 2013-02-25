@@ -3017,3 +3017,16 @@
 ;; 	      ((not (type-and c tp)) (print (list c tp nil)) nil)
 ;; 	      (form));FIXME hash here
 ;;       form)))
+
+
+(define-compiler-macro fset (&whole form &rest args)
+  (when *sig-discovery*
+    (let* ((info (make-info))
+	   (nargs (with-restore-vars (c1args args info)))
+	   (ff (cadr nargs))
+	   (fun (when (eq (car ff) 'function) (caaddr ff)))
+	   (fun (when (fun-p fun) fun))
+	   (sym (car (atomic-tp (info-type (cadar nargs))))))
+      (when (and sym fun);FIXME
+	(push (cons sym (apply 'si::make-function-plist (fun-call fun))) si::*sig-discovery-props*))))
+  form)

@@ -1147,7 +1147,16 @@
 	 (tp (or tp (info-type (cadr (with-restore-vars (c1expr arg))))))
 	 (atp (atomic-tp (type-and tp #t(not null)))))
     (when (atomic-type-constant-value atp);FIXME make sure this is never a binding
-      (c1expr `(if ,arg ',(car atp) ,@(when args `((or ,@args))))))))
+      (c1expr `(if ,arg ',(car atp) ,@(when args (if (cdr args) `((or ,@args)) args)))))))
+
+;; (defun co1or (fn args)
+;;   (declare (ignore fn))
+;;   (let* ((tp (when (and args (exit-to-fmla-p)) #t(member t)))
+;; 	 (arg (pop args))
+;; 	 (tp (or tp (info-type (cadr (with-restore-vars (c1expr arg))))))
+;; 	 (atp (atomic-tp (type-and tp #t(not null)))))
+;;     (when (atomic-type-constant-value atp);FIXME make sure this is never a binding
+;;       (c1expr `(if ,arg ',(car atp) ,@(when args `((or ,@args))))))))
 
 ;; (defun co1or (fn args)
 ;;   (declare (ignore fn))
