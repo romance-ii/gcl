@@ -9,6 +9,7 @@
 (defvar *cmr* nil)
 (defvar *keep-state* nil)
 (defvar *sig-discovery* nil)
+(defvar *split-files* nil)
 
 (defun break-state (sym x)
   (format t "Breaking state function ~s due to definition of ~s~%" x sym)
