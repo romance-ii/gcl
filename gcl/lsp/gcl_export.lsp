@@ -545,22 +545,11 @@
   (mapc #'(lambda (x) (setf (cdr x) (norm-sig (cdr x)))) (cadr plist))
   plist)
 
-(defun uniq-function-plist (plist)
-  (list* (uniq-sig (pop plist))
-	 (mapcar #'(lambda (x) (cons (car x) (uniq-sig (cdr x)))) (pop plist))
-	 plist))
-
-(defun make-function-plist (&rest args);FIXME
-  (cond (*boot* (normalize-function-plist args))
-;	((when (fboundp 'cmp-norm-tp) (mapc 'normalize-function-plist *lists*) (setq *boot* t *lists* nil)))
-	((car (push args *lists*)))))
-
-;; (defun make-function-plist (&rest args);FIXME
-;;   (labels ((norm-sig (sig) (list (mapcar 'cmp-norm-tp (car sig)) (cmp-norm-tp (cadr sig)))))
-;; 	  (cond (*boot* (cons (uniq-sig (norm-sig (pop args))) args))
-;; 		((when (fboundp 'cmp-norm-tp) 
-;; 		   (mapc #'(lambda (x) (rplaca x (norm-sig (car x)))) *lists*) (setq *boot* t *lists* nil)))
-;; 		((car (push (cons (uniq-sig (pop args)) args) *lists*))))))
+(let (boot lists)
+  (defun make-function-plist (&rest args);FIXME
+    (cond (boot (normalize-function-plist args))
+	  ((fboundp 'cmp-norm-tp) (mapc 'normalize-function-plist *lists*) (setq boot t lists nil) (apply 'make-function-plist args))
+	  ((car (push args lists))))))
 
 (in-package :s)
 (si::import-internal 'si::(\| & ^ ~ c+ c* << >> string-concatenate strcat lit seqind fixnum-length char-length cref address 

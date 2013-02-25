@@ -6,73 +6,9 @@
 
 (defstruct (call (:type list) (:constructor make-call))
   sig callees src file props name)
-(defvar *needs-recompile* nil);(make-array 10 :fill-pointer 0 :adjustable t))
-(defvar *us* nil)
 (defvar *cmr* nil)
 (defvar *keep-state* nil)
-(defvar *rfns* nil)
-(defvar *sfns* nil)
-(defvar *split-files* nil)
 (defvar *sig-discovery* nil)
-
-;; (defun add-hash (fn sig callees src file &optional props &aux ar cm)
-;;   (cond ((not (eq *boot* t))
-;; 	 (setq *pahl* (cons `(add-hash ',fn ',sig ',callees ,src ,file ,props) *pahl*))
-;; 	 (unless (or (not (and 
-;; 			   (setq *us* (find-symbol "UNIQUE-SIGS" (find-package "COMPILER")))
-;; 			   (fboundp *us*)))
-;; 		     *boot*)
-;; ;	   (setq *boot* 'add-hash) 
-;; 	   (let ((*package* (find-package "SI")))
-;; 	     (defstruct (call (:type list)
-;; 			      (:constructor make-call))
-;; 			      sig callees src file props name)
-;; 	     (defvar *needs-recompile* nil);(make-array 10 :fill-pointer 0 :adjustable t))
-;; 	     (defvar *us* nil)
-;; 	     (defvar *cmr* nil)
-;; 	     (defvar *keep-state* nil)
-;; 	     (defvar *rfns* nil)
-;; 	     (defvar *sfns* nil)
-;; 	     (defvar *split-files* nil)
-;; 	     (defvar *sig-discovery* nil)
-;; 	     (setq *tmp-dir* (get-temp-dir)))
-;; 	     (setq *boot* t)
-;; 	     (mapc 'eval (nreverse *pahl*))
-;; 	     (setq *pahl* nil)))
-;; 	((let* ((sig (when sig (funcall *us* sig)))
-;; 		(h (call fn t :sig sig)))
-;; 	   (when (symbolp fn)
-;; 	     (let ((x (get fn 'state-function)))
-;; 	       (when (and x (not (eq x *keep-state*)));(member-if (lambda (y) (not (eq (car y) x))) callees))
-;; 		 (break-state fn x))))
-;; 	   (when sig
-;; 	     (unless (eq sig (call-sig h))
-;; 	       (when (symbolp fn)
-;; 		 (when (call-sig h)
-;; 		   (dolist (l (get fn 'callers))
-;; 		     (unless (eq l fn)
-;; 		       (add-recompile l fn (call-sig h) sig)))))
-;; 	       (setf (call-sig h) sig)))
-;; 	   (when (symbolp fn) (setf (call-name h) fn))
-;; 	   (when src (setf (call-src h) src))
-;; 	   (when file (unless (call-file h) (setf (call-file h) file)));FIXME gazonk check
-;; 	   (when props (setf (call-props h) props))
-;; 	   (dolist (l callees (progn (when cm (pushnew fn *cmr* :test 'eq))
-;; 				     (unless ar (when (and sig callees) (remove-recompile fn)));fixme
-;; 				     h))
-;; 	     (let ((fe (car l)))
-;; 	       (unless (member fe (call-callees h) :test 'eq)
-;; 		 (push fe (call-callees h))
-;; 		 (setq cm (symbolp fn)))
-;; 	       (when (symbolp fn)
-;; 		 (let* ((ns (cdr l))
-;; 			(ns (when ns (funcall *us* ns)))
-;; 			(h (call fe))
-;; 			(os (when h (call-sig h))))
-;; 		   (pushnew fn (get fe 'callers) :test 'eq)
-;; 		   (unless (or (eq fn fe) (not os) (eq ns os))
-;; 		     (add-recompile fn fe os ns)
-;; 		     (setq ar t))))))))))
 
 (defun break-state (sym x)
   (format t "Breaking state function ~s due to definition of ~s~%" x sym)
@@ -92,15 +28,8 @@
 (defun unex-type (tp) (or (car (rassoc tp +et+)) tp))
 (defun unex-sig (sig) (list (mapcar 'unex-type (car sig)) (unex-type (cadr sig))))
 
-;; (defvar *uniq-sigs* (make-hash-table :test 'equal))
-;; (defun uniq-sigs (sig)
-;;   (or (gethash sig *uniq-sigs*) (setf (gethash sig *uniq-sigs*) sig)))
-
 (defun export-call-struct (l)
-  `(apply 'make-function-plist ',(ex-sig (pop l))  ',(pop l)  ,(apply 'compress-fle (pop l)) ',l))
-
-;; (defun export-call-struct (l)
-;;   `(apply 'make-function-plist ',(ex-sig (pop l))  ',(mapcar 'car (pop l))  ,(apply 'compress-fle (pop l)) ',l))
+  `(apply 'make-function-plist ',(ex-sig (pop l)) ',(pop l) ,(apply 'compress-fle (pop l)) ',l))
 
 (defvar *sig-discovery-props* nil)
 
@@ -120,69 +49,6 @@
 		(unless (eq cmp-sig act-sig)
 		  (return-from needs-recompile (list (list sym s cmp-sig act-sig))))))) callees)
     nil))
-
-(defun add-recompile (fn why assumed-sig actual-sig)
-  (let* ((q (car (member fn *needs-recompile* :key 'car))))
-    (if q
-	(setf (cadr q) why (caddr q) assumed-sig (cadddr q) actual-sig)
-      (push (list fn  why assumed-sig actual-sig) *needs-recompile*))))
-
-(defun remove-recompile (fn)
-  (setq *needs-recompile* (remove fn *needs-recompile* :key 'car)))
-
-;; (defun clear-compiler-properties (sym code)
-;;   (cond ((not code))
-;; 	((eq (symbol-to-function sym) code))
-;; 	((let ((h (call sym)))
-;; 	   (remove-recompile sym)
-;; 	   (when h
-;; 	     (dolist (l (call-callees h))
-;; 	       (setf (get l 'callers) (delete sym (get l 'callers)))))
-
-;; 	   (let ((x (get sym 'state-function)))
-;; 	     (when (and x (not (eq x *keep-state*)))
-;; 	       (break-state sym x)))
-
-;; 	   (let ((new (call code t :sig (when h (call-sig h)))))
-	     
-;; 	     (let ((nr (member code *needs-recompile* :key (lambda (x) (symbol-to-function x)))))
-;; 	       (when nr (add-recompile sym (cadr nr) (caddr nr) (cadddr nr))))
-;; 	     (when h
-;; 	       (let ((ns (call-sig new)))
-;; 		 (unless (eq ns (call-sig h))
-;; 		   (dolist (l (get sym 'callers))
-;; 		     (add-recompile l sym (call-sig h) ns)))))
-;; 	     (dolist (l (call-callees new)) 
-;; 	       (pushnew sym (get l 'callers) :test 'eq)))))))
-
-;; (defun clear-compiler-properties (sym code)
-;;   (cond ((not (eq *boot* t)) (push `(clear-compiler-properties ',sym nil) *pahl*))
-;;	((not code))
-;; 	((eq (symbol-to-function sym) code))
-;; 	((let ((h (call sym)))
-	   
-;; 	   (when h
-;; 	     (dolist (l (call-callees h))
-;; 	       (setf (get l 'callers) (delete sym (get l 'callers)))))
-
-;; 	   (let ((x (get sym 'state-function)))
-;; 	     (when (and x (not (eq x *keep-state*)))
-;; 	       (break-state sym x)))
-
-;; 	   (let ((new (call code t :sig (when h (call-sig h)))))
-	     
-;; 	     (let ((nr (member code *needs-recompile* :key (lambda (x) (symbol-to-function x)))))
-;; 	       (when nr (add-recompile sym (cadr nr) (caddr nr) (cadddr nr))))
-;; 	     (when h
-;; 	       (let ((ns (call-sig new)))
-;; 		 (unless (eq ns (call-sig h))
-;; 		   (dolist (l (get sym 'callers))
-;; 		     (add-recompile l sym (call-sig h) ns)))))
-;; 	     (dolist (l (call-callees new)) 
-;; 	       (pushnew sym (get l 'callers) :test 'eq)))))))
-
-(defun clr-call nil 
-  (setq *needs-recompile* nil))
 
 (defun same-file-all-callees (x y fn)
 ;  (let ((z (remove-if-not (lambda (x) (equal (file x) fn)) (callees x)))) ;FIXME remove inline

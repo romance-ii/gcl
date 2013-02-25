@@ -31,7 +31,6 @@
 
  (in-package :si)
  (use-package :gmp)
- (mapc 'normalize-function-plist *lists*) (setq *boot* t *lists* nil);FIXME
  (do-symbols 
   (s) 
   (when (get s 'proclaimed-function)
