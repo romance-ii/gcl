@@ -42,9 +42,8 @@
 				  
 (defun needs-recompile (sym)
   (let* ((plist (sym-plist sym))
-	 (sig (pop plist))
-	 (callees (car plist)))
-    (mapc (lambda (x &aux (s (car x)) (cmp-sig (cdr x))(act-sig (sig s))) 
+	 (callees (cadr plist)))
+    (mapc (lambda (x &aux (s (car x)) (cmp-sig (cdr x))(act-sig (car (sym-plist s))))
 	    (unless (eq sym s)
 	      (when act-sig
 		(unless (eq cmp-sig act-sig)
