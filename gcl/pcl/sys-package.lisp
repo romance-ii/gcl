@@ -2,3 +2,4 @@
 (make-package :walker :use '(:cl))
 (make-package :iterate :use '(:cl :walker))
 (make-package :pcl :use '(:cl :iterate :walker))
+(import 'si::std-instance :pcl)

@@ -537,9 +537,12 @@
 (defun uniq-sig (sig) (or (gethash sig *uniq-sigs*) (setf (gethash sig *uniq-sigs*) sig)))
 
 (defun normalize-function-plist (plist)
+  (labels ((mn (tp &aux (n (cmp-norm-tp tp))) (if (unless (eq tp n) (eq n '*)) (return-from normalize-function-plist nil) n))
+	   (norm-sig (sig) (uniq-sig (list (mapcar #'mn (car sig)) (mn (cadr sig))))))
   (setf (car plist) (norm-sig (car plist)))
   (mapc #'(lambda (x) (setf (cdr x) (norm-sig (cdr x)))) (cadr plist))
-  plist)
+  plist))
+
 
 (defun lremove (q l &key (key #'identity) (test #'eql))
   (labels ((l (l) (when l

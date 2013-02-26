@@ -163,22 +163,46 @@
 (defmacro std-instance-slots   (x) `(%std-instance-slots ,x))
 
 (defmacro get-wrapper (inst)
-  `(cond ((std-instance-p ,inst) (std-instance-wrapper ,inst))
-	 ((fsc-instance-p ,inst) (fsc-instance-wrapper ,inst))
-	 (t (error "What kind of instance is this?"))))
+  `(etypecase 
+    ,inst
+    (std-instance (std-instance-wrapper ,inst))
+    (generic-function (fsc-instance-wrapper ,inst))))
 
 (defmacro get-instance-wrapper-or-nil (inst)
-  `(cond ((std-instance-p ,inst) (std-instance-wrapper ,inst))
-	 ((fsc-instance-p ,inst) (fsc-instance-wrapper ,inst))))
+  `(typecase 
+    ,inst
+    (std-instance (std-instance-wrapper ,inst))
+    (generic-function (fsc-instance-wrapper ,inst))))
 
 (defmacro get-slots (inst)
-  `(cond ((std-instance-p ,inst) (std-instance-slots ,inst))
-	 ((fsc-instance-p ,inst) (fsc-instance-slots ,inst))
-	 (t (error "What kind of instance is this?"))))
+  `(etypecase 
+    ,inst
+    (std-instance (std-instance-slots ,inst))
+    (generic-function (fsc-instance-slots ,inst))))
 
 (defmacro get-slots-or-nil (inst)
-  `(cond ((std-instance-p ,inst) (std-instance-slots ,inst))
-	 ((fsc-instance-p ,inst) (fsc-instance-slots ,inst))))
+  `(typecase 
+    ,inst
+    (std-instance (std-instance-slots ,inst))
+    (generic-function (fsc-instance-slots ,inst))))
+
+;; (defmacro get-wrapper (inst)
+;;   `(cond ((std-instance-p ,inst) (std-instance-wrapper ,inst))
+;; 	 ((fsc-instance-p ,inst) (fsc-instance-wrapper ,inst))
+;; 	 (t (error "What kind of instance is this?"))))
+
+;; (defmacro get-instance-wrapper-or-nil (inst)
+;;   `(cond ((std-instance-p ,inst) (std-instance-wrapper ,inst))
+;; 	 ((fsc-instance-p ,inst) (fsc-instance-wrapper ,inst))))
+
+;; (defmacro get-slots (inst)
+;;   `(cond ((std-instance-p ,inst) (std-instance-slots ,inst))
+;; 	 ((fsc-instance-p ,inst) (fsc-instance-slots ,inst))
+;; 	 (t (error "What kind of instance is this?"))))
+
+;; (defmacro get-slots-or-nil (inst)
+;;   `(cond ((std-instance-p ,inst) (std-instance-slots ,inst))
+;; 	 ((fsc-instance-p ,inst) (fsc-instance-slots ,inst))))
 
 (defun print-std-instance (instance stream depth) ;A temporary definition used
   (declare (ignore depth))		          ;for debugging the bootstrap

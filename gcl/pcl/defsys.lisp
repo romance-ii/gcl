@@ -692,7 +692,7 @@ and load your system with:
     #-(or Lispm excl Xerox (and dec vax common) LUCID akcl gcl cmu17) nil))
 
 #-(or cmu Symbolics)
-(defvar *pcl-directory* (concatenate 'string user::*system-directory* "../pcl/"))
+(defvar *pcl-directory* (concatenate 'string si::*system-directory* "../pcl/"))
 ;	(or (load-truename t)
 ;	    (error "Because load-truename is not implemented in this port~%~
 ;                    of PCL, you must manually edit the definition of the~%~
