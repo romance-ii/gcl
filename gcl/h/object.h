@@ -427,14 +427,17 @@ struct hashtable {           /*  hash table header  */
   htent         ht_self;    /*  pointer to the hash table  */
   real          ht_rhsize;  /*  rehash size  */
   real          ht_rhthresh;/*  rehash threshold  */
-  ufixnum       ht_nent;    /*  number of entries  */
-  ufixnum       ht_size;    /*  hash table size  */
+  ufixnum       ht_pad1:4;    /*  number of entries  */
+  ufixnum       ht_nent:LM4BITS;    /*  number of entries  */
+  ufixnum       ht_pad2:4;    /*  hash table size  */
+  ufixnum       ht_size:LM4BITS;    /*  hash table size  */
   uhfixnum      ht_test:2;  /*  key test function  */
                             /*  of enum httest  */
-  uhfixnum      ht_pad:HM2BITS;    /*  key test function  */
+  uhfixnum      ht_pad3:HM2BITS;    /*  key test function  */
                             /*  of enum httest  */
-  hfixnum       ht_pad1;
-  ufixnum       ht_max_ent;
+  hfixnum       ht_pad4;
+  ufixnum       ht_pad5:4;
+  ufixnum       ht_max_ent:LM4BITS;
 
 };
 
