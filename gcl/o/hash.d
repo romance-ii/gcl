@@ -921,6 +921,11 @@ DEFUN("HASH-TABLE-REHASH-SIZE",object,fLhash_table_rehash_size,LISP,1,1,NONE,OO,
   RETURN1(table->ht.ht_rhsize);
 }
 
+DEFUN("EXTEND-HASHTABLE",fixnum,fSextent_hashtable,SI,1,1,NONE,OO,OO,OO,OO,(object table),"") {
+  extend_hashtable(table);
+  return table->ht.ht_size;
+}
+
 DEFUN("HASH-TABLE-REHASH-THRESHOLD",object,fLhash_table_rehash_threshold,LISP,1,1,NONE,OO,OO,OO,OO,(object table),"")
 {
   check_type_hash_table(&table);
