@@ -29,7 +29,7 @@
 	      non-generic-compiled-function
 	      non-logical-pathname
 	      non-standard-base-char true gsym
-	      std-structure
+	      std-instance
 	      hash-table-eq hash-table-eql hash-table-equal hash-table-equalp
 	      +type-alist+ 
 	      sequencep ratiop short-float-p long-float-p
@@ -648,7 +648,7 @@
 				      non-logical-pathname logical-pathname
 				      readtable 
 				      hash-table-eq hash-table-eql hash-table-equal hash-table-equalp
-				      random-state std-structure structure 
+				      random-state std-instance structure 
 				      non-generic-compiled-function
 				      generic-function
 				      ))
@@ -676,7 +676,7 @@
 (defconstant +kingdom-logic-ops-alist+ `(,@(mapcar (lambda (x) `(,x . range-op)) +range-types+)
 					  (cons . cons-op)
 ;					  (standard-object . standard-op)
-					  (std-structure . standard-op)
+					  (std-instance . standard-op)
 					  (generic-function . standard-op)
 					  (structure . structure-op)
 					  ,@(mapcar (lambda (x) `(,(cdr x) . complex-op)) +complex-type-alist+)
@@ -686,7 +686,7 @@
 (defconstant +kingdom-recon-ops-alist+ `(,@(mapcar (lambda (x) `(,x . range-recon)) +range-types+)
 					  (cons . cons-recon)
 ;					  (standard-object . standard-recon)
-					  (std-structure . standard-recon)
+					  (std-instance . standard-recon)
 					  (generic-function . standard-recon)
 					  (structure . structure-recon)
 					  ,@(mapcar (lambda (x) `(,(cdr x) . complex-recon)) +complex-type-alist+)
@@ -697,7 +697,7 @@
 					 (complex . complex-load)
 					 (cons . cons-load)
 ;					 (standard-object . standard-load)
-					 (std-structure . standard-load)
+					 (std-instance . standard-load)
 					 (generic-function . standard-load)
 					 (structure . structure-load)
 					 (array . array-load)
@@ -1348,9 +1348,9 @@
 		    (ntp-ld ntp (list 'generic-function tem)))
 		   ((member tem q)
 		    (ntp-ld ntp (list 'generic-function t));must be a fresh list
-		    (ntp-ld ntp (list 'std-structure t)))
-		   ((ntp-ld ntp (list 'std-structure tem))))))
-;	   (ntp-ld ntp (if (funcallable-standard-object-p tem) `(generic-function ,tem) `(std-structure ,tem))))
+		    (ntp-ld ntp (list 'std-instance t)))
+		   ((ntp-ld ntp (list 'std-instance tem))))))
+;	   (ntp-ld ntp (if (funcallable-standard-object-p tem) `(generic-function ,tem) `(std-instance ,tem))))
 ;	   (ntp-ld ntp `(standard-object ,tem)))
 	  ((and (symbolp (car type)) (setq tem (get (car type) 's-data)))
 	   (ntp-ld ntp `(structure ,tem)))

@@ -247,7 +247,7 @@
 		   (standard-char #\a)
 		   (non-standard-base-char #\Return)
 		   (structure (make-dummy-structure)) 
-		   (std-structure (set-d-tt 1 (make-dummy-structure))) 
+		   (std-instance (set-d-tt 1 (make-dummy-structure))) 
 		   (non-logical-pathname #p".")
 		   (logical-pathname (set-d-tt 1 #p"."))
 		   (hash-table-eq (make-hash-table :test 'eq))

@@ -65,7 +65,7 @@
 	 ((integer ratio single-float double-float short-float long-float float rational real) `(ibb ,o ,tp))
 	 (proper-cons `(unless (improper-consp ,o) t))
 	 ((structure structure-object) `(if tp (mss (c-structure-def ,o) (car tp)) t))
-	 (std-structure `(if tp (when (member (car tp) (si-class-precedence-list (si-class-of ,o))) t) t))
+	 (std-instance `(if tp (when (member (car tp) (si-class-precedence-list (si-class-of ,o))) t) t))
 	 (mod `(let ((s (pop ,tp))) (<= 0 ,o (1- s))));FIXME error null tp
 	 (signed-byte `(if tp (let* ((s (pop ,tp))(s (when s (ash 1 (1- s))))) (<= (- s) ,o (1- s))) t))
 	 (unsigned-byte `(if tp (let* ((s (pop ,tp))(s (when s (ash 1 s)))) (<= 0 ,o (1- s))) (<= 0 ,o)))
@@ -106,7 +106,7 @@
 
 
 (defun expand-deftype (type &aux (atp (listp type)) (ctp (if atp (car type) type)) (tp (when atp (cdr type))))
-  (cond ((unless (symbolp ctp) (si-classp ctp)) `(std-structure ,ctp));FIXME classp loop, also accept s-data?
+  (cond ((unless (symbolp ctp) (si-classp ctp)) `(std-instance ,ctp));FIXME classp loop, also accept s-data?
 	((setq tem (get ctp 's-data)) `(structure ,tem))
 	((let ((tem (get ctp 'deftype-definition)))
 	   (when tem
@@ -159,8 +159,8 @@
       ,@(mapcar (lambda (y &aux (b (pop y))) 
 		 `(,(car y) (let ((r (realpart x))(i (imagpart x))) `(complex (,',b ,(min r i) ,(max r i)))))) +ctps+)
       ,@(mapcar (lambda (y &aux (b (car y))) `((array ,b) `(array ,',b ,(array-dimensions x)))) +vtps+)
-      (std-structure (let* ((c (si-class-of x))(n (si-class-name c))) (if (when n (eq c (si-find-class n nil))) n c)))
+      (std-instance (let* ((c (si-class-of x))(n (si-class-name c))) (if (when n (eq c (si-find-class n nil))) n c)))
       (structure (let* ((c (c-structure-def x))(n (sdata-name c))) (if (when n (eq c (get n 's-data))) n c)))
       ,@(mapcar (lambda (x) `(,x ',x)) (cons 'standard-generic-function ;FIXME
-					     (set-difference +kt+ (mapcar 'cmp-norm-tp '(boolean number array structure std-structure))
+					     (set-difference +kt+ (mapcar 'cmp-norm-tp '(boolean number array structure std-instance))
 							     :test 'type-and)))))

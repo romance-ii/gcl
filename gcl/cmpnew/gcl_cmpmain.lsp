@@ -120,7 +120,8 @@
 
 (defun setup-sigs nil
   (clrhash *sigs*)
-  (mapc (lambda (x) (setf (gethash (car x) *sigs*) (cdr x))) si::*sig-discovery-props*))
+  (mapc (lambda (x) (setf (gethash (car x) *sigs*) (cdr x))
+	  (mapc (lambda (x) (setf (gethash (car x) *sigs*) (list (cdr x) nil nil nil nil nil))) (caddr x))) si::*sig-discovery-props*))
 
 (defun compile-file  (filename &rest args
 			    &aux (*print-pretty* nil)

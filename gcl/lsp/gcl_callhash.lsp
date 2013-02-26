@@ -247,15 +247,17 @@
 		(push s r))))))))))
 
 
-(defun do-recomp (&aux r *sig-discovery-props* *compile-verbose*)
-  (labels ((d (&aux (*sig-discovery* t)) (when (mapc (lambda (x) (compile (car x))) (mapcan 'needs-recompile r)) (d))))
+(defun do-recomp (&rest excl &aux r *sig-discovery-props* *compile-verbose*)
+  (labels ((d (&aux (*sig-discovery* t)(q (remove-duplicates (mapcar 'car (mapcan 'needs-recompile r))) ))
+	      (when q
+		(format t "~%Pass 1 signature discovery on ~s functions ..." (length q))
+		(mapc (lambda (x) (format t "~s " x) (compile x)) q) (d))))
 	  (do-all-symbols (s) (push s r))(d)
 	  (let* ((fl (remove-duplicates (mapcar (lambda (x) (file (car x))) *sig-discovery-props*) :test 'string=))
-		 (fl (set-difference fl '("pcl" "clcs_install") :test (lambda (x y) (search y x)))))
-	    (make-package :user :use '(:cl-user))
-	    (make-package :lisp :use '(:cl))
+		 (fl (set-difference fl excl :test (lambda (x y) (search y x)))))
 	    (compiler::cdebug)
-	    (mapc 'compile-file (remove nil fl)))))
+	    (format t "~%Recompiling original source files ...")
+	    (mapc (lambda (x) (format t "~s~%" x) (compile-file x)) (remove nil fl)))))
 
 (defun do-recompile (&optional (pn nil pnp))
 

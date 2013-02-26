@@ -142,7 +142,7 @@
    (long-float `(long-float ,thing ,thing))
    (null #tnull)
    (true #ttrue)
-   ((or symbol character complex cons structure std-structure function) `(member ,thing))
+   ((or symbol character complex cons structure std-instance function) `(member ,thing))
    (otherwise (cmp-norm-tp (type-of thing)))))
 
 ;; (defun object-type (thing); &optional lim
@@ -1213,35 +1213,35 @@
   (setf (get l 'compiler::c1no-side-effects) t)
   (setf (get l 'compiler::type-propagator) 'compiler::improper-consp-propagator))
 
-(eval-when
- (eval compile)
-  (defmacro maep nil
-   `(progn
-      (defun array-eltsize-propagator (f x)
-	(cond
-	 ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-eltsize-propagator f x)) (cdr x)) :initial-value nil))
-	 ,@(mapcar (lambda (x)
-		     `((type>= (load-time-value (cmp-norm-tp '(array ,(pop x)))) x) 
-		       (load-time-value (cmp-norm-tp ',(object-type (cadr x)))))) si::*array-type-info*)
-	 ((type>= (load-time-value (cmp-norm-tp 'array)) x) 
-	  (load-time-value (cmp-norm-tp ',(reduce 'type-or1 (mapcar 'object-type (remove-duplicates (mapcar 'caddr si::*array-type-info*)))))))))
-      (setf (get 'c-array-eltsize 'type-propagator) 'array-eltsize-propagator)
-      (defun array-elttype-propagator (f x)
-	(cond
-	 ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-elttype-propagator f x)) (cdr x)) :initial-value nil))
-	 ,@(mapcar (lambda (x)
-		     `((type>= (load-time-value (cmp-norm-tp '(array ,(pop x)))) x) 
-		       (load-time-value (cmp-norm-tp ',(object-type (car x)))))) si::*array-type-info*)))
-      (setf (get 'c-array-elttype 'type-propagator) 'array-elttype-propagator)
-      (defun array-rank-propagator (f x)
-	(cond
-	 ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-rank-propagator f x)) (cdr x)) :initial-value nil))
-	 ((type>= #tvector x) (object-type 1))
-	 ((and (consp x) (eq (car x) 'array)) 
-	  (let ((x (caddr x))) (typecase x (rnkind (object-type x)) (list (object-type (length x))) (otherwise #trnkind))))))
-      (setf (get 'c-array-rank 'type-propagator) 'array-rank-propagator))))
+;; (eval-when
+;;  (eval compile)
+;;   (defmacro maep nil
+;;    `(progn
+;;       (defun array-eltsize-propagator (f x)
+;; 	(cond
+;; 	 ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-eltsize-propagator f x)) (cdr x)) :initial-value nil))
+;; 	 ,@(mapcar (lambda (x)
+;; 		     `((type>= (load-time-value (cmp-norm-tp '(array ,(pop x)))) x) 
+;; 		       (load-time-value (cmp-norm-tp ',(object-type (cadr x)))))) si::*array-type-info*)
+;; 	 ((type>= (load-time-value (cmp-norm-tp 'array)) x) 
+;; 	  (load-time-value (cmp-norm-tp ',(reduce 'type-or1 (mapcar 'object-type (remove-duplicates (mapcar 'caddr si::*array-type-info*)))))))))
+;;       (setf (get 'c-array-eltsize 'type-propagator) 'array-eltsize-propagator)
+;;       (defun array-elttype-propagator (f x)
+;; 	(cond
+;; 	 ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-elttype-propagator f x)) (cdr x)) :initial-value nil))
+;; 	 ,@(mapcar (lambda (x)
+;; 		     `((type>= (load-time-value (cmp-norm-tp '(array ,(pop x)))) x) 
+;; 		       (load-time-value (cmp-norm-tp ',(object-type (car x)))))) si::*array-type-info*)))
+;;       (setf (get 'c-array-elttype 'type-propagator) 'array-elttype-propagator)
+;;       (defun array-rank-propagator (f x)
+;; 	(cond
+;; 	 ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-rank-propagator f x)) (cdr x)) :initial-value nil))
+;; 	 ((type>= #tvector x) (object-type 1))
+;; 	 ((and (consp x) (eq (car x) 'array)) 
+;; 	  (let ((x (caddr x))) (typecase x (rnkind (object-type x)) (list (object-type (length x))) (otherwise #trnkind))))))
+;;       (setf (get 'c-array-rank 'type-propagator) 'array-rank-propagator))))
 
-(maep)
+;; (maep)
 
 (defun symbol-gfdef-propagator (f t1 &aux (a (atomic-tp t1)))
   (declare (ignore f))

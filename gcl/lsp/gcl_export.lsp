@@ -536,17 +536,25 @@
 (setq *uniq-sigs* (make-hash-table :test 'equal))
 (defun uniq-sig (sig) (or (gethash sig *uniq-sigs*) (setf (gethash sig *uniq-sigs*) sig)))
 
-(defun norm-sig (sig) (uniq-sig (list (mapcar 'cmp-norm-tp (car sig)) (cmp-norm-tp (cadr sig)))))
 (defun normalize-function-plist (plist)
   (setf (car plist) (norm-sig (car plist)))
   (mapc #'(lambda (x) (setf (cdr x) (norm-sig (cdr x)))) (cadr plist))
   plist)
 
-(let (boot lists)
+(defun lremove (q l &key (key #'identity) (test #'eql))
+  (labels ((l (l) (when l
+		    (let* ((x (car l))(z (cdr l))(y (l z)))
+		      (if (funcall test q (funcall key x)) y (if (eq y z) l (cons x y)))))))
+	  (l l)))
+
+
+(defun lremove-if (f l) (lremove f l :test 'funcall))
+(defun lremove-if-not (f l) (lremove (lambda (x) (not (funcall f x))) l :test 'funcall))
+
+(let (lists)
   (defun make-function-plist (&rest args)
-    (cond (boot (normalize-function-plist args))
-	  ((fboundp 'cmp-norm-tp) (mapc 'normalize-function-plist lists) (setq boot t lists nil) (apply 'make-function-plist args))
-	  ((car (push args lists))))))
+    (when (fboundp 'cmp-norm-tp) (setq lists (lremove-if 'normalize-function-plist lists)))
+    (or (normalize-function-plist args) (car (push args lists)))))
 
 (in-package :s)
 (si::import-internal 'si::(\| & ^ ~ c+ c* << >> string-concatenate strcat lit seqind fixnum-length char-length cref address 
