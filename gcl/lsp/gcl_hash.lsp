@@ -61,6 +61,19 @@
 	    (symbol (c-symbol-hash x))
 	    (otherwise (hash-equal x 0))))
 
+(defun hash-set (k h v)
+  (declare (optimize (safety 1)))
+  (check-type h hash-table)
+  (let ((n (c-hashtable-nent h)))
+    (when (>= (1+ n) (c-hashtable-max_ent h))
+      (extend-hashtable h))
+    (let ((e (gethash-int k h)))
+      (when (zerop (htent-key e))
+	(c-set-hashtable-nent h (1+ n)))
+      (set-htent-key e (address k))
+      (set-htent-value e v))))
+(setf (get 'hash-set 'compiler::cmp-inline) t)
+
 (setf (symbol-function 'hash-table-count) (symbol-function 'c-hashtable-nent))
 (setf (symbol-function 'hash-table-size)  (symbol-function 'c-hashtable-size))
 
