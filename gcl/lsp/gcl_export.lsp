@@ -555,9 +555,9 @@
 (defun lremove-if-not (f l) (lremove (lambda (x) (not (funcall f x))) l :test 'funcall))
 
 (let (lists)
-  (defun make-function-plist (&rest args)
-    (when (fboundp 'cmp-norm-tp) (setq lists (lremove-if 'normalize-function-plist lists)))
-    (or (normalize-function-plist args) (car (push args lists)))))
+  (defun make-function-plist (&rest args &aux (b (fboundp 'cmp-norm-tp)))
+    (when b (setq lists (lremove-if 'normalize-function-plist lists)))
+    (or (when b (normalize-function-plist args)) (car (push args lists)))))
 
 (in-package :s)
 (si::import-internal 'si::(\| & ^ ~ c+ c* << >> string-concatenate strcat lit seqind fixnum-length char-length cref address 
