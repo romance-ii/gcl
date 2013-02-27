@@ -56,10 +56,10 @@
  (defun cfn (tp code) 
    (let* ((nc (cmp-norm-tp tp))
 	  (a (type-and-list (list nc)))(c (calist2 a))
-	  (f (best-type-of c)))
+	  (f (best-type-of c))(it (caar c))(it (if (cdr it) (cons 'or it) (car it))))
      `(case (,f o)
-	    (,(tps-ints a (cdr (assoc f +rs+))) ,(mkinf 'o nc (list code)))
-	    (otherwise ,(mkinf 'o `(not ,nc) '(nil))))))
+	    (,(tps-ints a (cdr (assoc f +rs+))) ,(mkinf 'o it (list code)))
+	    (otherwise ,(mkinf 'o `(not ,it) '(nil))))))
   (defun mksubb (o tp x)
    (case x
 	 ((integer ratio single-float double-float short-float long-float float rational real) `(ibb ,o ,tp))
@@ -104,9 +104,13 @@
   (or (eql 1 tp) (unless (atom tp) (not (cdr tp)))))
 (setf (get 'vtp 'compiler::cmp-inline) t)
 
+(defun valid-class-name (class &aux (name (si-class-name class)))
+  (when (eq class (si-find-class name nil))
+    name))
+(setf (get 'valid-class-name 'compiler::cmp-inline) t)
 
-(defun expand-deftype (type &aux (atp (listp type)) (ctp (if atp (car type) type)) (tp (when atp (cdr type))))
-  (cond ((unless (symbolp ctp) (si-classp ctp)) `(std-instance ,ctp));FIXME classp loop, also accept s-data?
+(defun expand-deftype (type &aux tem (atp (listp type)) (ctp (if atp (car type) type)) (tp (when atp (cdr type))))
+  (cond ((unless (symbolp ctp) (si-classp ctp)) (or (valid-class-name ctp) `(std-instance ,ctp)));FIXME classp loop, also accept s-data?
 	((setq tem (get ctp 's-data)) `(structure ,tem))
 	((let ((tem (get ctp 'deftype-definition)))
 	   (when tem
@@ -159,8 +163,8 @@
       ,@(mapcar (lambda (y &aux (b (pop y))) 
 		 `(,(car y) (let ((r (realpart x))(i (imagpart x))) `(complex (,',b ,(min r i) ,(max r i)))))) +ctps+)
       ,@(mapcar (lambda (y &aux (b (car y))) `((array ,b) `(array ,',b ,(array-dimensions x)))) +vtps+)
-      (std-instance (let* ((c (si-class-of x))(n (si-class-name c))) (if (when n (eq c (si-find-class n nil))) n c)))
-      (structure (let* ((c (c-structure-def x))(n (sdata-name c))) (if (when n (eq c (get n 's-data))) n c)))
-      ,@(mapcar (lambda (x) `(,x ',x)) (cons 'standard-generic-function ;FIXME
-					     (set-difference +kt+ (mapcar 'cmp-norm-tp '(boolean number array structure std-instance))
-							     :test 'type-and)))))
+      (std-instance (let* ((c (si-class-of x))) (or (valid-class-name c) c)))
+      (structure (sdata-name (c-structure-def x)))
+      ,@(mapcar (lambda (x) `(,x ',x)) (set-difference +kt+ 
+						       (mapcar 'cmp-norm-tp '(boolean number array structure std-instance))
+						       :test 'type-and))))

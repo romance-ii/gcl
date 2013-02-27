@@ -268,8 +268,8 @@
 		   (string-output-stream (make-string-output-stream));FIXME user defined, socket
 		   (random-state (make-random-state)) 
 		   (readtable (standard-readtable)) 
-		   (non-generic-compiled-function (function eq))
-		   (generic-function (set-d-tt 1 (lambda nil nil)))
+		   (non-standard-generic-function (function eq))
+		   (standard-generic-function (set-d-tt 1 (lambda nil nil)))
 		   ,@(mapcar (lambda (x) `(,(cadr x) (make-vector ',(car x) 1 nil nil nil 0 nil nil))) +vtps+)
 		   ,@(mapcar (lambda (x) `(,(cadr x) (make-array1 ',(car x) nil nil nil 0 '(1 1)))) +atps+)
 		   (cons '(1))
@@ -324,18 +324,5 @@
 (defun tps-ints (a rl)
   (lremove-duplicates (mapcar (lambda (x) (cdr (assoc (cadr x) rl))) a)))
 
-
-;; (import 'si::bfix :compiler);FIXME
-;; (defconstant +et+ (mapcar (lambda (x) (cons (cmp-norm-tp x) x)) 
-;; 			  '(list cons proper-list proper-sequence sequence boolean null true array vector number immfix bfix bignum integer
-;; 				 ratio short-float long-float float real number pathname hash-table function)))
-
-;; (defun export-type (tp) (or (cdr (assoc tp +et+)) tp))
-;; (defun export-sig (sig) (list (mapcar 'export-type (car sig)) (export-type (cadr sig))))
-;; (defun unexport-type (tp) (or (car (rassoc tp +et+)) tp))
-;; (defun unexport-sig (sig) (list (mapcar 'unexport-type (car sig)) (unexport-type (cadr sig))))
-
-;; (defun unique-sigs (sig)
-;;   (let ((sig (list (mapcar (lambda (x) (cmp-norm-tp x)) (car sig))
-;; 		   (cmp-norm-tp (cadr sig))))(sig (export-sig sig)))
-;;     (or (gethash sig *unique-sigs*) (setf (gethash sig *unique-sigs*) sig))))
+(defun ints-tps (a rl)
+  (lreduce (lambda (y x) (if (member (cdr x) a) (type-or1 y (car x)) y)) rl :initial-value nil))

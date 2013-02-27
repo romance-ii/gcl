@@ -29,7 +29,6 @@
          ,new-value))
 
 (si::freeze-defstruct 'pcl::std-instance)
-
 (si::freeze-defstruct 'method-call)
 (si::freeze-defstruct 'fast-method-call)
 
@@ -42,25 +41,14 @@
   (and (symbolp x)
        (setf (get x 'compiler::proclaimed-closure ) t)))
 
-
 (import 'si::seqind)
 
-
-(defun %cclosure-env-nthcdr (n f)
-  (function-env f n))
-
-
-(defun cclosurep (x) (typecase x (compiled-function t)))
-
-(defun %cclosure-env (f)
-  (function-env f 0))
-
-
-
+(defun %cclosure-env-nthcdr (n f) (function-env f n))
+(defun cclosurep (x) (typep x 'function));(typecase x (compiled-function t)))
+(defun %cclosure-env (f) (function-env f 0))
+(declaim (inline %cclosure-env-nthcdr cclosurep %cclosure-env))
 
 (defconstant funcallable-instance-closure-size 15)
-
-
 
 (defun allocate-funcallable-instance-2 ()
   (let (dummy)
@@ -76,20 +64,14 @@
     (c-set-t-tt fin 1)
     fin))
 
-(defun funcallable-instance-p (x) (typep x 'generic-function))
-;  (si::lit :boolean "fto(" (:object x) ")==" (:fixnum #.(let ((x (lambda nil nil))) (c-set-t-tt x 1) (compiler::tt3 x)))))
-(declaim (inline funcallable-instance-p))
+(defun funcallable-instance-p (x) (typep x 'standard-generic-function))
 (defun std-instance-p (x) (typep x 'std-instance))
-(declaim (inline std-instance-p))
+(declaim (inline std-instance-p funcallable-instance-p))
 (remprop 'std-instance-p 'compiler::co1)
-
-
 
 (defun si:%structure-name (x) (si::lit :object "(" (:object x) ")->str.str_def->str.str_self[0]"))
 (defun %fboundp (x) (/= 0 (si::address (c-symbol-gfdef x))))
 (declaim (inline si:%structure-name %fboundp))
-
-
 
 (defun set-function-name-1 (fn new-name ignore)
   (declare (ignore ignore))
@@ -107,9 +89,9 @@
 
 (defun %set-cclosure (r v s)
   (declare (fixnum s))
-  (unless (typep r 'compiled-function)
+  (unless (typep r 'function)
     (error "Bad fn 1"))
-  (unless (typep v 'compiled-function)
+  (unless (typep v 'function)
     (error "Bad fn 1"))
   (si::use-fast-links nil r)
   (progn (compiler::side-effects) (compiler::lit :object (:object r) "->fun.fun_self=" (:object v) "->fun.fun_self"));FIXME
@@ -125,25 +107,27 @@
 	 (ve (if (> l 0) (butlast ve l) ve)))
     (maplist (lambda (x y) (setf (car x) (car y))) (%cclosure-env r) ve)))
 
+(defun structure-functions-exist-p nil t)
 
-
-
-(defun structure-functions-exist-p ()
-  t)
-
-(si:define-compiler-macro structure-instance-p (x)
-  (once-only (x)
-    `(and (si:structurep ,x)
-          (not (eq (si:%structure-name ,x) 'std-instance)))))
+(defun structure-instance-p (x) (typep x 'structure))
+(declaim (inline structure-instance-p))
+;; (define-compiler-macro structure-instance-p (x)
+;;   (once-only (x)
+;;     `(and (si:structurep ,x)
+;;           (not (eq (si:%structure-name ,x) 'std-instance)))))
 
 (defun structure-type (x)
-  (and (si:structurep x)
-       (si:%structure-name x)))
+  (typecase x (structure (si:%structure-name x))));FIXME type-of
+(declaim (inline structure-type))
 
-(si:define-compiler-macro structure-type (x)
-  (once-only (x)
-    `(and (si:structurep ,x)
-          (si:%structure-name ,x))))
+;; (defun structure-type (x)
+;;   (and (si:structurep x)
+;;        (si:%structure-name x)))
+
+;; (define-compiler-macro structure-type (x)
+;;   (once-only (x)
+;;     `(and (si:structurep ,x)
+;;           (si:%structure-name ,x))))
 
 
 (defun structure-type-included-type-name (type)
@@ -183,25 +167,14 @@
                     (nthcdr (length (structure-type-internal-slotds inc)) slotds)
 		  slotds)))))
 
-(defun structure-slotd-name (slotd)
-  (first slotd))
+(defun structure-slotd-name (slotd) (first slotd))
+(defun structure-slotd-accessor-symbol (slotd) (second slotd))
+(defun structure-slotd-reader-function (slotd) (third slotd))
+(defun structure-slotd-writer-function (slotd) (fourth slotd))
+(defun structure-slotd-type (slotd) (fifth slotd))
+(defun structure-slotd-init-form (slotd) (sixth slotd))
 
-(defun structure-slotd-accessor-symbol (slotd)
-  (second slotd))
-
-(defun structure-slotd-reader-function (slotd)
-  (third slotd))
-
-(defun structure-slotd-writer-function (slotd)
-  (fourth slotd))
-
-(defun structure-slotd-type (slotd)
-  (fifth slotd))
-
-(defun structure-slotd-init-form (slotd)
-  (sixth slotd))
-
-(defun renew-sys-files()
+(defun renew-sys-files nil
   ;; packages:
   (compiler::get-packages "sys-package.lisp")
   (with-open-file (st "sys-package.lisp"

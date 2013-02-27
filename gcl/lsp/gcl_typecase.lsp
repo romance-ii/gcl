@@ -46,7 +46,7 @@
 (defun branches (f a tpsff fnl o c)
   (mapcar (lambda (x)
 	    `(,(lremove-duplicates (mapcar (lambda (x) (cdr (assoc x fnl))) (car x)))
-	      ,(mkinfm f (if (cdar x) (cons 'or (car x)) (caar x)) (list (branch1 x a tpsff f o))))) c ))
+	      ,(mkinfm f (if (cdar x) (cons 'or (car x)) (caar x)) (list (branch1 x a tpsff f o))))) c))
 
 
 (define-compiler-macro typecase (&whole w x &rest ff)

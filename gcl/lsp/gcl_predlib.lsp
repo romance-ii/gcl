@@ -25,8 +25,7 @@
 (in-package :system)
 
 (export '(int void static 
-;	      old-compiled-function 
-	      non-generic-compiled-function
+	      non-standard-generic-function
 	      non-logical-pathname
 	      non-standard-base-char true gsym
 	      std-instance
@@ -464,10 +463,9 @@
 (deftype real (&optional (low '*) (high '*)) `(or (rational ,low ,high) (float ,low ,high)))
 (deftype number () `(or real complex))
 (deftype atom () `(not cons))
-(deftype function (&rest r) (declare (ignore r)) `(compiled-function))
-;  `(or interpreted-function compiled-function))
-(deftype compiled-function nil `(or generic-function non-generic-compiled-function))
-;(deftype generic-function nil `(satisfies generic-function-p));Overwritten by pcl check ;FIXME
+(deftype function (&rest r) (declare (ignore r)) `(or standard-generic-function non-standard-generic-function))
+(defun compiled-function-p (fun) (when (typep fun 'function) (typep (caddr (c-function-plist fun)) 'string)))
+(deftype compiled-function nil `(and function (satisfies compiled-function-p)))
 
 (deftype integer (&optional (low '*) (high '*)) `(integer ,low ,high))
 (deftype ratio (&optional (low '*) (high '*)) `(ratio ,low ,high))
@@ -572,9 +570,10 @@
 (deftype type-spec nil `(or symbol class structure proper-cons))
 (deftype fpvec nil `(and vector (satisfies array-has-fill-pointer-p)))
 
-(defun non-generic-compiled-function-p (x)
-  (cond ((typep x 'generic-function) nil)
-	((typep x 'function) (typep (caddr (c-function-plist x)) 'string))));(compiled-function-p x)
+;; (defun non-generic-compiled-function-p (x)
+;;   (cond ((typep x 'generic-function) nil)
+;; 	((typep x 'function) (typep (caddr (c-function-plist x)) 'string))))
+					;(compiled-function-p x)
 
 (defconstant +type-alist+ '((null . null)
 	  (not-type . not)
@@ -627,9 +626,9 @@
           (random-state . random-state-p)
           (structure . structurep)
           (function . functionp)
-          (compiled-function . compiled-function-p)
-          (non-generic-compiled-function . non-generic-compiled-function-p)
-          (generic-function . generic-function-p)
+          ;; (compiled-function . compiled-function-p)
+          ;; (non-generic-compiled-function . non-generic-compiled-function-p)
+          ;; (generic-function . generic-function-p)
           (common . commonp)))
 
 (dolist (l +type-alist+)
@@ -649,8 +648,8 @@
 				      readtable 
 				      hash-table-eq hash-table-eql hash-table-equal hash-table-equalp
 				      random-state std-instance structure 
-				      non-generic-compiled-function
-				      generic-function
+				      non-standard-generic-function
+				      standard-generic-function
 				      ))
 
 
@@ -677,7 +676,7 @@
 					  (cons . cons-op)
 ;					  (standard-object . standard-op)
 					  (std-instance . standard-op)
-					  (generic-function . standard-op)
+					  (standard-generic-function . standard-op)
 					  (structure . structure-op)
 					  ,@(mapcar (lambda (x) `(,(cdr x) . complex-op)) +complex-type-alist+)
 					  ,@(mapcar (lambda (x) `(,(cdr x) . array-op)) +array-type-alist+)
@@ -687,7 +686,7 @@
 					  (cons . cons-recon)
 ;					  (standard-object . standard-recon)
 					  (std-instance . standard-recon)
-					  (generic-function . standard-recon)
+					  (standard-generic-function . standard-recon)
 					  (structure . structure-recon)
 					  ,@(mapcar (lambda (x) `(,(cdr x) . complex-recon)) +complex-type-alist+)
 					  ,@(mapcar (lambda (x) `(,(cdr x) . array-recon)) +array-type-alist+)
@@ -698,7 +697,7 @@
 					 (cons . cons-load)
 ;					 (standard-object . standard-load)
 					 (std-instance . standard-load)
-					 (generic-function . standard-load)
+					 (standard-generic-function . standard-load)
 					 (structure . structure-load)
 					 (array . array-load)
 ;					 (simple-array . array-load)
@@ -1343,15 +1342,13 @@
 	   (funcall tem ntp type))
 	  ((setq tem (coerce-to-standard-class (car type)))
 	   (let ((s (load-time-value nil))(q (load-time-value nil)))
-	     (setq s (or s (coerce-to-standard-class 'generic-function)) q (si-class-precedence-list s))
+	     (setq s (or s (coerce-to-standard-class 'standard-generic-function)) q (si-class-precedence-list s))
 	     (cond ((member s (si-class-precedence-list tem))
-		    (ntp-ld ntp (list 'generic-function tem)))
+		    (ntp-ld ntp (list 'standard-generic-function tem)))
 		   ((member tem q)
-		    (ntp-ld ntp (list 'generic-function t));must be a fresh list
+		    (ntp-ld ntp (list 'standard-generic-function t));must be a fresh list
 		    (ntp-ld ntp (list 'std-instance t)))
 		   ((ntp-ld ntp (list 'std-instance tem))))))
-;	   (ntp-ld ntp (if (funcallable-standard-object-p tem) `(generic-function ,tem) `(std-instance ,tem))))
-;	   (ntp-ld ntp `(standard-object ,tem)))
 	  ((and (symbolp (car type)) (setq tem (get (car type) 's-data)))
 	   (ntp-ld ntp `(structure ,tem)))
 	  ((eq (car type) 'member)

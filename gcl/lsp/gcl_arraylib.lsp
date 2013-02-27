@@ -473,28 +473,28 @@
    
     array))
 
-
 #.`(defun array-eltsize-propagator (f x)
      (cond
       ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-eltsize-propagator f x)) (cdr x)) :initial-value nil))
       ,@(mapcar (lambda (x)
-		  `((type>= (load-time-value (cmp-norm-tp '(array ,(pop x)))) x) ;FIXME +kt+
-		    (load-time-value (cmp-norm-tp ',(object-type (cadr x)))))) si::*array-type-info*)
+		  `((type>= (load-time-value (cmp-norm-tp '(array ,(pop x)))) x) (object-type ,(cadr x)))) si::*array-type-info*)
       ((type>= (load-time-value (cmp-norm-tp 'array)) x) 
-       (load-time-value (cmp-norm-tp ',(reduce 'type-or1 (mapcar 'object-type (remove-duplicates (mapcar 'caddr si::*array-type-info*)))))))))
+       (load-time-value (cmp-norm-tp ',(cons 'member (lremove-duplicates (mapcar 'caddr *array-type-info*))))))))
 (setf (get 'c-array-eltsize 'compiler::type-propagator) 'array-eltsize-propagator)
 #.`(defun array-elttype-propagator (f x)
      (cond
       ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-elttype-propagator f x)) (cdr x)) :initial-value nil))
-      ,@(mapcar (lambda (x)
-		  `((type>= (load-time-value (cmp-norm-tp '(array ,(pop x)))) x) 
-		    (load-time-value (cmp-norm-tp ',(object-type (car x)))))) si::*array-type-info*)))
+      ,@(mapcar (lambda (x) `((type>= (load-time-value (cmp-norm-tp '(array ,(pop x)))) x) (object-type ,(car x)))) *array-type-info*)))
 (setf (get 'c-array-elttype 'compiler::type-propagator) 'array-elttype-propagator)
 
 (defun array-rank-propagator (f x)
   (cond
    ((and (consp x) (eq (car x) 'or)) (reduce 'type-or1 (mapcar (lambda (x) (array-rank-propagator f x)) (cdr x)) :initial-value nil))
-   ((type>= #tvector x) (object-type 1))
+   ((type>= (load-time-value (cmp-norm-tp 'vector)) x) (object-type 1))
    ((and (consp x) (eq (car x) 'array)) 
-    (let ((x (caddr x))) (typecase x (rnkind (object-type x)) (list (object-type (length x))) (otherwise #trnkind))))))
+    (let ((x (caddr x))) 
+      (typecase x
+		(rnkind (object-type x))
+		(list (object-type (length x)))
+		(otherwise (load-time-value (cmp-norm-tp 'rnkind))))))))
 (setf (get 'c-array-rank 'compiler::type-propagator) 'array-rank-propagator)

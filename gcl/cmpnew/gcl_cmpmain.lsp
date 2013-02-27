@@ -118,10 +118,13 @@
 (defvar *sigs* (make-hash-table :test 'eq))
 (defvar *new-sigs-in-file* nil)
 
+(defun set-first-sig (x y)
+  (unless (gethash x *sigs*) (setf (gethash x *sigs*) y)))
+
 (defun setup-sigs nil
   (clrhash *sigs*)
-  (mapc (lambda (x) (setf (gethash (car x) *sigs*) (cdr x))
-	  (mapc (lambda (x) (setf (gethash (car x) *sigs*) (list (cdr x) nil nil nil nil nil))) (caddr x))) si::*sig-discovery-props*))
+  (mapc (lambda (x) (set-first-sig (car x) (cdr x))
+	  (mapc (lambda (x) (set-first-sig (car x) (list (cdr x) nil nil nil nil nil))) (caddr x))) si::*sig-discovery-props*))
 
 (defun compile-file  (filename &rest args
 			    &aux (*print-pretty* nil)

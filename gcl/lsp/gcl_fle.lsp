@@ -81,10 +81,7 @@
 (defun function-lambda-expression (y &aux z) 
   (declare (optimize (safety 1)))
   (check-type y function)
-  (let ((x (typecase 
-	    y
-;	    (interpreted-function (interpreted-function-lambda y))
-	    (compiled-function (uncompress-src y)))))
+  (let ((x (uncompress-src y)))
     (case (car x)
 	  (lambda (values x nil (get-blocked-body-name x)))
 	  (lambda-block (values (block-lambda (caddr x) (cadr x) (cdddr x)) nil (cadr x)))

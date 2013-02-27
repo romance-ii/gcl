@@ -393,7 +393,7 @@
 (defvar +value-types+ (mapcar (lambda (x) (cons (cmp-norm-tp x) (get-sym `(,x "-VALUE"))))
 			      (cons 'character +c-local-var-types-syms+)))
 
-(defun loc-kind (loc &aux (cl (car loc)))
+(defun loc-kind (loc &aux (cl (when (listp loc) (car loc))))
   (cond ((eq cl 'var) 
 	 (let* ((var (cadr loc))
 		(kind (var-kind var)))

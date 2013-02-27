@@ -137,8 +137,7 @@
 
 #+new-kcl-wrapper
 (progn
-(defvar *init-vector* (make-array 40 :fill-pointer 1 :adjustable t 
-				  :initial-element nil))
+(defvar *init-vector* (make-array 40 :fill-pointer 1 :adjustable t  :initial-element nil))
 
 (defun get-init-list (i)
   (declare (fixnum i)(special *slot-unbound*))

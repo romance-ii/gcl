@@ -1074,7 +1074,7 @@
        (or (local-fun-src n)
 	   (let ((fn (when (fboundp n) (symbol-function n))))
 	     (when (functionp fn) 
-	       (unless (typep fn 'generic-function)
+	       (unless (typep fn 'standard-generic-function)
 		 (values (or (gethash fn *src-hash*) (setf (gethash fn *src-hash*) (function-lambda-expression fn))))))))))
 
 ;; (defun inline-sym-src (n)
