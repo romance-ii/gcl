@@ -165,25 +165,25 @@
   `(etypecase 
     ,inst
     (std-instance (std-instance-wrapper ,inst))
-    (generic-function (fsc-instance-wrapper ,inst))))
+    (standard-generic-function (fsc-instance-wrapper ,inst))))
 
 (defmacro get-instance-wrapper-or-nil (inst)
   `(typecase 
     ,inst
     (std-instance (std-instance-wrapper ,inst))
-    (generic-function (fsc-instance-wrapper ,inst))))
+    (standard-generic-function (fsc-instance-wrapper ,inst))))
 
 (defmacro get-slots (inst)
   `(etypecase 
     ,inst
     (std-instance (std-instance-slots ,inst))
-    (generic-function (fsc-instance-slots ,inst))))
+    (standard-generic-function (fsc-instance-slots ,inst))))
 
 (defmacro get-slots-or-nil (inst)
   `(typecase 
     ,inst
     (std-instance (std-instance-slots ,inst))
-    (generic-function (fsc-instance-slots ,inst))))
+    (standard-generic-function (fsc-instance-slots ,inst))))
 
 ;; (defmacro get-wrapper (inst)
 ;;   `(cond ((std-instance-p ,inst) (std-instance-wrapper ,inst))
