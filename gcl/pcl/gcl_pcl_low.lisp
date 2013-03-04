@@ -405,14 +405,23 @@
 
 #-cmu17
 (defmacro wrapper-of-macro (x)
-  `(cond ((std-instance-p ,x)
-	  (std-instance-wrapper ,x))
-         ((fsc-instance-p ,x)
-	  (fsc-instance-wrapper ,x))	      
-         (t
-	  (#+new-kcl-wrapper built-in-wrapper-of
-	   #-new-kcl-wrapper built-in-or-structure-wrapper
-	   ,x))))
+  `(typecase
+    ,x
+    (std-instance (std-instance-wrapper ,x))
+    (standard-generic-function (fsc-instance-wrapper ,x))
+    (structure (wrapper-for-structure ,x))
+    (symbol (if ,x *the-wrapper-of-symbol* *the-wrapper-of-null*))
+    (otherwise (built-in-wrapper-of ,x))))
+
+;; (defmacro wrapper-of-macro (x)
+;;   `(cond ((std-instance-p ,x)
+;; 	  (std-instance-wrapper ,x))
+;;          ((fsc-instance-p ,x)
+;; 	  (fsc-instance-wrapper ,x))	      
+;;          (t
+;; 	  (#+new-kcl-wrapper built-in-wrapper-of
+;; 	   #-new-kcl-wrapper built-in-or-structure-wrapper
+;; 	   ,x))))
 
 #+cmu17
 (defmacro wrapper-of-macro (x)

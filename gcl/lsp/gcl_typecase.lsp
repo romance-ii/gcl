@@ -33,6 +33,9 @@
 (defun mkinfm (f tp z &aux (z (if (cdr z) `(progn ,@z) (car z))))
   `(infer-tp ,f ,tp ,z))
 
+;; (defun branch (tpsff x a f &aux (z (cdr (assoc x tpsff)))(tp (pop z)))
+;;   (if (sub-p1 x a) `(,(let* ((l (listp x))(ctp (if l (car x) x))(x (when l (cdr x)))) (mksubb f `',x ctp)) ,(mkinfm f x z)) z))
+
 (defun branch (tpsff x a f &aux (z (cdr (assoc x tpsff)))(tp (pop z)))
   (if (sub-p1 x a) `((typep ,f ',tp) ,(mkinfm f tp z)) z))
 
@@ -56,6 +59,8 @@
 	 (ff (if o (ldiff ff o) ff))
 	 (o (list (cons t (cdar o))))
 	 (tps (mapcar 'cmp-norm-tp (mapcar 'car ff)))
+;	 (q (mapcan (lambda (x y) (if (when (consp x) (eq (car x) 'or)) (mapcar (lambda (x) (cons x y)) (cdr x)) (cons x y))) tps ff))
+;	 (tps (mapcar 'car q))(ff (mapcar 'cdr q))(w (print (list q tps ff)))
 	 z (tps (mapcar (lambda (x) (prog1 (type-and x (cmp-norm-tp `(not ,z))) (setq z (type-or1 x z)))) tps))
 	 (a (type-and-list tps))(c (calist2 a))
 	 (fn (best-type-of c))

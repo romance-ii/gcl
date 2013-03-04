@@ -141,7 +141,7 @@
 (defun atomic-tp (tp)
   (when (consp tp)
     (case (car tp)
-      ((integer ratio short-float long-float)
+      ((immfix bfix bignum ratio short-float long-float)
        (let* ((d (cdr tp))(dd (cadr d))(da (car d)))
 	 (and (numberp da) (numberp dd) (= da dd) d)))
       ((member eql) (let ((d (cdr tp))) (unless (cdr d) d))))))
@@ -223,7 +223,7 @@
 
 
 
-(defconstant +ctps+ (mapcar (lambda (x) (list x (intern (string-concatenate "COMPLEX-" (string x))))) +range-types+))
+(defconstant +ctps+ (mapcar (lambda (x) (list x (intern (string-concatenate "COMPLEX-" (string x))))) +complex-types+));FIXME
 (defconstant +vtps+ (mapcar (lambda (x) (list x (intern (string-concatenate "VECTOR-"  (string x))))) +array-types+))
 (defconstant +atps+ (mapcar (lambda (x) (list x (intern (string-concatenate "ARRAY-"   (string x))))) +array-types+))
 
@@ -297,7 +297,7 @@
 		      (declare (ignore f))
 		      (cmp-norm-tp (cons 'member (tps-ints (type-and-list (list x)) rl))))
 		    (setf (get ',x 'compiler::type-propagator) ',s)
-		    (setf (get ',s 'compiler::cmp-inline) t))) +tfns1+))
+		    (setf (get ',x 'compiler::c1no-side-effects) t))) +tfns1+))
 
 (mapc (lambda (x) 
 	(setf (gethash x *and-tp-hash*) (make-hash-table :test 'eq :size 256))

@@ -137,9 +137,10 @@
 (defun object-type (thing); &optional lim
   (typecase
    thing
-   (integer `(integer ,thing ,thing))
-   (short-float `(short-float ,thing ,thing))
-   (long-float `(long-float ,thing ,thing))
+   (real (type-of thing))
+   ;; (integer `(integer ,thing ,thing))
+   ;; (short-float `(short-float ,thing ,thing))
+   ;; (long-float `(long-float ,thing ,thing))
    (null #tnull)
    (true #ttrue)
    ((or symbol character complex cons structure std-instance function) `(member ,thing))
@@ -1190,12 +1191,12 @@
       (when tem (object-type tem)))))
 (setf (get 'c-structure-def 'type-propagator) 'c-structure-def-propagator)
 
-;; (defun structure-name-propagator (f t1)
-;;   (declare (ignore f))
-;;   (when (symbolp t1)
-;;     (when (get t1 's-data)
-;;       (object-type t1))))
-;; (setf (get 'si::structure-name 'type-propagator) 'structure-name-propagator)
+(defun structure-name-propagator (f t1)
+  (declare (ignore f))
+  (when (symbolp t1)
+    (when (get t1 's-data)
+      (object-type t1))))
+(setf (get 'si::structure-name 'type-propagator) 'structure-name-propagator)
 
 
 (defun expand-type-propagator (f t1 &aux (a (atomic-tp t1))(b (car a)));FIXME organization

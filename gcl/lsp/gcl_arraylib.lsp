@@ -498,3 +498,9 @@
 		(list (object-type (length x)))
 		(otherwise (load-time-value (cmp-norm-tp 'rnkind))))))))
 (setf (get 'c-array-rank 'compiler::type-propagator) 'array-rank-propagator)
+
+(defun svref (x i) 
+  (declare (optimize (safety 1)))
+  (check-type x (vector t))
+  (check-type i seqind)
+  (aref x i))

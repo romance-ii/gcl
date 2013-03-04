@@ -4,7 +4,7 @@
 (make-package "ANSI-LOOP" :use '("LISP"))
 (make-package "DEFPACKAGE" :use '("LISP"))
 (make-package "TK" :use '("LISP" "SLOOP"))
-(make-package "JAPI-PRIMITIVES" :use '("LISP"))
+;(make-package "JAPI-PRIMITIVES" :use '("LISP"))
 (make-package "TK-PRIMITIVES" :use '("LISP"))
 
 (in-package "SYSTEM")
@@ -15,8 +15,8 @@
  ;; must be printed (see License).
 
 ;FIXME this preliminary definition is needed for bootstraping, and is overwritten later
-(defun c::set-symbol-plist (x y) (si::set-symbol-plist y x))
-(fset 'c::package-name (symbol-function 'package-name))
+;(defun c::set-symbol-plist (x y) (si::set-symbol-plist y x))
+;(fset 'c::package-name (symbol-function 'package-name))
 (defun abs (z)
   (cond ((complexp z)
 	 ;; Compute (sqrt (+ (* x x) (* y y))) carefully to prevent
@@ -51,14 +51,12 @@
    (s) 
    (when (get s 'proclaimed-function)
      (unless (sig s)
-       (clear-compiler-properties 
-	s
-	(let ((f (lambda nil nil))) 
-	  (c-set-function-plist
-	   f
-	   (make-function-plist
-	    (list (get s 'proclaimed-arg-types) (get s 'proclaimed-return-type))
-	    nil nil nil nil nil)) f)))
+       (let* ((fun (symbol-function s)))
+	 (c-set-function-plist 
+	  fun 
+	  (apply 'make-function-plist
+		 (list (get s 'proclaimed-arg-types) (get s 'proclaimed-return-type))
+		 (or (cdr (c-function-plist fun)) (list nil nil nil nil s))))))
      (dolist (l '(proclaimed-function proclaimed-arg-types proclaimed-return-type))
        (remprop s l))))
 
