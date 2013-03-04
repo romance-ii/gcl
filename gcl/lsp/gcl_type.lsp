@@ -181,7 +181,7 @@
        (uniq-tp ,s))))
 
 (defun type-or1 (t1 t2 &aux h1 h2 r f c1 c2);FIXME think about atomic types
-  (flet ((to (t1 t2 &aux (x (uniq-tp-from-stack `or t1 t2))) (cmp-norm-tp x)));(type-or1-int t1 t2 x)))
+  (flet ((to (t1 t2 &aux (x (uniq-tp-from-stack `or t1 t2))) (type-or1-int t1 t2 x)));(cmp-norm-tp x) FIXME no values support
 	(cond
 	 ((eq t1 t2) t2);accelerator
 	 ((eq t1 '*) t1);accelerator
