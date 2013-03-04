@@ -1446,8 +1446,8 @@
 	   ((and or) (and-or-flatten (cons ctp (mapcar 'normalize-type tp))))
 	   ((type-min type-max) (list ctp (normalize-type (car tp))))
 	   ((t proper-cons) (if lp type (list type)))
-	   (otherwise (let ((tem (expand-deftype type))) 
-			(when tem (normalize-type tem))))))
+	   (otherwise (or (normalize-type (expand-deftype type))
+			  (unless (get ctp 'deftype-definition) '(unknown))))))
 
 (defun ntp-load (type &aux tem)
   (let ((ntp (make-ntp)))

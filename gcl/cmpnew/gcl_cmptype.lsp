@@ -249,7 +249,7 @@
 ;; (defun literalp (form)
 ;;   (or (constantp form) (and (consp form) (eq (car form) 'load-time-value))))
 
-(defconstant +real-contagion-list+ '(integer ratio short-float long-float))
+(defconstant +real-contagion-list+ si::+range-types+)
 
 (defmacro sfl (&rest l)
   `'(,@(append l)))
@@ -289,7 +289,11 @@
 	      (or (< l 3) (eq (caddr type) '*) (typep (bound (caddr type)) 'real))))))
 
 (defun conv-bnd (z tp bnd def)
-  (cond ((or (not bnd) (eq bnd '*)) (if (eq tp 'short-float) (float def 0.0s0) def))
+  (cond ((or (not bnd) (eq bnd '*)) 
+	 (case tp
+	       (immfix (if (< def 0) si::most-negative-immfix si::most-positive-immfix))
+	       (si::bfix (if (< def 0) most-negative-fixnum most-positive-fixnum))
+	       (otherwise (if (eq tp 'short-float) (float def 0.0s0) def))))
 	((and z (realp bnd) (= 0 bnd)) (conv-bnd z tp '(0) def))
 	((or (atom bnd) (not (realp (car bnd))) (not (= 0 (car bnd)))) bnd)
 	((= def +inf) '-e)
@@ -357,7 +361,11 @@
 (defconstant +small-rat+ (rational least-positive-long-float))
 
 (defun contagion-irep (x tp)
-  (if (eq tp 'ratio) (if (or (= 0 x) (= 1 x)) x (+ x (/ 1 x))) (coerce x tp)));+small-rat+ FIXME
+  (case tp
+	(ratio (if (or (= 0 x) (= 1 x)) x (+ x (/ 1 x))))
+	(si::bfix (if (typep x 'si::bfix) x most-positive-fixnum))
+	(bignum (if (typep x 'bignum) x (1+ most-positive-fixnum)))
+	(otherwise (coerce x tp))))
 
 (defun mk-tp (&rest tp)
   (let ((v (car (member (car tp) +real-contagion-list+ :test 'typep))))
