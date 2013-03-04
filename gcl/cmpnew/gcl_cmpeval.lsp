@@ -1793,7 +1793,7 @@
 (defun ff-env (ff)
   (cond ((not ff) nil)
 	((symbolp ff) (ff-env (local-fun-fn ff)))
-	((consp ff) (ff-env (car (atomic-tp (info-type (cadr ff))))))
+	((consp ff) (let ((x (car (atomic-tp (info-type (cadr ff)))))) (unless (consp x) (ff-env x))));FIXME
 	((functionp ff) (list (fn-get ff 'ce) (fn-get ff 'df))))) 
 	
   ;; (let* ((fn (when ff (coerce-to-local-fn (car (atomic-tp (info-type (cadr ff))))))))

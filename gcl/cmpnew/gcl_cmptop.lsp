@@ -568,7 +568,7 @@
 
 (defvar *recursion-detected* nil)
 
-(defun split-decls (auxs decls &optional ro  &aux ad dd)
+(defun split-decls (auxs decls &optional ro &aux ad dd)
   (dolist (l decls (list (nreverse ad) (nreverse dd)))
     (dolist (bb (cdr l))
       (let ((b (if (eq (car bb) 'type) (cdr bb) bb)))
