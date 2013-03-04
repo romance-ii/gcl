@@ -82,7 +82,7 @@
  (defun cmp-norm-tpp (x) x)
 
  (defun mtpp (k y &aux (zz (car y))(z (if (consp zz) (car zz) zz))(u (when (consp zz) (eq (cdr zz) '|unsigned|))))
-   (cond ((caddr y) (unless u (error "bar")) (cmp-norm-tpp `(unsigned-byte ,(caddr y))))
+   (cond ((caddr y) (unless u (error "bar")) (cmp-norm-tpp `(unsigned-byte ,(1+ (caddr y)))))
 	 ((when (keywordp z) (eq k :object)) (mktp z));(get z 'lisp-type))
 	 ((mktp k));((get k 'lisp-type))
 	 (t)))
