@@ -66,7 +66,7 @@
 	 (fn (best-type-of c))
 	 (fm `(case (,fn ,f)
 		    ,@(branches f a (mapcar 'cons tps ff) (cdr (assoc fn +rs+)) o c)
-		    (otherwise ,(mkinfm f `(not (or ,@(mapcan 'car c))) (cdar o))))))
+		    (otherwise ,(mkinfm f `(not (or ,@(apply 'append (mapcar 'car c)))) (cdar o))))))
     (if bind `(let ,bind ,fm) fm)))
 
 (defun funcallable-symbol-function (x) (c-symbol-gfdef x))

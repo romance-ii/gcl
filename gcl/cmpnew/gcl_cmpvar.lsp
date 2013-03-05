@@ -962,6 +962,12 @@
   (add-vref name1 info t)
   (setq form1 (c1arg form info))
 
+  (when (and (eq (car form1) 'var)
+	     (or (eq (car name1) (caaddr form1))
+		 (and (eq (var-store (car name1)) (var-store (caaddr form1)))
+		      (not (eq +opaque+ (var-store (car name1)))))))
+    (return-from c1setq1 form1))
+
   (unless (and (eq (car form1) 'var) (eq (car name1) (caaddr form1)))
     (push-changed (car name1) info))
 
