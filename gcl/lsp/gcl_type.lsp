@@ -280,7 +280,7 @@
 
 (defconstant +rn+ (mapcar (lambda (x) (cons (cmp-norm-tp (car x)) (cadr x))) +r+))
 
-(defconstant +tfns1+ '(tp0 tp1 tp2 tp3 tp4 tp5 tp6 tp7))
+(defconstant +tfns1+ '(tp0 tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8))
 
 (defconstant +rs+ (mapcar (lambda (x) (cons x (mapcar (lambda (y) (cons (car y) (funcall x (eval (cdr y))))) +rn+))) +tfns1+))
 
