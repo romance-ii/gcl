@@ -356,15 +356,14 @@
 	(x)))
 
 (defun promote-ratio (x)
-  (if (eq x 'ratio) 'rational x))
-
+  (case x ((immfix si::bfix bignum) 'integer) (ratio 'rational)(otherwise x)))
+	
 (defconstant +small-rat+ (rational least-positive-long-float))
 
 (defun contagion-irep (x tp)
   (case tp
 	(ratio (if (or (= 0 x) (= 1 x)) x (+ x (/ 1 x))))
-	(si::bfix (if (typep x 'si::bfix) x most-positive-fixnum))
-	(bignum (if (typep x 'bignum) x (1+ most-positive-fixnum)))
+	((immfix si::bfix bignum) x)
 	(otherwise (coerce x tp))))
 
 (defun mk-tp (&rest tp)
