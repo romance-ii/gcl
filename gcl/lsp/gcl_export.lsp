@@ -561,7 +561,7 @@
 
 (in-package :s)
 (si::import-internal 'si::(\| & ^ ~ c+ c* << >> string-concatenate strcat lit seqind fixnum-length char-length cref address 
-			   package-internal package-external array-dims cmp-norm-tp tp0 tp1 tp2 tp3 tp4 tp5 tp6 tp7))
+			   package-internal package-external array-dims cmp-norm-tp tp0 tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8))
 ;(si::import-internal 'compiler::(lisp-type cmp-norm-tp fsf))
 (export '(lisp-type defdlfun strcat))
 
