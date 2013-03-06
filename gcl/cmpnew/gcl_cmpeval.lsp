@@ -1191,7 +1191,7 @@
      res))
      
 (defun mi4 (fn args la src env inls &aux *callees*)
-  (let* ((*compiler-check-args* (>= (this-safety-level) 2))
+  (let* (;(*compiler-check-args* (>= (this-safety-level) 2))
 	 (src (assert-safety fn (blla (cadr src) args la (cddr src)))))
       (c1inline (list (cons fn (append args la)) src) env inls)))
 
