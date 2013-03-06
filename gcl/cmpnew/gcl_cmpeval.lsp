@@ -1245,7 +1245,7 @@
 	((or (new-type-p (car a) (car b)) (new-type-p (cdr a) (cdr b))))))
 
 (defun tm (a b &aux (ca (cons-count a)))
-  (when (< ca (if (< ca (cons-count b)) 15 4))
+  (when (< ca (if (< ca (cons-count b)) 15 6))
     (new-type-p a b)))
 
 ;; (defun tm (ay ax &optional (i 0))
@@ -1337,7 +1337,7 @@
 (defun constant-type-p (tp)
   (typecase
    tp
-   (symbol (not (get tp 'tmp)))
+   (symbol (unless (eq tp +opaque+) (unless (get tp 'tmp) t)));FIXME
    (atom t)
    (cons (and (constant-type-p (car tp)) (constant-type-p (cdr tp))))))
 
@@ -3030,3 +3030,19 @@
       (when (and sym fun);FIXME
 	(push (cons sym (apply 'si::make-function-plist (fun-call fun))) si::*sig-discovery-props*))))
   form)
+
+
+(define-compiler-macro typep (&whole form &rest args)
+  (with-restore-vars
+   (let* ((info (make-info))
+	  (nargs (c1args args info))
+	  (tp (info-type (cadar nargs)))
+	  (a (atomic-tp (info-type (cadadr nargs))))
+	  (c (cmp-norm-tp (car a))))
+     (if (when a (constant-type-p (car a)))
+	 (cond ((type>= c tp) (keep-vars) t)
+	       ((not (type-and c tp)) (keep-vars) nil)
+	       ((unless (member-if-not 'ignorable-form nargs) (when (consp c) (eq (car c) 'or)))
+		(keep-vars) `(typecase ,(car args) (,c t)))
+	       (form));FIXME hash here
+       form))))

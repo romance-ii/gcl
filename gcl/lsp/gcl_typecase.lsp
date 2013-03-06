@@ -13,44 +13,29 @@
   (let ((tp `(or ,@(mapcar 'car clauses))))
     `(typecase ,keyform ,@clauses (t (error 'type-error :datum ,key :expected-type ',tp)))))
 
-(defun sub-tp-1 (t1 t2 a &aux (z (cdar (member-if (lambda (x) (and (eq (pop x) t1) (eq (car x) t2))) a))))
-  (not (eq (car z) (cadr z))))
-
-(defun add-t-p (x a tpsff &aux (tp (car (pop x))));FIXME
-  (when (member-if (lambda (z) (sub-tp-1 z tp a)) x)
-    (let ((x (cmp-norm-tp (cons 'or (mapcar (lambda (x) (cadr (assoc x tpsff))) x)))))
-      (unless (eq tp x) x))))
-
-(defun sub-p (x a &aux (z (cdr x)))
-  (or (cdr z)
-      (member-if (lambda (x) (when (eq (pop x) (car z)) (not (eq (pop x) (car x))))) a)))
-
-(defun sub-p1 (tp a)
-  (member-if (lambda (x) (when (eq (pop x) tp) (not (eq (pop x) (car x))))) a))
-
 (defmacro infer-tp (x y z) (declare (ignore x y)) z)
 
 (defun mkinfm (f tp z &aux (z (if (cdr z) `(progn ,@z) (car z))))
   `(infer-tp ,f ,tp ,z))
 
-;; (defun branch (tpsff x a f &aux (z (cdr (assoc x tpsff)))(tp (pop z)))
-;;   (if (sub-p1 x a) `(,(let* ((l (listp x))(ctp (if l (car x) x))(x (when l (cdr x)))) (mksubb f `',x ctp)) ,(mkinfm f x z)) z))
+(defun branch (tpsff x a f &aux (q (cdr x))(x (car x))(z (cdr (assoc x tpsff)))(tp (pop z)))
+  (if q
+      (mapcar (lambda (q) `((typep ,f ',q) ,(mkinfm f q z)))
+	      (if (when (consp q) (eq (car q) 'or)) (cdr q) (list q)))
+    (list z)))
 
-(defun branch (tpsff x a f &aux (z (cdr (assoc x tpsff)))(tp (pop z)))
-  (if (sub-p1 x a) `((typep ,f ',tp) ,(mkinfm f tp z)) z))
+(defun ?-add (x tp) (if (cdr tp) (cons x tp) (car tp)))
 
 (defun branch1 (x a tpsff f o)
-  (let* ((z (mapcar (lambda (x) (branch tpsff x a f)) (cdr x)))
-	 (s (add-t-p x a tpsff))
-	 (z (if s (nconc z `((t ,(mkinfm f `(not ,s) (cdar o))))) z)))
-    (if (member-if (lambda (x) (when (listp x) (cdr x))) z) `(cond ,@z) (caar z))));FIXME
-
+  (let* ((z (mapcan (lambda (x) (branch tpsff x a f)) (cdr x)))
+	 (s (lremove nil (mapcar 'cdr (cdr x))))
+	 (z (if s (nconc z `((t ,(mkinfm f `(not ,(?-add 'or s)) (cdar o))))) z)))
+    (if (member-if (lambda (x) (when (listp x) (cdr x))) z) `(cond ,@z) (caar z))))
 
 (defun branches (f a tpsff fnl o c)
   (mapcar (lambda (x)
 	    `(,(lremove-duplicates (mapcar (lambda (x) (cdr (assoc x fnl))) (car x)))
-	      ,(mkinfm f (if (cdar x) (cons 'or (car x)) (caar x)) (list (branch1 x a tpsff f o))))) c))
-
+	      ,(mkinfm f (?-add 'or (car x)) (list (branch1 x a tpsff f o))))) c))
 
 (define-compiler-macro typecase (&whole w x &rest ff)
   (let* ((bind (unless (symbolp x) (list (list (gensym) x))));FIXME sgen?
@@ -59,9 +44,7 @@
 	 (ff (if o (ldiff ff o) ff))
 	 (o (list (cons t (cdar o))))
 	 (tps (mapcar 'cmp-norm-tp (mapcar 'car ff)))
-;	 (q (mapcan (lambda (x y) (if (when (consp x) (eq (car x) 'or)) (mapcar (lambda (x) (cons x y)) (cdr x)) (cons x y))) tps ff))
-;	 (tps (mapcar 'car q))(ff (mapcar 'cdr q))(w (print (list q tps ff)))
-	 z (tps (mapcar (lambda (x) (prog1 (type-and x (cmp-norm-tp `(not ,z))) (setq z (type-or1 x z)))) tps))
+	 (z nil) (tps (mapcar (lambda (x) (prog1 (type-and x (cmp-norm-tp `(not ,z))) (setq z (type-or1 x z)))) tps))
 	 (a (type-and-list tps))(c (calist2 a))
 	 (fn (best-type-of c))
 	 (fm `(case (,fn ,f)

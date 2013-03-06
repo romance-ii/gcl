@@ -375,7 +375,8 @@
 	  ((symbolp funid) 
 	   (setf (info-sp-change info) (if (null (get funid 'no-sp-change)) 1 0))
 	   `(function ,info (call-global ,info ,funid)))
-	  ((setq fd (process-local-fun b (or f (make-fun :name 'lambda :src funid :c1cb t :fn fn :info (make-info :type '*))) funid tp))
+	  ((setq fd (let ((funid (effective-safety-src funid)))
+		      (process-local-fun b (or f (make-fun :name 'lambda :src funid :c1cb t :fn fn :info (make-info :type '*))) funid tp)))
 	   (add-info info (cadadr fd))
 	   `(function ,info ,fd)))))
 

@@ -304,6 +304,15 @@
 ;; 	   (ref-funs (cdddr form) funs l)))
 ;; 	(t (ref-funs (car form) funs l) (ref-funs (cdr form) funs l))))
 
+(defun effective-safety-src (src &aux (n (pop src))(ll (pop src)))
+  (multiple-value-bind
+   (doc decls ctps body)
+   (parse-body-header src)
+   `(,n ,ll ,@(when doc (list doc))
+	,@(cons `(declare (optimize (safety ,(this-safety-level)))) decls)
+	,@ctps
+	,@body)))
+
 (defun c1flet-labels (labels args &aux body ss ts is other-decl (info (make-info))
 			     defs1 fnames (ofuns *funs*) (*funs* *funs*))
 
@@ -315,7 +324,8 @@
     (when labels
       (cmpck (member (car def) fnames) "The function ~s was already defined." (car def))
       (push (car def) fnames))
-    (let* ((src (si::block-lambda (cadr def) (car def) (cddr def)))
+    (let* ((def (effective-safety-src def))
+	   (src (si::block-lambda (cadr def) (car def) (cddr def)))
 	   (fun (make-fun :name (car def) :src src :info (make-info :type nil :sp-change 1))))
       (push fun *funs*)
       (push (list fun (cdr def)) defs1)))

@@ -255,8 +255,16 @@
 
 ;;; Some DEFTYPE definitions.
 
+;; (deftype lambda-expression nil `(cons (member lambda) t))
+;; (deftype function-sym nil `(and symbol (not boolean)))
+;; (deftype setf-function-name nil `(cons (member setf) (cons function-sym null)))
+;; (deftype function-name nil `(or function-sym setf-function-name))
+;; (deftype function-designator `(or function function-sym))
+;; (deftype extended-function-designator `(or function function-sym))
+
+
 (deftype function-designator nil `(or (and symbol (not boolean)) function))
-(deftype extended-function-designator nil `(or function-designator (cons (member setf) (cons t null))))
+(deftype extended-function-designator nil `(or function-designator (cons (member setf) (cons symbol null))))
 
 (deftype hash-table nil `(or hash-table-eq hash-table-eql hash-table-equal hash-table-equalp))
 (deftype compiler::funcallable-symbol nil `(satisfies compiler::funcallable-symbol-p));FIXME

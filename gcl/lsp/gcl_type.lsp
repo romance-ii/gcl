@@ -313,13 +313,22 @@
 			 (eq z (lremove-duplicates z))) +rs+))
       (caar +rs+)))
 
-(defun malist (car cadr a)
-  (mapcar (lambda (x) (cons x (mapcar car (lremove-if-not (lambda (z) (eq (funcall cadr z) x)) a)))) (lremove-duplicates (mapcar cadr a))))
+;; (defun malist (car cadr a)
+;;   (mapcar (lambda (x) (cons x (mapcar car (lremove-if-not (lambda (z) (eq (funcall cadr z) x)) a)))) (lremove-duplicates (mapcar cadr a))))
 
 (defun calist2 (a)
-  (let* ((b (malist 'car 'cadr a))
-	 (b (mapcar 'cdr (malist 'car 'cadr b))))
-    (mapcar (lambda (x) (cons x (lremove-duplicates (mapcar 'car (lremove-if-not (lambda (z) (member (cadr z) x)) a))))) b)))
+  (let* ((subs (lremove-duplicates (mapcar 'cadr (lremove-if (lambda (x) (eq (cadr x) (caddr x))) a))))
+	 (x (mapcar (lambda (x) (cons (list x) (mapcar (lambda (x) (cons (car x) (caddr x)))
+						       (lremove-if-not (lambda (y) (eq (cadr y) x)) a)))) subs))
+	 (ra (lremove-if (lambda (x) (member (cadr x) subs)) a))
+	 (y (mapcar (lambda (x) (list (mapcar 'cadr (lremove-if-not (lambda (y) (eq x (car y))) ra)) (cons x nil))) 
+		    (lremove-duplicates (mapcar 'car ra)))))
+    (nconc x y)))
+
+;; (defun calist2 (a)
+;;   (let* ((b (malist 'car 'cadr a))
+;; 	 (b (mapcar 'cdr (malist 'car 'cadr b))))
+;;     (mapcar (lambda (x) (cons x (lremove-duplicates (mapcar 'car (lremove-if-not (lambda (z) (member (cadr z) x)) a))))) b)))
 
 (defun tps-ints (a rl)
   (lremove-duplicates (mapcar (lambda (x) (cdr (assoc (cadr x) rl))) a)))

@@ -7,8 +7,6 @@
 (defun mkinf (f tp z &aux (z (if (cdr z) `(progn ,@z) (car z))))
   `(infer-type ',f ',tp ,z))
 
-#.`(defun listp (x) (if (eql 0 (tp2 x)) ,(mkinf 'x 'list '(t)) ,(mkinf 'x '(not list) '(nil))));FIXME
-
 (defun ib (o l &optional f)
   (let* ((a (atom l))
 	 (l (if a l (car l)))
@@ -73,9 +71,10 @@
 	 (mod `(let ((s (pop ,tp))) (<= 0 ,o (1- s))));FIXME error null tp
 	 (signed-byte `(if tp (let* ((s (pop ,tp))(s (when s (ash 1 (1- s))))) (<= (- s) ,o (1- s))) t))
 	 (unsigned-byte `(if tp (let* ((s (pop ,tp))(s (when s (ash 1 s)))) (<= 0 ,o (1- s))) (<= 0 ,o)))
-	 (cons `(if tp (and (typep (pop ,o) (pop ,tp)) (typep ,o (car ,tp)) t) t))
+	 (cons `(if tp (and (typep (car ,o) (car ,tp)) (typep (cdr ,o) (cadr ,tp)) t) t))
 	 (otherwise t))))
 
+#.`(defun listp (o) ,(cfn 'list t))
 
 #.`(defun mtc (o tp &aux (otp (car tp))(tp otp)(lp (listp tp))(ctp (if lp (car tp) tp))(tp (when lp (cdr tp))))
      (case (when ctp (upgraded-complex-part-type ctp))
@@ -135,7 +134,7 @@
 		   (case ctp
 			 ,@(mapcar (lambda (x &aux (c (if (atom x) x (car x)))) 
 				     `(,c ,(cfn c (mksubb 'o 'tp c)))) (append +s+ +rr+))
-			 (member (when (if (cdr tp) (member o tp) (eql o (car tp))) t));FIXME
+			 (member (when (if (cdr tp) (member o tp) (when tp (eql o (car tp)))) t));FIXME
 			 (eql (eql o (car tp)))
 			 (complex (mtc o tp))
 			 (vector (mtv o tp))
@@ -163,69 +162,3 @@
       ,@(mapcar (lambda (x) `(,x ',x)) (set-difference +kt+ 
 						       (mapcar 'cmp-norm-tp '(boolean number array structure std-instance))
 						       :test 'type-and))))
-
-
-;; (eval-when
-;;  (compile eval)
-;;  (defconstant +s+ `(list sequence function symbol boolean 
-;; 			 proper-cons
-;; 			 fixnum integer rational float real number;complex
-;; 			 character
-;; 			 hash-table pathname
-;; 			 stream 
-;; ;			 double-float single-float
-;; 			 structure-object ;FIXME
-;; 			 ))
-;;  (defconstant +rr+ (lremove-if (lambda (x) (type-and (cmp-norm-tp '(or complex array)) (cmp-norm-tp (car x)))) +r+)))
-
-
-;; (defun ibm (o l &optional f)
-;;   (let* ((a (atom l))
-;; 	 (l (if a l (car l)))
-;; 	 (l (unless (eq '* l) l)))
-;;     (or (not l) (if f (if a `(<= ,l ,o) `(< ,l ,o)) (if a `(<= ,o ,l) `(< ,o ,l))))))
-
-;; (defun ibbm (o tp)
-;;   (and (ibm o (car tp) t) (ibm o (cadr tp))))
-
-;; (defun cfnm (tp o code) 
-;;   (let* ((nc (cmp-norm-tp tp))
-;; 	 (a (type-and-list (list nc)))(c (calist2 a))
-;; 	 (f (best-type-of c))(it (caar c))(it (if (cdr it) (cons 'or it) (car it))))
-;;     `(case (,f ,o)
-;; 	   (,(tps-ints a (cdr (assoc f +rs+))) ,(mkinf o it (list code)))
-;; 	   (otherwise ,(mkinf o `(not ,it) '(nil))))))
-;; (defun mksubbm (o tp x)
-;;   (case x
-;; 	((integer ratio single-float double-float short-float long-float float rational real) (ibbm o tp))
-;; 	(proper-cons `(unless (improper-consp ,o) t))
-;; 	((structure structure-object) (if tp `(mss (c-structure-def ,o) ',(car tp)) t))
-;; 	(std-instance (if tp `(when (member ',(car tp) (si-class-precedence-list (si-class-of ,o))) t) t))
-;; 	(cons (if tp `(and (typep (pop ,o) ',(pop tp)) (typep ,o ',(car tp)) t) t))
-;; 	(otherwise t)))
-
-
-;; #.`(defun tpim (o ctp tp otp &aux (ctp (if (when (eq ctp 'array) (vtp tp)) 'vector ctp)))(print (list 'foo o ctp tp otp))
-;;      (when (or (eq ctp 'values) (when tp (eq ctp 'function)))
-;;        (error 'type-error :datum (cons ctp tp) :expected-type 'type-spec))
-;;      (case ctp
-;; 	   ,@(mapcar (lambda (x &aux (c (if (atom x) x (car x)))) 
-;; 		       `(,c (cfnm ',c o (mksubbm o tp ',c)))) (append +s+ +rr+))
-;; 	   (member (when (if (cdr tp) `(member ,o ',tp) `(eql ,o ,(car tp))) t));FIXME
-;; 	   (eql `(eql ,o ,(car tp)))
-;; 	   (complex (mtcm o tp))
-;; 	   (vector (mtvm o tp))
-;; 	   (array (mtam o tp))
-;; 	   (or (when tp `(or ,(typepm o (car tp)) ,(tpim o 'or (cdr tp) nil))))
-;; 	   (and (if tp `(and ,(typepm o (car tp)) ,(tpim o 'and (cdr tp) nil)) t))
-;; 	   (not `(not ,(typepm o (car tp))))
-;; 	   (satisfies `(when (funcall ',(car tp) ,o) t))
-;; 	   ((nil t) (when ctp t));FIXME ctp not inferred here
-;; 	   (otherwise (let ((tem (expand-deftype otp))) (when tem (typepm o tem))))))
-
-
-;; #.`(defun typepm (o otp &optional env &aux (lp (listp otp)))
-;;      (declare (ignore env))(print (list o otp lp))
-;;      (tpim o (if lp (car otp) otp) (when lp (cdr otp)) otp))
-
-;; (defmacro ttm (o tp) (typepm o tp))
