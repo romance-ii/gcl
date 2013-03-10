@@ -375,12 +375,25 @@
 (defun get-vbind (var &aux (var (if (when (consp var) (eq 'var (car var))) (local-var (caddr var)) var)))
   (when (var-p var) (var-store var)))
 
-(defun push-vbind (var form &aux (s (tmpsym)) (i (when (member (car form) '(lit var)) (cadr form))))
+(defun repeatable-var-binding (form)
+  (case (car form)
+	(var form)
+	(lit (unless (member-if (lambda (x) (when (stringp x) (>= (si::string-match #v"[a-zA-Z0-9]+\\(" x) 0))) form)
+	       form))))
+
+(defun push-vbind (var form &aux (s (tmpsym))(i (cadr (repeatable-var-binding form))))
   (when (eq 'lexical (var-kind var))
     (unless (eq (var-store var) +opaque+) 
       (when (and i (info-type i) (not (iflag-p (info-flags i) side-effects)) (not (or (info-ref-clb i) (info-ref-ccb i))))
 	(setf (get s 'bindings) form))
       (setf (var-store var) s))))
+
+;; (defun push-vbind (var form &aux (s (tmpsym)) (i (when (member (car form) '(lit var)) (cadr form))))
+;;   (when (eq 'lexical (var-kind var))
+;;     (unless (eq (var-store var) +opaque+) 
+;;       (when (and i (info-type i) (not (iflag-p (info-flags i) side-effects)) (not (or (info-ref-clb i) (info-ref-ccb i))))
+;; 	(setf (get s 'bindings) form))
+;;       (setf (var-store var) s))))
 
 ;; (defun push-vbind (var form &aux
 ;; 		       (s (or (get-vbind form) (tmpsym)))

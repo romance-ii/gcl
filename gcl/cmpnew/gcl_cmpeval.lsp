@@ -515,7 +515,26 @@
 	 (ri (cadr res)))
     (add-info info ri)
     (setf (info-type info) (info-type ri))
-    `(infer-tp ,info (var ,(make-info) ,v) ,tpi ,res)))
+    (if (exit-to-fmla-p) `(infer-tp ,info (var ,(make-info) ,v) ,tpi ,res) res)))
+
+;; (defun c1infer-tp (args)
+;;   (let* ((n (pop args))
+;; 	 (v (c1vref n))
+;; 	 (x (car v))
+;; 	 (tpi (pop args))
+;; 	 (tpi (if (si::t-to-nil (car (atomic-tp tpi))) tpi (cmp-norm-tp tpi)));FIXME
+;; 	 (tp (type-and (var-type x) tpi))
+;; 	 (info (make-info))
+;; 	 (v1 (c1arg n))
+;; 	 (v1 (when (eq (car v1) 'var) (caaddr v1)))
+;; 	 (v1 (unless (eq x v1) v1))
+;; 	 (res (with-restore-vars
+;; 	       (do-setq-tp x nil tp)
+;; 	       (c1expr (if v1 `(infer-tp ,v1 ,tp ,(car args)) (car args)))))
+;; 	 (ri (cadr res)))
+;;     (add-info info ri)
+;;     (setf (info-type info) (info-type ri))
+;;     `(infer-tp ,info (var ,(make-info) ,v) ,tpi ,res)))
 
 ;; (defun c1infer-tp (args)
 ;;   (let* ((v (c1vref (pop args)))
