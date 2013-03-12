@@ -460,40 +460,98 @@
 	(return nil))))
 
 
-(eval-when 
- (compile eval)
+;; (eval-when 
+;;  (compile eval)
 
- (defmacro locsym (f s) `(sgen (concatenate 'string (string ,f) ,s)))
+;;  (defmacro locsym (f s) `(sgen (concatenate 'string (string ,f) ,s)))
 
- (defmacro dyncpl (x &aux (l (locsym 'dyncpl "-LOOP")));FIXME this can't cons in a labels as it might be a separate fn.  Get do to unroll too.
-   `(labels ((,l (x y) (when x (setf (car x) (car y)) (,l (cdr x) (cdr y)))))
-	    (declare (notinline make-list))
-	    (let ((tmp (make-list (length ,x))))
-	      (declare (:dynamic-extent tmp))
-	      (,l tmp ,x);Can't be mapl, used by
-	     tmp)))
-
- (defmacro make-map (f c a &optional n &aux (l (locsym f "-LOOP")) (g (locsym f "-GATHER")))
-   `(defun ,f (f l &rest q ,@(when a `(&aux r rp)))
-      (declare (optimize (safety 2))(:dynamic-extent q))
-      (check-type l proper-list)
-      (labels (,@(when a `((,g (x ,@(unless n `(&aux (x (cons x nil)))))
-				    (if rp (rplacd rp x) (setq r x))
-				    ,(if n `(when (consp x) (setq rp (last x))) `(setq rp x)))))
-	       (,l (l q ,@(when c `(v)))
-		     (unless (or (endp l) (member-if 'endp q)) 
-		       ,(let ((x `(apply f ,@(if c `((car l) (mapl (lambda (x y) (setf (car x) (pop (car y)))) v q)) `(l q)))))
-			  (if a `(,g ,x) x))
-		       (,l (cdr l) ,@(if c `(q v) `((mapl (lambda (x) (setf (car x) (cdar x))) q)))))))
-	      (,l l (dyncpl q) ,@(when c `((dyncpl q)))) ,(if a `r `l)))))
+;;  (defmacro dyncpl (x &aux (l (locsym 'dyncpl "-LOOP")));FIXME this can't cons in a labels as it might be a separate fn.  Get do to unroll too.
+;;    `(labels ((,l (x y) (when x (setf (car x) (car y)) (,l (cdr x) (cdr y)))))
+;; 	    (declare (notinline make-list))
+;; 	    (let ((tmp (make-list (length ,x))))
+;; 	      (declare (:dynamic-extent tmp))
+;; 	      (,l tmp ,x);Can't be mapl, used by
+;; 	     tmp)))
 
 
-(make-map mapl    nil nil)
-(make-map maplist nil t)
-(make-map mapcon  nil t   t)
-(make-map mapc    t   nil)
-(make-map mapcar  t   t)
-(make-map mapcan  t   t   t)
+
+;;  (defmacro make-map (f c a &optional n &aux (l (locsym f "-LOOP")) (g (locsym f "-GATHER")))
+;;    `(defun ,f (f l &rest q ,@(when a `(&aux r rp)))
+;;       (declare (optimize (safety 2))(:dynamic-extent q))
+;;       (check-type l proper-list)
+;;       (labels (,@(when a `((,g (x ,@(unless n `(&aux (x (cons x nil)))))
+;; 				    (if rp (rplacd rp x) (setq r x))
+;; 				    ,(if n `(when (consp x) (setq rp (last x))) `(setq rp x)))))
+;; 	       (,l (l q ,@(when c `(v)))
+;; 		     (unless (or (endp l) (member-if 'endp q)) 
+;; 		       ,(let ((x `(apply f ,@(if c `((car l) (mapl (lambda (x y) (setf (car x) (pop (car y)))) v q)) `(l q)))))
+;; 			  (if a `(,g ,x) x))
+;; 		       (,l (cdr l) ,@(if c `(q v) `((mapl (lambda (x) (setf (car x) (cdar x))) q)))))))
+;; 	      (,l l (dyncpl q) ,@(when c `((dyncpl q)))) ,(if a `r `l)))))
+
+
+(defun mapl (fd list &rest r &aux (fun (coerce fd 'function)))
+  (declare (optimize (safety 1))(:dynamic-extent r)(notinline make-list));FIXME
+  (check-type fd function-designator)
+  (check-type list list)
+  (let ((q (when r (make-list (length r)))))
+    (declare (:dynamic-extent q))
+    (labels ((a-cons (x) (check-type x list) (or x (return-from mapl list)))
+	     (lmap (f x &optional c) (when x (funcall f x) (lmap f (if c (a-cons (cdr x)) (cdr x)) c)))
+	     (last nil (lmap (lambda (x) (rplaca x (if r (a-cons (pop r)) (a-cons (cdar x))))) q) q))
+	    (lmap (lambda (x) (apply fun x (last))) list t))))
+
+
+(defun mapc (fd list &rest r &aux (fun (coerce fd 'function)))
+  (declare (optimize (safety 1))(:dynamic-extent r))
+  (check-type fd function-designator)
+  (check-type list list)
+  (let ((q (when r (make-list (length r)))))
+    (declare (:dynamic-extent q))
+    (apply 'mapl (lambda (x &rest r) (apply fun (car x) (mapl (lambda (x) (setf (car x) (car (pop r)))) q))) list r)))
+
+
+(defun mapcar (fd list &rest r &aux (fun (coerce fd 'function)) res rp)
+  (declare (optimize (safety 1))(:dynamic-extent r))
+  (check-type fd function-designator)
+  (check-type list list)
+  (apply 'mapc (lambda (x &rest z &aux (tem (cons (apply fun x z) nil)))
+		 (setq rp (if rp (cdr (rplacd rp tem)) (setq res tem)))) list r)
+  res)
+
+(defun mapcan (fd list &rest r &aux (fun (coerce fd 'function)) res rp)
+  (declare (optimize (safety 1))(:dynamic-extent r))
+  (check-type fd function-designator)
+  (check-type list list)
+  (apply 'mapc (lambda (x &rest z &aux (tem (apply fun x z)))
+		 (if rp (rplacd rp tem) (setq res tem))
+		 (when (consp tem) (setq rp (last tem)))) list r)
+  res)
+
+(defun maplist (fd list &rest r &aux (fun (coerce fd 'function)) res rp)
+  (declare (optimize (safety 1))(:dynamic-extent r))
+  (check-type fd function-designator)
+  (check-type list list)
+  (apply 'mapl (lambda (x &rest z &aux (tem (cons (apply fun x z) nil)))
+		 (setq rp (if rp (cdr (rplacd rp tem)) (setq res tem)))) list r)
+  res)
+
+(defun mapcon(fd list &rest r &aux (fun (coerce fd 'function)) res rp)
+  (declare (optimize (safety 1))(:dynamic-extent r))
+  (check-type fd function-designator)
+  (check-type list list)
+  (apply 'mapl (lambda (x &rest z &aux (tem (apply fun x z)))
+		 (if rp (rplacd rp tem) (setq res tem))
+		 (when (consp tem) (setq rp (last tem)))) list r)
+  res)
+
+
+;; (make-map mapl    nil nil)
+;; (make-map maplist nil t)
+;; (make-map mapcon  nil t   t)
+;; (make-map mapc    t   nil)
+;; (make-map mapcar  t   t)
+;; (make-map mapcan  t   t   t)
 
 ;; (defun mapl (f l1 &rest l)
 ;;   (declare (optimize (safety 2))(:dynamic-extent l))

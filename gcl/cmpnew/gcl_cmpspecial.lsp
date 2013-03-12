@@ -360,12 +360,15 @@
 ;;   (or (local-fun-fn funid) (gethash funid *fn-src-fn*) (setf (gethash funid *fn-src-fn*) (mf funid))))
 
 
+(defvar *prov* nil)
+
 (defun c1function (args &optional (b 'cb) f &aux fd)
 
   (when (endp args) (too-few-args 'function 1 0))
   (unless (endp (cdr args)) (too-many-args 'function 1 (length args)))
   
   (let* ((funid (si::funid (car args)))
+	 (funid (if (consp funid) (effective-safety-src funid) funid))
 	 (fn (afe (cons 'ce (current-env)) (funid-to-fn funid)))
 	 (tp (if fn (object-type fn) #tfunction))
 	 (info (make-info :type tp)))
@@ -375,10 +378,31 @@
 	  ((symbolp funid) 
 	   (setf (info-sp-change info) (if (null (get funid 'no-sp-change)) 1 0))
 	   `(function ,info (call-global ,info ,funid)))
-	  ((setq fd (let ((funid (effective-safety-src funid)))
-		      (process-local-fun b (or f (make-fun :name 'lambda :src funid :c1cb t :fn fn :info (make-info :type '*))) funid tp)))
+	  ((let* ((fun (or f (make-fun :name 'lambda :src funid :c1cb t :fn fn :info (make-info :type '*))))
+		  (fd (if *prov* (list fun) (process-local-fun b fun funid tp))))
 	   (add-info info (cadadr fd))
-	   `(function ,info ,fd)))))
+	   (when *prov* (setf (info-flags info) (logior (info-flags info) (iflags provisional))))
+	   `(function ,info ,fd))))))
+
+;; (defun c1function (args &optional (b 'cb) f &aux fd)
+
+;;   (when (endp args) (too-few-args 'function 1 0))
+;;   (unless (endp (cdr args)) (too-many-args 'function 1 (length args)))
+  
+;;   (let* ((funid (si::funid (car args)))
+;; 	 (funid (if (consp funid) (effective-safety-src funid) funid))
+;; 	 (fn (afe (cons 'ce (current-env)) (funid-to-fn funid)))
+;; 	 (tp (if fn (object-type fn) #tfunction))
+;; 	 (info (make-info :type tp)))
+;;     (cond ((setq fd (c1local-fun funid t))
+;; 	   (add-info info (cadr fd))
+;; 	   `(function ,info ,fd))
+;; 	  ((symbolp funid) 
+;; 	   (setf (info-sp-change info) (if (null (get funid 'no-sp-change)) 1 0))
+;; 	   `(function ,info (call-global ,info ,funid)))
+;; 	  ((setq fd (process-local-fun b (or f (make-fun :name 'lambda :src funid :c1cb t :fn fn :info (make-info :type '*))) funid tp))
+;; 	   (add-info info (cadadr fd))
+;; 	   `(function ,info ,fd)))))
 
 ;; (defun c1function (args &optional (provisional *provisional-inline*) b f)
 

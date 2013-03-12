@@ -74,8 +74,8 @@
 	       (c-array-eltsize r)
 	       ,@(mapcar (lambda (x &aux (z (pop x)) (y (maybe-cons 'or (mapcar (lambda (x) (list 'array x)) x)))
 				    (w (fifth (assoc (car x) *array-type-info*))))
-			   `(,z (compiler::infer-tp 
-				       r ,y (compiler::infer-tp 
+			   `(,z (infer-tp 
+				       r ,y (infer-tp 
 					     s ,y 
 					     (sp r i s j 
 						 ,(if (zerop z) `'0-byte-array-self `(lambda (r i) (,w (c-array-self r) i nil nil)))

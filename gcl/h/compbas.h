@@ -92,7 +92,12 @@ typedef double complex dcomplex;
       ((((ufixnum)_x)>=IM_FIX_BASE) ? (t_fixnum<<4)+1 :\
        (_x->d.e && _x->ff.ff<IM_FIX_BASE ? _x->fstp.tp : 0));})
 
-#define tp8(x) ({object _x=x;((((ufixnum)_x)>=IM_FIX_BASE) ? t_end :  (_x->d.e && _x->ff.ff<IM_FIX_BASE ? _x->d.t : t_end));})
+#define tp8(x) ({object _x=x;((((ufixnum)_x)>=IM_FIX_BASE) ? 0 :  \
+			      (_x->d.e && _x->ff.ff<IM_FIX_BASE ? \
+			       (_x->d.t<t_complex ? x->d.t :		\
+				(_x->d.t==t_complex&&x->d.tt<2 ? x->d.t :		\
+				 (_x->d.t==t_complex ? x->d.t+x->d.tt-1 : \
+				  0))) : 0));})/*FIXME*/
 
 /* #define immnum_comp(x,y,c) (fimf(((ufixnum)x)&((ufixnum)y)) ? (x c y) : (number_compare(x,y) c 0)) */
 #define immnum_comp(x,y,c) ({register object _x=x,_y=y;\

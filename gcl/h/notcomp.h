@@ -288,6 +288,7 @@ gcl_init_cmp_anon(void);
 #endif
 #include "gmp_wrappers.h"
 
+
 extern enum type t_vtype;
 extern int vtypep_fn(object);
 extern void Check_type(object *,int (*)(object),object);
@@ -491,3 +492,4 @@ object ihs_top_function_name(ihs_ptr h);
 #define coerce_to_local_filename(a_,b_) coerce_to_local_filename1(a_,b_,sizeof(b_))
 
 #define massert(a_) if (!(a_)) assert_error(#a_,__LINE__,__FILE__,__FUNCTION__)
+

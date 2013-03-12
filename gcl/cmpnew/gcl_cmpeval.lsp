@@ -1398,9 +1398,18 @@
 	(let* ((tag (tmpsym))
 	       (tsrc (ttl-tag-src src tag))
 	       (*src-inline-recursion* (maybe-cons-sir sir tag ttag src env)))
-	  (with-restore-vars
-	   (prog1 (catch tag (mi4 fun args la tsrc env inls))
-	     (keep-vars))))))))
+	  (catch tag (mi4 fun args la tsrc env inls)))))))
+
+;; (defun mi3 (fun args la fms ttag envl inls &aux (src (under-env (pop envl) (inline-src fun))) (env (car envl)))
+;;   (when (maybe-inline-src fun fms src)
+;;     (let ((sir (cons (sir-name fun) (mapcar (lambda (x) (when x (info-type (cadr x)))) fms))))
+;;       (unless (prev-sir sir)
+;; 	(let* ((tag (tmpsym))
+;; 	       (tsrc (ttl-tag-src src tag))
+;; 	       (*src-inline-recursion* (maybe-cons-sir sir tag ttag src env)))
+;; 	  (with-restore-vars
+;; 	   (prog1 (catch tag (mi4 fun args la tsrc env inls))
+;; 	     (keep-vars))))))))
 
 ;; (defun mi3 (fun args la fms ttag envl inls &aux (src (under-env (pop envl) (inline-src fun))) (env (car envl)))
 ;;   (when (maybe-inline-src fun fms src)
@@ -1836,14 +1845,40 @@
 ;; 	(foo (gethash (car (atomic-tp (info-type (cadr ff)))) *fun-ev-hash*))))
 ;  (when (member (car ff) '(foo location)) (gethash (car (atomic-tp (info-type (cadr ff)))) *fun-ev-hash*)))
 
-(defun mi1a (fun args last info &optional ff &aux (*in-inline* t))
+(defun mi1c (fun args last info &optional ff prov &aux (*in-inline* t))
 
   (let* ((otp (info-type info))
-	 (fms (make-c1forms fun args last info))
+	 (fms (let ((*prov* prov)) (make-c1forms fun args last info)))
 	 (last (when (and last (nth (length args) fms)) last))
 	 (tp (type-from-args fun fms last info))
 	 (inl (when (or tp (eq otp tp)) (mi2 fun args last fms (ff-env (or ff fun))))))
-    (or inl (mi5 (or (when (symbolp fun) fun) ff) info fms last))))
+    (or (when inl 
+	  (unless (iflag-p (info-flags (cadr inl)) provisional)
+	    inl))
+	(unless (member-if (lambda (x) (iflag-p (info-flags (cadr x)) provisional)) fms)
+	  (mi5 (or (when (symbolp fun) fun) ff) info fms last)))))
+
+
+(defun mi1b (fun args last info &optional ff)
+  (with-restore-vars
+   (let ((res (mi1c fun args last info ff t)))
+     (when res
+       (keep-vars)
+       res))))
+
+(defun mi1a (fun args last info &optional ff &aux (i1 (copy-info info)));FIXME side-effects on info
+  (or (mi1b fun args last info ff)
+      (prog1 (mi1c fun args last i1 ff)
+	(setf (info-type info) (info-type i1)))))
+
+;; (defun mi1a (fun args last info &optional ff &aux (*in-inline* t))
+
+;;   (let* ((otp (info-type info))
+;; 	 (fms (make-c1forms fun args last info))
+;; 	 (last (when (and last (nth (length args) fms)) last))
+;; 	 (tp (type-from-args fun fms last info))
+;; 	 (inl (when (or tp (eq otp tp)) (mi2 fun args last fms (ff-env (or ff fun))))))
+;;     (or inl (mi5 (or (when (symbolp fun) fun) ff) info fms last))))
 
 ;; (defun mi1a (fun args last info &aux (*in-inline* t))
 

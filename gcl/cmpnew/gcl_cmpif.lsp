@@ -254,7 +254,7 @@
 			   (v (car (third (third fmla))))
 			   (i (when (member v *vars*)
 				(cond ((type>= #tnull tp) (list (list* v nil (fourth fmla))))
-				    ((type>= #t(not null) tp) (list (list* v (fourth fmla) nil)))))))
+				      ((type>= #t(not null) tp) (list (list* v (fourth fmla) nil)))))))
 		      (append i (fmla-infer-tp (fifth fmla)))))
 	  (if (apply 'fmla-if (cddr fmla)))
 	  (var (when (member (car (third fmla)) *vars*) (list (cons (car (third fmla)) (cons #t(not null) #tnull)))))

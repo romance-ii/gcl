@@ -31,7 +31,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define P__(x)
 #endif
 
-
 #include "options.h"
 #include "gclincl.h"
 #include "config.h"
@@ -94,9 +93,12 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define EXTER extern 
 #endif
 
+
 #if defined(GMP) || defined(NEED_MP_H)
 #include "../h/mp.h"
 #endif
+
+
 
 #include "../h/sfun_argd.h"
 #include "../h/compbas.h"

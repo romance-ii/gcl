@@ -37,7 +37,6 @@
 	  (var-mt v) (var-type v)
 	  (var-loc v) (unless (and (eq (var-loc v) 'object)
 				   (unless (eq t (var-type v)) (var-type v))) (var-loc v)))
-    (unless (var-type v) (cmpwarn "Variable ~s initialized with type ~s" (var-name v) (var-type v)))
     (keyed-cmpnote (list (var-name v) 'type-propagation 'type 'init-type)
 		   "Setting init type of ~s to ~s" (var-name v) (var-type v))))
 
