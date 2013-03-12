@@ -247,7 +247,7 @@
 		    (return-from member x))) list)))
 
 (defktn adjoin (item list)
-  (if (member item list :key key :test test :test-not test-not)
+  (if (member (if key (funcall key item) item) list :key key :test test :test-not test-not)
       list
     (cons item list)))
 
