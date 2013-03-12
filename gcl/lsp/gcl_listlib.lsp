@@ -193,7 +193,7 @@
     (labels ((a-cons (x) (check-type x list) (or x (return-from mapl list)))
 	     (lmap (f x) (when x (funcall f x) (lmap f (cdr x))))
 	     (last nil (lmap (lambda (x) (rplaca x (if r (a-cons (pop r)) (a-cons (cdar x))))) q) q))
-	    (lmap (lambda (x) (apply fun x (last))) list))))
+	    (lmap (lambda (x) (apply fun x (last))) list) list)))
 
 
 (defun mapc (fd list &rest r &aux (fun (coerce fd 'function)))
