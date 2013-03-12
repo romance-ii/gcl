@@ -22,6 +22,7 @@
 
 (defconstant +et+ (mapcar (lambda (x) (cons (cmp-norm-tp x) x)) 
 			  '(list cons proper-list proper-sequence sequence boolean null true array vector number immfix bfix bignum integer
+				 function-designator
 				 ratio short-float long-float float real number pathname hash-table function)))
 
 (defun ex-type (tp) (or (cdr (assoc tp +et+)) tp))
@@ -153,6 +154,7 @@
 		     sts fns)))))))
 
 (defun sig (x) (let ((h (call x))) (when h (call-sig h))))
+(defun signature (x) (ex-sig (sig x)))
 (defun props (x) (let ((h (call x))) (when h (call-props h))))
 (defun src (x) (let ((h (call x))) (when h (call-src h))))
 (defun file (x) (let ((h (call x))) (when h (call-file h))))

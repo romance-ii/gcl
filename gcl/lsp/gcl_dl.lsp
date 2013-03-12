@@ -19,7 +19,7 @@
 	 (ad (dlsym k str))
 	 (p (or (pathname-name (dladdr ad)) ""))
 	 (psym (intern p pk))
-	 (npk (or (find-package psym) (make-package psym :use '(lisp))))
+	 (npk (or (find-package psym) (make-package psym :use '(:cl))))
 	 (sym (and (shadow str npk) (intern str npk))))
     (export (list psym) pk)
     (export sym npk)
