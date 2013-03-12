@@ -360,13 +360,3 @@ Good luck!				 The GCL Development Team")
 (defvar *lib-directory* (namestring (truename "../")))
 
 (import '(*lib-directory* *load-path* *system-directory*) 'si::user) 
-
-
-(defun eql-int (x y)
-  (zerop (number-compare x y)))
-(declaim (inline eql-int))
-
-(unless (fboundp 'equal-int)
-  (fset 'equal-int (symbol-function 'equal)))
-(unless (fboundp 'equalp-int)
-  (fset 'equalp-int (symbol-function 'equalp)))

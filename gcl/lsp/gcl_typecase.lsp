@@ -113,7 +113,7 @@
      (declare (fixnum tp))
      (case tp
 	    ,@(let (r) (dotimes (i +xi+) (push `(,(1+ i) ,(mtp8b (1+ i))) r)) (nreverse r))))
-(setf (get 'num-comp 'compiler::cmp-inline) t)
+;(setf (get 'num-comp 'compiler::cmp-inline) t)
 
 (defun eql (x y)
   (or (eq x y)
