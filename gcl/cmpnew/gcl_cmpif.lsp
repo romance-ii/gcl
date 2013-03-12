@@ -242,7 +242,7 @@
 	  (block 
 	   (let ((*infer-tags* (cons (cons (third fmla) (fmla-infer-tp (fourth fmla))) *infer-tags*)))
 	     (labels ((fmla-walk (f) (cond ((atom f))
-					   ((eq (car f) 'return-from) (fmla-infer-tp f))
+					   ((when (eq (car f) 'return-from) (eq (caddr f) (third fmla))) (fmla-infer-tp f))
 					   (t (fmla-walk (car f)) (fmla-walk (cdr f))))))
 		     (fmla-walk (fourth fmla)))
 	     (fmla-clean (cdar *infer-tags*))))
