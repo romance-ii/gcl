@@ -326,7 +326,7 @@
      (member fname *inline*)
      (local-fun-fn fname)
      (get fname 'cmp-inline)
-     (member (symbol-package fname) (load-time-value (mapcar 'find-package '(:c |libm| |libc|)))))))
+     (member (symbol-package fname) (load-time-value (mapcar 'find-package '(:c |libm| |libc| |libgmp|)))))))
 
 ;; (defun inline-asserted (fname)
 ;;   (unless *compiler-push-events*

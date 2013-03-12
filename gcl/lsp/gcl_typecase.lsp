@@ -76,3 +76,55 @@
 
 (defun funid (funid)
   (funid-p funid t))
+
+
+
+
+
+
+(defconstant +xi+ (let* ((a (type-and-list (list (cmp-norm-tp `(and number (not immfix))))))
+			 (rl (cdr (assoc 'tp8 +rs+)))
+			 (i (lremove-duplicates (mapcar (lambda (x) (cdr (assoc (cadr x) rl))) a)))
+			 (mi (apply 'min i))(xi (apply 'max i))(m (apply '+ i)))
+;		    (assert (= mi 1))
+;		    (assert (= m (/ (* xi (1+ xi)) 2)))
+		    xi))
+
+
+(eval-when
+ (compile eval)
+ (defun mtp8b (tpi &aux (rl (cdr (assoc 'tp8 +rs+)))
+		   (tp (lreduce 'type-or1 (mapcar 'car (lremove-if-not (lambda (x) (eql tpi (cdr x))) rl)) :initial-value nil)))
+   `(infer-type
+     'x ',tp
+     (infer-type
+      'y ',tp
+      ,(let ((x (car (member-if (lambda (x) (eql tpi (cdr (assoc (cmp-norm-tp `(and ,(get x 'lisp-type) (not immfix))) rl))))
+				'(:fixnum :float :double :fcomplex :dcomplex)))))
+	 (if x `(,(intern (string-upcase (strcat "C-" x "-=="))) x y)
+	   (cond ((eq tp (cmp-norm-tp 'bignum)) `(eql 0 (mpz_cmp x y)))
+		 ((eq tp (cmp-norm-tp 'ratio)) `(and (eql (numerator x) (numerator y)) (eql (denominator x) (denominator y))))
+		 ((eq tp (cmp-norm-tp '(complex rational))) 
+		  `(and (eql (realpart x) (realpart y))
+			(eql (imagpart x) (imagpart y))))
+		 ((error "Unknown tp")))))))))
+			   
+#.`(defun num-comp (x y tp)
+     (declare (fixnum tp))
+     (case tp
+	    ,@(let (r) (dotimes (i +xi+) (push `(,(1+ i) ,(mtp8b (1+ i))) r)) (nreverse r))))
+(setf (get 'num-comp 'compiler::cmp-inline) t)
+
+(defun eql (x y)
+  (or (eq x y)
+      (let ((tx (tp8 x))(ty (tp8 y))) 
+	(when (= tx ty)
+	  (num-comp x y tx)))))
+
+(defun eql-with-tx (x y tx)
+  (declare (fixnum tx))
+  (or (eq x y)
+      (let ((ty (tp8 y))) 
+	(when (= tx ty)
+	  (num-comp x y tx)))))
+(setf (get 'eql-with-tx 'compiler::cmp-inline) t)

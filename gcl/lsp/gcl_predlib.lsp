@@ -1576,6 +1576,3 @@
 	   (not (eql majvers *gcl-major-version*)))
        *load-verbose*
        (format t "[compiled in GCL ~a.~a.~a] " majvers minvers extvers)))
-
-
-

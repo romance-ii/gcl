@@ -1125,25 +1125,53 @@ DEFUN("ARRAY-ELEMENT-TYPE",object,fLarray_element_type,LISP,1,1,NONE,OO,OO,OO,OO
   return * aet_types[(int)t].namep;
 }
 
-DEFUN("C+",fixnum,fScp,SI,2,2,NONE,II,IO,00,00,(fixnum x,fixnum y),"") {
+DEFUN("C-FIXNUM-==",fixnum,fSc_fixnum_eq,SI,2,2,NONE,II,IO,OO,OO,(fixnum x,fixnum y),"") {
+  RETURN1(x==y);
+}
+DEFUN("C-FLOAT-==",fixnum,fSc_float_eq,SI,2,2,NONE,IO,OO,OO,OO,(object x,object y),"") {
+  check_type(x,t_shortfloat);
+  check_type(y,t_shortfloat);
+  RETURN1(sf(x)==sf(y));
+}
+DEFUN("C-DOUBLE-==",fixnum,fSc_double_eq,SI,2,2,NONE,IO,OO,OO,OO,(object x,object y),"") {
+  check_type(x,t_longfloat);
+  check_type(y,t_longfloat);
+  RETURN1(lf(x)==lf(y));
+}
+DEFUN("C-FCOMPLEX-==",fixnum,fSc_fcomplex_eq,SI,2,2,NONE,IO,OO,OO,OO,(object x,object y),"") {
+  check_type(x,t_complex);
+  check_type(y,t_complex);
+  check_type(x->cmp.cmp_real,t_shortfloat);
+  check_type(y->cmp.cmp_real,t_shortfloat);
+  RETURN1(sfc(x)==sfc(y));
+}
+DEFUN("C-DCOMPLEX-==",fixnum,fSc_dcomplex_eq,SI,2,2,NONE,IO,OO,OO,OO,(object x,object y),"") {
+  check_type(x,t_complex);
+  check_type(y,t_complex);
+  check_type(x->cmp.cmp_real,t_longfloat);
+  check_type(y->cmp.cmp_real,t_longfloat);
+  RETURN1(lfc(x)==lfc(y));
+}
+
+DEFUN("C+",fixnum,fScp,SI,2,2,NONE,II,IO,OO,OO,(fixnum x,fixnum y),"") {
   RETURN1(x+y);
 }
-DEFUN("&",fixnum,fSand,SI,2,2,NONE,II,IO,00,00,(fixnum x,fixnum y),"") {
+DEFUN("&",fixnum,fSand,SI,2,2,NONE,II,IO,OO,OO,(fixnum x,fixnum y),"") {
   RETURN1(x&y);
 }
-DEFUN("|",fixnum,fSor,SI,2,2,NONE,II,IO,00,00,(fixnum x,fixnum y),"") {
+DEFUN("|",fixnum,fSor,SI,2,2,NONE,II,IO,OO,OO,(fixnum x,fixnum y),"") {
   RETURN1(x|y);
 }
-DEFUN("^",fixnum,fSxor,SI,2,2,NONE,II,IO,00,00,(fixnum x,fixnum y),"") {
+DEFUN("^",fixnum,fSxor,SI,2,2,NONE,II,IO,OO,OO,(fixnum x,fixnum y),"") {
   RETURN1(x^y);
 }
-DEFUN("~",fixnum,fSnot,SI,1,1,NONE,II,OO,00,00,(fixnum x),"") {
+DEFUN("~",fixnum,fSnot,SI,1,1,NONE,II,OO,OO,OO,(fixnum x),"") {
   RETURN1(~x);
 }
-DEFUN("<<",fixnum,fSlshft,SI,2,2,NONE,II,IO,00,00,(fixnum x,fixnum y),"") {
+DEFUN("<<",fixnum,fSlshft,SI,2,2,NONE,II,IO,OO,OO,(fixnum x,fixnum y),"") {
   RETURN1(x<<y);
 }
-DEFUN(">>",fixnum,fSrshft,SI,2,2,NONE,II,IO,00,00,(fixnum x,fixnum y),"") {
+DEFUN(">>",fixnum,fSrshft,SI,2,2,NONE,II,IO,OO,OO,(fixnum x,fixnum y),"") {
   RETURN1(x>>y);
 }
 

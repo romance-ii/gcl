@@ -560,7 +560,9 @@
     (or (when b (normalize-function-plist args)) (car (push args lists)))))
 
 (in-package :s)
-(si::import-internal 'si::(\| & ^ ~ c+ c* << >> string-concatenate strcat lit seqind fixnum-length char-length cref address 
+(si::import-internal 'si::(\| & ^ ~ c+ c* << >> 
+			   c-fixnum-== c-float-== c-double-== c-fcomplex-== c-dcomplex-== fcomplex dcomplex
+			   string-concatenate strcat lit seqind fixnum-length char-length cref address 
 			   package-internal package-external array-dims cmp-norm-tp tp0 tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8))
 ;(si::import-internal 'compiler::(lisp-type cmp-norm-tp fsf))
 (export '(lisp-type defdlfun strcat))
