@@ -1845,24 +1845,20 @@
 ;; 	(foo (gethash (car (atomic-tp (info-type (cadr ff)))) *fun-ev-hash*))))
 ;  (when (member (car ff) '(foo location)) (gethash (car (atomic-tp (info-type (cadr ff)))) *fun-ev-hash*)))
 
-(defun mi1c (fun args last info &optional ff prov &aux (*in-inline* t))
+(defun mi1c (fun args last info &optional ff prov &aux (*in-inline* t)(*prov* prov))
 
   (let* ((otp (info-type info))
-	 (fms (let ((*prov* prov)) (make-c1forms fun args last info)))
+	 (fms (make-c1forms fun args last info))
 	 (last (when (and last (nth (length args) fms)) last))
 	 (tp (type-from-args fun fms last info))
 	 (inl (when (or tp (eq otp tp)) (mi2 fun args last fms (ff-env (or ff fun))))))
-    (or (when inl 
-	  (unless (iflag-p (info-flags (cadr inl)) provisional)
-	    inl))
-	(unless (member-if (lambda (x) (iflag-p (info-flags (cadr x)) provisional)) fms)
-	  (mi5 (or (when (symbolp fun) fun) ff) info fms last)))))
+    (or inl (mi5 (or (when (symbolp fun) fun) ff) info fms last))))
 
 
 (defun mi1b (fun args last info &optional ff)
   (with-restore-vars
    (let ((res (mi1c fun args last info ff t)))
-     (when res
+     (unless (iflag-p (info-flags (cadr res)) provisional)
        (keep-vars)
        res))))
 
