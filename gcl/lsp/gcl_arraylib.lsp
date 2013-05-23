@@ -50,6 +50,7 @@
 
  (defun af (x) (cdr (assoc x '((character . *char) (bit . *char) (non-negative-char . *char);fixme
 			       (unsigned-char . *uchar) (signed-char . *char)
+			       #+64bit (non-negative-int . *int) #+64bit (unsigned-int . *int) #+64bit (signed-int . *int)
 			       (non-negative-short . *short) (unsigned-short . *ushort)
 			       (signed-short . *short) (short-float . *float) (long-float . *double)
 			       (t . *object) (non-negative-fixnum . *fixnum) (fixnum . *fixnum)))))
@@ -261,7 +262,8 @@
 (defun fill-pointer (x)
   (declare (optimize (safety 2)))
   (check-type x fpvec)
-  (fill-pointer-internal x))
+  (c-vector-fillp x))
+;  (fill-pointer-internal x)
 
 (defun make-array (dimensions
 		   &key element-type
@@ -398,8 +400,8 @@
       (adjust-array vector (the seqind (+ dim (or extension (max 5 dim))))
 		    :element-type (array-element-type vector)
 		    :fill-pointer fp))
-    (si:aset new-element vector fp)
-    (si:fill-pointer-set vector (1+ fp))
+    (aset new-element vector fp)
+    (setf (fill-pointer vector) (1+ fp))
     fp))
 
 

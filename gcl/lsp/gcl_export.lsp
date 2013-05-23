@@ -536,6 +536,17 @@
 (setq *uniq-sigs* (make-hash-table :test 'equal))
 (defun uniq-sig (sig) (or (gethash sig *uniq-sigs*) (setf (gethash sig *uniq-sigs*) sig)))
 
+(defun num-comp (x y tp) 
+  (if (c-fixnum-== tp 1) (c-fixnum-== x y)
+    (if (c-fixnum-== tp 2) (eql 0 (gmp::mpz_cmp x y))
+      (if (c-fixnum-== tp 3) (and (eql (numerator x) (numerator y))
+				  (eql (denominator x) (denominator y)))
+	(if (c-fixnum-== tp 4) (c-float-== x y)
+	  (if (c-fixnum-== tp 5) (c-double-== x y)
+	    (if (c-fixnum-== tp 6) (and (eql (realpart x) (realpart y)) (eql (imagpart x) (imagpart y)))
+	      (if (c-fixnum-== tp 7) (c-fcomplex-== x y)
+		(if (c-fixnum-== tp 8) (c-dcomplex-== x y))))))))))
+
 (defun normalize-function-plist (plist)
   (labels ((mn (tp &aux (n (cmp-norm-tp tp))) (if (unless (eq tp n) (eq n '*)) (return-from normalize-function-plist nil) n))
 	   (norm-sig (sig) (uniq-sig (list (mapcar #'mn (car sig)) (mn (cadr sig))))))

@@ -964,7 +964,7 @@ get_mmap(FILE *fp,void **ve) {
 
   massert((n=fileno(fp))>2);
   massert(!fstat(n,&ss));
-  if (sSAload_with_freadA==Cnil) {
+  if (sSAload_with_freadA->s.s_dbind==Cnil) {
     massert((v1=mmap(0,ss.st_size,PROT_READ|PROT_WRITE,MAP_PRIVATE,n,0))!=(void *)-1);
   } else {
     massert(v1=malloc(ss.st_size));
@@ -980,7 +980,7 @@ get_mmap(FILE *fp,void **ve) {
 int
 un_mmap(void *v1,void *ve) {
 
-  if (sSAload_with_freadA==Cnil)
+  if (sSAload_with_freadA->s.s_dbind==Cnil)
     return munmap(v1,ve-v1);
   else {
     free(v1);

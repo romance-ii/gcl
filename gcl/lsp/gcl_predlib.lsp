@@ -1553,15 +1553,15 @@
 	   (rt (if (or (not (cadr rt)) (car mt)) rt `(nil nil))))
       (values (not (car rt))  (not (cadr rt))))))
 
-(deftype seqind nil `(,(if (<= array-dimension-limit most-positive-immfix) 'immfix 'fixnum) 0 ,array-dimension-limit))
-(deftype rnkind nil `(,(if (<= array-rank-limit most-positive-immfix) 'immfix 'fixnum) 0 ,array-rank-limit))
+(deftype seqind (&aux (s array-dimension-limit)) `(,(if (<= s most-positive-immfix) 'immfix 'fixnum) 0 ,s))
+(deftype rnkind (&aux (s array-rank-limit)) `(,(if (<= s most-positive-immfix) 'immfix 'fixnum) 0 ,s))
 (deftype mod (n) `(,(cond ((<= (1- n) most-positive-immfix) 'immfix)((<= (1- n) most-positive-fixnum) 'fixnum)('integer))
 		   0 ,(1- n)))
 (deftype bit () `(mod 2))
-(deftype non-negative-byte (&optional (s '*)) `(unsigned-byte ,s))
+(deftype non-negative-byte (&optional (s '*)) `(unsigned-byte ,(1- s)))
 (deftype negative-byte (&optional (s '*)) (normalize-type `(integer  ,(if (eq s '*) s (- (ash 1 (1- s)))) -1)))
 (deftype signed-byte (&optional (s '*)) (normalize-type `(integer ,(if (eq s '*) s (- (ash 1 (1- s)))) ,(if (eq s '*) s (1- (ash 1 (1- s)))))))
-(deftype unsigned-byte (&optional (s '*)) (normalize-type `(integer 0 ,(if (eq s '*) s (1- (ash 1 (1- s)))))))
+(deftype unsigned-byte (&optional (s '*)) (normalize-type `(integer 0 ,(if (eq s '*) s (1- (ash 1 s))))))
 
 ;; set by unixport/init_kcl.lsp
 ;; warn if a file was comopiled in another version

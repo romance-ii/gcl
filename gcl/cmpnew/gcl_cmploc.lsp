@@ -440,7 +440,7 @@
 		   (wt cast (setq p "object_to_") (if pp "pointer" "dcomplex"))))
 	     (wt (or (setq p (cdr (assoc tt +to-c-var-alist+ :test 'type<=))) cast))));FIXME prune to-c list
 	  ((eq tt #tt) (wt (or (setq p (cdr (assoc ft +wt-c-var-alist+))) "")))
-	  ((and (type>= #tfixnum tt) (type>= tt ft)))
+	  ((and (type>= #tint tt) (type>= tt ft)))
 	  ((and (type>= #tcnum tt) (type>= #tcnum ft)) (wt cast))
 	  ((baboon)))
 
