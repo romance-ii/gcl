@@ -709,13 +709,13 @@ unexec (char *new_name, char *old_name, unsigned int data_start, unsigned int bs
      extra careful to use the correct value of sbrk(0) after
      allocating all buffers in the code below, which we aren't.  */
   old_file_size = stat_buf.st_size;
-  old_base = mmap (NULL, old_file_size, PROT_READ | PROT_WRITE,
-		   MAP_ANON | MAP_PRIVATE, mmap_fd, 0);
+  old_base = mmap (NULL, old_file_size, PROT_READ,MAP_SHARED, old_file, 0);
   if (old_base == MAP_FAILED)
     fatal ("Can't allocate buffer for %s\n", old_name);
 
-  if (read (old_file, old_base, stat_buf.st_size) != stat_buf.st_size)
-    fatal ("Didn't read all of %s: errno %d\n", old_name, errno);
+  /* errno=0; */
+  /* if (read (old_file, old_base, stat_buf.st_size) != stat_buf.st_size) */
+  /*   fatal ("Didn't read all of %s: errno %d\n", old_name, errno); */
 
   /* Get pointers to headers & section names */
 
@@ -824,8 +824,7 @@ unexec (char *new_name, char *old_name, unsigned int data_start, unsigned int bs
   if (ftruncate (new_file, new_file_size))
     fatal ("Can't ftruncate (%s): errno %d\n", new_name, errno);
 
-  new_base = mmap (NULL, new_file_size, PROT_READ | PROT_WRITE,
-		   MAP_ANON | MAP_PRIVATE, mmap_fd, 0);
+  new_base = mmap (NULL, new_file_size, PROT_READ | PROT_WRITE,MAP_SHARED, new_file, 0);
   if (new_base == MAP_FAILED)
     fatal ("Can't allocate buffer for %s\n", old_name);
 
@@ -1360,14 +1359,10 @@ unexec (char *new_name, char *old_name, unsigned int data_start, unsigned int bs
 
   /* Write out new_file, and free the buffers.  */
 
-  if (write (new_file, new_base, new_file_size) != new_file_size)
-#ifndef emacs
-    fatal ("Didn't write %d bytes: errno %d\n",
-	   new_file_size, errno);
-#else
-    fatal ("Didn't write %d bytes to %s: errno %d\n",
-	   new_file_size, new_base, errno);
-#endif
+  /* if (write (new_file, new_base, new_file_size) != new_file_size) */
+  /*   fatal ("Didn't write %d bytes to %s: errno %d\n", */
+  /* 	   new_file_size, new_base, errno); */
+
   munmap (old_base, old_file_size);
   munmap (new_base, new_file_size);
 

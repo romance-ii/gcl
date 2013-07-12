@@ -54,6 +54,12 @@ are understood:
 Call read and then eval on the
 .I command passed in.
 .TP
+.B \-\-
+.RB
+Stop processing arguments, setting si::*command-args* to a list
+containing the arguments after the
+.BR \-\- .
+.TP
 .BR \-load\ pathname
 .RB
 Load the file whose
@@ -62,11 +68,11 @@ is specified after
 .BR \-load .
 .TP
 .B \-f
-Replace si::*command-args* by the the list starting after
-.BR \-f .
 Open the file following
 .BR \-f  for input, skip the first line, and
-then read and eval the rest of the forms in the file.   This can
+then read and eval the rest of the forms in the file.
+Replaces si::*command-args* by the the list starting after
+.BR \-f .   This can
 be used as with the shells to write small shell programs:
 
 .LP

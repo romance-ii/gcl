@@ -129,11 +129,15 @@
         (/ nil) (// nil) (/// nil))
     (setq *lisp-initialized* t)
     (catch *quit-tag*
-      (cond
-       (*multiply-stacks* (setq *multiply-stacks* nil))
-       ((probe-file "init.lsp") (load "init.lsp")))
-      (let (*load-verbose*) (process-some-args *command-args*))
-      (and (functionp *top-level-hook*)(funcall *top-level-hook*)))
+      (progn 
+	(cond
+	 (*multiply-stacks* (setq *multiply-stacks* nil))
+	 ((probe-file "init.lsp") (load "init.lsp"))))
+      (and (functionp *top-level-hook*)(funcall   *top-level-hook*)))
+
+    (when (boundp '*system-banner*)
+      (format t *system-banner*)
+      (format t "Temporary directory for compiler files set to ~a~%" *tmp-dir*))
 
     (loop
      (when 
@@ -234,22 +238,41 @@
 
 (defun top-level nil (gcl-top-level))
 
-(defun process-some-args (args)
-  (loop
-   (let ((x (car args))
-	 y)
-     (cond ((equal x "-load")
-	    (load (second args)))
-	   ((equal x "-eval")
-	    (eval (read-from-string (second args))))
-	   (t (setq y t)))
-     (or y (setq args (cdr args)))
-     (setq args (cdr args)))
-   (or args (return nil))))  
-  
+(defun set-dir (sym val)
+   (let ((tem (or val (and (boundp sym) (symbol-value sym)))))
+      (if tem (set sym (coerce-slash-terminated tem)))))
 
+(defvar *error-p* nil)
 
+(defun process-some-args (args &optional compile &aux *load-verbose*)
+  (when args
+    (let ((x (pop args)))
+      (cond ((equal x "-load") (load (pop args)))
+	    ((equal x "-eval") (eval (read-from-string (pop args))))
+	    ((equal x "-batch") (setq *top-level-hook* 'bye))
+	    ((equal x "-o-file") (unless (read-from-string (car args))
+				   (push (cons :o-file nil) compile)
+				   (pop args)))
+	    ((equal x "-h-file") (push (cons :h-file t) compile))
+	    ((equal x "-data-file") (push (cons :data-file t) compile))
+	    ((equal x "-c-file") (push (cons :c-file t) compile))
+	    ((equal x "-system-p") (push (cons :system-p t) compile))
+	    ((equal x "-compile") (push (cons :compile (pop args)) compile))
+	    ((equal x "-o") (push (cons :o (pop args)) compile))
+	    ((equal x "-libdir") (set-dir '*lib-directory* (pop args)))
+	    ((equal x "-dir") (set-dir '*system-directory* (pop args)))
+	    ((equal x "-f") (do-f (car (setq *command-args* args))))
+	    ((equal x "--") (setq *command-args* args args nil))))
+    (process-some-args args compile))
 
+  (when compile
+    (let* (*break-enable* 
+	   (file (cdr (assoc :compile compile)))
+	   (o (cdr (assoc :o compile)))
+	   (compile (remove :o (remove :compile compile :key 'car) :key 'car))
+	   (compile (cons (cons :output-file (or o file)) compile))
+	   (result (system:error-set `(apply 'compile-file ,file ',(mapcan (lambda (x) (list (car x) (cdr x))) compile)))))
+      (bye (if (or *error-p* (equal result '(nil))) 1 0)))))
 
 (defun dbl-read (&optional (stream *standard-input*) (eof-error-p t) (eof-value nil))
 
@@ -819,31 +842,8 @@ First directory is checked for first name and all extensions etc."
 
 ;(eval-when (compile) (proclaim '(optimize (safety 0))) )
 (defvar si::*command-args* nil)
-(defun si::get-command-arg (a &optional val-if-there &aux (v *command-args*))
-  (declare (string a))
-  ;; return non nil if annnnxu is in si::*command-args* and return
-  ;; the string which is after it if there is one"
-  (loop
-    (setq v (cdr v))
-    (or v (return nil))
-    (let ((str (car v)))
-      (declare (string str))
-;;FIXME  equal on strings should compile to something like this by itself
-      (if (and (= (length str) (length a))
-	       (or (= (length str) 0) (eql  (aref str 0) (aref a 0)))
-	       (or (= (length str) 1) (eql  (aref str 1) (aref a 1)))
-	       (equal str a))
-	  (return
-	   (cond (val-if-there)
-		 ((cadr v)(values (cadr v) (cdr v)))
-		 (t t)))))))
 
-; (let ((tem (member a si::*command-args* :test 'equal)))
-;    (if tem (or  val-if-there (cadr tem) t))))
-
-(defun set-dir (sym flag)
-   (let ((tem (or (si::get-command-arg flag) (and (boundp sym) (symbol-value sym)))))
-      (if tem (set sym (si::coerce-slash-terminated tem)))))
+(defvar *tmp-dir*)
 
 (defun get-temp-dir ()
   (dolist (x `(,@(mapcar 'si::getenv '("TMPDIR" "TMP" "TEMP")) "/tmp" ""))
@@ -867,14 +867,12 @@ First directory is checked for first name and all extensions etc."
 
 (defvar *tmp-dir*)
 
-(defun set-up-top-level ( &aux (i (argc)) tem)
+(defun set-up-top-level (&aux (i (argc)) tem)
   (declare (fixnum i))
   (reset-lib-syms)
-  (loop (setq i (- i 1))
-	(cond ((< i 0)(return nil))
-	      (t (setq tem (cons (argv i) tem)))))
-  (setq *command-args* tem)
   (setq *tmp-dir* (get-temp-dir))
+  (dotimes (j i) (push (argv j) tem))
+  (setq *command-args* (nreverse tem))
   (setq tem *lib-directory*)
   (let ((dir (getenv "GCL_LIBDIR")))
     (unless (set-dir '*lib-directory* "-libdir")
