@@ -1585,9 +1585,10 @@
 
 (defun global-type-bump (tp)
   (let* ((mv (cmpt tp))
-	 (tpp (if mv (coerce-to-one-value tp) tp))
-	 (tppn (car (member (nil-to-t tpp) `(,@+c-global-arg-types+ ,#tt ,#t*) :test 'type<=))));FIXME
-    (if mv (cmp-norm-tp `(,(car tp) ,tppn ,@(cddr tp))) tppn)))
+	 (tpp (nil-to-t (if mv (coerce-to-one-value tp) tp)))
+	 (tppn (car (member tpp `(,@+c-global-arg-types+ ,#tt ,#t*) :test 'type<=))));FIXME
+    (if mv (cmp-norm-tp `(,(car tp) ,@(when (cdr tp) `(,tppn)) ,@(cddr tp))) tppn)))
+
 
 (defun t2defun (fname cfun lambda-expr doc sp)
   (declare (ignore cfun lambda-expr doc sp))
