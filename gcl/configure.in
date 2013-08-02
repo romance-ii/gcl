@@ -27,7 +27,7 @@ AC_DEFINE_UNQUOTED(VSSIZE,$enable_vssize,[value stack size])
 
 AC_ARG_ENABLE(bdssize,
 [ --enable-bdssize=XXXX  will compile in a binding stack of size XXX],
-,enable_bdssize=2048)
+,enable_bdssize=4096)
 AC_DEFINE_UNQUOTED(BDSSIZE,$enable_bdssize,[binding stack size])
 
 

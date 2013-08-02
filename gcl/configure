@@ -2553,7 +2553,7 @@ _ACEOF
 if test "${enable_bdssize+set}" = set; then :
   enableval=$enable_bdssize;
 else
-  enable_bdssize=2048
+  enable_bdssize=4096
 fi
 
 
