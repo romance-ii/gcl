@@ -164,6 +164,8 @@
     bit))
 
 (defun array-in-bounds (i) (apply 'array-in-bounds-p *array* i))
+(declaim (inline array-in-bounds))
+
 
 (defun array-row-major-index (array &rest indices)
   (declare (:dynamic-extent indices)(optimize (safety 2)))
@@ -214,6 +216,7 @@
 (defvar *dim* nil)
 
 (defun array-dimension-index-less-than-rank (i) (< i *dim*))
+(declaim (inline array-dimension-index-less-than-rank))
 
 (defun array-dimension (x i)
   (declare (optimize (safety 2)))
