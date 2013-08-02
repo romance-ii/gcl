@@ -48,3 +48,7 @@ typedef struct
   } _mp_algdata;
 } __gmp_randstate_struct;
 typedef __gmp_randstate_struct gmp_randstate_t[1];
+
+#define mpz_sgn(x_)  ((x_)->_mp_size < 0 ? -1 : (x_)->_mp_size > 0)
+#define mpz_odd_p(x_)  (((x_)->_mp_size != 0) & ((int) ((x_)->_mp_d[0])))
+#define mpz_even_p(x_)  (! (((x_)->_mp_size != 0) & ((int) ((x_)->_mp_d[0]))))
