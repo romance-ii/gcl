@@ -378,8 +378,9 @@
 (defun repeatable-var-binding (form)
   (case (car form)
 	(var form)
-	(lit (unless (member-if (lambda (x) (when (stringp x) (>= (si::string-match #v"[a-zA-Z0-9]+\\(" x) 0))) form)
-	       form))))
+	;; (lit (unless (member-if (lambda (x) (when (stringp x) (>= (si::string-match #v"[a-zA-Z0-9]+\\(" x) 0))) form)
+	;;        form))
+	))
 
 (defun push-vbind (var form &aux (s (tmpsym))(i (cadr (repeatable-var-binding form))))
   (when (eq 'lexical (var-kind var))
