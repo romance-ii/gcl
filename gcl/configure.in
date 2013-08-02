@@ -328,8 +328,8 @@ if test "x$enable_machine" != "x" ; then
 fi
 
 def_dlopen="no"
-def_statsysbfd="yes"
-def_custreloc="no"
+def_statsysbfd="no"
+def_custreloc="yes"
 def_locbfd="no"
 def_pic="no";
 def_static="no";
@@ -809,8 +809,6 @@ if test "$NEED_LOCAL_GMP" != "" ; then
 		MPFILES=gmp_all
 	fi
 
-else
-	cp /usr/include/gmp.h h/gmp.h
 fi
 
 AC_MSG_CHECKING([for size of gmp limbs])
