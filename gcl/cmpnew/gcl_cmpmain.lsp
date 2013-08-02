@@ -479,6 +479,15 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	(t (error "can't compile ~a" name))))
 
 
+(defun vec-to-list (x)
+  (typecase
+   x
+   (string (if (find-if-not 'standard-char-p x) "fasl code" x))
+   (vector (vec-to-list (coerce x 'list)))
+   (cons (let ((a (vec-to-list (car x)))(d (vec-to-list (cdr x))))
+	   (if (and (eq a (car x)) (eq d (cdr x))) x (cons a d))))
+   (otherwise x)))
+
 (defun disassemble (name &optional (asm t) file &aux tem)
   (check-type name (or function function-identifier))
   (cond ((and (consp name)
@@ -512,12 +521,14 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 					 a))))
 			     (si::copy-stream st *standard-output*))
 	     (with-open-file (st dn)
-			     (do (form) ((eq 'eof (setq form (read st nil 'eof)))) (princ form)))
+			     (princ
+			      (let (f) (do nil ((eq 'eof (car (push (read st nil 'eof) f))) 
+						(vec-to-list (nreverse (cdr f))))))))
 ;			     (si::copy-stream st *standard-output*))
 	     (with-open-file (st hn)
 			     (si::copy-stream st *standard-output*))
-	     (when asm (system (si::string-concatenate "objdump --source "
-					     (namestring on))))
+	     (when asm (si::copy-stream (open (concatenate 'string "|objdump --source " (namestring on)))
+					*standard-output*))
 	     (delete-file cn)
 	     (delete-file dn)
 	     (delete-file hn)
