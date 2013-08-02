@@ -558,36 +558,39 @@
 	 (apply 'format t ,control-string arguments)
 	 *format-unused-args*))))
 
+(defun stream-external-format (s)
+  (declare (optimize (safety 1)))
+  (check-type s stream)
+  :default)
+
 ;;; copied from ECL under LGPL by Michael Koehne
 ;;;    with-standard-io-syntax
 
+
 (defmacro with-standard-io-syntax (&body body)
-  "Syntax: ({forms}*)
-The forms of the body are executed in a print environment that corresponds to
-the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
-*package* is \"CL-USER\", etc."
   (declare (optimize (safety 2)))
-  `(let*((*package* (find-package :cl-user))
-	 (*print-array* t) ;; print-array -> core dampft
-	 (*print-base* 10)
-	 (*print-case* :upcase)
-	 (*print-circle* nil)
-	 (*print-escape* t)
-	 (*print-gensym* t)
-	 (*print-length* nil)
-	 (*print-level* nil)
-	 (*print-lines* nil)
-	 (*print-miser-width* nil)
-	 (*print-pretty* nil)
-	 (*print-radix* nil)
-	 (*print-readably* t)
-	 (*print-right-margin* nil)
-	 (*read-base* 10)
-	 (*read-default-float-format* 'single-float)
-	 (*read-eval* t)
-	 (*read-suppress* nil)
-	 (*readtable* (copy-readtable (si::standard-readtable))))
-    ,@body))
+  `(let* ((*package* (find-package :cl-user))
+	  (*print-array* t)
+	  (*print-base* 10)
+	  (*print-case* :upcase)
+	  (*print-circle* nil)
+	  (*print-escape* t)
+	  (*print-gensym* t)
+	  (*print-length* nil)
+	  (*print-level* nil)
+	  (*print-lines* nil)
+	  (*print-miser-width* nil)
+	  (*print-pprint-dispatch* *print-pprint-dispatch*);FIXME
+	  (*print-pretty* nil)
+	  (*print-radix* nil)
+	  (*print-readably* t)
+	  (*print-right-margin* nil)
+	  (*read-base* 10)
+	  (*read-default-float-format* 'single-float)
+	  (*read-eval* t)
+	  (*read-suppress* nil)
+	  (*readtable* (copy-readtable (si::standard-readtable))));FIXME copy?
+     ,@body))
 
 (defmacro print-unreadable-object
 	  ((object stream &key type identity) &body body)
@@ -736,8 +739,6 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
   
   (when etp (setq element-type (restrict-stream-element-type element-type)))
   (open-int f direction element-type if-exists iesp if-does-not-exist idnesp external-format))
-
-
 (defun load (f &rest args)
   (values (apply 'load1 f args)))
 
