@@ -103,8 +103,10 @@
 (setf (get 'mtv 'compiler::cmp-inline) t)
 
 		       
-(defun vtp (tp &aux (tp (cadr tp)))
-  (or (eql 1 tp) (unless (atom tp) (not (cdr tp)))))
+(defun vtp (tp &aux (dims (cadr tp)))
+  (cond ((eql 1 dims) `(,(car tp) *))
+	((or (atom dims) (cdr dims)) nil)
+	(tp)))
 (setf (get 'vtp 'compiler::cmp-inline) t)
 
 (defun valid-class-name (class &aux (name (si-class-name class)))
@@ -126,11 +128,19 @@
 			 signed-byte))
  (defconstant +rr+ (lremove-if (lambda (x) (type-and (cmp-norm-tp '(or complex array)) (cmp-norm-tp (car x)))) +r+)))
 
+ (eval-when (eval compile) (defun tpc (&rest x) (tps-ints (type-and-list (mapcar 'cmp-norm-tp x)) (cdr (assoc 'tp7 +rs+)))))
+
 #.`(defun typep (o otp &optional env &aux (lp (listp otp)))
      (declare (ignore env))
-     (labels ((tpi (o ctp tp &aux (ctp (if (when (eq ctp 'array) (vtp tp)) 'vector ctp)))
-		   (when (or (eq ctp 'values) (when tp (eq ctp 'function)))
-		     (error 'type-error :datum (cons ctp tp) :expected-type 'type-spec))
+     (unless ;Cannot use check-type here
+	 (case (tp7 otp)
+	       (,(tpc 'std-instance) (si-classp otp))
+	       (,(tpc 'symbol) (not (eq otp 'values)))
+	       (,(tpc 'cons) (unless (improper-consp otp) 
+			       (case (car otp) (function (not (cdr otp)))(values nil)(otherwise t))))
+	       (,(tpc 'structure) t))
+       (error 'type-error :datum otp :expected-type 'type-spec))
+     (labels ((tpi (o ctp tp &aux (ntp (when (eq ctp 'array) (vtp tp)))(ctp (if ntp 'vector ctp))(tp (or ntp tp)))
 		   (case ctp
 			 ,@(mapcar (lambda (x &aux (c (if (atom x) x (car x)))) 
 				     `(,c ,(cfn c (mksubb 'o 'tp c)))) (append +s+ +rr+))
@@ -139,8 +149,8 @@
 			 (complex (mtc o tp))
 			 (vector (mtv o tp))
 			 (array (mta o tp))
-			 (or (when tp (or (typep o (car tp)) (tpi o 'or (cdr tp)))))
-			 (and (if tp (and (typep o (car tp)) (tpi o 'and (cdr tp))) t))
+			 (or (when tp (or (typep o (car tp)) (tpi o ctp (cdr tp)))))
+			 (and (if tp (and (typep o (car tp)) (tpi o ctp (cdr tp))) t))
 			 (not (not (typep o (car tp))))
 			 (satisfies (when (funcall (car tp) o) t))
 			 ((nil t) (when ctp t));FIXME ctp not inferred here
