@@ -43,6 +43,8 @@
 (setf (get 'sdata-included 'compiler::cmp-inline) t)
 (defun sdata-name (x)
   (the symbol (*object (c-structure-self x) 0 nil nil)));FIXME s-data-name boostrap loop
+(defun sdata-type (x)
+  (the symbol (*object (c-structure-self x) 16 nil nil)));FIXME s-data-name boostrap loop
 (setf (get 'sdata-name 'compiler::cmp-inline) t)
 
 ;; (defun mss (o sn) (or (eq o sn) (when (sdata-included sn) (let ((o (sdata-includes o))) (when o (mss o sn))))))

@@ -1420,8 +1420,7 @@
 
 (defun expand-deftype (type &aux (atp (listp type)) (ctp (if atp (car type) type)) (tp (when atp (cdr type))))
   (cond ((unless (symbolp ctp) (si-classp ctp)) (or (valid-class-name ctp) `(std-instance ,ctp)));FIXME classp loop, also accept s-data?
-;	((setq tem (get ctp 's-data)) `(structure ,tem))
-	((get ctp 's-data) (cons 'structure (get-included ctp)))
+	((let ((tem (get ctp 's-data))) (when tem (null (sdata-type tem)))) (cons 'structure (get-included ctp)))
 	((let ((tem (get ctp 'deftype-definition)))
 	   (when tem
 	     (let ((ntype (apply tem tp)))
