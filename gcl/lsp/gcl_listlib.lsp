@@ -560,17 +560,24 @@
 	      ((setq st (cons tr st) cs (cons g cs) tr (car tr)))))))
 
 (defun append (&rest l &aux r rp)
-  (declare (optimize (safety 2))(:dynamic-extent l))
+  (declare (:dynamic-extent l))
   (mapl (lambda (x &aux (y (car x)))
+	  (declare (optimize (safety 2)))
 	  (if (cdr x)
 	      (mapc (lambda (x) (collect r rp (cons x nil))) y)
 	    (collect r rp y))) l) r)
 
 (defun revappend (list tail)
-  (declare (optimize (safety 2)))
+  (declare (optimize (safety 1)))
   (check-type list proper-list)
-  (do (cdp (p tail)(pp list)) ((endp pp) p)
-      (setq cdp (cdr pp) p (cons (car pp) p) pp cdp)))
+  (mapc (lambda (x) (setq tail (cons x tail))) list)
+  tail)
+
+;; (defun revappend (list tail)
+;;   (declare (optimize (safety 2)))
+;;   (check-type list proper-list)
+;;   (do (cdp (p tail)(pp list)) ((endp pp) p)
+;;       (setq cdp (cdr pp) p (cons (car pp) p) pp cdp)))
 
 (defun not (x)
   (if x nil t))

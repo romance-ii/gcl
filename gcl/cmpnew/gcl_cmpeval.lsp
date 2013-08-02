@@ -754,9 +754,10 @@
   (labels ((f (x y) (when (consp x) (eq (car x) y)))
 	   (ff (x) (when (f x 'safety) 
 		     (when (> (cadr x) lev)
-		       (keyed-cmpnote (list l 'inline 'safety)
-				      "Reducing safety of ~s from ~s to ~s on inline" 
-				      fun (cadr x) lev) t))))
+		       (unless (when (listp fun) (eq (car fun) 'lambda))
+			 (keyed-cmpnote (list l 'inline 'safety)
+					"Reducing safety of ~s from ~s to ~s on inline" 
+					fun (cadr x) lev) t)))))
 	  (multiple-value-bind
 	   (doc decl ctps body)
 	   (parse-body-header form)
