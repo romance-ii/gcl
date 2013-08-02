@@ -457,7 +457,7 @@
 
 (deftype complex (&optional (rp 'real)) `(complex ,(if (eq rp '*) 'real rp)))
 (deftype cons (&optional (car t) (cdr t)) `(cons ,(if (eq car '*) t car)  ,(if (eq cdr '*) t cdr)))
-(deftype structure-object nil `(structure))
+;(deftype structure-object nil `(structure))
 ;(deftype logical-pathname nil `(and pathname (satisfies logical-pathname-p)))
 (deftype pathname () `(or non-logical-pathname logical-pathname))
 
@@ -1442,6 +1442,7 @@
 		   (d (if (cdr tp) (normalize-type (cadr tp)) def)))
 	      (if (when (cdr tp) (and (eq a (car tp)) (eq d (cadr tp)))) type (list ctp a d))))
 	   (,(lremove-if (lambda (x) (member x '(null true))) +singleton-types+) (if lp type (list type)))
+	   (structure-object `(structure))
 	   (satisfies (if (get (car tp) 'predicate-type) (list (get (car tp) 'predicate-type)) type));FIXME
 	   (not	 (let ((x (normalize-type (car tp))))
 		   (if (atom x) (cons 'not x)
