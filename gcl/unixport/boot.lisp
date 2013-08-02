@@ -5,16 +5,17 @@
   (declaim (optimize (safety 3)))
   (unless (fboundp 'logandc2) (defun logandc2 (x y) (boole boole-andc2 x y)))
   (unless (fboundp 'lognot) (defun lognot (x) (boole boole-c1 x 0)))
-  (defun mc nil (si::make-anonymous-closure))
-;  (compile 'compiler::function-symbol)
-;  (mapc 'compile 'si::(funid-sym funid-sym-p funid funid-p funid-to-sym tpi ibb ib <= typep < > >= + - set-array concatenate))
-  (mapc 'compile 'si::(listp typep ibb ib <= coerce < > >= + - set-array concatenate mta mtv eql-is-eq))
-  (mapc 'compile '(info-p info-ref info-type info-flags info-ch info-ref-ccb info-ref-clb c1constant-value-object))
-  (mapc 'compile '(var-p var-name var-kind var-ref var-ref-ccb var-loc var-dt var-type var-mt var-tag var-store))
-  (mapc 'compile '(c-array-rank c-array-dim c-array-elttype c-array-eltsize c-array-self c-array-hasfillp))
-  (setf (symbol-function 'array-rank) (symbol-function 'c-array-rank)
-	(symbol-function 'array-total-size) (symbol-function 'c-array-dim))
-  (mapc 'compile '(array-dimension array-row-major-index row-major-aref si::row-major-aset aref si::aset array-has-fill-pointer-p length)))
+  (defun mc nil (si::make-anonymous-closure)))
+
+(mapc 'compile (nconc #-pre-gcl '(mapcar mapc mapl maplist)
+		      'si::(listp typep ibb ib <= coerce < > >= + - set-array concatenate mta mtv eql-is-eq)
+		      '(info-p info-ref info-type info-flags info-ch info-ref-ccb info-ref-clb c1constant-value-object
+			     var-p var-name var-kind var-ref var-ref-ccb var-loc var-dt var-type var-mt var-tag var-store
+			     c-array-rank c-array-dim c-array-elttype c-array-eltsize c-array-self c-array-hasfillp
+			     array-dimension array-row-major-index row-major-aref si::row-major-aset aref si::aset 
+			     array-has-fill-pointer-p length)))
+(setf (symbol-function 'array-rank) (symbol-function 'c-array-rank)
+      (symbol-function 'array-total-size) (symbol-function 'c-array-dim))
 
 (in-package :user)
 
