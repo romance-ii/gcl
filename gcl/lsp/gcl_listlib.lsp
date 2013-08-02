@@ -191,9 +191,9 @@
   (let ((q (when r (make-list (length r)))))
     (declare (:dynamic-extent q))
     (labels ((a-cons (x) (check-type x list) (or x (return-from mapl list)))
-	     (lmap (f x &optional (h x)) (cond (x (funcall f x) (lmap f (cdr x) h)) (h)))
-	     (last nil (lmap (lambda (x) (rplaca x (if r (a-cons (pop r)) (a-cons (cdar x))))) q)))
-	    (lmap (lambda (x) (apply fun x (last))) list))))
+	     (lmap (f x h) (cond (x (funcall f x) (lmap f (cdr x) h)) (h)))
+	     (last nil (lmap (lambda (x) (rplaca x (if r (a-cons (pop r)) (a-cons (cdar x))))) q q)))
+	    (lmap (lambda (x) (apply fun x (last))) list list))))
 
 ;; (defun mapl (fd list &rest r &aux (fun (coerce fd 'function)))
 ;;   (declare (optimize (safety 1))(:dynamic-extent r)(notinline make-list));FIXME
