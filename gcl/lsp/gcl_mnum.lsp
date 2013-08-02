@@ -22,7 +22,7 @@
     `(progn
        (defdlfun (:float    ,(strcat "f" x "f") ) :float)
        (defdlfun (:double   ,(strcat "f" x)     ) :double)
-       (defdlfun (:fixnum   ,x                  ) :fixnum)
+       (defdlfun (:fixnum   ,(strcat "l" x)     ) :fixnum)
        (defdlfun (:float    ,(strcat "c" x "f") ) :fcomplex)
        (defdlfun (:double   ,(strcat "c" x)     ) :dcomplex))))
 
@@ -89,7 +89,7 @@
 	     body)))))
 
  (defmacro defmabs (x &optional n)
-   (let* ((i (mdlsym x))
+   (let* ((i (mdlsym (string-concatenate "l" x)))
 	  (b (mdlsym (string-concatenate "f" x)))
 	  (f (mdlsym (string-concatenate "f" x "f")))
 	  (c (mdlsym (string-concatenate "c" x)))
