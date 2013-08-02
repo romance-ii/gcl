@@ -16,7 +16,7 @@
 
 (defun character-designator-p (s)
   (or (typep s 'fixnum)
-      (= (stdesig-fillp s) 1)))
+      (= (c-stdesig-sdfillp s) 1)))
 
 (deftype character-designator nil `(and string-designator (satisfies character-designator-p)))
 (deftype string-designator    nil `(or string symbol character (integer 0 255)))
@@ -189,7 +189,7 @@
   (typecase d
 	    (unsigned-char
 	     (let ((b #.(1- (integer-length (- (address #\^A) (address #\^@))))))
-	       (the character (nani (+ (address #\^@) (ash d b))))))));FIXME
+	       (the character (nani (c+ (address #\^@) (ash d b))))))));FIXME
 
 
 (defchr char=  (= address))
