@@ -978,7 +978,8 @@
 
   (when (and (eq (car form1) 'var)
 	     (or (eq (car name1) (caaddr form1))
-		 (and (eq (var-store (car name1)) (var-store (caaddr form1)))
+		 (and (var-store (car name1))
+		      (eq (var-store (car name1)) (var-store (caaddr form1)))
 		      (not (eq +opaque+ (var-store (car name1)))))))
     (return-from c1setq1 form1))
 
@@ -1191,7 +1192,7 @@
 
 (defun c2setq (vref form c1fv &aux (v (car vref)))
   (declare (ignore c1fv))
-  (cond ((or (eq t (var-ref v)) (consp (var-ref v)) (var-cb v) (eq (var-kind v) 'global));FIXME
+  (cond ((or (eq t (var-ref v)) (consp (var-ref v)) (var-cb v) (member (var-kind v) '(special global)));FIXME
 	 (push 'var vref)
 	 (let ((*value-to-go* vref)) (c2expr* form))
 	 (case (car form)
