@@ -531,11 +531,11 @@
 
 
 
-;;si::FILL-POINTER-INTERNAL
- (push '((t) seqind #.(flags rfa)"((#0)->v.v_fillp)")
-   (get 'si::fill-pointer-internal 'inline-unsafe))
- (push '((vector) seqind #.(flags rfa)"((#0)->v.v_fillp)")
-   (get 'si::fill-pointer-internal 'inline-always))
+;; ;;si::FILL-POINTER-INTERNAL
+;;  (push '((t) seqind #.(flags rfa)"((#0)->v.v_fillp)")
+;;    (get 'si::fill-pointer-internal 'inline-unsafe))
+;;  (push '((vector) seqind #.(flags rfa)"((#0)->v.v_fillp)")
+;;    (get 'si::fill-pointer-internal 'inline-always))
 
 ;;ARRAY-HAS-FILL-POINTER-P
  (push '((t) boolean #.(flags rfa)"((#0)->v.v_hasfillp)")

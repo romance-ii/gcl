@@ -34,7 +34,7 @@
 	     (((array)  seqind) . array-total-size)
 	     (((array)  symbol) . array-element-type)
 	     (((array)  rnkind) . array-rank)
-	     (((vector) seqind) . si::fill-pointer-internal)
+;	     (((vector) seqind) . si::fill-pointer-internal)
 	     (((string) symbol) . make-symbol)
 ;	     (((integer integer) integer) . ash)
 	     (((float) (returns-exactly (integer 0) fixnum (member 1 -1))) . integer-decode-float);fixme
