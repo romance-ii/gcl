@@ -3,6 +3,7 @@
 ;; (export '(function-lambda-expression))
 
 (in-package :si)
+(export 'fle)
 
 ;; (export '(blocked-body-name parse-body-header))
 
@@ -77,6 +78,14 @@
     (when (vectorp ss)
       (close-fasd ss))
     out))
+
+(defun fle (x) 
+  (typecase
+   x
+   (function (function-lambda-expression x))
+   (symbol (when (fboundp x) (unless (special-operator-p x)
+			       (unless (macro-function x) (function-lambda-expression (symbol-function x))))))))
+
 
 (defun function-lambda-expression (y &aux z) 
   (declare (optimize (safety 1)))

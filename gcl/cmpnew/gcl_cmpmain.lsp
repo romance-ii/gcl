@@ -892,9 +892,3 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 (defun cdebug (&optional a) 
   (setq *default-system-p* t *default-c-file* t *default-data-file* t *default-h-file* t *keep-gaz* a *annotate* a))
 
-(defun fle (x) 
-  (typecase
-   x
-   (function (function-lambda-expression x))
-   (symbol (when (fboundp x) (unless (special-operator-p x)
-			       (unless (macro-function x) (function-lambda-expression (symbol-function x))))))))
