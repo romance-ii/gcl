@@ -505,6 +505,11 @@
 
 (in-package :si)
 
+(unless (member :pre-gcl *features*);FIXME
+  (or (find-package :lib) (make-package :lib))
+  (or (find-symbol "libm" :lib) (make-package (intern "libm" :lib)))
+  (or (find-symbol "libc" :lib) (make-package (intern "libc" :lib)))
+  (or (find-symbol "libgmp" :lib) (make-package (intern "libgmp" :lib))))
 (use-package :s)
 
 (let ((l (package-used-by-list (find-package :old-lisp))))
@@ -572,8 +577,8 @@
 
 (in-package :s)
 (si::import-internal 'si::(\| & ^ ~ c+ c* << >> 
-			   c-fixnum-== c-float-== c-double-== c-fcomplex-== c-dcomplex-== fcomplex dcomplex
-			   string-concatenate strcat lit seqind fixnum-length char-length cref address 
+			   c-object-== c-fixnum-== c-float-== c-double-== c-fcomplex-== c-dcomplex-== fcomplex dcomplex
+			   string-concatenate strcat lit seqind fixnum-length char-length cref address short int
 			   package-internal package-external array-dims cmp-norm-tp tp0 tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8))
 ;(si::import-internal 'compiler::(lisp-type cmp-norm-tp fsf))
 (export '(lisp-type defdlfun strcat))
@@ -619,4 +624,3 @@
   (in-package :user))
 
 (si::import-internal 'si::while)
-
