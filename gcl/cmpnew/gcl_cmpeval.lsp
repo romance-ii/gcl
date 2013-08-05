@@ -1370,6 +1370,8 @@
     (cond ((setq fm (type-fm fun fms)) (known-type-p fm))
 	  ((< (cons-count src) 100))
 	  ((not (symbolp fun)))
+	  ((let* ((n (symbol-package fun))(n (when n (package-name n)))(p (find-package :lib))) 
+	     (when n (or (when p (find-symbol n p)) (string-equal "S" n)))));FIXME
 	  ((local-fun-p fun))
 	  ((intersection '(&key &rest) (cadr src)))
 	  ((member-if-not (lambda (x) (type>= (car x) (cdr x))) 
