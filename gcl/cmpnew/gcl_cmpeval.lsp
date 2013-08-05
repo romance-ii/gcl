@@ -1210,10 +1210,14 @@
      (incf (cadr dd) end)
      res))
      
-(defun mi4 (fn args la src env inls &aux *callees*)
-  (let* (;(*compiler-check-args* (>= (this-safety-level) 2))
-	 (src (assert-safety fn (blla (cadr src) args la (cddr src)))))
-      (c1inline (list (cons fn (append args la)) src) env inls)))
+(defun mi4 (fn args la src env inls)
+  (c1inline (list (cons fn (append args la)) 
+		  (assert-safety fn (blla (cadr src) args la (cddr src)))) env inls))
+
+;; (defun mi4 (fn args la src env inls &aux *callees*)
+;;   (let* (;(*compiler-check-args* (>= (this-safety-level) 2))
+;; 	 (src (assert-safety fn (blla (cadr src) args la (cddr src)))))
+;;       (c1inline (list (cons fn (append args la)) src) env inls)))
 
 ;; (defun mi4 (fn args la src env inls &aux *callees*)
 ;;   (let* ((*compiler-check-args* (>= (this-safety-level) 2))
@@ -2056,30 +2060,8 @@
 	       (inline-possible fname)
 	       (funcall (car fd) args))
 	  (funcall (cdr fd) args))
-	 ;; record the call info if we get to here
-	 ;; ((progn
-	 ;;    (and (eq (symbol-package fname) (symbol-package 'and))
-	 ;; 	 (not (fboundp fname))
-	 ;; 	 (cmpwarn "~A (in lisp package) is called as a function--not yet defined"
-	 ;; 		  fname))
-	 ;;    (and *record-call-info* (record-call-info 'record-call-info
-	 ;; 					      fname))
-	 ;;    nil))
-	 ;;continue
 	 ((setq fd (macro-function fname))
 	  (c1expr (cmp-expand-macro-w fd whole)))
-;; 	 ((and nil (setq fd (get fname 'si::structure-access))
-;; 	       (inline-possible fname)
-;;               ;;; Structure hack.
-;; 	       (consp fd)
-;; 	       (si:fixnump (cdr fd))
-;; 	       (not (endp args))
-;; 	       (endp (cdr args)))
-;; 	  (case (car fd)
-;; 		(vector (c1expr `(elt ,(car args) ,(cdr fd))))
-;; ;		(list (c1expr `(si:list-nth ,(cdr fd) ,(car args))))
-;; 		(list (c1expr `(let ((c (nthcdr ,(cdr fd) ,(car args)))) (check-type c cons) (car c))))
-;; 		(t (c1structure-ref1 (car args) (car fd) (cdr fd)))))
 	 ((eq fname 'si:|#,|)
 	  (cmperr "Sharp-comma-macro was found in a bad place."))
 	 ((mi1 fname args)))))

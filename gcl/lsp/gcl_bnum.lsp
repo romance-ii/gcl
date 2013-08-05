@@ -50,7 +50,7 @@
   (typecase
    x
    (real x)
-   (otherwise (complex-real x))))
+   (otherwise (c-ocomplex-real x))))
 
 (defun imagpart (x)
   (declare (optimize (safety 2)))
@@ -58,7 +58,7 @@
   (typecase
    x
    (real (if (floatp x) (float 0 x) 0))
-   (otherwise (complex-imag x))))
+   (otherwise (c-ocomplex-imag x))))
 
 (defun numerator (x)
   (declare (optimize (safety 2)))
@@ -66,7 +66,7 @@
   (typecase
    x
    (integer x)
-   (otherwise (ratio-numerator x))))
+   (otherwise (c-ratio-num x))))
 
 (defun denominator (x)
   (declare (optimize (safety 2)))
@@ -74,4 +74,4 @@
   (typecase
    x
    (integer 1)
-   (otherwise (ratio-denominator x))))
+   (otherwise (c-ratio-den x))))
