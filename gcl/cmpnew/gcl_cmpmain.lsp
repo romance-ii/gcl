@@ -479,6 +479,39 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	(t (error "can't compile ~a" name))))
 
 
+(defvar *codes* '((lambda (x) (code-char x))
+		  (lambda (x) (char-code x))
+		  (lambda (x y) (+ x y))
+		  (lambda (x y) (declare (seqind x y)) (+ x y))
+		  (lambda (x y) (- x y))
+		  (lambda (x y) (declare (seqind x y)) (- x y))
+		  (lambda (x) (- x))
+		  (lambda (x) (declare (seqind x)) (- x))
+		  (lambda (x y) (member x y))
+		  (lambda (x y) (declare (symbol x)) (member x y))
+		  (lambda (f x) (mapl f x))
+		  (lambda (x) (mapc (lambda (x) (1+ x)) x))
+		  (lambda (x) (coerce x 'function))
+		  (lambda (x) (declare (function x)) (coerce x 'function))
+		  (lambda (x) (declare (symbol x)) (coerce x 'function))
+		  (lambda (x y) (eq x y))
+		  (lambda (x y) (eql x y))
+		  (lambda (x y) (declare (symbol x)) (eql x y))
+		  (lambda (x y) (declare (fixnum x)) (eql x y))
+		  (lambda (x y) (declare (symbol x) (fixnum x)) (eql x y))))
+
+
+(defun code-size (f)
+  (let* ((x (with-output-to-string 
+	     (s)
+	     (let ((*standard-output* s))
+	       (disassemble f))))
+	 (b (string-match #v"\n[0-9a-f]* <[^>\n]*>:" x))
+	 (e (string-match #v"\n[0-9a-f]* <[^>\n]*>:" x (match-end 0)))
+	 (x (subseq x b e))(i 0)(zb 0)(ze 0))
+    (do nil ((>= 0 (string-match #v"\n *\([0-9a-f]*\):" x i))) (setq zb (match-beginning 1) ze (match-end 1) i (match-end 0)))
+    (let ((*read-base* 16)) (read-from-string (subseq x zb ze)))))
+
 (defun vec-to-list (x)
   (typecase
    x
