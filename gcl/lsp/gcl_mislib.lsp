@@ -185,7 +185,7 @@
 			((+ x (* 2 (1+ most-positive-fixnum))))))))))
 
 (defun room (&optional x)
-  (declare (ignore x))
+
   (let ((l (room-report));(multiple-value-list (si:room-report)))
         maxpage holepage leftpage ncbpage maxcbpage ncb cbgbccount npage
         rbused rbfree nrbpage rbgbccount
@@ -221,9 +221,9 @@
                      (push (list nfree typename)
                            link-alist))))))
     (terpri)
-    (format t "~@[~2A~]~8@A/~A~14T~6@A%~@[~8@A~]~30T~{~A~^ ~}~%~%" "WS" "UP" "MP" "FI" "GC" '("TYPES"))
+    (format t "~@[~2A~]~8@A/~A~19T~6@A%~@[~8@A~]~35T~{~A~^ ~}~%~%" "WS" "UP" "MP" "FI" "GC" '("TYPES"))
     (dolist (info (reverse info-list))
-      (apply #'format t "~@[~2D~]~8D/~D~14T~6,1F%~@[~8D~]~30T~{~A~^ ~}"
+      (apply #'format t "~@[~2D~]~8D/~D~19T~6,1F%~@[~8D~]~35T~{~A~^ ~}"
              (append (cdr info)
                      (if  (assoc (car info) link-alist)
                           (list (assoc (car info) link-alist))
@@ -231,10 +231,10 @@
       (terpri)
       )
     (terpri)
-    (format t "~10D/~D~19T~@[~8D~]~30Tcontiguous (~D blocks)~%"
+    (format t "~10D/~D~26T~@[~8D~]~35Tcontiguous (~D blocks)~%"
             ncbpage maxcbpage (if (zerop cbgbccount) nil cbgbccount) ncb)
-    (format t "~11T~D~30Thole~%" holepage)
-    (format t "~11T~D~14T~6,1F%~@[~8D~]~30Trelocatable~%~%"
+    (format t "~11T~D~35Thole~%" holepage)
+    (format t "~11T~D~19T~6,1F%~@[~8D~]~35Trelocatable~%~%"
             nrbpage (/ rbused 0.01 (+ rbused rbfree))
             (if (zerop rbgbccount) nil rbgbccount))
     (format t "~10D pages for cells~%" npage)
@@ -245,9 +245,10 @@
     (format t "~10D maximum pages~%" maxpage)
     (values)
     )
-  (format t "~%~%")
-  (format t "Key:~%~%WS: words per struct~%UP: allocated pages~%MP: maximum pages~%FI: fraction of cells in use on allocated pages~%GC: number of gc triggers allocating this type~%~%")
-  (heaprep)
+  (when x
+    (format t "~%~%")
+    (format t "Key:~%~%WS: words per struct~%UP: allocated pages~%MP: maximum pages~%FI: fraction of cells in use on allocated pages~%GC: number of gc triggers allocating this type~%~%")
+    (heaprep))
   (values))
 
 (defvar *call-stack* nil)
