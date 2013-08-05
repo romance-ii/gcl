@@ -88,7 +88,19 @@
 		      (if ,gs ,gs ,form)))))
                ((endp forms) form)))))
 
-(defmacro locally (&rest body)   (declare (optimize (safety 2))) `(let () ,@body))
+(defmacro locally (&rest body)
+  (multiple-value-bind
+   (doc decls ctps body)
+   (parse-body-header body)
+   `(let (,@(mapcan (lambda (x &aux (z (pop x))(z (if (eq z 'type) (pop x) z)))
+		      (case z
+			    ((ftype inline notinline optimize) nil)
+			    (otherwise (mapcar (lambda (x) (list x x)) x))))
+		   (apply 'append (mapcar 'cdr decls))))
+      ,@(when doc (list doc))
+      ,@decls
+      ,@ctps
+      ,@body)))
 
 (defmacro loop (&rest body &aux (tag (sgen "LOOP")))
   (declare (optimize (safety 2)))
