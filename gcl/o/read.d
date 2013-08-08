@@ -31,8 +31,23 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 static object
 current_readtable(void);
 
+DEFVAR("*SHARP-EQ-CONTEXT*",sSAsharp_eq_contextA,SI,sLnil,"");
+
+DEFUN("TYPE_OF",fixnum,fStype_of,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {
+  return type_of(x);
+}
+DEFUN("ALLOC-SPICE",object,fSalloc_spice,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+  return alloc_object(t_spice);
+}
+DEFUN("SPICE-P",object,fSspice_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  return type_of(x)==t_spice ? Ct : Cnil;
+}
+
+DEFVAR("PATCH-SHARP",sSpatch_sharp,SI,sLnil,"");
+DEFVAR("NEW-CONTEXT",sSnew_context,SI,sLnil,"");
+
 static object
-patch_sharp(object);
+patch_sharp(object x) {return ifuncall1(sSpatch_sharp,x);}
 
 static object
 parse_number(char *,int,int *,int);
@@ -51,29 +66,11 @@ object dispatch_reader;
 #define	trt(c)	(READtable->rt.rt_self[char_code((c))] \
 		 .rte_chatrait)
 
-#ifndef SHARP_EQ_CONTEXT_SIZE
-#define	SHARP_EQ_CONTEXT_SIZE	4096
-#endif
-
 static void
 setup_READtable()
 {
 	READtable = current_readtable();
 }
-
-struct sharp_eq_context_struct {
-	fixnum	sharp_index;
-	object	sharp_eq;
-	object	sharp_sharp;
-} sharp_eq_context[SHARP_EQ_CONTEXT_SIZE];
-
-/*
-	NOTE:
-
-		I believe that there is no need to enter
-		sharp_eq_context to mark_origin.
-*/
-
 
 /* FIXME What should this be? Apparently no reliable way to use value stack */ 
 #define MAX_PACKAGE_STACK 1024
@@ -107,7 +104,7 @@ setup_READ()
 	READbase = fix(x);
 	READsuppress = symbol_value(sLAread_suppressA) != Cnil;
 	READeval = symbol_value(sLAread_evalA) != Cnil;
-	sharp_eq_context_max = 0;
+	sSAsharp_eq_contextA->s.s_dbind=Cnil;
 
 	backq_level = 0;
 
@@ -125,7 +122,7 @@ setup_standard_READ()
 	READbase = 10;
 	READsuppress = FALSE;
 	READeval = TRUE;
-	sharp_eq_context_max = 0;
+	sSAsharp_eq_contextA->s.s_dbind=Cnil;
 	backq_level = 0;
 }
 
@@ -261,16 +258,13 @@ read_object_non_recursive(in)
 object in;
 {
 	VOL object x;
-	int i;
 	bool e;
 	object old_READtable;
 	int old_READdefault_float_format;
 	int old_READbase;
 	int old_READsuppress;
 	int old_READeval;
-	int old_sharp_eq_context_max;
-	struct sharp_eq_context_struct
-		old_sharp_eq_context[SHARP_EQ_CONTEXT_SIZE];
+	object old_READcontext;
 	int old_backq_level;
 
 	old_READtable = READtable;
@@ -278,12 +272,10 @@ object in;
 	old_READbase = READbase;
 	old_READsuppress = READsuppress;
 	old_READeval = READeval;
-	old_sharp_eq_context_max = sharp_eq_context_max;
+	old_READcontext=sSAsharp_eq_contextA->s.s_dbind;
+
 	/* BUG FIX by Toshiba */
 	vs_push(old_READtable);
-	for (i = 0;  i < sharp_eq_context_max;  i++)
-		old_sharp_eq_context[i] = sharp_eq_context[i];
-	memset(old_sharp_eq_context+i,0,sizeof(old_sharp_eq_context)-i*sizeof(*old_sharp_eq_context));
 	old_backq_level = backq_level;
 	setup_READ();
 
@@ -306,7 +298,7 @@ object in;
 	}
 #endif        
 
-	if (sharp_eq_context_max > 0)
+	if (sSAsharp_eq_contextA->s.s_dbind!=Cnil)
 		x = vs_head = patch_sharp(x);
 
 	e = FALSE;
@@ -319,9 +311,7 @@ L:
 	READbase = old_READbase;
 	READsuppress = old_READsuppress;
 	READeval = old_READeval;
-	sharp_eq_context_max = old_sharp_eq_context_max;
-	for (i = 0;  i < sharp_eq_context_max;  i++)
-		sharp_eq_context[i] = old_sharp_eq_context[i];
+	sSAsharp_eq_contextA->s.s_dbind=old_READcontext;
 	backq_level = old_backq_level;
 	if (e) {
 		nlj_active = FALSE;
@@ -333,72 +323,6 @@ L:
 	return(x);
 }
 
-/* static object
-standard_read_object_non_recursive(in)
-object in;
-{
-	VOL object x;
-	int i;
-	bool e;
-	object old_READtable;
-	int old_READdefault_float_format;
-	int old_READbase;
-	int old_READsuppress;
-	int old_READeval;
-	int old_sharp_eq_context_max;
-	struct sharp_eq_context_struct
-		old_sharp_eq_context[SHARP_EQ_CONTEXT_SIZE];
-	int old_backq_level;
-
-	old_READtable = READtable;
-	old_READdefault_float_format = READdefault_float_format;
-	old_READbase = READbase;
-	old_READsuppress = READsuppress;
-	old_READeval = READeval;
-	old_sharp_eq_context_max = sharp_eq_context_max;
-	BUG FIX by Toshiba
-	vs_push(old_READtable);
-	for (i = 0;  i < sharp_eq_context_max;  i++)
-		old_sharp_eq_context[i] = sharp_eq_context[i];
-	old_backq_level = backq_level;
-
-	setup_standard_READ();
-
-	frs_push(FRS_PROTECT, Cnil);
-	if (nlj_active) {
-		e = TRUE;
-		goto L;
-	}
-
-	x = read_object(in);
-	vs_push(x);
-
-	if (sharp_eq_context_max > 0)
-		x = vs_head = patch_sharp(x);
-
-	e = FALSE;
-
-L:
-	frs_pop();
-
-	READtable = old_READtable;
-	READdefault_float_format = old_READdefault_float_format;
-	READbase = old_READbase;
-	READsuppress = old_READsuppress;
-	READeval = old_READeval;
-	sharp_eq_context_max = old_sharp_eq_context_max;
-	for (i = 0;  i < sharp_eq_context_max;  i++)
-		sharp_eq_context[i] = old_sharp_eq_context[i];
-	backq_level = old_backq_level;
-	if (e) {
-		nlj_active = FALSE;
-		unwind(nlj_fr, nlj_tag);
-	}
-	vs_popp;
-	BUG FIX by Toshiba
-	vs_popp;
-	return(x);
-}*/
 #ifdef UNIX  /* faster code for inner loop from file stream */
 #define xxxread_char_to(res,in,eof_code) \
   do{FILE *fp; \
@@ -1796,7 +1720,7 @@ Lsharp_exclamation_reader()
 		return;
 	}
 	vs_base[0] = read_object(vs_base[0]);
-	if (sharp_eq_context_max > 0)
+	if (sSAsharp_eq_contextA->s.s_dbind!=Cnil)
 		vs_base[0]=patch_sharp(vs_base[0]);
 	ieval(vs_base[0]);
 	vs_popp;
@@ -1905,158 +1829,9 @@ Lsharp_R_reader()
 			1, vs_base[0]);
 }
 
-/*static void Lsharp_A_reader(){}*/
-
-/*static void Lsharp_S_reader(){}*/
-
-static void
-Lsharp_eq_reader()
-{
-	int i;
-	fixnum f;
-
-	check_arg(3);
-	if (READsuppress) {
-		vs_top = vs_base;
-		return;
-	}
-	if (vs_base[2] == Cnil)
-		FEerror("The #= readmacro requires an argument.", 0);
-	if (type_of(vs_base[2])!=t_fixnum)
-		FEerror("The #= readmacro requires a fixnum argument.", 0);
-	f=fix(vs_base[2]);
-	for (i = 0;  i < sharp_eq_context_max;  i++)
-	  if (sharp_eq_context[i].sharp_index==f)
-	    FEerror("Duplicate definitions for #~D=.",1, vs_base[2]);
-	if (sharp_eq_context_max >= SHARP_EQ_CONTEXT_SIZE)
-	  FEerror("Too many #= definitions.", 0);
-	i = sharp_eq_context_max++;
-	sharp_eq_context[i].sharp_index = f;
-	sharp_eq_context[i].sharp_sharp = OBJNULL;
-	vs_base[0]
-	= sharp_eq_context[i].sharp_eq
-	= read_object(vs_base[0]);
-	if (sharp_eq_context[i].sharp_eq==sharp_eq_context[i].sharp_sharp)
-	  FEerror("#~D# is defined by itself.",1,make_fixnum(sharp_eq_context[i].sharp_index));
-	vs_top = vs_base+1;
-}
-
-static void
-Lsharp_sharp_reader()
-{
-	int i;
-	fixnum f;
-
-	check_arg(3);
-	if (READsuppress) {
-		vs_popp;
-		vs_popp;
-		vs_base[0] = Cnil;
-		return;
-	}
-	if (vs_base[2] == Cnil)
-	  FEerror("The ## readmacro requires an argument.", 0);
-	if (type_of(vs_base[2])!=t_fixnum)
-	  FEerror("The ## readmacro requires a fixnum argument.", 0);
-	f=fix(vs_base[2]);
-	for (i = 0;  ;  i++)
-	  if (i >= sharp_eq_context_max)
-	    FEerror("#~D# is undefined.", 1, vs_base[2]);
-	  else if (sharp_eq_context[i].sharp_index==f)
-	    break;
-	if (sharp_eq_context[i].sharp_sharp == OBJNULL)
-	  sharp_eq_context[i].sharp_sharp = alloc_object(t_spice);
-	vs_base[0] = sharp_eq_context[i].sharp_sharp;
-	vs_top = vs_base+1;
-}
-
-static void
-patch_sharp_cons(x)
-object x;
-{
-	for (;;) {
-		x->c.c_car = patch_sharp(x->c.c_car);
-		if (consp(x->c.c_cdr))
-			x = x->c.c_cdr;
-		else {
-			x->c.c_cdr = patch_sharp(x->c.c_cdr);
-			break;
-		}
-	}
-}
-
-static object
-patch_sharp(x)
-object x;
-{
-	cs_check(x);
-
-	switch (type_of(x)) {
-	case t_spice:
-	{
-		int i;
-
-		for (i = 0;  i < sharp_eq_context_max;  i++)
-			if (sharp_eq_context[i].sharp_sharp == x)
-				return(sharp_eq_context[i].sharp_eq);
-		break;
-	}
-	case t_cons:
-	/*
-		x->c.c_car = patch_sharp(x->c.c_car);
-		x->c.c_cdr = patch_sharp(x->c.c_cdr);
-	*/
-		patch_sharp_cons(x);
-		break;
-
-	case t_vector:
-	{
-		int i;
-
-		if ((enum aelttype)x->v.v_elttype != aet_object)
-		  break;
-
-		for (i = 0;  i < x->v.v_fillp;  i++)
-			x->v.v_self[i] = patch_sharp(x->v.v_self[i]);
-		break;
-	}
-	case t_array:
-	{
-		int i, j;
-		
-		if ((enum aelttype)x->a.a_elttype != aet_object)
-		  break;
-
-		for (i = 0, j = 1;  i < x->a.a_rank;  i++)
-			j *= x->a.a_dims[i];
-		for (i = 0;  i < j;  i++)
-			x->a.a_self[i] = patch_sharp(x->a.a_self[i]);
-		break;
-	}
-	case t_structure:
-	{object def = x->str.str_def;
-	 int i;
-	 i=S_DATA(def)->length;
-	 while (i--> 0)
-	   structure_set(x,def,i,patch_sharp(structure_ref(x,def,i)));
-	 break;
-       }
-	
-	default:
-		break;
-	}
-	return(x);
-}
-
 static void Lsharp_plus_reader(){}
 
 static void Lsharp_minus_reader(){}
-
-/*static void Lsharp_less_than_reader(){}*/
-
-/*static void Lsharp_whitespace_reader(){}*/
-
-/*static void Lsharp_right_parenthesis_reader(){}*/
 
 static void
 Lsharp_vertical_bar_reader() {
@@ -2309,10 +2084,8 @@ DEFUN("READ-DELIMITED-LIST",object,fLread_delimited_list,LISP,1,3,NONE,OO,OO,OO,
   fixnum nargs=INIT_NARGS(1);
   object l=Cnil,x,f=OBJNULL,strm,recursivep,*p;
   va_list ap;
-  int i;
   bool e;
-  volatile int old_sharp_eq_context_max=0;
-  struct sharp_eq_context_struct old_sharp_eq_context[SHARP_EQ_CONTEXT_SIZE];
+  volatile object old_READcontext;
   volatile int old_backq_level=0;
 
 
@@ -2328,9 +2101,8 @@ DEFUN("READ-DELIMITED-LIST",object,fLread_delimited_list,LISP,1,3,NONE,OO,OO,OO,
     strm = symbol_value(sLAterminal_ioA);
   check_type_stream(&strm);
   if (recursivep == Cnil) {
-    old_sharp_eq_context_max = sharp_eq_context_max;
-    for (i = 0;  i < sharp_eq_context_max;  i++)
-      old_sharp_eq_context[i] = sharp_eq_context[i];
+
+    old_READcontext=sSAsharp_eq_contextA->s.s_dbind;
     old_backq_level = backq_level;
     setup_READ();
     frs_push(FRS_PROTECT, Cnil);
@@ -2351,14 +2123,12 @@ DEFUN("READ-DELIMITED-LIST",object,fLread_delimited_list,LISP,1,3,NONE,OO,OO,OO,
     p = &((*p)->c.c_cdr);
   }
   if (recursivep == Cnil) {
-    if (sharp_eq_context_max > 0)
+    if (sSAsharp_eq_contextA->s.s_dbind!=Cnil)
       l = patch_sharp(l);
     e = FALSE;
   L:
     frs_pop();
-    sharp_eq_context_max = old_sharp_eq_context_max;
-    for (i = 0;  i < sharp_eq_context_max;  i++)
-      sharp_eq_context[i] = old_sharp_eq_context[i];
+    sSAsharp_eq_contextA->s.s_dbind=old_READcontext;
     backq_level = old_backq_level;
     if (e) {
       nlj_active = FALSE;
@@ -3013,8 +2783,8 @@ gcl_init_read()
 	dtab['A'] = dtab['a'] = make_si_ordinary("SHARP-A-READER");
 	dtab['S'] = dtab['s'] = make_si_ordinary("SHARP-S-READER");
 
-	dtab['='] = make_cf(Lsharp_eq_reader);
-	dtab['#'] = make_cf(Lsharp_sharp_reader);
+	dtab['='] = make_si_ordinary("SHARP-EQ-READER");
+	dtab['#'] = make_si_ordinary("SHARP-SHARP-READER");
 	dtab['+'] = make_cf(Lsharp_plus_reader);
 	dtab['-'] = make_cf(Lsharp_minus_reader);
 /*
@@ -3062,7 +2832,7 @@ gcl_init_read()
 	READsuppress = FALSE;
 	READeval = TRUE;
 
-	sharp_eq_context_max = 0;
+	sSAsharp_eq_contextA->s.s_dbind=Cnil;
 
 	siSsharp_comma = make_si_ordinary("#,");
 	enter_mark_origin(&siSsharp_comma);
@@ -3137,9 +2907,7 @@ object in;
 	int old_READbase;
 	int old_READsuppress;
 	int old_READeval;
-	int old_sharp_eq_context_max;
-	struct sharp_eq_context_struct
-		old_sharp_eq_context[SHARP_EQ_CONTEXT_SIZE];
+	volatile object old_READcontext;
 	int old_backq_level;
 
         /* to prevent longjmp clobber */
@@ -3150,11 +2918,9 @@ object in;
 	old_READbase = READbase;
 	old_READsuppress = READsuppress;
 	old_READeval = READeval;
-	old_sharp_eq_context_max = sharp_eq_context_max;
+	old_READcontext=sSAsharp_eq_contextA->s.s_dbind;
 	/* BUG FIX by Toshiba */
 	vs_push(old_READtable);
-	for (i = 0;  i < sharp_eq_context_max;  i++)
-		old_sharp_eq_context[i] = sharp_eq_context[i];
 	old_backq_level = backq_level;
 
 	setup_standard_READ();
@@ -3172,7 +2938,7 @@ object in;
 	vsp = vs_top;
 	dimcount = 0;
 	for (;;) {
-		sharp_eq_context_max = 0;
+                sSAsharp_eq_contextA->s.s_dbind=Cnil;
 		backq_level = 0;
 		delimiting_char = code_char(')');
 		preserving_whitespace_flag = FALSE;
@@ -3181,7 +2947,7 @@ object in;
 		if (x == OBJNULL)
 			break;
 		vs_check_push(x);
-		if (sharp_eq_context_max > 0)
+		if (sSAsharp_eq_contextA->s.s_dbind!=Cnil)
 			x = vs_head = patch_sharp(x);
 		dimcount++;
 	}
@@ -3212,9 +2978,7 @@ L:
 	READbase = old_READbase;
 	READsuppress = old_READsuppress;
 	READeval = old_READeval;
-	sharp_eq_context_max = old_sharp_eq_context_max;
-	for (i = 0;  i < sharp_eq_context_max;  i++)
-		sharp_eq_context[i] = old_sharp_eq_context[i];
+	sSAsharp_eq_contextA->s.s_dbind=old_READcontext;
 	backq_level = old_backq_level;
 	if (e) {
 		nlj_active = FALSE;
