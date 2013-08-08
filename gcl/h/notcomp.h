@@ -258,9 +258,8 @@ EXTER struct printStruct *printStructBufp;
 
 #endif /* NULL_OR_ON_C_STACK */
 
-/* more readable name */
-#define siScomma sSY
-EXTER object sSY;
+#define	siScomma     sSXB
+EXTER object sSXB;
 
 #define	inheap(pp)	((char *)(pp) < heap_end)
 

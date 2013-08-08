@@ -32,8 +32,9 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define	APPEND	5
 #define	NCONC	6
 
-#define	siScomma_at sSYB
+#define	siScomma_at  sSYB
 #define siScomma_dot sSYZ
+object sSXB;
 object sSYB;
 object sSYZ;
 
@@ -365,8 +366,8 @@ static object fLbackquote_reader(object x0, object x1)
 
 
 /* DEF_ORDINARY("Y",sSY,SI,""); */
+DEF_ORDINARY("XB",sSXB,SI,"");
 DEF_ORDINARY("YB",sSYB,SI,"");
-
 DEF_ORDINARY("YZ",sSYZ,SI,"");
 DEF_ORDINARY("LIST*",sLlistA,LISP,"");
 
