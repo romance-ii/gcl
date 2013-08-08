@@ -1195,15 +1195,15 @@ GBC(enum type t) {
     i = rb_pointer - rb_start;
 #endif    
 
-    if (nrbpage > (real_maxpage-page(heap_end)
-		   -holepage-real_maxpage/32)/2) {
-      if (i > nrbpage*PAGESIZE)
-	error("Can't allocate.  Good-bye!.");
-      else
-	nrbpage =
-	  (real_maxpage-page(heap_end)
-	   -holepage-real_maxpage/32)/2;
-    }
+    /* if (nrbpage > (real_maxpage-page(heap_end) */
+    /* 		   -holepage-real_maxpage/32)/2) { */
+    /*   if (i > nrbpage*PAGESIZE) */
+    /* 	error("Can't allocate.  Good-bye!."); */
+    /*   else */
+    /* 	nrbpage = */
+    /* 	  (real_maxpage-page(heap_end) */
+    /* 	   -holepage-real_maxpage/32)/2; */
+    /* } */
     
 /*     if (saving_system) */
 /*       rb_start = heap_end+PAGESIZE; */
@@ -1501,14 +1501,11 @@ FFN(siLheap_report)(void) {
 }  
 
 
-DEFUN("ROOM-REPORT",object,fSroom_report,SI
-	  ,0,0,NONE,OO,OO,OO,OO,(void),"") {
-/* static void */
-/* FFN(siLroom_report)(void) { */
+DEFUN("ROOM-REPORT",object,fSroom_report,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
 
   int i;
   object x;
-  
+
   /*
     GBC(t_contiguous);
   */
