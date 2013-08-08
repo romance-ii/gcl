@@ -1398,14 +1398,31 @@
 ;; 	    (x (if (or (type>= #tarray x) (atomic-tp x)) x #tt)));FIXME
 ;;        (not (type>= x y))))))
 
-(defun mi3 (fun args la fms ttag envl inls &aux (src (under-env (pop envl) (inline-src fun))) (env (car envl)))
-  (when (maybe-inline-src fun fms src)
+(defun mi3a (env fun fms)
+  (under-env 
+   env
+   (let ((src (inline-src fun)))
+     (when (maybe-inline-src fun fms src)
+       src))))
+	     
+
+(defun mi3 (fun args la fms ttag envl inls &aux (src (mi3a (pop envl) fun fms)) (env (car envl)))
+  (when src
     (let ((sir (cons (sir-name fun) (mapcar (lambda (x) (when x (info-type (cadr x)))) fms))))
       (unless (prev-sir sir)
 	(let* ((tag (tmpsym))
 	       (tsrc (ttl-tag-src src tag))
 	       (*src-inline-recursion* (maybe-cons-sir sir tag ttag src env)))
 	  (catch tag (mi4 fun args la tsrc env inls)))))))
+
+;; (defun mi3 (fun args la fms ttag envl inls &aux (src (under-env (pop envl) (inline-src fun))) (env (car envl)))
+;;   (when (maybe-inline-src fun fms src)
+;;     (let ((sir (cons (sir-name fun) (mapcar (lambda (x) (when x (info-type (cadr x)))) fms))))
+;;       (unless (prev-sir sir)
+;; 	(let* ((tag (tmpsym))
+;; 	       (tsrc (ttl-tag-src src tag))
+;; 	       (*src-inline-recursion* (maybe-cons-sir sir tag ttag src env)))
+;; 	  (catch tag (mi4 fun args la tsrc env inls)))))))
 
 ;; (defun mi3 (fun args la fms ttag envl inls &aux (src (under-env (pop envl) (inline-src fun))) (env (car envl)))
 ;;   (when (maybe-inline-src fun fms src)
