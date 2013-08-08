@@ -329,13 +329,12 @@
               (t
                (values nil (cons d (cdr body))))))))
 
-
 (defmacro symbol-to-function (sym)
   (let* ((n (gensym))
 	 (gf (find-symbol "C-SYMBOL-GFDEF" (find-package :s))))
     `(when (symbolp ,sym)
        ,(if (fboundp gf) `(let ((,n (address (,gf ,sym))))
-			    (unless (= 0 ,n) (nani ,n)))
+			    (unless (= +objnull+ ,n) (nani ,n)))
 	  `(let* ((,n (when (fboundp ,sym) (symbol-function ,sym)))
 		  (,n (if (and (consp ,n) (eq (car ,n) 'macro)) (cdr ,n) ,n)))
 	     (unless (consp ,n) ,n))))))

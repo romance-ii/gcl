@@ -160,7 +160,8 @@ typedef union int_object iobject;
  OBJect NULL value.
  It should not coincide with any legal object value.
 */
-#define OBJNULL  ((object)NULL)
+/* #define OBJNULL  ((object)NULL) */
+#define OBJNULL  ((object)DBEGIN)
 
 /*
  Definition of each implementation type.
@@ -173,7 +174,20 @@ struct fixnum_struct {
 
 };
 
-#if defined (IM_FIX_BASE) && defined(IM_FIX_LIM)
+#if defined (LOW_SHFT)
+
+#define LOW_IM_FIX (1L<<(LOW_SHFT-1))
+#define INT_IN_BITS(a_,b_) ({fixnum _a=(fixnum)(a_);_a>>(b_)==_a>>(CHAR_SIZE*SIZEOF_LONG-1);})
+
+#define      make_imm_fixnum(a_)        ((object)a_)
+#define       fix_imm_fixnum(a_)        ((fixnum)a_)
+#define      mark_imm_fixnum(a_)        ((a_)=((object)((fixnum)(a_)+(LOW_IM_FIX<<1))))
+#define    unmark_imm_fixnum(a_)        ((a_)=((object)((fixnum)(a_)-(LOW_IM_FIX<<1))))
+#define        is_imm_fixnum(a_)        ((fixnum)(a_)<DBEGIN)
+#define is_unmrkd_imm_fixnum(a_)        ((fixnum)(a_)<LOW_IM_FIX)
+#define is_marked_imm_fixnum(a_)        (is_imm_fixnum(a_)*!is_unmrkd_imm_fixnum(a_))
+#define           is_imm_fix(a_)        INT_IN_BITS(a_,LOW_SHFT-1)
+#elif defined (IM_FIX_BASE) && defined(IM_FIX_LIM)
 #define      make_imm_fixnum(a_)        ((object)((a_)+(IM_FIX_BASE+(IM_FIX_LIM>>1))))
 #define       fix_imm_fixnum(a_)        (((fixnum)(a_))-(IM_FIX_BASE+(IM_FIX_LIM>>1)))
 #define      mark_imm_fixnum(a_)        ((a_)=((object)(((fixnum)(a_)) | IM_FIX_LIM)))
@@ -182,7 +196,7 @@ struct fixnum_struct {
 #define is_unmrkd_imm_fixnum(a_)        (is_imm_fixnum(a_)&&!is_marked_imm_fixnum(a_))
 #define is_marked_imm_fixnum(a_)        (((fixnum)(a_))&IM_FIX_LIM)
 #define           is_imm_fix(a_)        (!(((a_)+(IM_FIX_LIM>>1))&-IM_FIX_LIM))
-#define        un_imm_fixnum(a_)        ((a_)=((object)(((fixnum)(a_))&~(IM_FIX_BASE))))
+/* #define        un_imm_fixnum(a_)        ((a_)=((object)(((fixnum)(a_))&~(IM_FIX_BASE)))) */
 #else
 #define      make_imm_fixnum(a_)        make_fixnum1(a_)
 #define       fix_imm_fixnum(a_)        ((a_)->FIX.FIXVAL)
@@ -192,7 +206,7 @@ struct fixnum_struct {
 #define is_unmrkd_imm_fixnum(a_)        0
 #define is_marked_imm_fixnum(a_)        0
 #define           is_imm_fix(a_)        0
-#define        un_imm_fixnum(a_)        
+/* #define        un_imm_fixnum(a_)         */
 #endif
 
 #define make_fixnum(a_)  ({register fixnum _q1=(a_);register object _q3;\
@@ -1395,7 +1409,7 @@ extern void *stack_alloc_start,*stack_alloc_end;
    _x;})
                                         
 
-#define make_cons(a_,b_) ({register struct typemanager *_tm=tm_table+(int)t_cons;register object _x;if (!stack_alloc_start && _tm->tm_free) {_x=_tm->tm_free;_tm->tm_free=OBJ_LINK(_x);_tm->tm_nfree--;_tm->tm_nused++;_x->c.c_car=(a_);_x->c.c_cdr=(b_);} else _x=make_cons1(a_,b_);_x;})
+#define make_cons(a_,b_) ({register struct typemanager *_tm=tm_table+(int)t_cons;register object _x;if (!stack_alloc_start && _tm->tm_free!=OBJNULL) {_x=_tm->tm_free;_tm->tm_free=OBJ_LINK(_x);_tm->tm_nfree--;_tm->tm_nused++;_x->c.c_car=(a_);_x->c.c_cdr=(b_);} else _x=make_cons1(a_,b_);_x;})
 
 EXTER object null_string;
 #define FEerror(a_,b_...)   Icall_error_handler(sLerror,null_string,\

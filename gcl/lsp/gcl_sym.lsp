@@ -55,7 +55,7 @@
 (defun boundp (s)
   (declare (optimize (safety 1)))
   (check-type s symbol)
-  (not (eq (nani 0) (c-symbol-dbind s))))
+  (not (eq (nani +objnull+) (c-symbol-dbind s))))
 
 
 (defun symbol-name (s)

@@ -590,7 +590,7 @@ DEFUN("GENSYM1S",object,fSgensym1s,SI,1,1,NONE,OO,OO,OO,OO,(object g),"") {
 DEFUN("GENSYM1IG",object,fSgensym1ig,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
   check_type_non_negative_integer(&x);
-  RETURN1(gensym_int(NULL,x));
+  RETURN1(gensym_int(OBJNULL,x));
 
 }
 #ifdef STATIC_FUNCTION_POINTERS

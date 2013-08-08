@@ -27,23 +27,23 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "include.h"
-DEFUN("TP0",fixnum,fStp0,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {return tp0(x);}
-DEFUN("TP1",fixnum,fStp1,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {return tp1(x);}
-DEFUN("TP2",fixnum,fStp2,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {return tp2(x);}
-DEFUN("TP3",fixnum,fStp3,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {return tp3(x);}
-DEFUN("TP4",fixnum,fStp4,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {return tp4(x);}
-DEFUN("TP5",fixnum,fStp5,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {return tp5(x);}
-DEFUN("TP6",fixnum,fStp6,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {return tp6(x);}
-DEFUN("TP7",fixnum,fStp7,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {return tp7(x);}
-DEFUN("TP8",fixnum,fStp8,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {return tp8(x);}
+/* DEFUN("TP0",fixnum,fStp0,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {return tp0(x);} */
+/* DEFUN("TP1",fixnum,fStp1,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {return tp1(x);} */
+/* DEFUN("TP2",fixnum,fStp2,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {return tp2(x);} */
+/* DEFUN("TP3",fixnum,fStp3,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {return tp3(x);} */
+/* DEFUN("TP4",fixnum,fStp4,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {return tp4(x);} */
+/* DEFUN("TP5",fixnum,fStp5,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {return tp5(x);} */
+/* DEFUN("TP6",fixnum,fStp6,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {return tp6(x);} */
+/* DEFUN("TP7",fixnum,fStp7,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {return tp7(x);} */
+/* DEFUN("TP8",fixnum,fStp8,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {return tp8(x);} */
 
 
-DEFUN("TT3",fixnum,fStt3,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {
-  return fto(x);
-}
-DEFUN("TT30",object,fStt30,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
-  return fto0(x)?Cnil:Ct;
-}
+/* DEFUN("TT3",fixnum,fStt3,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") { */
+/*   return fto(x); */
+/* } */
+/* DEFUN("TT30",object,fStt30,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") { */
+/*   return fto0(x)?Cnil:Ct; */
+/* } */
 
 DEFUN("CFUN-CALL",object,fScfun_call,SI,1,1,NONE,OO,OO,OO,OO,(object fun),"") {
   if (!functionp(fun))
@@ -64,7 +64,7 @@ DEFUN("FBOUNDP-SYM",object,fSfboundp_sym,SI,1,1,NONE,OO,OO,OO,OO,(object sym),""
     not_a_symbol(sym);
     RETURN1(Cnil);
   }
-  RETURN1(sym->s.s_sfdef!=NOT_SPECIAL || sym->s.s_gfdef ? Ct : Cnil);
+  RETURN1(sym->s.s_sfdef!=NOT_SPECIAL || sym->s.s_gfdef!=OBJNULL ? Ct : Cnil);
 
 }
 

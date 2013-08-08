@@ -78,7 +78,7 @@ make_fun(void *addr,object data,object call,object env,ufixnum argd,ufixnum size
 
 }
 
-#define GET_DATA(d_,a_) ((d_)!=Cnil ? (d_) : ((a_) && (a_)->s.s_dbind && type_of((a_)->s.s_dbind)==t_cfdata ? (a_)->s.s_dbind : 0))
+#define GET_DATA(d_,a_) ((d_)!=Cnil ? (d_) : ((a_) && (a_)->s.s_dbind!=OBJNULL && type_of((a_)->s.s_dbind)==t_cfdata ? (a_)->s.s_dbind : 0))
 
 DEFUN("ANONYMOUS-CLOSURE",object,fSanonymous_closure,SI,0,0,NONE,OO,OO,OO,OO,(),"") {
   object f=fcall.fun;
@@ -110,11 +110,11 @@ DEFUN("INIT-FUNCTION",object,fSinit_function,SI,7,7,NONE,OO,OO,OI,II, \
 
   m=sSPmemory;
   m=m ? m->s.s_dbind : m;
-  m=m && type_of(m)==t_cfdata ? m : 0;
+  m=m && m!=OBJNULL && type_of(m)==t_cfdata ? m : 0;
   d=data!=Cnil ? data : m;
   i=sSPinit;
   i=i ? i->s.s_dbind : i;
-  s=i && type_of(addr)==t_fixnum ? i->v.v_self[fix(addr)] : addr;
+  s=i && i!=OBJNULL && type_of(addr)==t_fixnum ? i->v.v_self[fix(addr)] : addr;
   z=type_of(sc)==t_cons && sc->c.c_car==sLmacro; /*FIXME limited no. of args.*/
   sc=z ? sc->c.c_cdr : sc;
   sc=type_of(sc)==t_function ? sc->fun.fun_plist : sc;

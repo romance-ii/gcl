@@ -357,7 +357,7 @@ DEFUN("UNIVERSAL-ERROR-HANDLER",object,fSuniversal_error_handler,SI
   princ(error_fmt_string,Cnil);
   putchar(' ');
   va_start(ap,error_fmt_string);
-  for (n=VFUN_NARGS,l=Cnil,f=OBJNULL;(z=NEXT_ARG(n,ap,l,f,(object)0));)
+  for (n=VFUN_NARGS,l=Cnil,f=OBJNULL;(z=NEXT_ARG(n,ap,l,f,OBJNULL))!=OBJNULL;)
     princ(z,Cnil);
   flush_stream(symbol_value(sLAstandard_outputA));
   va_end(ap);

@@ -1098,7 +1098,7 @@ typedef enum {memprotect_none,memprotect_cannot_protect,memprotect_sigaction,
 	      memprotect_bad_return,memprotect_no_signal,
 	      memprotect_multiple_invocations,memprotect_no_restart,
 	      memprotect_bad_fault_address,memprotect_success} memprotect_enum;
-static memprotect_enum memprotect_result;
+static volatile memprotect_enum memprotect_result;
 static int memprotect_handler_invocations,memprotect_print_enable;
 static void *memprotect_test_address;
 
@@ -1197,7 +1197,7 @@ memprotect_test(void) {
   }
   memprotect_result=memprotect_success;
   sigaction(SIGSEGV,&sao,NULL);
-    sigaction(SIGBUS,&saob,NULL);
+  sigaction(SIGBUS,&saob,NULL);
   return 0;
 
 }
@@ -1296,7 +1296,7 @@ sgc_start(void) {
       bzero(free_map,npages*sizeof(short));
       f = tm->tm_free;
       count=0;
-      while (f!=0) {
+      while (f!=OBJNULL) {
 	j=page(f);
 	if (j>=MAXPAGE)
 	  error("Address in tm freelist out of range");
@@ -1504,7 +1504,7 @@ sgc_start(void) {
       int count=0;
       x=y=0;
       
-      while (f!=0) {
+      while (f!=OBJNULL) {
 	next=OBJ_LINK(f);
 #ifdef SDEBUG	     
 	if (!is_free(f))
@@ -1582,7 +1582,7 @@ sgc_quit(void) {
       if ((np=tm->tm_sgc)) {
 	object f,y;
 	f=tm->tm_free;
-	if (f==0) 
+	if (f==OBJNULL) 
 	  tm->tm_free=tm->tm_alt_free;
 	else {
 	  /* tack the alt_free onto the end of free */

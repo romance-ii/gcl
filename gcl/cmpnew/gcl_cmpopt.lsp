@@ -924,9 +924,9 @@
       (get 'funcallable-symbol-function 'inline-always))
 
 ;;SI::FBOUNDP-SYM
-(push '((t) boolean #.(flags rfa) "@0;(#0->s.s_sfdef!=NOT_SPECIAL || #0->s.s_gfdef)")
+(push '((t) boolean #.(flags rfa) "@0;(#0->s.s_sfdef!=NOT_SPECIAL || #0->s.s_gfdef!=OBJNULL)")
       (get 'si::fboundp-sym 'inline-unsafe))
-(push '((symbol) boolean #.(flags rfa) "@0;(#0->s.s_sfdef!=NOT_SPECIAL || #0->s.s_gfdef)")
+(push '((symbol) boolean #.(flags rfa) "@0;(#0->s.s_sfdef!=NOT_SPECIAL || #0->s.s_gfdef!=OBJNULL)")
       (get 'si::fboundp-sym 'inline-always))
 
 ;;TERPRI

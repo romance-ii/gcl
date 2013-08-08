@@ -64,10 +64,8 @@ Iarray_element_type(object);
 DEFCONST("ARRAY-RANK-LIMIT", sLarray_rank_limit, LISP,
 	 make_fixnum(ARRAY_RANK_LIMIT),"");
 
-DEFCONST("ARRAY-DIMENSION-LIMIT", sLarray_dimension_limit,
-	 LISP, make_fixnum(MOST_POSITIVE_FIX>>3),"");
-DEFCONST("ARRAY-TOTAL-SIZE-LIMIT", sLarray_total_size_limit,
-	 LISP, make_fixnum(MOST_POSITIVE_FIX),"");
+DEFCONST("ARRAY-DIMENSION-LIMIT", sLarray_dimension_limit,LISP,make_fixnum(((1L<<31)>>3)-1),"");
+DEFCONST("ARRAY-TOTAL-SIZE-LIMIT", sLarray_total_size_limit,LISP,make_fixnum(((1L<<31)>>3)-1),"");
 
 DEF_ORDINARY("BIT",sLbit,LISP,"");
 
@@ -292,7 +290,7 @@ DEFUN("ASET",object,fSaset,SI,2,ARG_LIMIT,NONE,OO,OO,OO,OO,(object y,object x,..
   object z,l=Cnil,f=OBJNULL;
 
   va_start(ap,x);
-  for (i1=m=0;(z=NEXT_ARG(n,ap,l,f,(object)0)) && m<rank;m++) {
+  for (i1=m=0;(z=NEXT_ARG(n,ap,l,f,OBJNULL))!=OBJNULL && m<rank;m++) {
     check_type(z,t_fixnum);
     k=Mfix(z);
     if (k>=(rank>1 ? x->a.a_dims[m] : x->v.v_dim)||k<0)
@@ -301,7 +299,7 @@ DEFUN("ASET",object,fSaset,SI,2,ARG_LIMIT,NONE,OO,OO,OO,OO,(object y,object x,..
     i1+=k;
   }
   va_end(ap);
-  if (m!=rank || z)
+  if (m!=rank || z!=OBJNULL)
     FEerror("Array rank/index number mismatch on ~a",1,x);
 
   RETURN1(fSaset1(x,i1,y));
@@ -525,7 +523,7 @@ DEFUN("AELTTYPE-LIST",object,fSaelttype_list,SI,0,0,NONE,OO,OO,OO,OO,(),"") {
 
   for (p=aet_types,pe=p+aet_fix;p<=pe;p++) {
     x=MMcons(*p->namep,Cnil);
-    y=y ? (y->c.c_cdr=x) : (f=x);
+    y=y!=OBJNULL ? (y->c.c_cdr=x) : (f=x);
   }
   
   return f;
@@ -535,6 +533,7 @@ DEFUN("AELTTYPE-LIST",object,fSaelttype_list,SI,0,0,NONE,OO,OO,OO,OO,(),"") {
 
 DEFUN("GET-AELTTYPE",object,fSget_aelttype,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
   int i;
+
   for (i=0 ; i <   aet_last ; i++)
     if (x == * aet_types[i].namep)
       return make_fixnum((enum aelttype) i);
@@ -1075,7 +1074,7 @@ array_allocself(object x, int staticp, object dflt)
 	default:
 	  break;
 	}
-	if(dflt!=0) gset(x->st.st_self,raw_aet_ptr(dflt,typ),n,typ);
+	if(dflt!=OBJNULL) gset(x->st.st_self,raw_aet_ptr(dflt,typ),n,typ);
       }
 	
 }
@@ -1097,9 +1096,9 @@ DEFUN("FILL-POINTER-SET",object,fSfill_pointer_set,SI,2,2,NONE,OO,IO,OO,OO,(obje
   return make_fixnum(0);
 }
 
-DEFUN("FILL-POINTER-INTERNAL",fixnum,fSfill_pointer_internal,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {
-  RETURN1(x->v.v_fillp);
-}
+/* DEFUN("FILL-POINTER-INTERNAL",fixnum,fSfill_pointer_internal,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") { */
+/*   RETURN1(x->v.v_fillp); */
+/* } */
 
 DEFUN("ARRAY-HAS-FILL-POINTER-P",object,fLarray_has_fill_pointer_p,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
@@ -1125,55 +1124,6 @@ DEFUN("ARRAY-ELEMENT-TYPE",object,fLarray_element_type,LISP,1,1,NONE,OO,OO,OO,OO
   return * aet_types[(int)t].namep;
 }
 
-DEFUN("C-FIXNUM-==",fixnum,fSc_fixnum_eq,SI,2,2,NONE,II,IO,OO,OO,(fixnum x,fixnum y),"") {
-  RETURN1(x==y);
-}
-DEFUN("C-FLOAT-==",fixnum,fSc_float_eq,SI,2,2,NONE,IO,OO,OO,OO,(object x,object y),"") {
-  check_type(x,t_shortfloat);
-  check_type(y,t_shortfloat);
-  RETURN1(sf(x)==sf(y));
-}
-DEFUN("C-DOUBLE-==",fixnum,fSc_double_eq,SI,2,2,NONE,IO,OO,OO,OO,(object x,object y),"") {
-  check_type(x,t_longfloat);
-  check_type(y,t_longfloat);
-  RETURN1(lf(x)==lf(y));
-}
-DEFUN("C-FCOMPLEX-==",fixnum,fSc_fcomplex_eq,SI,2,2,NONE,IO,OO,OO,OO,(object x,object y),"") {
-  check_type(x,t_complex);
-  check_type(y,t_complex);
-  check_type(x->cmp.cmp_real,t_shortfloat);
-  check_type(y->cmp.cmp_real,t_shortfloat);
-  RETURN1(sfc(x)==sfc(y));
-}
-DEFUN("C-DCOMPLEX-==",fixnum,fSc_dcomplex_eq,SI,2,2,NONE,IO,OO,OO,OO,(object x,object y),"") {
-  check_type(x,t_complex);
-  check_type(y,t_complex);
-  check_type(x->cmp.cmp_real,t_longfloat);
-  check_type(y->cmp.cmp_real,t_longfloat);
-  RETURN1(lfc(x)==lfc(y));
-}
-
-DEFUN("C+",fixnum,fScp,SI,2,2,NONE,II,IO,OO,OO,(fixnum x,fixnum y),"") {
-  RETURN1(x+y);
-}
-DEFUN("&",fixnum,fSand,SI,2,2,NONE,II,IO,OO,OO,(fixnum x,fixnum y),"") {
-  RETURN1(x&y);
-}
-DEFUN("|",fixnum,fSor,SI,2,2,NONE,II,IO,OO,OO,(fixnum x,fixnum y),"") {
-  RETURN1(x|y);
-}
-DEFUN("^",fixnum,fSxor,SI,2,2,NONE,II,IO,OO,OO,(fixnum x,fixnum y),"") {
-  RETURN1(x^y);
-}
-DEFUN("~",fixnum,fSnot,SI,1,1,NONE,II,OO,OO,OO,(fixnum x),"") {
-  RETURN1(~x);
-}
-DEFUN("<<",fixnum,fSlshft,SI,2,2,NONE,II,IO,OO,OO,(fixnum x,fixnum y),"") {
-  RETURN1(x<<y);
-}
-DEFUN(">>",fixnum,fSrshft,SI,2,2,NONE,II,IO,OO,OO,(fixnum x,fixnum y),"") {
-  RETURN1(x>>y);
-}
 
 DEFUN("REF",object,fSref,SI,5,5,NONE,OI,II,IO,OO,(fixnum addr,fixnum s,fixnum u,fixnum z,object v),"") { 
 

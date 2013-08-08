@@ -2318,7 +2318,7 @@ DEFUN("FORMAT",object,fLformat,LISP,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,(object strm,
     {
       object l[MAX_ARGS],ll=Cnil,f=OBJNULL;
       ufixnum i;
-      for (i=0;(l[i]=NEXT_ARG(nargs,ap,ll,f,(object)0));i++);
+      for (i=0;(l[i]=NEXT_ARG(nargs,ap,ll,f,OBJNULL))!=OBJNULL;i++);
       fmt_base = l;
       fmt_index = 0;
       fmt_end = i;
@@ -2340,7 +2340,7 @@ DEFUN("FORMAT",object,fLformat,LISP,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,(object strm,
 	goto L;
       }
       format(strm, 0, control->st.st_fillp);
-      if (sSAformat_unused_argsA->s.s_dbind) {
+      if (sSAformat_unused_argsA->s.s_dbind!=OBJNULL) {
 	int i;
 	for (i=fmt_end-1;i>=fmt_index;i--)
 	  sSAformat_unused_argsA->s.s_dbind=MMcons(fmt_base[i],sSAformat_unused_argsA->s.s_dbind);
@@ -2372,7 +2372,7 @@ DEFUN("FORMAT",object,fLformat,LISP,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,(object strm,
 
 	va_start(ap,control);
 	Xxvl[0] = strm;
-	for (i=1;(Xxvl[i]=NEXT_ARG(nargs,ap,ll,f,(object)0));i++);
+	for (i=1;(Xxvl[i]=NEXT_ARG(nargs,ap,ll,f,OBJNULL))!=OBJNULL;i++);
 	va_end(ap);
 	fcall.valp=0,funcall_vec(control,i,Xxvl);
 	vs_reset;

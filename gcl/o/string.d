@@ -579,7 +579,7 @@ DEFUN("STRING-CONCATENATE",object,fLstring_concatenate,SI,0,63,NONE,OO,OO,OO,OO,
 
   va_start(ap,first);
   vs_base=vs_top;
-  for (l=i=0;(z=NEXT_ARG(narg,ap,ll,first,(object)0));i++) {
+  for (l=i=0;(z=NEXT_ARG(narg,ap,ll,first,OBJNULL))!=OBJNULL;i++) {
     vs_push(coerce_to_string(z));
     l += vs_head->st.st_fillp;
   }

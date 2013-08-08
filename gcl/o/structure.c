@@ -223,7 +223,7 @@ DEFUN("MAKE-STRUCTURE",object,fSmake_structure,SI,1,63,NONE,OO,OO,OO,OO,(object 
     s_type = (&(SLOT_TYPE(x->str.str_def,0)));
 
     va_start(ap,name);
-    for (i=0;(v=NEXT_ARG(narg,ap,l,f,OBJNULL));i++) {
+    for (i=0;(v=NEXT_ARG(narg,ap,l,f,OBJNULL))!=OBJNULL;i++) {
 
       switch(s_type[i]) {
 	     

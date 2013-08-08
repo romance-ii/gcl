@@ -116,6 +116,7 @@ FFN(siLAmake_special)(void)
 	vs_base[0]->s.s_stype = (short)stp_special;
 }
 
+DEFUN("OBJNULL",fixnum,fSobjnull,SI,0,0,NONE,IO,OO,OO,OO,(void),"") {return (fixnum)OBJNULL;}
 
 DEFUN("*MAKE-CONSTANT",object,fSAmake_constant,SI,2,2,NONE,OO,OO,OO,OO, \
 	  (object s,object v),"") { 

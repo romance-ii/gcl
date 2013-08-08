@@ -94,7 +94,7 @@ DEFUN("DEFVAR1",object,fSdefvar1,SI
   doc=NEXT_ARG(n,ap,l,f,Cnil);
   va_end(ap);
   
-  if (sym->s.s_dbind==0 && n>1)
+  if (sym->s.s_dbind==OBJNULL && n>1)
     sym->s.s_dbind= val;
   sym->s.s_stype=(short)stp_special;
   if (n>2)

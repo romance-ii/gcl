@@ -83,7 +83,9 @@
 ;(defconstant +coerce-list+ '(list vector string array character short-float
 ;				  long-float float complex function null cons))
 
-(defun coerce (object type &aux ntype (atp (listp type)) (ctp (if atp (car type) type)) (tp (when atp (cdr type))))
+(defconstant +objnull+ (objnull))
+
+#.`(defun coerce (object type &aux ntype (atp (listp type)) (ctp (if atp (car type) type)) (tp (when atp (cdr type))))
   (declare (optimize (safety 2))) ;(print (list 'coerce object type))
   (check-type type (or (member function) type-spec));FIXME
   (case ctp
@@ -95,7 +97,7 @@
 	    (function object) 
 	    ((and symbol (not boolean)) 
 	     (let* ((f (c-symbol-gfdef object))(fi (address f))(m (c-symbol-mflag object)))
-	       (check-type fi (and fixnum (not (integer 0 0))))
+	       (check-type fi (and fixnum (not (integer ,+objnull+ ,+objnull+))))
 	       (check-type m  (integer 0 0))
 	       f))
 	    (cons (the function (eval object))))))
@@ -618,7 +620,7 @@
 				      hash-table-eq hash-table-eql hash-table-equal hash-table-equalp
 				      random-state std-instance structure 
 				      non-standard-generic-function
-				      standard-generic-function
+				      standard-generic-function spice
 				      ))
 
 

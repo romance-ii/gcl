@@ -364,7 +364,7 @@ alloc_object(enum type t)
 
 	tm = tm_of(t);
 
-	if ((obj=maybe_alloc_on_stack(tm->tm_size,t))) {
+	if ((obj=maybe_alloc_on_stack(tm->tm_size,t))!=OBJNULL) {
 /* 	  printf("alloc_object %u %u %u %p\n",getpid(),t,tm->tm_size,obj); */
 	  return obj;
 	}
@@ -446,7 +446,7 @@ make_cons1(object a, object d)
 	 int must_have_more_pages;
 	 unsigned long i;
 
-	if ((obj=maybe_alloc_on_stack(tm->tm_size,t_cons))) {
+	if ((obj=maybe_alloc_on_stack(tm->tm_size,t_cons))!=OBJNULL) {
 /* 	  printf("make_cons %u %u %u %p %p %p\n",getpid(),t_cons,tm->tm_size,obj,a,d); */
 	  obj->c.c_car=a;
 	  obj->c.c_cdr=d;
@@ -527,8 +527,7 @@ object on_stack_cons(object x, object y)
 }
 
 
-DEFUNM("ALLOCATED",object,fSallocated,SI,1,1,NONE,OO,OO,OO,OO,
-	   (object typ),"") { 
+DEFUNM("ALLOCATED",object,fSallocated,SI,1,1,NONE,OO,OO,OO,OO,(object typ),"") { 
 
   struct typemanager *tm=(&tm_table[t_from_type(typ)]);
   fixnum vals=(fixnum)fcall.valp;
@@ -583,7 +582,7 @@ DEFUN("RESET-NUMBER-USED",object,fSreset_number_used,SI,0,1,NONE,OO,OO,OO,OO,
   z=NEXT_ARG(nargs,ap,l,typ,OBJNULL);
   va_end(ap);
 
-  if (z) 
+  if (z!=OBJNULL) 
     tm_table[t_from_type(z)].tm_nused = 0;
   else for (i=0; i <= t_relocatable ; i++)
 	 tm_table[i].tm_nused = 0;
@@ -618,7 +617,7 @@ alloc_contblock(size_t n) {
 	g = FALSE;
 	n = ROUND_UP_PTR_CONT(n);
 
-	if ((p=maybe_alloc_on_stack(n,-1))) {
+	if ((object)(p=maybe_alloc_on_stack(n,-1))!=OBJNULL) {
 /* 	  printf("alloc_contblock %u %d %u %p\n",getpid(),-1,n,p); */
 	  return p;
 	}
@@ -792,7 +791,7 @@ alloc_relblock(size_t n) {
 	g = FALSE;
 	n = ROUND_UP_PTR(n);
 
-	if ((p=maybe_alloc_on_stack(n,-1))) {
+	if ((object)(p=maybe_alloc_on_stack(n,-1))!=OBJNULL) {
 /* 	  printf("alloc_relblock %u %d %u %p\n",getpid(),-1,n,p); */
 	  return p;
 	}

@@ -240,7 +240,7 @@ make_function_internal(char *s, void (*f)())
 	vs_mark;
 
 	x = make_ordinary(s);
-	if (x->s.s_gfdef) {
+	if (x->s.s_gfdef!=OBJNULL) {
 	  printf("Skipping redefinition of %-.*s\n",(int)x->st.st_fillp,x->st.st_self);
 	  return(x);
 	}
@@ -259,7 +259,7 @@ make_si_function_internal(char *s, void (*f)())
 	vs_mark;
 
 	x = make_si_ordinary(s);
-	if (x->s.s_gfdef) {
+	if (x->s.s_gfdef!=OBJNULL) {
 	  printf("Skipping redefinition of %-.*s\n",(int)x->st.st_fillp,x->st.st_self);
 	  return(x);
 	}

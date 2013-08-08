@@ -28,7 +28,7 @@ DEFUN("XDR-OPEN",object,fSxdr_open,SI,1,1,NONE,OO,OO,OO,OO,(object f),"") {
 
   XDR *xdrs;
   object ar= alloc_simple_string(sizeof(XDR));
-  array_allocself(ar,1,0);
+  array_allocself(ar,1,OBJNULL);
   xdrs= (XDR *) ar->a.a_self;
   if (f->sm.sm_fp == 0) FEerror("stream not ok for xdr io",0);
   xdrstdio_create(xdrs, f->sm.sm_fp,

@@ -291,15 +291,17 @@ funcall(object fun) {
   /*   CHECK_AVMA; return; */
     
   case t_function:
-    ihs_check;ihs_push(fun);
-    quick_call_function(fun);
-    ihs_pop();
+    {int i=Rset;
+      if (!i) {ihs_check;ihs_push(fun);}
+      quick_call_function(fun);
+      if (!i) ihs_pop();
+    }
     return;
     
   case t_symbol:
     {
       object x = fun->s.s_gfdef;
-      if (x) { fun = x; goto TOP;}
+      if (x!=OBJNULL) { fun = x; goto TOP;}
       else
 	FEundefined_function(fun);
     }
@@ -363,7 +365,7 @@ funcall(object fun) {
     } else if (x == sLlambda_block) {
       b = TRUE;
       c = FALSE;
-      if(sSlambda_block_expanded->s.s_dbind)
+      if(sSlambda_block_expanded->s.s_dbind!=OBJNULL)
 	fun = ifuncall1(sSlambda_block_expanded->s.s_dbind,fun);
       
       fun = fun->c.c_cdr;

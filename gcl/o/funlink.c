@@ -158,7 +158,7 @@ is supplied and FLAG is nil, then this function is deleted from the fast links")
 
    if (Rset) {
 
-     if (!fun) 
+     if (fun==OBJNULL) 
        RETURN1(Cnil);
 
      switch(type_of(fun)) {
@@ -1102,7 +1102,7 @@ call_proc_new(object sym,ufixnum clp,ufixnum vld,void **link,ufixnum argd,object
   fu u;
 
   if (type_of(sym)==t_symbol) {
-    if (!(fun=sym->s.s_gfdef))
+    if ((fun=sym->s.s_gfdef)==OBJNULL)
       FEundefined_function(sym);
   } else
     fun=sym;

@@ -20,7 +20,7 @@
   (declare (optimize (safety 1)))
   (check-type y hash-table)
   (let ((e (gethash-int x y)))
-    (if (zerop (htent-key e))
+    (if (eql +objnull+ (htent-key e))
 	(values z nil)
       (values (htent-value e) t))))
 
@@ -31,16 +31,16 @@
     (dotimes (i n)
       (let* ((e (hashtable-self h i))
 	     (k (htent-key e)))
-	(unless (zerop k)
+	(unless (eql +objnull+ k)
 	  (funcall f (nani k) (htent-value e)))))))
 
 (defun remhash (x y)
   (declare (optimize (safety 1)))
   (check-type y hash-table)
   (let ((e (gethash-int x y)))
-    (unless (zerop (htent-key e))
-      (set-htent-key e 0)
-      (set-htent-value e nil)
+    (unless (eql +objnull+ (htent-key e))
+      (set-htent-key e +objnull+)
+      (set-htent-value e (nani +objnull+))
       (c-set-hashtable-nent y (1- (c-hashtable-nent y)))
       t)))
 
@@ -50,8 +50,8 @@
   (let ((n (hash-table-size h)))
     (dotimes (i n)
       (let ((e (hashtable-self h i)))
-	(set-htent-key e 0)
-	(set-htent-value e (nani 0))));FIXNE?
+	(set-htent-key e +objnull+)
+	(set-htent-value e (nani +objnull+))));FIXNE?
     (c-set-hashtable-nent h 0)
     h))
 
@@ -68,7 +68,7 @@
     (when (>= (1+ n) (c-hashtable-max_ent h))
       (extend-hashtable h))
     (let ((e (gethash-int k h)))
-      (when (zerop (htent-key e))
+      (when (eql +objnull+ (htent-key e))
 	(c-set-hashtable-nent h (1+ n)))
       (set-htent-key e (address k))
       (set-htent-value e v))))

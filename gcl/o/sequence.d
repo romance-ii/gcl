@@ -267,7 +267,7 @@ E:
 		else if (e < s || e > sequence->v.v_fillp)
 			goto ILLEGAL_START_END;
 		x = alloc_simple_vector(e - s, sequence->v.v_elttype);
-		array_allocself(x, FALSE,0);
+		array_allocself(x, FALSE,OBJNULL);
 		switch (sequence->v.v_elttype) {
 		case aet_object:
 			for (i = s, j = 0;  i < e;  i++, j++)
@@ -442,7 +442,7 @@ object seq;
 		k = x->v.v_fillp;
 		y = alloc_simple_vector(k, x->v.v_elttype);
 		vs_push(y);
-		array_allocself(y, FALSE,0);
+		array_allocself(y, FALSE,OBJNULL);
 		switch (x->v.v_elttype) {
 		case aet_object:
 			for (j = k - 1, i = 0;  j >=0;  --j, i++)
