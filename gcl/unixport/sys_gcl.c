@@ -61,6 +61,7 @@ gcl_init_init()
   build_symbol_table();
 
   lsp_init("../lsp/gcl_export.lsp");
+
   ar_init(gcl_s);
   ar_init(gcl_sf);
   ar_init(gcl_dl);
@@ -97,6 +98,7 @@ gcl_init_system(object no_init)
   ar_check_init(gcl_sc,no_init);
   ar_check_init(gcl_assert,no_init);
   ar_check_init(gcl_defstruct,no_init);
+  ar_check_init(gcl_sharp,no_init);
   ar_check_init(gcl_callhash,no_init);
   ar_check_init(gcl_describe,no_init);
 #ifdef HAVE_JAPI_H
@@ -172,7 +174,7 @@ gcl_init_system(object no_init)
 /*   ar_check_init(gcl_index,no_init); */
 /* #endif */
     
-#include "recompile.h"
+/* #include "recompile.h" */
   
 }
 

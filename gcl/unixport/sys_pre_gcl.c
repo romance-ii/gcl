@@ -106,6 +106,7 @@ gcl_init_system(object no_init)
   lsp_init("../lsp/gcl_numlib.lsp");
 
   lsp_init("../lsp/gcl_defstruct.lsp");
+  lsp_init("../lsp/gcl_sharp.lsp");
   lsp_init("../lsp/gcl_callhash.lsp");
   lsp_init("../lsp/gcl_describe.lsp");
 #ifdef HAVE_JAPI_H
