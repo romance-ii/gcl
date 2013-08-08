@@ -68,7 +68,7 @@ number_compare(object x, object y) {
       if (is_imm_fixnum(x)) {
 
 	if (is_imm_fixnum(y))
-	  return x<y ? -1 : (x==y ? 0 : 1);
+	  return fix(x)<fix(y) ? -1 : (fix(x)==fix(y) ? 0 : 1);
 	else
 	  return fix(y)<0 ? 1 : -1;
 

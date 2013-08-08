@@ -1487,7 +1487,10 @@ FFN(siLheap_report)(void) {
   vs_push(make_fixnum((CSTACK_DIRECTION+1)>>1));
   vs_push(make_fixnum(CSTACK_ALIGNMENT));
   vs_push(make_fixnum(CSSIZE));
-#if defined(IM_FIX_BASE) && defined(IM_FIX_LIM)
+#if defined(LOW_IM_FIX)
+  vs_push(make_fixnum(-(LOW_IM_FIX>>1)));
+  vs_push(make_fixnum(LOW_IM_FIX));
+#elif defined(IM_FIX_BASE) && defined(IM_FIX_LIM)
   vs_push(make_fixnum(IM_FIX_BASE));
   vs_push(make_fixnum(IM_FIX_LIM));
 #else  
