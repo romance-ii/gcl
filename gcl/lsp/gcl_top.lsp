@@ -227,7 +227,7 @@
 	    (when (boundp '*system-banner*)
 	      (format t "~a~%" *system-banner*))
 	    (format t "Temporary directory for compiler files set to ~a~%" *tmp-dir*)))
-   (setq *ihs-top* 1)
+   (setq *ihs-top* (ihs-top))
 ;   (in-package 'system::user) ;(incf system::*ihs-top* 2)
    (setq *package* (user-package))
    (top-level1))
