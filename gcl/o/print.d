@@ -661,7 +661,7 @@ object obj,a_list;
 	object pri=Cnil;
 
 	if ((sLtypep->s.s_gfdef == OBJNULL) ||
-	    (sLtypep->s.s_gfdef == Cnil))
+	    (sLtypep->s.s_gfdef == Cnil))/*FIXME*/
 	    return Cnil; /* we may not have typep in raw_gcl */
 	if (a_list == Cnil)
 	    return Cnil;
