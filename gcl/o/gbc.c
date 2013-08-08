@@ -228,9 +228,9 @@ mark_cons(object x) {
   } else
     mark_object(x->c.c_car);
  MARK_CDR:  
-  if (NULL_OR_ON_C_STACK(x->c.c_cdr))
-    return;
   x = Scdr(x);
+  if (NULL_OR_ON_C_STACK(x))
+    return;
   if (consp(x)) {
     if (is_marked_or_free(x))
       return;
