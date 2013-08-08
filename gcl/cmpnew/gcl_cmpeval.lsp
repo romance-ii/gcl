@@ -1356,6 +1356,7 @@
 (defun type-fm (fun fms)
   (case fun
 	((si::tpi typep coerce) (cadr fms))
+	(si::num-comp (caddr fms))
 	(make-sequence (car fms))))
 
 (defun constant-type-p (tp)
@@ -1372,7 +1373,7 @@
 (defun maybe-inline-src (fun fms src &aux fm)
   (when src
     (cond ((setq fm (type-fm fun fms)) (known-type-p fm))
-	  ((< (cons-count src) 100))
+	  ((< (cons-count src) 30))
 	  ((not (symbolp fun)))
 	  ((let* ((n (symbol-package fun))(n (when n (package-name n)))(p (find-package :lib))) 
 	     (when n (or (when p (find-symbol n p)) (string-equal "S" n)))));FIXME
