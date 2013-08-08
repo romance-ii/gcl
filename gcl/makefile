@@ -72,7 +72,7 @@ $(PORTDIR)/saved_pre_gcl: $(HDIR)cmpinclude.h
 	(cd $(BINDIR); $(MAKE) all)
 	$(MAKE) mpfiles
 	rm -f o/cmpinclude.h ; cp h/cmpinclude.h o
-	(cd $(ODIR); rm -f boot.h; touch boot.h; $(MAKE) all)
+	(cd $(ODIR); $(MAKE) all)
 	$(MAKE) $<
 	rm -f o/cmpinclude.h ; cp h/cmpinclude.h o
 #	(cd $(ODIR); $(MAKE) all)

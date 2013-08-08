@@ -49,6 +49,7 @@ OOBJS:=$(shell j=$$(ar t $(ODIR)/gcllib.a) ; for i in $$(ls -1 $(ODIR)/*.o) ; do
 OOBJS:=$(filter-out $(FIRST_FILE),$(OOBJS))
 OOBJS:=$(filter-out $(LAST_FILE),$(OOBJS))
 OOBJS:=$(filter-out $(ODIR)/plttest.o,$(OOBJS))
+OOBJS:=$(filter-out $(ODIR)/boot.o,$(OOBJS))
 OBJS:=$(OOBJS) $(shell ls -1 $(LSPDIR)/*.o | grep -v recompile.o)
 OBJS:=$(OBJS) $(shell ls -1 $(XDIR)/*.o)
 OBJS:=$(OBJS) $(shell ls -1 $(CMPDIR)/*.o | grep -v collectfn.o)
@@ -133,31 +134,34 @@ final: $(FLISP)
 
 FORCE:
 
-recompile.h: FORCE $(ROBJS)
-	echo -n $(ROBJS) | sed 's,gcl_recompile.o,gcl_recompileq.o,g' |\
-		sed -e 's,gcl_recompile,,g' -e 's,\.o,,g' | \
-		tr ' ' '\012' | sort -n | \
-		awk '{a=$$1;if (a=="q") a="";printf("  ar_check_init(gcl_recompile%s,no_init);\n",a)}'  >$@;
+# recompile.h: FORCE $(ROBJS)
+# 	echo -n $(ROBJS) | sed 's,gcl_recompile.o,gcl_recompileq.o,g' |\
+# 		sed -e 's,gcl_recompile,,g' -e 's,\.o,,g' | \
+# 		tr ' ' '\012' | sort -n | \
+# 		awk '{a=$$1;if (a=="q") a="";printf("  ar_check_init(gcl_recompile%s,no_init);\n",a)}'  >$@;
 
-sys_ansi_gcl.o sys_gcl.o: recompile.h
+#sys_ansi_gcl.o sys_gcl.o: recompile.h
 
 pre_init.lsp post_init.lsp:
 	touch $@
 
+libboot.so: ../o/boot.o
+	$(CC) -shared $< -o $@
+
 saved_%:raw_% $(RSYM) init_%.lsp pre_init.lsp post_init.lsp raw_%_map \
 		$(CMPDIR)/gcl_lfun_list.lsp \
 		$(CMPDIR)/gcl_cmpopt.lsp $(HDIR)/cmpinclude.h \
-		$(LSPDIR)/gcl_auto_new.lsp
+		$(LSPDIR)/gcl_auto_new.lsp libboot.so
 
 #	echo " (in-package #+ansi-cl \"CL-USER\" #-ansi-cl\"USER\")(system:save-system \"tmp_image\")" >foo
-	echo " (system:save-system \"tmp_image\")" >foo
-	./$< $(PORTDIR)/ $(LISPFLAGS) -libdir $(GCLDIR)/ < foo
+#	echo " (system:save-system \"tmp_image\")" >foo
+#	./$< $(PORTDIR)/ $(LISPFLAGS) -libdir $(GCLDIR)/ < foo
 	cp pre_init.lsp foo
 	cat init_$*.lsp >>foo
 	cat post_init.lsp >>foo
 #	echo " (in-package  #+ansi-cl \"CL-USER\" #-ansi-cl\"USER\")(system:save-system \"$@\")" >>foo
 	echo " (system:save-system \"$@\")" >>foo
-	./tmp_image $(PORTDIR)/ $(LISPFLAGS) -libdir $(GCLDIR)/ < foo
+	./$< $(PORTDIR)/ $(LISPFLAGS) -libdir $(GCLDIR)/ < foo #tmp_image
 	rm -f tmp_image
 
 $(RSYM): $(SPECIAL_RSYM) $(HDIR)/mdefs.h
@@ -192,11 +196,9 @@ libpcl_gcl.a: $(OBJS) $(PCLOBJS) sys_pcl_gcl.o gmpfiles bfdfiles # plt_pcl_gcl.o
 raw_%_map raw_%: lib%.a libgclp.a $(SYSTEM_OBJS) $(EXTRAS)
 	touch raw_$*_map
 ifeq ($(GNU_LD),1)
-	$(CC) -o raw_$*$(EXE) $(filter %.o,$^) \
-		-L. $(EXTRA_LD_LIBS) $(LD_STACK_FLAGS) -Wl,-Map raw_$*_map $(LD_LIBS_PRE) -l$* $(LD_LIBS_POST)
+	$(CC) -o raw_$*$(EXE) $(filter %.o,$^) -rdynamic -L. $(EXTRA_LD_LIBS) $(LD_STACK_FLAGS) -Wl,-Map raw_$*_map $(LD_LIBS_PRE) -l$* $(LD_LIBS_POST)
 else
-	$(CC) -o raw_$*$(EXE) $(filter %.o,$^) \
-		-L. $(EXTRA_LD_LIBS) $(LD_LIBS_PRE) -l$* $(LD_LIBS_POST)
+	$(CC) -o raw_$*$(EXE) $(filter %.o,$^) -L. $(EXTRA_LD_LIBS) $(LD_LIBS_PRE) -l$* $(LD_LIBS_POST)
 endif
 #	cp raw_$*_map raw_$*_map.bak
 #	diff map_$* map_$*.old >/dev/null || (cp map_$* map_$*.old && rm -f $@ && $(MAKE) $@)
@@ -223,4 +225,4 @@ clean:
 		pre_init.lsp post_init.lsp final recompile.h
 
 .INTERMEDIATE: init_ansi_gcl.lsp.tmp init_gcl.lsp.tmp raw_gcl raw_ansi_gcl recompile.h pre_init.lsp post_init.lsp
-.PRECIOUS: init_pre_gcl.lsp init_gcl.lsp init_ansi_gcl.lsp
+.PRECIOUS: init_pre_gcl.lsp init_gcl.lsp init_ansi_gcl.lsp libboot.so

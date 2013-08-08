@@ -27,7 +27,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 #include "num_include.h"
-#include "boot.h"
 
 object sKinitial_element;
 

@@ -21,6 +21,16 @@
 
 /* FIXME, possibly restore old MAKEFUN in place (in NewInit) here 
    when STATIC_FUNCTION_POINTERS not defined */
+/* #define str(s) #s */
+/* #define xstr(s) str(s) */
+/* #undef DEFBFUN */
+/* #define DEFBFUN(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) \ */
+/*   {void *v,*q;\ */
+/*     if (!(v=dlopen("./libboot.so",RTLD_LAZY|RTLD_GLOBAL))) printf("%s\n",dlerror());\ */
+/*     if (!(q=dlsym(v,xstr(Mjoin(fname,_init))))) printf("%s\n",dlerror());\ */
+/*     fflush(stdout);\ */
+/*     ((void (*)())q)();} */
+
 #undef DEFUN
 #define DEFUN(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) \
   {extern void Mjoin(fname,_init)(); Mjoin(fname,_init)();}

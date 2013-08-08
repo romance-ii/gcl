@@ -134,6 +134,24 @@ clear_c_stack(VOL unsigned n) {
 
 unsigned long cssize      = 0;
 
+int pre_gcl=0;
+
+void
+init_boot(void) {
+
+  void *v,*q;
+  char *z,*s="libboot.so";
+  size_t n=strlen(system_directory)+strlen(s)+1;
+  z=alloca(n);
+  snprintf(z,n,"%s%s",system_directory,s);
+  if (!(v=dlopen(z,RTLD_LAZY|RTLD_GLOBAL)))
+    printf("%s\n",dlerror());
+  if (!(q=dlsym(v,"gcl_init_boot")))
+    printf("%s\n",dlerror());
+  ((void (*)())q)();
+
+}
+
 int
 gcl_main(int argc, char **argv, char **envp)
 {
@@ -363,6 +381,8 @@ gcl_main(int argc, char **argv, char **envp)
         ihs_push(Cnil);
         lex_new();
         vs_base = vs_top;
+
+	if (pre_gcl) init_boot();
 
         interrupt_enable = TRUE;
         install_default_signals();
@@ -731,7 +751,7 @@ initlisp(void) {
 	sLlambda_block_closure = make_si_ordinary("LAMBDA-BLOCK-CLOSURE");
 	sLspecial = make_ordinary("SPECIAL");
 
-	
+	init_boot();
 	NewInit();
 
         if ( NULL_OR_ON_C_STACK(&j) == 0
@@ -746,6 +766,7 @@ initlisp(void) {
 	    error("NULL_OR_ON_C_STACK macro invalid");
 	  }
 
+	dlopen("libboot",RTLD_LAZY|RTLD_GLOBAL);
 	gcl_init_typespec();
 	gcl_init_number();
 	gcl_init_character();
@@ -1160,7 +1181,6 @@ DEFVAR("*SYSTEM-DIRECTORY*",sSAsystem_directoryA,SI,make_simple_string(system_di
 DEFVAR("*MULTIPLY-STACKS*",sSAmultiply_stacksA,SI,Cnil,"");
 DEF_ORDINARY("TOP-LEVEL",sStop_level,SI,"");
 DEFVAR("*COMMAND-ARGS*",sSAcommand_argsA,SI,sLnil,"");
-
 
 static void
 init_main(void) {
