@@ -62,7 +62,7 @@
 (si::freeze-defstruct 'info)
 
 
-(defconstant +iflags+ '(side-effects provisional))
+(defconstant +iflags+ '(side-effects provisional compiler args))
 
 (defmacro iflag-p (flags flag)
   (let ((i (position flag +iflags+)))

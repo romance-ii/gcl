@@ -2061,7 +2061,7 @@
 		 (tbp (info-ref     f))
 		 (tbp (info-ref-ccb f))
 		 (tbp (info-ref-clb f))
-		 (iflag-p (info-flags f) side-effects)))))
+		 (/= 0 (logand (info-flags f) (iflags side-effects compiler)))))))
 
 ;; (defun if1 (f)
 ;;   (not (or (info-ch f) (info-blocks f) (info-tags f)
