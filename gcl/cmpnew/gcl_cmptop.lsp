@@ -707,7 +707,7 @@
 ;; 		 ,@(mapcar 'c1retnote (last le))))
 ;; 	(otherwise (list (car le) 'foo))))
 
-(defvar *callees* nil)
+;(defvar *callees* nil)
 
 (defconstant +nargs+ (let ((s (tmpsym))) (setf (get s 'tmp) t) s))
 (defconstant +fun+ (let ((s (tmpsym))) (setf (get s 'tmp) t) s))
@@ -1129,14 +1129,14 @@
       (member-if (lambda (x) (when (fun-p x) (unless (eq x fun) (not (consp (if (eq b 'cb) (fun-c1cb x) (fun-c1 x)))))))
 		 (append (info-ref (cadr l)) (info-ref-ccb (cadr l)))))))
 
-(defun do-l1-fun (name src e b &aux (wns *warning-note-stack*) *callees* (*recursion-detected* (cons (list name) *recursion-detected*)))
+(defun do-l1-fun (name src e b &aux (wns *warning-note-stack*) (*recursion-detected* (cons (list name) *recursion-detected*)))
 
   (let* ((l (c1lambda-expr src))
 	 (osig (car e))
 	 (sig (lam-e-to-sig l))
 	 (rd (cdar *recursion-detected*))
 	 (sig (if rd (list (car sig) (bbump-tp (cadr sig))) sig)))
-    (setf (car e) sig (cadr e) *callees*)
+    (setf (car e) sig); (cadr e) *callees*)
     (cond ((and rd (not (eq (cadr osig) (cadr sig))))
 	   (keyed-cmpnote (list name 'recursion) "Reprocessing ~s: ~s ~s" name osig sig)
 	   (setq *warning-note-stack* wns);FIXME try to use with-restore-vars

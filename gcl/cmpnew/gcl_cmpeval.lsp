@@ -1072,7 +1072,7 @@
 			      (cmp-aset . si::aset1)
 			      (cmp-array-dimension . array-dimension)))
 (defvar *in-inline* nil)
-(defvar *callees* nil)
+;(defvar *callees* nil)
 
 (defun maybe-reverse-type-prop (dt f)
   (unless (or *safe-compile* (when (consp f) (eq (car f) 'lit)));FIXME push-vbind/c1var copy
@@ -2034,21 +2034,6 @@
 		 (let ((fd (funcall fn res nil)));(cmp-eval `(funcall ',fn ',res nil))))
 		   (and (not (eq res fd))
 			(c1expr fd))))))
-	 ((when (and *compiler-auto-proclaim*
-;		     (not *in-inline*)
-		     (not (macro-function fname))
-		     (not (member fname '(comment recur fun-fun fun-valp vfun-nargs)));FIXME
-		     (member (first *current-form*) '(defun))
-		     (symbolp (second *current-form*))
-		     (symbol-package (second *current-form*)))
-	    (let ((fname (or (cdr (assoc fname +cmp-fn-alist+)) fname)))
-	      (pushnew (cons fname (export-sig (get-sig fname)))
-		       *callees* :test 'eq :key 'car))
-	    nil))
-;	 ((and (get fname 'c1no-side-effects) 
-;	       (not (member fname '(min max)));FIXME
-;	       (not (member-if-not 'constantp args)))
-;	  (c1expr `(quote ,(cmp-eval `(,fname ,@args)))))
 	 ((and (setq fd (get fname 'co1))
 	       (inline-possible fname)
 	       (funcall fd fname args)))
