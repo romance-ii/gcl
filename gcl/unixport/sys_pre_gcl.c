@@ -57,8 +57,14 @@ load1(x)
 void
 gcl_init_init()
 {
+  object features;
+  extern int pre_gcl;
 
   build_symbol_table();
+
+  features=find_symbol(make_simple_string("*FEATURES*"),system_package);
+  features->s.s_dbind=make_cons(make_keyword("PRE-GCL"),features->s.s_dbind);
+  pre_gcl=1;
 
   lsp_init("../lsp/gcl_export.lsp");
 
