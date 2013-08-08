@@ -769,6 +769,16 @@ DEFUNM("GETHASH",object,fLgethash,LISP,2,3,NONE,OO,OO,OO,OO,(object x,object y,.
 /* 	vs_popp; */
 /* } */
 
+DEFUN("GETHASH1",object,fSgethash1,SI,2,2,NONE,OO,OO,OO,OO,(object k,object h),"") {
+
+  struct cons *e;
+
+  check_type_hash_table(&h);
+  e = gethash(k,h);
+  return e->c_cdr != OBJNULL ? e->c_car : Cnil;
+
+}
+
 DEFUN("HASH-SET",object,fShash_set,SI,3,3,NONE,OO,OO,OO,OO,(object x,object y,object z),"") {
 /* LFD(siLhash_set)() */
 /* { */
