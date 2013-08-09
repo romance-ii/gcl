@@ -27,7 +27,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 #include "num_include.h"
-#include "boot.h"
 
 object sKinitial_element;
 
@@ -196,16 +195,6 @@ object x;
 	return(Cnil);
 }
 
-object
-kar(x)
-object x;
-{
-	if (consp(x))
-		return(x->c.c_car);
-	FEwrong_type_argument(sLcons, x);
-	return(Cnil);
-}
-
 /* static object
 kdr(x)
 object x;
@@ -283,17 +272,6 @@ object list_vector_new(fixnum n,object first,va_list ap)
    }
  return ans;}
 
-   
-/* clean this up */
-/* static object on_stack_list(int n, ...)
-{va_list ap;
- object res;
- va_start(ap,n);
- res=on_stack_list_vector(n,ap);
- va_end(ap);
- return res;
-}*/
-  
 
 object list(fixnum n,...) { 
 
@@ -538,20 +516,20 @@ object alist, *treep;
 #endif
 
 
-DEFUN_NEW("CONS-CAR",object,fScons_car,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") { 
-  if (!listp(x))
-    TYPE_ERROR(x,sLlist);
-  RETURN1(x->c.c_car);
-}
+/* DEFUN("CONS-CAR",object,fScons_car,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {  */
+/*   if (!listp(x)) */
+/*     TYPE_ERROR(x,sLlist); */
+/*   RETURN1(x->c.c_car); */
+/* } */
 
-DEFUN_NEW("CONS-CDR",object,fScons_cdr,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") { 
-  if (!listp(x))
-    TYPE_ERROR(x,sLlist);
-  RETURN1(x->c.c_cdr);
-}
+/* DEFUN("CONS-CDR",object,fScons_cdr,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {  */
+/*   if (!listp(x)) */
+/*     TYPE_ERROR(x,sLlist); */
+/*   RETURN1(x->c.c_cdr); */
+/* } */
 
 
-DEFUN_NEW("CONS",object,fLcons,LISP,2,2,NONE,OO,OO,OO,OO,(object a,object d),"") {
+DEFUN("CONS",object,fLcons,LISP,2,2,NONE,OO,OO,OO,OO,(object a,object d),"") {
 
   object x=alloc_object(t_cons);
   x->c.c_car=a;
@@ -640,30 +618,7 @@ LFD(Lcddadr)(){check_arg(1); vs_base[0] = cdr(cdr(car(cdr(vs_base[0]))));}
 LFD(Lcdddar)(){check_arg(1); vs_base[0] = cdr(cdr(cdr(car(vs_base[0]))));}
 LFD(Lcddddr)(){check_arg(1); vs_base[0] = cdr(cdr(cdr(cdr(vs_base[0]))));}
 
-DEFUN_NEW("SET-DIFFERENCE",object,fLset_difference,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") { 
-  object z=Cnil,yy;
-  for (;!endp(x);x=x->c.c_cdr) {
-    for (yy=y;!endp(yy) && !eql(x->c.c_car,yy->c.c_car);yy=yy->c.c_cdr);
-    if (yy==Cnil)
-      z=MMcons(x->c.c_car,z);
-  }
-  RETURN1(z);
-
-}
-
-DEFUN_NEW("UNION",object,fLunion,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") { 
-  object z=y,yy;
-  for (;!endp(x);x=x->c.c_cdr) {
-    for (yy=z;!endp(yy) && !eql(x->c.c_car,yy->c.c_car);yy=yy->c.c_cdr);
-    if (yy==Cnil)
-      z=MMcons(x->c.c_car,z);
-  }
-  RETURN1(z);
-
-}
-
-
-DEFUN_NEW("SET-DIFFERENCE-EQ",object,fSset_difference_eq,SI,2,8,NONE,OO,OO,OO,OO,
+DEFUN("SET-DIFFERENCE-EQ",object,fSset_difference_eq,SI,2,8,NONE,OO,OO,OO,OO,
 	  (object x,object y,...),"") { 
   object z=Cnil,yy;
   for (;x!=Cnil;x=x->c.c_cdr) {
@@ -675,7 +630,7 @@ DEFUN_NEW("SET-DIFFERENCE-EQ",object,fSset_difference_eq,SI,2,8,NONE,OO,OO,OO,OO
 
 }
 
-DEFUN_NEW("UNION-EQ",object,fSunion_eq,SI,2,8,NONE,OO,OO,OO,OO,
+DEFUN("UNION-EQ",object,fSunion_eq,SI,2,8,NONE,OO,OO,OO,OO,
 	  (object x,object y,...),"") { 
   object z=y,yy;
   for (;x!=Cnil;x=x->c.c_cdr) {
@@ -687,7 +642,7 @@ DEFUN_NEW("UNION-EQ",object,fSunion_eq,SI,2,8,NONE,OO,OO,OO,OO,
 
 }
 
-DEFUN_NEW("NUNION-EQ",object,fSnunion_eq,SI,2,8,NONE,OO,OO,OO,OO,
+DEFUN("NUNION-EQ",object,fSnunion_eq,SI,2,8,NONE,OO,OO,OO,OO,
 	  (object x,object y,...),"") { 
   object z=Cnil,zp=z,yy;
   for (;x!=Cnil;x=x->c.c_cdr) {
@@ -702,7 +657,7 @@ DEFUN_NEW("NUNION-EQ",object,fSnunion_eq,SI,2,8,NONE,OO,OO,OO,OO,
 
 }
 
-DEFUN_NEW("INTERSECTION-EQ",object,fSintersection_eq,SI,2,8,NONE,OO,OO,OO,OO,
+DEFUN("INTERSECTION-EQ",object,fSintersection_eq,SI,2,8,NONE,OO,OO,OO,OO,
 	  (object x,object y,...),"") { 
   object z=Cnil,yy;
   for (;x!=Cnil;x=x->c.c_cdr) {
@@ -714,7 +669,8 @@ DEFUN_NEW("INTERSECTION-EQ",object,fSintersection_eq,SI,2,8,NONE,OO,OO,OO,OO,
 
 }
 
-DEFUN_NEW("NTH",object,fLnth,LISP,2,2,NONE,OO,OO,OO,OO,(object i,object lst),"") { 
+
+DEFUN("NTH",object,fLnth,LISP,2,2,NONE,OO,OO,OO,OO,(object i,object lst),"") { 
   object x = lst;
   fixnum index=fixint(i);
   if (index < 0)
@@ -728,7 +684,7 @@ DEFUN_NEW("NTH",object,fLnth,LISP,2,2,NONE,OO,OO,OO,OO,(object i,object lst),"")
       else FEwrong_type_argument(sLlist, lst);}
 }
 
-DEFUN_NEW("NTHCDR",object,fLnthcdr,LISP,2,2,NONE,OO,OO,OO,OO,(object i,object lst),"") { 
+DEFUN("NTHCDR",object,fLnthcdr,LISP,2,2,NONE,OO,OO,OO,OO,(object i,object lst),"") { 
   object x = lst;
   fixnum index=fixint(i);
   if (index < 0)
@@ -742,26 +698,26 @@ DEFUN_NEW("NTHCDR",object,fLnthcdr,LISP,2,2,NONE,OO,OO,OO,OO,(object i,object ls
       else FEwrong_type_argument(sLlist, lst);}
 }
 
-DEFUN_NEW("FIRST",object,fLfirst,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+DEFUN("FIRST",object,fLfirst,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { RETURN1(car(x)) ;}
 
-DEFUN_NEW("SECOND",object,fLsecond,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+DEFUN("SECOND",object,fLsecond,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { return FFN(fLnth)(make_fixnum(1),x);}
-DEFUN_NEW("THIRD",object,fLthird,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+DEFUN("THIRD",object,fLthird,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { return FFN(fLnth)(make_fixnum(2),x);}
-DEFUN_NEW("FOURTH",object,fLfourth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+DEFUN("FOURTH",object,fLfourth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { return FFN(fLnth)(make_fixnum(3),x);}
-DEFUN_NEW("FIFTH",object,fLfifth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+DEFUN("FIFTH",object,fLfifth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { return FFN(fLnth)(make_fixnum(4),x);}
-DEFUN_NEW("SIXTH",object,fLsixth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+DEFUN("SIXTH",object,fLsixth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { return FFN(fLnth)(make_fixnum(5),x);}
-DEFUN_NEW("SEVENTH",object,fLseventh,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+DEFUN("SEVENTH",object,fLseventh,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { return FFN(fLnth)(make_fixnum(6),x);}
-DEFUN_NEW("EIGHTH",object,fLeighth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+DEFUN("EIGHTH",object,fLeighth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { return FFN(fLnth)(make_fixnum(7),x);}
-DEFUN_NEW("NINTH",object,fLninth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+DEFUN("NINTH",object,fLninth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { return FFN(fLnth)(make_fixnum(8),x);}
-DEFUN_NEW("TENTH",object,fLtenth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+DEFUN("TENTH",object,fLtenth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { return FFN(fLnth)(make_fixnum(9),x);}
 
 static bool
@@ -1110,7 +1066,7 @@ LFD(Lldiff)() {
 
 #endif
 
-DEFUN_NEW("RPLACA",object,fLrplaca,LISP,2,2,NONE,OO,OO,OO,OO,(object o,object c),"") {
+DEFUN("RPLACA",object,fLrplaca,LISP,2,2,NONE,OO,OO,OO,OO,(object o,object c),"") {
 
   check_type_cons(&o);
   o->c.c_car = c;
@@ -1118,7 +1074,7 @@ DEFUN_NEW("RPLACA",object,fLrplaca,LISP,2,2,NONE,OO,OO,OO,OO,(object o,object c)
 
 }
 
-DEFUN_NEW("RPLACD",object,fLrplacd,LISP,2,2,NONE,OO,OO,OO,OO,(object o,object d),"") {
+DEFUN("RPLACD",object,fLrplacd,LISP,2,2,NONE,OO,OO,OO,OO,(object o,object d),"") {
 
   check_type_cons(&o);
   o->c.c_cdr = d;
@@ -1198,7 +1154,7 @@ object alist;
 }
 
 
-DEFUN_NEW("PROPER-LISTP",object,fSproper_listp,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") { 
+DEFUN("PROPER-LISTP",object,fSproper_listp,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") { 
   check_proper_list(x);
   RETURN1(Ct);
 }
@@ -1334,7 +1290,8 @@ LFD(Lacons)()
 		if (a_list->c.c_car != Cnil && 
 		    TEST((*car_or_cdr)(a_list->c.c_car))) {
 			a_list = a_list->c.c_car;
-			goto L;
+			break;
+			/* goto L; */
 		}
 		a_list = a_list->c.c_cdr;
 	}

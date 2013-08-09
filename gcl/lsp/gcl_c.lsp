@@ -1,20 +1,18 @@
-(in-package 'lisp)
-
-(export '(car cdr caar cadr cdar cddr caaar caadr cadar caddr cdaar cdadr cddar cdddr
-          caaaar caaadr caadar caaddr cadaar cadadr caddar cadddr cdaaar cdaadr cdadar
-          cdaddr cddaar cddadr cdddar cddddr))
-
-(in-package 'si)
+(in-package :si)
 
 (defun car (x)
   (declare (optimize (safety 2)))
   (check-type x list)
-  (cons-car x))
+;  (*object (address x) 1 nil nil)
+  (lit :object (:object x) "->c.c_car")
+  );  (cons-car x)
 
 (defun cdr (x)
   (declare (optimize (safety 2)))
   (check-type x list)
-  (cons-cdr x))
+;  (*object (address x) 0 nil nil)
+  (lit :object (:object x) "->c.c_cdr")
+ );  (cons-cdr x)
 
 (defun cadr (x)
   (declare (optimize (safety 2)))

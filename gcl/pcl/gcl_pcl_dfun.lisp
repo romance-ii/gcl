@@ -129,8 +129,7 @@ And so, we are saved.
 				 not-best-p)))
 		(if generator-entry
 		    (push entry (cdr generator-entry))
-		    (push (list generator entry)
-			  *dfun-constructors*)))
+		  (push (list generator entry) *dfun-constructors*)))
 	      (values new not-best-p))))))
 
 (defun load-precompiled-dfun-constructor (generator args system constructor)

@@ -1278,14 +1278,16 @@ object pathname;
     pathname = coerce_to_pathname(pathname);
     vs_push(pathname);
     pathname = make_pathname(
-        pathname_resolve(sKhost) ? pathname->pn.pn_host : Cnil,
-	pathname_resolve(sKdevice) ? pathname->pn.pn_device : Cnil,
+        pathname->pn.pn_host,
+	pathname->pn.pn_device,
+        /* pathname_resolve(sKhost) ? pathname->pn.pn_host : Cnil, */
+	/* pathname_resolve(sKdevice) ? pathname->pn.pn_device : Cnil, */
 	pathname->pn.pn_directory,
 	pathname->pn.pn_name,
 	pathname->pn.pn_type,
 	Cnil, Cnil);
     vs_push(pathname);
-    if (pathname_resolve(sKhost)) {
+    if (1) {/* pathname_resolve(sKhost)) { */
 	if (type_of(pathname->pn.pn_host) == t_string) {
 	    pathname = search_local_pathname(pathname,32);
 	    vs_push(pathname);
@@ -1295,7 +1297,7 @@ object pathname;
 	if (pathname->pn.pn_host != Cnil)
 	    file_error("Invalid host in pathname ~S.",pathname);
     }
-    if (pathname_resolve(sKdevice) &&
+    if (1 && /* pathname_resolve(sKdevice) && */
 	(type_of(pathname->pn.pn_device) == t_string) &&
 	(consp(pathname_lookup(pathname->pn.pn_device,sSApathname_deviceA)))) {
 	    pathname = search_local_pathname(pathname,32);
@@ -2464,6 +2466,7 @@ object path;
 	    s->pn.pn_device = sKunspecific; /*FIXME side effect*/
     }
 
+    s->d.tt=1;
     vs_reset;
   }
   @(return s)

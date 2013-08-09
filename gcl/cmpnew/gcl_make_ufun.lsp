@@ -21,7 +21,7 @@
 
 
 
-(in-package 'compiler)
+(in-package :compiler)
 
 (defvar gazonk (make-package 'symbol-table :use nil))
 (defvar eof (cons nil nil))
@@ -31,7 +31,7 @@
 
 (defun make-Ufun (in-files &key (out-file "Ufun_list.lsp"))
   (with-open-file (*Ufun-out* out-file :direction :output)
-    (print '(in-package "COMPILER") *Ufun-out*)
+    (print '(in-package :COMPILER) *Ufun-out*)
     (dolist (file in-files)
       (with-open-file (in (merge-pathnames file #".lsp"))
         (loop (when (eq (setq form (read in nil eof)) eof) (return))

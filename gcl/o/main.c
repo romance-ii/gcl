@@ -134,6 +134,24 @@ clear_c_stack(VOL unsigned n) {
 
 unsigned long cssize      = 0;
 
+int pre_gcl=0;
+
+void
+init_boot(void) {
+
+  void *v,*q;
+  char *z,*s="libboot.so";
+  size_t n=strlen(system_directory)+strlen(s)+1;
+  z=alloca(n);
+  snprintf(z,n,"%s%s",system_directory,s);
+  if (!(v=dlopen(z,RTLD_LAZY|RTLD_GLOBAL)))
+    printf("%s\n",dlerror());
+  if (!(q=dlsym(v,"gcl_init_boot")))
+    printf("%s\n",dlerror());
+  ((void (*)())q)();
+
+}
+
 int
 gcl_main(int argc, char **argv, char **envp)
 {
@@ -364,6 +382,8 @@ gcl_main(int argc, char **argv, char **envp)
         lex_new();
         vs_base = vs_top;
 
+	if (pre_gcl) init_boot();
+
         interrupt_enable = TRUE;
         install_default_signals();
 
@@ -417,6 +437,14 @@ gcl_main(int argc, char **argv, char **envp)
             LISP_IMPLEMENTATION_VERSION,
             MAXPAGE);
     fflush(stdout);
+
+    def_env1[0]=(object)1;/*FIXME better place*/
+    def_env1[1]=Cnil;
+    def_env=def_env1+1;
+
+    src_env1[0]=(object)1;/*FIXME better place*/
+    src_env1[1]=Cnil;
+    src_env=src_env1+1;
 
     initlisp();
 
@@ -686,6 +714,7 @@ initlisp(void) {
 	
 	set_type_of(Ct,t_symbol);
  	Ct->s.s_dbind = Ct;
+	Ct->s.tt=1;
  	Ct->s.s_sfdef = NOT_SPECIAL;
  	Ct->s.s_fillp = 1;
  	Ct->s.s_self = "T";
@@ -708,21 +737,21 @@ initlisp(void) {
 	import(Ct, lisp_package);
 	export(Ct, lisp_package);
 
-#ifdef ANSI_COMMON_LISP
-	import(Cnil, common_lisp_package);
-	export(Cnil, common_lisp_package);
+/* #ifdef ANSI_COMMON_LISP */
+/* 	import(Cnil, common_lisp_package); */
+/* 	export(Cnil, common_lisp_package); */
 
-	import(Ct, common_lisp_package);
-	export(Ct, common_lisp_package);
-#endif
+/* 	import(Ct, common_lisp_package); */
+/* 	export(Ct, common_lisp_package); */
+/* #endif */
 
 	sLlambda = make_ordinary("LAMBDA");
-	sLlambda_block = make_ordinary("LAMBDA-BLOCK");
-	sLlambda_closure = make_ordinary("LAMBDA-CLOSURE");
-	sLlambda_block_closure = make_ordinary("LAMBDA-BLOCK-CLOSURE");
+	sLlambda_block = make_si_ordinary("LAMBDA-BLOCK");
+	sLlambda_closure = make_si_ordinary("LAMBDA-CLOSURE");
+	sLlambda_block_closure = make_si_ordinary("LAMBDA-BLOCK-CLOSURE");
 	sLspecial = make_ordinary("SPECIAL");
 
-	
+	init_boot();
 	NewInit();
 
         if ( NULL_OR_ON_C_STACK(&j) == 0
@@ -737,6 +766,7 @@ initlisp(void) {
 	    error("NULL_OR_ON_C_STACK macro invalid");
 	  }
 
+	dlopen("libboot",RTLD_LAZY|RTLD_GLOBAL);
 	gcl_init_typespec();
 	gcl_init_number();
 	gcl_init_character();
@@ -868,23 +898,27 @@ segmentation_catcher(int i, long code, void *scp, char *addr) {
 
 }
 
-DEFUNO_NEW("BYE",object,fLbye,LISP
-       ,0,1,NONE,OI,OO,OO,OO,void,Lby,(fixnum exitc),"")
-{	int n=VFUN_NARGS;
-	int exit_code;
-	if (n>=1) exit_code=exitc;else exit_code=0;
+DEFUN("BYE",object,fSbye,SI,0,1,NONE,OI,OO,OO,OO,(ufixnum exit_code,...),"") {
+
+  fixnum n=INIT_NARGS(0);
+  object l=Cnil,f=(object)(exit_code+1);
+  va_list ap;
+
+  va_start(ap,exit_code);
+  exit_code=((fixnum)NEXT_ARG(n,ap,l,f,(object)1))-1;
+  va_end(ap);
 
 #ifdef UNIX
-	exit(exit_code);
+  exit(exit_code);
 #else
-	RETURN(1,int,exit_code, 0); 
+  RETURN(1,int,exit_code, 0); 
 #endif
 
 }
 
-DEFUN_NEW("QUIT",object,fLquit,LISP
-       ,0,1,NONE,OI,OO,OO,OO,(fixnum exitc),"")
-{	return FFN(fLbye)(exitc); }
+DEFUN("QUIT",object,fSquit,SI,0,1,NONE,OI,OO,OO,OO,(fixnum exitc),"") {
+  return FFN(fSbye)(exitc); 
+}
  
 
 static void
@@ -953,8 +987,7 @@ FFN(siLcheck_vs)(void) {
   vs_base[0] = Cnil;
 }
 
-static object
-FFN(siLcatch_fatal)(int i) {
+DEFUN("CATCH-FATAL",object,fScatch_fatal,SI,1,1,NONE,OI,OO,OO,OO,(fixnum i),"") {
   catch_fatal=i;
   return Cnil;
 }
@@ -1002,7 +1035,7 @@ LFD(siLreset_stack_limits)(void)
  do{int leng,topl;      \
   bcopy(org,p,leng=(stack_multiple*size*sizeof(typ))); \
   topl= top - org; \
-  org=(typ *)p; top = org +topl;\
+  org=(typ *)p; top = org +topl;	    \
   p=p+leng+(STACK_OVER+1)*geta*sizeof(typ); \
   lim = ((typ *)p) - (STACK_OVER+1)*geta;   \
   }while (0)
@@ -1022,6 +1055,7 @@ multiply_stacks(int m) {
   array_allocself(stack_space,1,code_char(0));
   p=stack_space->st.st_self;
   COPYSTACK(vs_org,p,object,vs_limit,vs_top,VSGETA,VSSIZE);
+  vs_base=vs_org;
   COPYSTACK(bds_org,p,struct bds_bd,bds_limit,bds_top,BDSGETA,BDSSIZE);
   COPYSTACK(frs_org,p,struct frame,frs_limit,frs_top,FRSGETA,FRSSIZE);
   COPYSTACK(ihs_org,p,struct invocation_history,ihs_limit,ihs_top,
@@ -1036,6 +1070,7 @@ LFD(siLinit_system)(void) {
   check_arg(0);
   gcl_init_system(sSAno_initA);
   vs_base[0] = Cnil;
+  vs_top=vs_base+1;
 }
 
 static void
@@ -1079,30 +1114,20 @@ FFN(siLinitialization_failure)(void) {
   exit(0);
 }
 
-DEFUNO_NEW("IDENTITY",object,fLidentity,LISP
-       ,1,1,NONE,OO,OO,OO,OO,void,Lidentity,(object x0),"")
-{
-	/* 1 args */
+DEFUN("IDENTITY",object,fLidentity,LISP,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
   RETURN1 (x0);
 }
 
-DEFUNO_NEW("GCL-COMPILE-TIME",object,fSgcl_compile_time,SI
-       ,0,0,NONE,OO,OO,OO,OO,void,Lgcl_compile_time,(void),"")
-{
+DEFUN("GCL-COMPILE-TIME",object,fSgcl_compile_time,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
   RETURN1 (make_simple_string(__DATE__ " " __TIME__));
 }
 
-DEFUNO_NEW("LDB1",object,fSldb1,SI
-       ,3,3,NONE,OI,II,OO,OO,void,Lldb1,(fixnum a,fixnum b, fixnum c),"")
-{
+DEFUN("LDB1",object,fSldb1,SI,3,3,NONE,OI,II,OO,OO,(fixnum a,fixnum b, fixnum c),"") {
   RETURN1 (make_fixnum(((((~(-1 << (a))) << (b)) & (c)) >> (b))));
 }
 
-DEFUN_NEW("LISP-IMPLEMENTATION-VERSION",object,fLlisp_implementation_version,LISP
-       ,0,0,NONE,OO,OO,OO,OO,(void),"")
-{
-	/* 0 args */
-	RETURN1((make_simple_string(LISP_IMPLEMENTATION_VERSION)));
+DEFUN("LISP-IMPLEMENTATION-VERSION",object,fLlisp_implementation_version,LISP,0,0,NONE,OO,OO,OO,OO,(void),"") {
+  RETURN1((make_simple_string(LISP_IMPLEMENTATION_VERSION)));
 }
 
 
@@ -1157,11 +1182,10 @@ DEFVAR("*MULTIPLY-STACKS*",sSAmultiply_stacksA,SI,Cnil,"");
 DEF_ORDINARY("TOP-LEVEL",sStop_level,SI,"");
 DEFVAR("*COMMAND-ARGS*",sSAcommand_argsA,SI,sLnil,"");
 
-
 static void
 init_main(void) {
 
-  make_function("BY", Lby);
+  /* make_function("BY", Lby); */
   make_si_function("ARGC", siLargc);
   make_si_function("ARGV", siLargv);
   
@@ -1299,10 +1323,15 @@ init_main(void) {
 #ifdef STATIC_LINKING
   ADD_FEATURE("STATIC");
 #endif	 
+
+#if SIZEOF_LONG==8
+  ADD_FEATURE("64BIT");
+#endif	 
+
   make_special("*FEATURES*",features);}
   
   make_si_function("SAVE-SYSTEM", siLsave_system);
-  make_si_sfun("CATCH-FATAL",siLcatch_fatal,ARGTYPE1(f_fixnum));
-  make_si_function("WARN-VERSION",Lidentity);
+/*   make_si_sfun("CATCH-FATAL",siLcatch_fatal,ARGTYPE1(f_fixnum)); */
+  /* make_si_function("WARN-VERSION",Lidentity); */
   
 }

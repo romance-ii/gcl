@@ -23,15 +23,12 @@
 ;;;;                            module routines
 
 
-(in-package 'lisp)
+;; (in-package 'lisp)
 
-(export '(*modules* provide require))
-(export '(documentation variable function structure type setf compiler-macro))
+;; (export '(*modules* provide require))
+;; (export '(documentation variable function structure type setf compiler-macro))
 
-(in-package 'system)
-
-
-;(eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))
+(in-package :system)
 
 
 (defvar *modules* nil)
@@ -58,38 +55,22 @@
           
 
 (defun documentation (object doc-type)
-  (cond ((typep object 'function)
-	 (setq object (function-name object)))
-	((typep object 'package)
-	 (setq object (find-symbol (package-name object) :keyword))))
-  (when object
-    (check-type object symbol)
-    (ecase doc-type
-      (variable (get object 'variable-documentation))
-      (function (get object 'function-documentation))
-      (structure (get object 'structure-documentation))
-      (type (get object 'type-documentation))
-      (setf (get object 'setf-documentation))
-      (compiler-macro (get object 'compiler-macro-documentation))
-      (method-combination (get object 'method-combination-documentation))
-      ((t) (when (find-package object) (get object 'package-documentation))))))
+  (let ((x (typecase object
+		     (function (function-name object))
+		     (package (find-symbol (package-name object) :keyword))
+		     ((cons (member setf) (cons symbol nil)) (setf-sym object))
+		     (symbol object)))
+	(p (ecase doc-type
+	       (variable 'variable-documentation)
+	       (function 'function-documentation)
+	       (structure 'structure-documentation)
+	       (type 'type-documentation)
+	       (setf 'setf-documentation)
+	       (compiler-macro 'compiler-macro-documentation)
+	       (method-combination 'method-combination-documentation)
+	       ((t) 'package-documentation))))
+    (when x (get x p))))
 
-(defun set-documentation (object doc-type value)
-  (cond ((typep object 'function)
-	 (setq object (function-name object) doc-type 'function))
-	((typep object 'package)
-	 (setq object (find-symbol (package-name object) :keyword))))
-  (when object
-    (check-type object symbol)
-    (ecase doc-type
-      (variable (setf (get object 'variable-documentation) value))
-      (function (setf (get object 'function-documentation) value))
-      (structure (setf (get object 'structure-documentation) value))
-      (type (setf (get object 'type-documentation) value))
-      (setf (setf (get object 'setf-documentation) value))
-      (compiler-macro (setf (get object 'compiler-macro-documentation) value))
-      (method-combination (setf (get object 'method-combination-documentation) value))
-      ((t) (when (find-package object) (setf (get object 'package-documentation) value))))))
 
 (defun find-documentation (body)
   (if (or (endp body) (endp (cdr body)))

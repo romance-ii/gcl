@@ -19,10 +19,8 @@
 #endif
 
 
-DEFUN_NEW("CHECK-FD-FOR-INPUT",object,fScheck_fd_for_input,
-      SI,2,2,NONE,OI,IO,OO,OO,(fixnum fd,fixnum timeout),
-
-"Check FD a file descriptor for data to read, waiting TIMEOUT clicks \
+DEFUN("CHECK-FD-FOR-INPUT",object,fScheck_fd_for_input,SI,2,2,NONE,OI,IO,OO,OO,(fixnum fd,fixnum timeout),
+      "Check FD a file descriptor for data to read, waiting TIMEOUT clicks \
 for data to become available.  Here there are \
 INTERNAL-TIME-UNITS-PER-SECOND in one second.  Return is 1 if data \
 available on FD, 0 if timeout reached and -1 if failed.")
@@ -263,15 +261,16 @@ write1(sfd,p,bytes)
       
 }	  
 
-DEFUN_NEW("CLEAR-CONNECTION",object,fSclear_connection,SI,1,1,NONE,OI,OO,OO,OO,(fixnum fd),
-      "Read on FD until nothing left to read.  Return number of bytes read")
-{char buffer[0x1000];
- int n=0;
- while (fix(FFN(fScheck_fd_for_input)(fd,0)))
-   { n+=read(fd,buffer,sizeof(buffer));
-   }
- 
- return make_fixnum1(n);
+DEFUN("CLEAR-CONNECTION",object,fSclear_connection,SI,1,1,NONE,OI,OO,OO,OO,(fixnum fd),
+      "Read on FD until nothing left to read.  Return number of bytes read") {
+  
+  char buffer[0x1000];
+  int n=0;
+  while (fix(FFN(fScheck_fd_for_input)(fd,0)))
+    n+=read(fd,buffer,sizeof(buffer));
+  
+  return make_fixnum1(n);
+
 }
 #ifdef STATIC_FUNCTION_POINTERS
 object

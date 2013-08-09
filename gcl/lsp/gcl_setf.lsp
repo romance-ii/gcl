@@ -23,20 +23,21 @@
 ;;;;                                setf routines
 
 
-(in-package 'lisp)
+;; (in-package 'lisp)
 
 
-(export '(setf psetf shiftf rotatef
-          define-modify-macro defsetf
-          getf remf incf decf push pushnew pop
-          define-setf-method
-	  define-setf-expander
-	  get-setf-method
-	  get-setf-expansion
-	  get-setf-method-multiple-value))
+;; (export '(setf psetf shiftf rotatef
+;;           define-modify-macro defsetf
+;;           getf remf incf decf push pushnew pop
+;; ;         define-setf-method
+;; 	  define-setf-expander
+;; ;	  get-setf-method
+;; 	  get-setf-expansion
+;; ;	  get-setf-method-multiple-value
+;; 	  ))
 
 
-(in-package 'system)
+(in-package :system)
 
 
 ;(eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))
@@ -82,8 +83,9 @@
 	 (unless (= (list-length (cadr rest)) 1)
 		 (error "(store-variable) expected."))
 	 (multiple-value-bind
-	  (doc decls body)
-	  (find-doc (cddr rest) nil)
+	  (doc decls ctps body)
+	  (parse-body-header (cddr rest))
+	  (declare (ignore ctps))
 	  `(eval-when (compile eval load)
 		      (si:putprop 
 		       ',access-fn 
@@ -233,7 +235,12 @@
 (defsetf symbol-value set)
 (defsetf symbol-function si::fset)
 (defsetf macro-function (s &optional env) (v) `(let ((env ,env)) (declare (ignorable env)) (si:fset ,s (cons 'macro ,v)) ,v))
-(defsetf aref si:aset)
+;; (defun aset-wrap (x &rest r &aux v)
+;;   (declare (:dynamic-extent r)) 
+;;   (setq r (nreverse r) v (pop r) r (nreverse r)) 
+;;   (apply 'si:aset v x r))
+(defsetf aref (x &rest r) (v) `(si::aset ,v ,x ,@r))
+;(defsetf aref aset-wrap)
 (defsetf get put-aux)
 (defmacro put-aux (a b &rest l)
   `(si::sputprop ,a ,b (progn ,@l)))
@@ -241,24 +248,37 @@
 (defsetf nth (n l) (v) `(progn (rplaca (nthcdr ,n ,l) ,v) ,v))
 (defsetf char si:char-set)
 (defsetf schar si:schar-set)
-(defsetf bit si:aset)
-(defsetf sbit si:aset)
-(defsetf fill-pointer si:fill-pointer-set)
-(defsetf symbol-plist si:set-symbol-plist)
+;(defsetf bit aset-wrap)
+;(defsetf sbit aset-wrap)
+(defsetf bit (x &rest r) (v) `(si::aset ,v ,x ,@r))
+(defsetf sbit (x &rest r) (v) `(si::aset ,v ,x ,@r))
+;(defsetf fill-pointer si:fill-pointer-set)
+(defsetf fill-pointer c-set-vector-fillp)
+;(defsetf symbol-plist si:set-symbol-plist)
+(defsetf symbol-plist (x) (y) `(c-set-symbol-plist ,x ,y))
 (defsetf gethash (k h &optional d) (v) `(si:hash-set ,k ,h ,v))
-(defsetf row-major-aref si:aset1)
+(defsetf row-major-aref si::aset1)
 (defsetf readtable-case si::set-readtable-case)
-(defsetf documentation (s d) (v)
-  `(case ,d
-     (variable (si:putprop ,s ,v 'variable-documentation))
-     (function (si:putprop ,s ,v 'function-documentation))
-     (structure (si:putprop ,s ,v 'structure-documentation))
-     (type (si:putprop ,s ,v 'type-documentation))
-     (setf (si:putprop ,s ,v 'setf-documentation))
-     (compiler-macro (si:putprop ,s ,v 'compiler-macro-documentation))
-     (method-combination (si:putprop ,s ,v 'method-combination-documentation))
-     (t (error "~S is an illegal documentation type." ,d))))
 
+(defun set-documentation (s d v)
+  (let ((x (typecase s
+		      (function (function-name s))
+		      (package (find-symbol (package-name s) :keyword))
+		      ((cons (member setf) (cons symbol nil)) (setf-sym s))
+		      (symbol s)))
+	(p (ecase d
+	       (variable 'variable-documentation)
+	       (function 'function-documentation)
+	       (structure 'structure-documentation)
+	       (type 'type-documentation)
+	       (setf 'setf-documentation)
+	       (compiler-macro 'compiler-macro-documentation)
+	       (method-combination 'method-combination-documentation)
+	       ((t) 'package-documentation))))
+    (if x (putprop x v p) v)))
+
+(defsetf documentation (s d) (v)
+  `(set-documentation ,s ,d ,v))
 
 (define-setf-method getf (&environment env place indicator &optional default)
   (multiple-value-bind (vars vals stores store-form access-form)
@@ -396,11 +416,13 @@
       (get-setf-method place env)
     (declare (ignore access-form))
     `(let* ,(join (append vars stores) (append vals (list newvalue)))
+       (declare (ignorable ,@vars))
        ,store-form)))
 
 (defun setf-structure-access (struct type index newvalue)
   (case type
-    (list `(si:rplaca-nthcdr ,struct ,index ,newvalue))
+    (list `(setf (nth ,index ,struct) ,newvalue))
+;    (list `(si:rplaca-nthcdr ,struct ,index ,newvalue))
     (vector `(si:elt-set ,struct ,index ,newvalue))
     (t `(si::structure-set ,struct ',type ,index ,newvalue))))
 
@@ -445,7 +467,7 @@
 	      (store-forms nil))
 	     ((endp r)
 	      `(let* ,pairs
-		 ,@(nreverse store-forms)
+		 ,@(nreverse store-forms);FIXME put in ignorable decl here
 		 nil))
 	   (when (endp (cdr r)) (error "~S is an illegal PSETF form." rest))
 	   (multiple-value-bind (vars vals stores store-form access-form)
@@ -545,6 +567,7 @@
 	   (get-setf-method reference env)
          (list 'let*
 	       (join (append vars stores) (append vals (list ,update-form)))
+	       (list 'declare (cons 'ignorable vars))
 	       store-form)))))
 
 
@@ -601,6 +624,7 @@
     (multiple-value-bind (vars vals stores store-form access-form)
 			 (get-setf-method place env)
 			 `(let* ,(join (append (list myitem) vars stores) (append (list   item) vals (list (list 'cons myitem access-form))))
+			    (declare (ignorable ,@vars))
 			    ,store-form))))
 
 (defmacro pushnew (&environment env item place &rest rest)
@@ -613,6 +637,7 @@
 			 (get-setf-method place env)
 			 `(let* ,(join (append (list myitem) vars stores) 
 				       (append (list item) vals  (list (list* 'adjoin myitem access-form rest))))
+			    (declare (ignorable ,@vars))
 			    ,store-form))))
 
 (defmacro pop (&environment env place)
@@ -626,6 +651,7 @@
   (multiple-value-bind (vars vals stores store-form access-form)
       (get-setf-method place env)
     `(let* ,(join (append vars stores) (append vals (list (list 'cdr access-form))))
+       (declare (ignorable ,@vars))
        (prog1 (car ,access-form)
               ,store-form))))
 

@@ -155,7 +155,7 @@ enum dump_type {
 
 object fas_stream;
 int dump_index;
-struct htent *gethash();
+/* struct htent *gethash(); */
 static void read_fasd1(int i, object *loc);
 object extended_read();
 
@@ -470,10 +470,10 @@ getd(str)
 
 static enum circ_ind
 do_hash(object obj, int dot)
-{    struct htent *e;
+{    struct cons *e;
      int i;
      e=gethash(obj,dump_hash_table); 
-     if (e->hte_key==OBJNULL) 
+     if (e->c_cdr==OBJNULL) 
 /* We won't index things unless they have  < -2 in the hash table */
   {   if(type_of(obj)!=t_package) return NOT_INDEXED;
       sethash(obj,dump_hash_table,make_fixnum(dump_index));
@@ -483,12 +483,12 @@ do_hash(object obj, int dot)
 	dump_index++;
 	return FIRST_INDEX;}
 	
-     i = fix(e->hte_value);
+     i = fix(e->c_car);
      if (i == -1) return NOT_INDEXED; /* don't want to index this baby */
      
      if (dot) PUT_OP(dot);
      if ( i < -1)
-       { e->hte_value = make_fixnum(dump_index);
+       { e->c_car = make_fixnum(dump_index);
 	 PUT_OP(d_new_indexed_item);
 	 DPRINTF("{dump_index=%d}",dump_index);
 	 dump_index++;
@@ -518,7 +518,7 @@ do_hash(object obj, int dot)
  
 static void write_fasd(object obj);
 
-DEFUN_NEW("WRITE-FASD-TOP",object,fSwrite_fasd_top,SI
+DEFUN("WRITE-FASD-TOP",object,fSwrite_fasd_top,SI
 	  ,2,2,NONE,OO,OO,OO,OO,(object obj, object x),"") {
 
 /* static object */
@@ -544,7 +544,7 @@ struct fasd *fd = (struct fasd *) x->v.v_self;
 #define MAYBE_PATCH(result) \
   if (needs_patching)  result =fasd_patch_sharp(result,0)
 
-DEFUN_NEW("READ-FASD-TOP",object,fSread_fasd_top,SI
+DEFUN("READ-FASD-TOP",object,fSread_fasd_top,SI
 	  ,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 /* static object */
 /* FFN(read_fasd_top)(object x) */
@@ -593,7 +593,7 @@ object sLeq;
 object sSPinit;
 void Lmake_hash_table();
 
-DEFUN_NEW("OPEN-FASD",object,fSopen_fasd,SI
+DEFUN("OPEN-FASD",object,fSopen_fasd,SI
 	  ,4,4,NONE,OO,OO,OO,OO,(object stream, object direction, object eof, object tabl),"") {
 
 
@@ -649,7 +649,7 @@ DEFUN_NEW("OPEN-FASD",object,fSopen_fasd,SI
   return result;
   }}
 
-DEFUN_NEW("CLOSE-FASD",object,fSclose_fasd,SI
+DEFUN("CLOSE-FASD",object,fSclose_fasd,SI
 	  ,1,1,NONE,OO,OO,OO,OO,(object ar),"") {
 /* static object */
 /* FFN(close_fasd)(object ar) */
@@ -995,7 +995,7 @@ fasd_patch_sharp(object x, int depth)
 object sharing_table;
 static enum circ_ind
 is_it_there(object x)
-{ struct htent *e;
+{ struct cons *e;
   object table=sharing_table;
   switch(type_of(x)){
   case t_cons:
@@ -1005,14 +1005,14 @@ is_it_there(object x)
   case t_vector:
   case t_package:
   e= gethash(x,table);
-    if (e->hte_key ==OBJNULL)
+    if (e->c_cdr ==OBJNULL)
       {sethash(x,table,make_fixnum(-1));
        return FIRST_INDEX;
      }
     else
-      {int n=fix(e->hte_value);
+      {int n=fix(e->c_car);
        if (n <0)
-	 e->hte_value=make_fixnum(n-1);
+	 e->c_car=make_fixnum(n-1);
        return LATER_INDEX;}
   break;
  default:
@@ -1082,7 +1082,7 @@ find_sharing(object x)
 /*  return Ct; */
 /* } */
 
-DEFUN_NEW("FIND-SHARING-TOP",object,fSfind_sharing_top,SI
+DEFUN("FIND-SHARING-TOP",object,fSfind_sharing_top,SI
 	  ,2,2,NONE,OO,OO,OO,OO,(object x,object table),"") {
 
   sharing_table=table;
@@ -1103,16 +1103,17 @@ DEFUN_NEW("FIND-SHARING-TOP",object,fSfind_sharing_top,SI
      /* I am not sure if saving vs_top,vs_base is necessary */
 static object 
 lisp_eval(object x)
-{  object *b,*t;
+{  /* object *b,*t; */
    SAVE_CURRENT_FASD;
-   b=vs_base;
-   t=vs_top;
-   vs_base=vs_top;
-   vs_push(x);
-   Leval(); 
-   x=vs_base[0];
-   vs_base=b;
-   vs_top=t;
+   x=fLeval(x);/*FIXME FFN*/
+   /* b=vs_base; */
+   /* t=vs_top; */
+   /* vs_base=vs_top; */
+   /* vs_push(x); */
+   /* Leval();  */
+   /* x=vs_base[0]; */
+   /* vs_base=b; */
+   /* vs_top=t; */
    RESTORE_FASD;
    return x;
  }
@@ -1350,7 +1351,9 @@ read_fasd1(int i, object *loc)
 	      read_fasd1(GET_OP(),p++);
 	    vs_base=base;
 	    vs_top = p;
-	    siLmake_structure();
+#define str(a_) ({string_register->st.st_fillp=string_register->st.st_dim=sizeof(a_)-1;string_register->st.st_self=(a_);string_register;})
+	    funcall(find_symbol(str("MAKE-STRUCTURE"),system_package));
+	    /* siLmake_structure(); */
 	    *loc = vs_base[0];
 	    vs_top=vs_base=base;
 	    return;
@@ -1383,7 +1386,8 @@ read_fasd1(int i, object *loc)
 	 object y;
 	 object x=alloc_object(t_vector);
 	 GET4(leng);
-	 x->v.v_elttype = GETD("v_elttype=%d");
+	 x->v.tt=x->v.v_elttype = GETD("v_elttype=%d");
+	 x->v.v_eltsize=elt_size(x->v.v_elttype);
 	 x->v.v_defrank=1;
 	 x->v.v_dim=x->v.v_fillp=leng;
 	 x->v.v_self=0;
@@ -1407,7 +1411,8 @@ read_fasd1(int i, object *loc)
 	 object x=alloc_object(t_array);
 	 GET4(leng);
 
-	 x->a.a_elttype = GETD("a_elttype=%d");
+	 x->a.tt=x->a.a_elttype = GETD("a_elttype=%d");
+	 x->a.a_eltsize = elt_size(x->a.a_elttype);
 	 x->a.a_dim=leng;
 	 x->a.a_hasfillp=0;
 	 x->a.a_rank= GETD("a_rank=%d");
@@ -1512,8 +1517,8 @@ clrhash(object table)
 {int i;
    if (table->ht.ht_nent > 0 )
      for(i = 0; i < table->ht.ht_size; i++) {
-       table->ht.ht_self[i].hte_key = OBJNULL;
-       table->ht.ht_self[i].hte_value = OBJNULL;}
+       table->ht.ht_self[i].c_cdr = OBJNULL;
+       table->ht.ht_self[i].c_car = OBJNULL;}
    table->ht.ht_nent =0;}
 
 

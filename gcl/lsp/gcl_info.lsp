@@ -1,16 +1,11 @@
 ;; -*-Lisp-*-
-(in-package "SI"  )
+(in-package :SI)
 
-;(eval-when (compile)
-;(proclaim '(ftype (function (t t &optional fixnum) fixnum) string-match))
-;(proclaim '(ftype (function (fixnum) fixnum)
-;		  match-beginning match-end)))
 (eval-when (compile eval)
 (defmacro while (test &body body)
   `(slooP::sloop while ,test do ,@ body))
  (defmacro f (op x y)
-   `(the ,(if  (get op 'compiler::predicate)  't 'fixnum)
-	 (,op (the fixnum ,x) (the fixnum ,y)))))
+   (list op x y)))
 
 (eval-when (compile eval load)
 

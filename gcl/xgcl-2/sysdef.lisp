@@ -19,9 +19,8 @@
 ; Some of the files that interface to the Xlib are adapted from DEC/MIT files.
 ; See the file dec.copyright for details.
 
-(make-package :XLIB)
+(make-package :XLIB :use '(:lisp :si))
 (in-package :XLIB)
-(sys::use-package '(:lisp :system :sys))
 
 (defvar *files* '( "gcl_Xlib"
       "gcl_Xutil"

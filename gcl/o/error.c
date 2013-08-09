@@ -35,6 +35,20 @@ object siSuniversal_error_handler;
 object sSterminal_interrupt;
 
 void
+assert_error(const char *a,unsigned l,const char *f,const char *n) {
+
+  if (initflag)
+    FEerror("The assertion ~a on line ~a of ~a in function ~a failed",4,
+	    make_simple_string(a),make_fixnum(l),
+	    make_simple_string(f),make_simple_string(n));
+  else {
+    fprintf(stderr,"The assertion %s on line %d of %s in function %s failed",a,l,f,n);
+    exit(-1);
+  }
+
+}
+
+void
 terminal_interrupt(int correctable)
 {
     signals_allowed = sig_normal; 
@@ -50,9 +64,9 @@ ihs_function_name(object x)
 	case t_symbol:
 		return(x);
 
-	case t_ifun:
-	  x=x->ifn.ifn_self;
-	  /*pass through*/
+	/* case t_ifun: */
+	/*   x=x->ifn.ifn_self; */
+	/*   /\*pass through*\/ */
 	case t_cons:
 		y = x->c.c_car;
 		if (y == sLlambda)
@@ -85,15 +99,13 @@ ihs_function_name(object x)
 		  return y;
 		return(Cnil);
 
-	case t_afun:
-	case t_closure:
-	case t_cfun:
-        case t_sfun:
-        case t_vfun:
-        case t_cclosure:
-        case t_gfun:
+	/* case t_cfun: */
 
-		return(x->cf.cf_name);
+	/* 	return(x->cf.cf_name); */
+
+        case t_function:
+
+		return(Cnil);
 
 	default:
 		return(Cnil);
@@ -115,342 +127,29 @@ ihs_top_function_name(ihs_ptr h)
 	return(Cnil);
 }
 
-/* static void */
-/* call_error_handler(void) */
-/* { */
-/* 	super_funcall(siSuniversal_error_handler); */
-/* } */
-
-
-
 object
-Icall_error_handler(object error_name,object error_format_string,int nfmt_args,...) { 
+Icall_gen_error_handler(object ci,object cs,object en,object es,ufixnum n,...) { 
 
-  object b[20],*bs=vs_base,res;
-  int n;
-
-  b[0]= error_name;
-  b[1]= Cnil;  /* continue format */
-  b[2] = ihs_top_function_name(ihs_top);
-  b[3] = null_string;  /*continue format arg*/
-  b[4] = error_format_string;
-  {int i = 0;
-   va_list ap;
-   va_start(ap,nfmt_args);
-   while (i++ < nfmt_args)
-     { b[i+4]= va_arg(ap,object);
-     }
-    va_end(ap);
-  }
-  res=IapplyVector(sSuniversal_error_handler,nfmt_args+5,b);
-  n = fcall.nvalues;
-  vs_base = bs;
-  vs_top =  bs+ n;
-  while (--n> 0 ) bs[n] = fcall.values[n];
-  bs[0] = res;
-  return res;
-}
-
-object
-Icall_continue_error_handler(object continue_format_string,object error_name,object error_format_string,int nfmt_args,...) { 
-
-  object b[20],*bs=vs_base,res;
-  int n;
-
-  b[0]= error_name;
-  b[1]= Ct;  /* continue format */
-  b[2] = ihs_top_function_name(ihs_top);
-  b[3] = continue_format_string;  /*continue format arg*/
-  b[4] = error_format_string;
-  {int i = 0;
-   va_list ap;
-   va_start(ap,nfmt_args);
-   while (i++ < nfmt_args)
-     { b[i+4]= va_arg(ap,object);
-     }
-    va_end(ap);
-  }
-  res=IapplyVector(sSuniversal_error_handler,nfmt_args+5,b);
-  n = fcall.nvalues;
-  vs_base = bs;
-  vs_top =  bs+ n;
-  while (--n> 0 ) bs[n] = fcall.values[n];
-  bs[0] = res;
-  return res;
-}
-
-DEFUNO_NEW("ERROR",object,fLerror,LISP
-	   ,1,F_ARG_LIMIT,NONE,OO,OO,OO,OO,void,Lerror,(object name_or_fmt,...),"") {
-
-  int n=VFUN_NARGS-1,i=4;
-  object b[F_ARG_LIMIT],name,fmt_string,*bs=vs_base,res;
+  object *b;
+  ufixnum i;
   va_list ap;
 
-  va_start(ap,name_or_fmt);
-  if (type_of(name_or_fmt)==t_string) {
-    name=sKerror;
-    fmt_string=name_or_fmt;
-  } else {
-    name=name_or_fmt;
-    fmt_string=va_arg(ap,object);
-    n--;
-  }
-  b[0]=name;
-  b[1]=Cnil;
-  b[2]=ihs_top_function_name(ihs_top-1);
-  b[3]=null_string;
-  b[4]=fmt_string;
-  while (n--)
-    b[++i]=va_arg(ap,object);
+  n+=5;
+  b=ZALLOCA(n*sizeof(*b));
+  b[0]= en;
+  b[1]= ci; 
+  b[2] = ihs_top_function_name(ihs_top);
+  b[3] = cs;
+  b[4] = es;
+   
+  va_start(ap,n);
+  for (i=5;i<n;i++)
+    b[i]= va_arg(ap,object);
   va_end(ap);
-  res=IapplyVector(sSuniversal_error_handler,++i,b);
-  n = fcall.nvalues;
-  vs_base = bs;
-  vs_top =  bs+ n;
-  while (--n> 0 ) bs[n] = fcall.values[n];
-  bs[0] = res;
-  RETURN1(res);
+
+  return funcall_vec(sSuniversal_error_handler,n,b);
 
 }
-
-/* DEFUN_NEW("SPECIFIC-ERROR",object,fLspecific_error,LISP */
-/*        ,1,F_ARG_LIMIT,NONE,OO,OO,OO,OO,(object error_name,object fmt_string,...),"") */
-/* { int n = VFUN_NARGS,i=0; */
-/*   object b[F_ARG_LIMIT]; */
-/*   va_list ap; */
-
-/*   b[0]=error_name; */
-/*   b[1]=Cnil; */
-/*   b[2]=ihs_top_function_name(ihs_top-1); */
-/*   b[3]=null_string; */
-/*   b[4]=fmt_string; */
-/*   i=4; */
-/*   va_start(ap,fmt_string); */
-/*   n--; */
-/*   while (--n) */
-/*     b[++i]=va_arg(ap,object); */
-/*   va_end(ap); */
-/*   RETURN1(IapplyVector(sSuniversal_error_handler,++i,b)); */
-/* } */
-
-
-/* DEFUN_NEW("SPECIFIC-CORRECTABLE-ERROR",object,fLspecific_correctable_error,LISP */
-/*        ,1,F_ARG_LIMIT,NONE,OO,OO,OO,OO, */
-/*        (object error_name,object fmt_string,...),"") */
-/* { int n = VFUN_NARGS,i=0; */
-/*   object b[F_ARG_LIMIT]; */
-/*   va_list ap; */
-
-/*   b[0]=error_name; */
-/*   b[1]=Ct; */
-/*   b[2]=ihs_top_function_name(ihs_top-1); */
-/*   b[3]=null_string; */
-/*   b[4]=fmt_string; */
-/*   i=4; */
-/*   va_start(ap,fmt_string); */
-/*   n--; */
-/*   while (--n) */
-/*     b[++i]=va_arg(ap,object); */
-/*   va_end(ap); */
-/*   RETURN1(IapplyVector(sSuniversal_error_handler,++i,b)); */
-/* } */
-
-
-DEFUNO_NEW("CERROR",object,fLcerror,LISP
-	   ,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,void,Lcerror,(object continue_fmt_string,object name_or_fmt,...),"") {
-
-  int n=VFUN_NARGS-2,i=4;
-  object b[F_ARG_LIMIT],fmt_string,name,*bs=vs_base,res;
-  va_list ap;
-
-  va_start(ap,name_or_fmt);
-  if (type_of(name_or_fmt)==t_string) {
-    name=sKerror;
-    fmt_string=name_or_fmt;
-  } else {
-    name=name_or_fmt;
-    fmt_string=va_arg(ap,object);
-    n--;
-  }
-  b[0]=name;
-  b[1]=Ct;
-  b[2]=ihs_top_function_name(ihs_top-1);
-  b[3]=continue_fmt_string;
-  b[4]=fmt_string;
-  while (n--)
-    b[++i]=va_arg(ap,object);
-  va_end(ap);
-  res=IapplyVector(sSuniversal_error_handler,++i,b);
-  n = fcall.nvalues;
-  vs_base = bs;
-  vs_top =  bs+ n;
-  while (--n> 0 ) bs[n] = fcall.values[n];
-  bs[0] = res;
-  RETURN1(res);
-}
-
-
-/*  void */
-/*  FEerror(char *s, int num, object arg1, object arg2, object arg3, object arg4) */
-/* void */
-/* FEerror(char *s,int num,...)  */
-/* {   */
-/*   char *p = s; */
-/*   int last = 0; */
-/*   int count = 0; */
-/*   int i; */
-/*   object arg1,arg2,arg3,arg4; */
-/*   va_list args; */
-
-/*   while (*p) {    if (*p=='~' && last != '~') */
-/* 		    count ++; */
-/* 		  last = *p ; p++;} */
-/*   VFUN_NARGS = (count == 0 ? 1 : (num > 50 ? count+1 : num+1)); */
-
-/*   arg1=arg2=arg3=arg4=Cnil; */
-/*   i=VFUN_NARGS; */
-/*   va_start(args,num); */
-/*   if (i && --i) */
-/*     arg1=va_arg(args,object); */
-/*   if (i && --i) */
-/*     arg2=va_arg(args,object); */
-/*   if (i && --i) */
-/*     arg3=va_arg(args,object); */
-/*   if (i && --i) */
-/*     arg4=va_arg(args,object); */
-/*   va_end(args); */
-
-/*   FFN(fLerror)(make_simple_string(s),arg1,arg2,arg3,arg4); */
-  
-/* } */
-
-
-/* void */
-/* FEwrong_type_argument(object type, object value) */
-/* { */
-
-/* /\*   Icall_error_handler(sKwrong_type_argument, *\/ */
-/* /\* 		     make_simple_string("~S is not of type ~S."), *\/ */
-/* /\* 		     2,(value),(type)); *\/ */
-/*   Icall_error_handler(sLtype_error, */
-/* 		     make_simple_string("~*~S is not of type ~*~S."), */
-/* 		     4,sKdatum,(value),sKexpected_type,(type)); */
-/* } */
-
-/* void */
-/* FEcannot_coerce(object type, object value) */
-/* {Icall_error_handler(sKwrong_type_argument, */
-/* 		     make_simple_string("Cannot coerce ~S to class ~S."), */
-/* 		     2,(value),(type)); */
-/* } */
-
-/* void */
-/* FEtoo_few_arguments(object *base, object *top) */
-/* {    Icall_error_handler(sKtoo_few_arguments, */
-/* 			 (make_simple_string("~S [or a callee] requires more than ~R argument~:p.")), */
-/* 			 2,(ihs_top_function_name(ihs_top)), */
-/* 			 (make_fixnum(top - base))); */
-
-/* } */
-
-/* void */
-/* FEtoo_few_argumentsF(object args) */
-/* {Icall_error_handler(sKtoo_few_arguments, */
-/* 		     make_simple_string("Too few arguments."), */
-/* 		     2,(ihs_top_function_name(ihs_top)), */
-/* 		     (args)); */
-/* } */
-
-/* void */
-/* FEtoo_many_arguments(object *base, object *top) */
-/* {      Icall_error_handler(sKtoo_many_arguments, */
-/* 			   (make_simple_string("~S [or a callee] requires less than ~R argument~:p.")), */
-/* 			   2,(ihs_top_function_name(ihs_top)),(make_fixnum(top - base))); */
-/* } */
-
-/* void */
-/* FEtoo_many_argumentsF(object args) */
-/* { */
-/*   Icall_error_handler(sKtoo_many_arguments, */
-/* 		      make_simple_string("Too many arguments."),0); */
-/* } */
-
-/* static void */
-/* FEinvalid_macro_call(void) */
-/* {Icall_error_handler(sKinvalid_form, */
-/* 		     (make_simple_string("Invalid macro call to ~S.")), */
-/* 		     1,(ihs_top_function_name(ihs_top))); */
-/* } */
-
-/* void */
-/* FEunexpected_keyword(object key) */
-/* {/\* 	if (!keywordp(key)) *\/ */
-/* /\* 		not_a_keyword(key); *\/ */
-
-/*   Icall_error_handler(sKunexpected_keyword, */
-/* 		      make_simple_string("~S does not allow the keyword ~S."), */
-/* 		      2,(ihs_top_function_name(ihs_top)),(key)); */
-		     
-/* } */
-
-/* void */
-/* FEinvalid_form(char *s, object form) */
-/* {Icall_error_handler(sKinvalid_form,make_simple_string(s), */
-/* 		     1,(form)); */
-
-/* } */
-
-/* void */
-/* FEunbound_variable(object sym) */
-/* {Icall_error_handler(sKunbound_variable, */
-/* 		     make_simple_string("The variable ~S is unbound."), */
-/* 		     1,(sym)); */
-/* } */
-
-/* void */
-/* FEinvalid_variable(char *s, object obj) */
-/* {Icall_error_handler(sKinvalid_variable,make_simple_string(s), */
-/* 		     1,(obj)); */
-/* } */
-
-/* void */
-/* FEundefined_function(object fname) */
-/* {Icall_error_handler(sKundefined_function, */
-/* 		     make_simple_string("The function ~S is undefined."), */
-/* 		     1,(fname)); */
-/* } */
-
-/* void */
-/* FEinvalid_function(object obj) */
-/* { */
-/* #ifdef ANSI_COMMON_LISP */
-/*     TYPE_ERROR(obj,sLfunction); */
-/* #else */
-/*     Icall_error_handler(sKinvalid_function, */
-/* 		     make_simple_string("~S is invalid as a function."), */
-/* 		     2,(obj),sLfunction); */
-/* #endif */
-/* } */
-
-/* void */
-/* FEpackage_error(object obj,const char *s) */
-/* { */
-/*   Icall_continue_error_handler(null_string, */
-/* 			       sKpackage_error, */
-/* 			       make_simple_string("A package error occurred on ~S: ~S."), */
-/* 			       2,(obj),make_simple_string(s)); */
-/* } */
-
-
-/* object */
-/* CEerror(char *error_str, char *cont_str, int num, object arg1, object arg2, object arg3, object arg4) */
-/* { */
-/*         VFUN_NARGS=num+2;  */
-/*         return FFN(fLcerror)(make_simple_string(cont_str), */
-/* 			make_simple_string(error_str), */
-/* 			arg1,arg2,arg3,arg4); */
-/* } */
-
 
 /*
 	Lisp interface to IHS
@@ -471,225 +170,202 @@ ILLEGAL:
 	return(NULL);
 }
 
-DEFUNO_NEW("IHS-TOP",object,fSihs_top,SI
-       ,0,0,NONE,OO,OO,OO,OO,static void,siLihs_top,(void),"")
-
-{
-	/* 0 args */
+DEFUN("IHS-TOP",object,fSihs_top,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
   fixnum i=ihs_top-ihs_org;
-  for (;i>=0 && type_of(ihs_org[i].ihs_function)==t_afun && ihs_org[i].ihs_function->sfn.sfn_self==FFN(fSihs_top);i--);
+  for (;i>=0 && type_of(ihs_org[i].ihs_function)==t_function && 
+	 ihs_org[i].ihs_function->fun.fun_self==FFN(fSihs_top);i--);
   RETURN1(make_fixnum(i));
 }
 
-DEFUN_NEW("IHS-FUN",object,fSihs_fun,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	/* 1 args */
-	x0 = get_ihs_ptr(x0)->ihs_function;
-	RETURN1(x0);
+DEFUN("IHS-FUN",object,fSihs_fun,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  x0 = get_ihs_ptr(x0)->ihs_function;
+  RETURN1(x0);
 }
 
-DEFUN_NEW("IHS-VS",object,fSihs_vs,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	/* 1 args */
-	x0 = make_fixnum(get_ihs_ptr(x0)->ihs_base - vs_org);
-	RETURN1(x0);
+DEFUN("IHS-VS",object,fSihs_vs,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  x0 = make_fixnum(get_ihs_ptr(x0)->ihs_base - vs_org);
+  RETURN1(x0);
 }
 
-static frame_ptr get_frame_ptr(object x)
-{
-	frame_ptr p;
+static frame_ptr get_frame_ptr(object x) {
 
-	if (type_of(x) != t_fixnum)
-		goto ILLEGAL;
-	p = frs_org + fix(x);
-	if (fix(x)==0) return p;
-	if (frs_org <= p && p <= frs_top)
-		return(p);
-ILLEGAL:
-	FEerror("~S is an illegal frs index.", 1, x);
-	return NULL;
+  frame_ptr p;
+  
+  if (type_of(x) != t_fixnum)
+    goto ILLEGAL;
+  p = frs_org + fix(x);
+  if (fix(x)==0) return p;
+  if (frs_org <= p && p <= frs_top)
+    return(p);
+ ILLEGAL:
+  FEerror("~S is an illegal frs index.", 1, x);
+  return NULL;
+
 }
 
-DEFUN_NEW("FRS-TOP",object,fSfrs_top,SI
-       ,0,0,NONE,OO,OO,OO,OO,(void),"")
-
-{
-	/* 0 args */
-	RETURN1((make_fixnum(frs_top - frs_org)));
+DEFUN("FRS-TOP",object,fSfrs_top,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+  RETURN1((make_fixnum(frs_top - frs_org)));
 }
 
-DEFUN_NEW("FRS-VS",object,fSfrs_vs,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	/* 1 args */
-	x0 = make_fixnum(get_frame_ptr(x0)->frs_lex - vs_org);
-	RETURN1(x0);
+DEFUN("FRS-VS",object,fSfrs_vs,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  x0 = make_fixnum(get_frame_ptr(x0)->frs_lex - vs_org);
+  RETURN1(x0);
 }
 
-DEFUN_NEW("FRS-BDS",object,fSfrs_bds,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	/* 1 args */
-	x0
-	= make_fixnum(get_frame_ptr(x0)->frs_bds_top - bds_org);
-	RETURN1(x0);
+DEFUN("FRS-BDS",object,fSfrs_bds,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  x0=make_fixnum(get_frame_ptr(x0)->frs_bds_top - bds_org);
+  RETURN1(x0);
 }
 
-DEFUN_NEW("FRS-CLASS",object,fSfrs_class,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	enum fr_class c;
+DEFUN("FRS-CLASS",object,fSfrs_class,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
 
-	/* 1 args */
+  enum fr_class c;
 
-	c = get_frame_ptr(x0)->frs_class;
-	if (c == FRS_CATCH) x0 = sKcatch;
-	else if (c == FRS_PROTECT) x0 = sKprotect;
-	else if (c == FRS_CATCHALL) x0 = sKcatchall;
-	else FEerror("Unknown frs class was detected.", 0);
-	RETURN1(x0);
+  c = get_frame_ptr(x0)->frs_class;
+  if (c == FRS_CATCH) x0 = sKcatch;
+  else if (c == FRS_PROTECT) x0 = sKprotect;
+  else if (c == FRS_CATCHALL) x0 = sKcatchall;
+  else FEerror("Unknown frs class was detected.", 0);
+  RETURN1(x0);
+
 }
 
-DEFUN_NEW("FRS-TAG",object,fSfrs_tag,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	/* 1 args */
-	x0 = get_frame_ptr(x0)->frs_val;
-	RETURN1(x0);
+DEFUN("FRS-TAG",object,fSfrs_tag,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  x0 = get_frame_ptr(x0)->frs_val;
+  RETURN1(x0);
 }
 
-DEFUN_NEW("FRS-IHS",object,fSfrs_ihs,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	/* 1 args */
-	x0
-	= make_fixnum(get_frame_ptr(x0)->frs_ihs - ihs_org);
-	RETURN1(x0);
+DEFUN("FRS-IHS",object,fSfrs_ihs,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  x0=make_fixnum(get_frame_ptr(x0)->frs_ihs - ihs_org);
+  RETURN1(x0);
 }
 
-static bds_ptr get_bds_ptr(object x)
-{
-	bds_ptr p;
+static bds_ptr get_bds_ptr(object x) {
 
-	if (type_of(x) != t_fixnum)
-		goto ILLEGAL;
-	p = bds_org + fix(x);
-	if (0 == fix(x)) return p;
-	if (bds_org <= p && p <= bds_top)
-		return(p);
-ILLEGAL:
-	FEerror("~S is an illegal bds index.", 1, x);
-	return NULL;
+  bds_ptr p;
+  
+  if (type_of(x) != t_fixnum)
+    goto ILLEGAL;
+  p = bds_org + fix(x);
+  if (0 == fix(x)) return p;
+  if (bds_org <= p && p <= bds_top)
+    return(p);
+ ILLEGAL:
+  FEerror("~S is an illegal bds index.", 1, x);
+  return NULL;
+
 }
 
-DEFUN_NEW("BDS-TOP",object,fSbds_top,SI
-       ,0,0,NONE,OO,OO,OO,OO,(void),"")
-
-{
-	/* 0 args */
-	RETURN1((make_fixnum(bds_top - bds_org)));
+DEFUN("BDS-TOP",object,fSbds_top,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+  RETURN1((make_fixnum(bds_top - bds_org)));
 }
 
-DEFUN_NEW("BDS-VAR",object,fSbds_var,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	/* 1 args */
-	x0 = get_bds_ptr(x0)->bds_sym;
-	RETURN1(x0);
+DEFUN("BDS-VAR",object,fSbds_var,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  x0 = get_bds_ptr(x0)->bds_sym;
+  RETURN1(x0);
 }
 
-DEFUN_NEW("BDS-VAL",object,fSbds_val,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	/* 1 args */
-	x0 = get_bds_ptr(x0)->bds_val;
-	RETURN1(x0);
+DEFUN("BDS-VAL",fixnum,fSbds_val,SI,1,1,NONE,IO,OO,OO,OO,(object x0),"") {
+  RETURN1((fixnum)get_bds_ptr(x0)->bds_val);
 }
 
-static object *get_vs_ptr(object x)
-{
-	object *p;
+static object *get_vs_ptr(object x) {
 
-	if (type_of(x) != t_fixnum)
-		goto ILLEGAL;
-	p = vs_org + fix(x);
-	if (vs_org <= p && p < vs_top)
-		return(p);
-ILLEGAL:
-	FEerror("~S is an illegal vs index.", 1, x);
-	return NULL;
+  object *p;
+
+  if (type_of(x) != t_fixnum)
+    goto ILLEGAL;
+  p = vs_org + fix(x);
+  if (vs_org <= p && p < vs_top)
+    return(p);
+ ILLEGAL:
+  FEerror("~S is an illegal vs index.", 1, x);
+  return NULL;
+
 }
 
-DEFUN_NEW("VS-TOP",object,fSvs_top,SI
-       ,0,0,NONE,OO,OO,OO,OO,(void),"")
-{
-	object x;
-	/* 0 args */
-	x = (make_fixnum(vs_top - vs_org));
-	RETURN1(x);
+DEFUN("VS-TOP",object,fSvs_top,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+  object x;
+  x = (make_fixnum(vs_top - vs_org));
+  RETURN1(x);
 }
 
-DEFUN_NEW("VS",object,fSvs,SI
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
-{
-	/* 1 args */
-	x0 = *get_vs_ptr(x0);
-	RETURN1(x0);
+DEFUN("VS",object,fSvs,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
+  x0 = *get_vs_ptr(x0);
+  RETURN1(x0);
 }
 
-DEFUN_NEW("SCH-FRS-BASE",object,fSsch_frs_base,SI
-       ,2,2,NONE,OO,OO,OO,OO,(object x0,object x1),"")
-{
-	frame_ptr x;
-	ihs_ptr y;
+DEFUN("SCH-FRS-BASE",object,fSsch_frs_base,SI,2,2,NONE,OO,OO,OO,OO,(object x0,object x1),"") {
 
-	/* 2 args */
-	y = get_ihs_ptr(x1);
-	for (x = get_frame_ptr(x0);
-	     x <= frs_top && x->frs_ihs < y; 
-	     x++);
-	if (x > frs_top) x0 = Cnil;
-	else x0 = make_fixnum(x - frs_org);
+  frame_ptr x;
+  ihs_ptr y;
+  
+  /* 2 args */
+  y = get_ihs_ptr(x1);
+  for (x = get_frame_ptr(x0);
+       x <= frs_top && x->frs_ihs < y; 
+       x++);
+  if (x > frs_top) x0 = Cnil;
+  else x0 = make_fixnum(x - frs_org);
+  
+  RETURN1(x0);
 
-	RETURN1(x0);
 }
 
-DEFUNM_NEW("INTERNAL-SUPER-GO",object,fSinternal_super_go,SI
-       ,3,3,NONE,OO,OO,OO,OO,(object tag,object x1,object x2),"")
-{
-	frame_ptr fr;
+DEFUNM("INTERNAL-SUPER-GO",object,fSinternal_super_go,SI,3,3,NONE,OO,OO,OO,OO,(object tag,object x1,object x2),"") {
+  frame_ptr fr;
+  fixnum vals=(fixnum)fcall.valp;
+  
+  fr = frs_sch(tag);
+  if (fr == NULL)
+    FEerror("The tag ~S is missing.", 1, tag);
+  if (x2 == Cnil)
+    tag = x1;
+  else
+    tag = MMcons(tag, x1);
+  unwind(fr,tag);
+  RETURN0;
 
-	/* 3 args */
-
-	fr = frs_sch(tag);
-	if (fr == NULL)
-		FEerror("The tag ~S is missing.", 1, tag);
-	if (x2 == Cnil)
-		tag = x1;
-	else
-		tag = MMcons(tag, x1);
-	unwind(fr,tag);
-	RETURN0 ;
 }
 
 DEF_ORDINARY("UNIVERSAL-ERROR-HANDLER",sSuniversal_error_handler,SI
 	     ,"Redefined in lisp, this is the function called by the \
-internal error handling mechanism. \
- Args:  (error-name correctable function-name \
-   continue-format-string error-format-string \
-   &rest args)");
-DEFUN_NEW("UNIVERSAL-ERROR-HANDLER",object,fSuniversal_error_handler,SI
-	   ,1,F_ARG_LIMIT,NONE,OO,OO,OO,OO,(object x0,object x1,object x2,object x3,object error_fmt_string),"")
-{
-	int i;
-	/* 5 args */
-	for (i = 0;  i < error_fmt_string->st.st_fillp;  i++)
-		putchar(error_fmt_string->st.st_self[i]);
-	printf("\nLisp initialization failed.\n");
-	exit(0);
-	RETURN1(x0);
+               internal error handling mechanism. \
+               Args:  (error-name correctable function-name \
+                       continue-format-string error-format-string \
+                       &rest args)");
+DEFUN("UNIVERSAL-ERROR-HANDLER",object,fSuniversal_error_handler,SI
+	   ,1,F_ARG_LIMIT,NONE,OO,OO,OO,OO,
+	  (object x0,object x1,object x2,object x3,object x4,
+	   object error_fmt_string,...),"") {
+
+  va_list ap;
+  object z,l,f;
+  ufixnum n;
+
+  /* 5 args */
+  princ(x0,Cnil);
+  putchar(' ');
+  princ(x1,Cnil);
+  putchar(' ');
+  princ(x2,Cnil);
+  putchar(' ');
+  princ(x3,Cnil);
+  putchar(' ');
+  princ(x4,Cnil);
+  putchar(' ');
+  princ(error_fmt_string,Cnil);
+  putchar(' ');
+  va_start(ap,error_fmt_string);
+  for (n=VFUN_NARGS,l=Cnil,f=OBJNULL;(z=NEXT_ARG(n,ap,l,f,OBJNULL))!=OBJNULL;)
+    princ(z,Cnil);
+  flush_stream(symbol_value(sLAstandard_outputA));
+  va_end(ap);
+  printf("\nLisp initialization failed.\n");
+  
+  exit(0);
+  RETURN1(x0);
+
 }
 
 void
@@ -813,31 +489,13 @@ if (type_of(strm) != t_stream)
 			FEwrong_type_argument(sLstream, strm);
 }
 
-/* static object */
-/* LVerror(object first,...) */
-/* {va_list ap; */
-/*  va_start(ap,first); */
-/*  fcall.fun= make_cfun(Lerror,Cnil,Cnil,0,0); */
-/*  fcalln_general(first,ap); */
-/*  va_end(ap); */
-/*  return Cnil; */
-/* } */
-     
-void
-vfun_wrong_number_of_args(object x)
-{
-
-  FEerror("Expected ~S args but received ~S args",2,
-	 x,make_fixnum(VFUN_NARGS));
-}
-
 
 void
-check_arg_range(int n, int m) {  
+check_arg_range(fixnum nargs,int n, int m) {  
   
-  if (VFUN_NARGS < n)
+  if (nargs < n)
     FEwrong_no_args("Need at least ~D argument(s).",make_fixnum(n));
-  else if (VFUN_NARGS > m)
+  else if (nargs > m)
     FEwrong_no_args("Need no more than ~D argument(s).",make_fixnum(m));
 
  }

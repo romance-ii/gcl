@@ -28,25 +28,14 @@ endif
 #endif
 
 #RELOC=locbfd
-RELOC?=statsysbfd
-
-#FIXME upstream bfd data structures are read-only
-ifeq ($(ARCHT),alpha)
-RELOC=locbfd
-endif
-ifeq ($(ARCHT),mips)
-RELOC=locbfd
-endif
-ifeq ($(ARCHT),mipsel)
-RELOC=locbfd
-endif
-
+#RELOC?=statsysbfd
+RELOC?=custreloc
 ifeq ($(ARCHT),ia64)
 RELOC=dlopen
 endif
-ifeq ($(ARCHT),hppa)
-RELOC=dlopen
-endif
+#ifeq ($(ARCHT),hppa)
+#RELOC=dlopen
+#endif
 
 GMP?=
 
@@ -58,7 +47,7 @@ DEBUG=
 VERS=$(shell echo $$(cat majvers).$$(cat minvers))
 EXT:=cvs
 
-CFG:=$(addsuffix /config.,. binutils) gmp3/configfsf.
+CFG:=$(addsuffix /config.,. binutils) gmp4/configfsf.
 # Bug in autocont dependency on emacsen-common workaround
 #CFGS:=$(addsuffix .ori,configure $(addsuffix guess,$(CFG)) $(addsuffix sub,$(CFG)))
 CFGS:=$(addsuffix .ori,$(addsuffix guess,$(CFG)) $(addsuffix sub,$(CFG)))
@@ -84,9 +73,9 @@ configure-%-stamp: $(CFGS)
 
 	! [ -e unixport/saved_pre_gcl ] || ( for i in o lsp cmpnew unixport pcl clcs gcl-tk ; do $(MAKE) -C $$i clean ; done )
 
-	chmod -R +x gmp3/*
+	chmod -R +x gmp4/*
 
-#	[ "$(ARCHT)" != "i386" ] || ( cd gmp3 && CC=$(MCC) ./configure --build=i486-unknown-linux-gnu )
+#	[ "$(ARCHT)" != "i386" ] || ( cd gmp4 && CC=$(MCC) ./configure --build=i486-unknown-linux-gnu )
 
 	[ "$*" != "ansi" ] || FLAGS="--enable-ansi" ; \
 	[ "$*" != "gprof" ] || FLAGS="--enable-gprof" ; \
@@ -267,7 +256,7 @@ binary-arch: build install #debian/substvars
 	dh_testroot -a
 	dh_installdocs -a
 	dh_installemacsen -a
-#	dh_installmanpages -a gcl/gmp3/ansi2knr.1
+#	dh_installmanpages -a gcl/gmp4/ansi2knr.1
 	dh_installman -a
 	dh_installdebconf -a
 	dh_installchangelogs ChangeLog -a

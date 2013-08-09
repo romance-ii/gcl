@@ -54,19 +54,6 @@ FFN(Fdefun)(object args)
 	if (type_of(name) != t_symbol)
 	  name=ifuncall1(sSfunid_to_sym,name);
 
-/* 	if (type_of(name) != t_symbol) { */
-/* 	  if (setf_fn_form(name)) { */
-/* 	    object x; */
-/* 	    vs_base = vs_top; */
-/* 	    x=alloc_object(t_ifun); */
-/* 	    x->ifn.ifn_self=list(3,sLlambda,MMcadr(args),listA(3,sLblock,MMcadr(name),MMcddr(args))); */
-/* 	    vs_push(x); */
-/* 	    putprop(MMcadr(name),vs_base[0],sSsetf_function); */
-/* 	    vs_base[0]=name; */
-/* 	    return; */
-/* 	  } else */
-/* 	    not_a_symbol(name); */
-/* 	} */
 	if (name->s.s_sfdef != NOT_SPECIAL) {
 	  if (name->s.s_mflag) {
 	    if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
@@ -75,7 +62,7 @@ FFN(Fdefun)(object args)
 	    FEerror("~S, a special form, cannot be redefined.", 1, name);
 	}
 	if (name->s.s_hpack == lisp_package &&
-	    name->s.s_gfdef != OBJNULL && initflag) {
+	    name->s.s_gfdef != OBJNULL && initflag && sLwarn->s.s_gfdef) {
 	  vs_push(make_simple_string("~S is being redefined."));
 	  ifuncall2(sLwarn, vs_head, name);
 	  vs_popp;
@@ -89,12 +76,17 @@ FFN(Fdefun)(object args)
 	  vs_base[0] = MMcons(lex_env[0], vs_base[0]);
 	  vs_base[0] = MMcons(sLlambda_block_closure, vs_base[0]);
 	}
-	{object fname =  clear_compiler_properties(name,vs_base[0]);
-	object x=alloc_object(t_ifun);
-	x->ifn.ifn_self=vs_base[0];
-	vs_base[0]=x;
-	fname->s.s_gfdef = vs_base[0];
-	fname->s.s_mflag = FALSE;}
+	{/* object fname; */
+	  vs_base[0]=fSfset_in(name,vs_base[0]);
+	/* object x=alloc_object(t_ifun); */
+	/* x->ifn.ifn_self=vs_base[0]; */
+	/* x->ifn.ifn_name=name; */
+	/* x->ifn.ifn_call=Cnil; */
+	/* vs_base[0]=x; */
+	/* fname =  clear_compiler_properties(name,vs_base[0]); */
+	/* fname->s.s_gfdef = vs_base[0]; */
+	/* fname->s.s_mflag = FALSE; */
+	}
 	vs_base[0] = oname;
 	for (body = MMcddr(args);  !endp(body);  body = body->c.c_cdr) {
 	  form = macro_expand(body->c.c_car);
@@ -124,25 +116,48 @@ FFN(siLAmake_special)(void)
 	vs_base[0]->s.s_stype = (short)stp_special;
 }
 
-static void
-FFN(siLAmake_constant)(void)
-{
-	check_arg(2);
-	check_type_symbol(&vs_base[0]);
-	if ((enum stype)vs_base[0]->s.s_stype == stp_special)
-		FEerror(
-		 "The argument ~S to DEFCONSTANT is a special variable.",
-		 1, vs_base[0]);
-	vs_base[0]->s.s_stype = (short)stp_constant;
-	vs_base[0]->s.s_dbind = vs_base[1];
-	vs_popp;
+DEFUN("OBJNULL",fixnum,fSobjnull,SI,0,0,NONE,IO,OO,OO,OO,(void),"") {return (fixnum)OBJNULL;}
+
+DEFUN("*MAKE-CONSTANT",object,fSAmake_constant,SI,2,2,NONE,OO,OO,OO,OO, \
+	  (object s,object v),"") { 
+
+  check_type_symbol(&s);
+  switch(s->s.s_stype) {
+  case stp_special:
+    FEerror("The argument ~S to DEFCONSTANT is a special variable.", 1, s);
+    break;
+  case stp_constant:
+    break;
+  default:
+    s->s.s_dbind=v;
+    break;
+  }
+
+  s->s.s_stype=stp_constant;
+
+  RETURN1(s);
+
 }
+
+/* static void */
+/* FFN(siLAmake_constant)(void) */
+/* { */
+/* 	check_arg(2); */
+/* 	check_type_symbol(&vs_base[0]); */
+/* 	if ((enum stype)vs_base[0]->s.s_stype == stp_special) */
+/* 		FEerror( */
+/* 		 "The argument ~S to DEFCONSTANT is a special variable.", */
+/* 		 1, vs_base[0]); */
+/* 	vs_base[0]->s.s_stype = (short)stp_constant; */
+/* 	vs_base[0]->s.s_dbind = vs_base[1]; */
+/* 	vs_popp; */
+/* } */
 
 static void
 FFN(Feval_when)(object arg)
 {
 
-	object *base = vs_base;
+	object *base = vs_top;
 	object ss;
 	bool flag = FALSE;
 
@@ -253,7 +268,7 @@ gcl_init_toplevel(void)
 {
 	make_special_form("DEFUN",Fdefun);
 	make_si_function("*MAKE-SPECIAL", siLAmake_special);
-	make_si_function("*MAKE-CONSTANT", siLAmake_constant);
+	/* make_si_function("*MAKE-CONSTANT", siLAmake_constant); */
 	make_special_form("EVAL-WHEN", Feval_when);
 	make_special_form("LOAD-TIME-VALUE", Fload_time_value);
 	make_special_form("THE", Fthe);

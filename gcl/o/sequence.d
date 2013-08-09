@@ -51,7 +51,8 @@ enum aelttype aet;
 	x->v.v_displaced = Cnil;
 	x->v.v_dim = x->v.v_fillp = l;
 	x->v.v_self = NULL;
-	x->v.v_elttype = (short)aet;
+	x->v.tt=x->v.v_elttype = (short)aet;
+	x->v.v_eltsize = elt_size(aet);
 	x->v.v_defrank = 1;
 	return(x);
 }
@@ -69,7 +70,8 @@ int l;
 	x->bv.bv_dim = x->bv.bv_fillp = l;
 	x->bv.bv_offset = 0;
 	x->bv.bv_self = NULL;
-        x->bv.bv_elttype = aet_bit;
+        x->bv.tt=x->bv.bv_elttype = aet_bit;
+        x->bv.bv_eltsize = elt_size(aet_bit);
         x->bv.bv_defrank = 1;
 	return(x);
 }
@@ -93,7 +95,7 @@ int index;
 
 	if (index < 0) {
 	  object y=make_fixnum(index);
-	  TYPE_ERROR(y,sLnon_negative_fixnum);
+	  TYPE_ERROR(y,sSnon_negative_fixnum);
 	  index=fix(y);
 	}
 	switch (type_of(seq)) {
@@ -165,7 +167,7 @@ object val;
 
 	if (index < 0) {
 	  object y=make_fixnum(index);
-	  TYPE_ERROR(y,sLnon_negative_fixnum);
+	  TYPE_ERROR(y,sSnon_negative_fixnum);
 	  index=fix(y);
 	}
 	switch (type_of(seq)) {
@@ -265,7 +267,7 @@ E:
 		else if (e < s || e > sequence->v.v_fillp)
 			goto ILLEGAL_START_END;
 		x = alloc_simple_vector(e - s, sequence->v.v_elttype);
-		array_allocself(x, FALSE,0);
+		array_allocself(x, FALSE,OBJNULL);
 		switch (sequence->v.v_elttype) {
 		case aet_object:
 			for (i = s, j = 0;  i < e;  i++, j++)
@@ -274,21 +276,21 @@ E:
 
 		case aet_lf:
 			for (i = s, j = 0;  i < e;  i++, j++)
-				x->lfa.lfa_self[j] =
-				sequence->lfa.lfa_self[i];
+			  ((double *)x->a.a_self)[j] =
+			    ((double *)sequence->a.a_self)[i];
 			break;
 
 		case aet_sf:
 			for (i = s, j = 0;  i < e;  i++, j++)
-				x->sfa.sfa_self[j] =
-				sequence->sfa.sfa_self[i];
+			  ((float *)x->a.a_self)[j] =
+			    ((float *)sequence->a.a_self)[i];
 			break;
 
 		case aet_nnfix:
 		case aet_fix:
 			for (i = s, j = 0;  i < e;  i++, j++)
-				x->fixa.fixa_self[j] =
-				sequence->fixa.fixa_self[i];
+			  ((fixnum *)x->a.a_self)[j] =
+			    ((fixnum *)sequence->a.a_self)[i];
 			break;
 
 		case aet_int:
@@ -440,7 +442,7 @@ object seq;
 		k = x->v.v_fillp;
 		y = alloc_simple_vector(k, x->v.v_elttype);
 		vs_push(y);
-		array_allocself(y, FALSE,0);
+		array_allocself(y, FALSE,OBJNULL);
 		switch (x->v.v_elttype) {
 		case aet_object:
 			for (j = k - 1, i = 0;  j >=0;  --j, i++)
@@ -449,18 +451,18 @@ object seq;
 
 		case aet_lf:
 			for (j = k - 1, i = 0;  j >=0;  --j, i++)
-				y->lfa.lfa_self[j] = x->lfa.lfa_self[i];
+			  ((double *)y->a.a_self)[j] = ((double *)x->a.a_self)[i];
 			break;
 
 		case aet_sf:
 			for (j = k - 1, i = 0;  j >=0;  --j, i++)
-				y->sfa.sfa_self[j] = x->sfa.sfa_self[i];
+			  ((float *)y->a.a_self)[j] = ((float *)x->a.a_self)[i];
 			break;
 
 		case aet_fix:
 		case aet_nnfix:
 			for (j = k - 1, i = 0;  j >=0;  --j, i++)
-				y->fixa.fixa_self[j] = x->fixa.fixa_self[i];
+			  ((fixnum *)y->a.a_self)[j] = ((fixnum *)x->a.a_self)[i];
 			break;
 
 		case aet_int:
@@ -565,18 +567,18 @@ object seq;
 		case aet_lf:
 			for (i = 0, j = k - 1;  i < j;  i++, --j) {
 				longfloat y;
-				y = x->lfa.lfa_self[i];
-				x->lfa.lfa_self[i] = x->lfa.lfa_self[j];
-				x->lfa.lfa_self[j] = y;
+				y = ((double *)x->a.a_self)[i];
+				((double *)x->a.a_self)[i] = ((double *)x->a.a_self)[j];
+				((double *)x->a.a_self)[j] = y;
 			}
 			return(seq);
 
 		case aet_sf:
 			for (i = 0, j = k - 1;  i < j;  i++, --j) {
 				shortfloat y;
-				y = x->sfa.sfa_self[i];
-				x->sfa.sfa_self[i] = x->sfa.sfa_self[j];
-				x->sfa.sfa_self[j] = y;
+				y = ((float *)x->a.a_self)[i];
+				((float *)x->a.a_self)[i] = ((float *)x->a.a_self)[j];
+				((float *)x->a.a_self)[j] = y;
 			}
 			return(seq);
 
@@ -584,9 +586,9 @@ object seq;
 		case aet_nnfix:
 			for (i = 0, j = k - 1;  i < j;  i++, --j) {
 				fixnum y;
-				y = x->fixa.fixa_self[i];
-				x->fixa.fixa_self[i] = x->fixa.fixa_self[j];
-				x->fixa.fixa_self[j] = y;
+				y = ((fixnum *)x->a.a_self)[i];
+				((fixnum *)x->a.a_self)[i] = ((fixnum *)x->a.a_self)[j];
+				((fixnum *)x->a.a_self)[j] = y;
 			}
 			return(seq);
 

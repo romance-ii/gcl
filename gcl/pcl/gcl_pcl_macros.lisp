@@ -209,19 +209,20 @@
 ;;; Common Lisp BUG:
 ;;;    Common Lisp should have destructuring-bind.
 ;;;    
-;#-gcl
 ; FIXME use regular destructuring-bind
-(defmacro pcl-destructuring-bind (pattern form &body body)
-  (multiple-value-bind (ignore declares body)
-      (extract-declarations body)
-    (declare (ignore ignore))
-    (multiple-value-bind (setqs binds)
-	(destructure pattern form)
-      `(let ,binds
-	 ,@declares
-	 ,@setqs
-	 (progn .destructure-form.)
-	 . ,body))))
+;; #+gcl(setf (macro-function 'pcl-destructuring-bind) (macro-function 'destructuring-bind))
+;; #-gcl
+;; (defmacro pcl-destructuring-bind (pattern form &body body)
+;;   (multiple-value-bind (ignore declares body)
+;;       (extract-declarations body)
+;;     (declare (ignore ignore))
+;;     (multiple-value-bind (setqs binds)
+;; 	(destructure pattern form)
+;;       `(let ,binds
+;; 	 ,@declares
+;; 	 ,@setqs
+;; 	 (progn .destructure-form.)
+;; 	 . ,body))))
 
 (eval-when (compile load eval)
 (defun destructure (pattern form)
@@ -357,7 +358,7 @@
        (printing-random-thing-internal ,thing ,stream)
        (format ,stream ">"))))
 
-(defun printing-random-thing-internal (thing stream)
+#-gcl(defun printing-random-thing-internal (thing stream)
   (declare (ignore thing stream))
   nil)
 
@@ -390,7 +391,7 @@
 ;(warn "****** Things will go faster if you fix define-compiler-macro")
 )
 
-#-cmu
+#-(or cmu gcl)
 (defmacro define-compiler-macro (name arglist &body body)
   #+(or lucid kcl)
   `(#+lucid lcl:def-compiler-macro #+kcl si::define-compiler-macro
@@ -444,10 +445,18 @@
 
 (defvar *create-classes-from-internal-structure-definitions-p* t)
 
+#+gcl(defvar *structure-table* (make-hash-table :test 'eq))
+#+gcl(defun structure-type-p (type)
+       (or (not (null (gethash type *structure-table*)))
+	   (let ((s-data nil))
+	     (and (symbolp type)
+		  (setq s-data (get type 'si::s-data))
+		  (null (si::s-data-type s-data))))))
 
 (defun find-class-from-cell (symbol cell &optional (errorp t))
   (or (find-class-cell-class cell)
       (and *create-classes-from-internal-structure-definitions-p*
+	   (fboundp 'find-structure-class)
            (structure-type-p symbol)
            (find-structure-class symbol))
       (cond ((null errorp) nil)
@@ -480,9 +489,8 @@
 
 ; Use this definition in any CL implementation supporting 
 ; both define-compiler-macro and load-time-value.
-#+cmu ; Note that in CMU, lisp:find-class /= pcl:find-class
-(define-compiler-macro find-class (&whole form
-				   symbol &optional (errorp t) environment)
+#+(or gcl cmu) ; Note that in CMU, lisp:find-class /= pcl:find-class
+(define-compiler-macro find-class (&whole form symbol &optional (errorp t) environment)
   (declare (ignore environment))
   (if (and (constantp symbol) 
 	   (legal-class-name-p (eval symbol))

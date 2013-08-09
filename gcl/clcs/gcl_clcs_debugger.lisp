@@ -1,6 +1,6 @@
 ;;; -*- Mode: Lisp; Syntax: Common-Lisp; Package: "CONDITIONS"; Base: 10 -*-
 
-(in-package "CONDITIONS")
+(in-package :CONDITIONS)
 
 (DEFVAR *DEBUG-LEVEL* 0)
 (DEFVAR *DEBUG-ABORT* NIL)
@@ -71,7 +71,7 @@
   (WHEN RESTARTS
     (DO ((W (IF TARGET-COLUMN
 		(- TARGET-COLUMN 3)
-		(CEILING (LOG MAX 10))))
+		(CEILING (LOG MAX 10.0))));FIXME
          (P RESTARTS (CDR P))
          (I 0 (1+ I)))
         ((OR (NOT P) (= I MAX)))

@@ -12,35 +12,38 @@
 ;;; file will define a bunch of functions which work like a condition system. Redefining
 ;;; existing condition systems is beyond the goal of this implementation attempt.
 
-(unless (find-package "CONDITIONS")
-  (MAKE-PACKAGE "CONDITIONS" :USE '("LISP")))
+(unless (find-package :conditions)
+  (make-package :conditions :use '(:cl)))
 
-(IN-PACKAGE "CONDITIONS" :USE '("LISP"))
+(in-package :conditions)
 
-(SHADOW '())
+(export '(*break-on-signals* *debugger-hook* signal
+			     with-condition-restarts
+			     handler-case handler-bind ignore-errors define-condition make-condition
+			     with-simple-restart restart-case restart-bind restart-name
+			     restart-name find-restart compute-restarts invoke-restart
+			     invoke-restart-interactively abort continue muffle-warning
+			     store-value use-value invoke-debugger restart condition
+			     warning serious-condition simple-condition simple-warning simple-error
+			     simple-condition-format-control simple-condition-format-arguments
+			     storage-condition stack-overflow storage-exhausted type-error
+			     type-error-datum type-error-expected-type simple-type-error
+			     program-error control-error stream-error stream-error-stream
+			     end-of-file file-error file-error-pathname cell-error cell-error-name
+			     unbound-variable unbound-slot unbound-slot-name unbound-slot-instance undefined-function
+			     arithmetic-error print-not-readable-object
+			     arithmetic-error-operation arithmetic-error-operands
+			     package-error package-error-package
+			     division-by-zero floating-point-overflow floating-point-underflow))
 
-(EXPORT '(;; Shadowed symbols
-	  ))
-(EXPORT '(;; New symbols
-	  *BREAK-ON-SIGNALS* *DEBUGGER-HOOK* SIGNAL
-			     WITH-CONDITION-RESTARTS
-			     HANDLER-CASE HANDLER-BIND IGNORE-ERRORS DEFINE-CONDITION MAKE-CONDITION
-			     WITH-SIMPLE-RESTART RESTART-CASE RESTART-BIND RESTART-NAME
-			     RESTART-NAME FIND-RESTART COMPUTE-RESTARTS INVOKE-RESTART
-			     INVOKE-RESTART-INTERACTIVELY ABORT CONTINUE MUFFLE-WARNING
-			     STORE-VALUE USE-VALUE INVOKE-DEBUGGER RESTART CONDITION
-			     WARNING SERIOUS-CONDITION SIMPLE-CONDITION SIMPLE-WARNING SIMPLE-ERROR
-			     SIMPLE-CONDITION-FORMAT-CONTROL SIMPLE-CONDITION-FORMAT-ARGUMENTS
-			     STORAGE-CONDITION STACK-OVERFLOW STORAGE-EXHAUSTED TYPE-ERROR
-			     TYPE-ERROR-DATUM TYPE-ERROR-EXPECTED-TYPE SIMPLE-TYPE-ERROR
-			     PROGRAM-ERROR CONTROL-ERROR STREAM-ERROR STREAM-ERROR-STREAM
-			     END-OF-FILE FILE-ERROR FILE-ERROR-PATHNAME CELL-ERROR CELL-ERROR-NAME
-			     UNBOUND-VARIABLE UNBOUND-SLOT UNBOUND-SLOT-NAME UNBOUND-SLOT-INSTANCE UNDEFINED-FUNCTION
-			     ARITHMETIC-ERROR PRINT-NOT-READABLE-OBJECT
-			     ARITHMETIC-ERROR-OPERATION ARITHMETIC-ERROR-OPERANDS
-			     PACKAGE-ERROR PACKAGE-ERROR-PACKAGE
-			     DIVISION-BY-ZERO FLOATING-POINT-OVERFLOW FLOATING-POINT-UNDERFLOW))
+(import '(with-simple-restart abort continue compute-restarts
+	  *debug-level* *debug-restarts* *number-of-debug-restarts*
+	  *debug-abort* *debug-continue* *debug-condition* *debug-eval*
+	  find-restart invoke-restart invoke-restart-interactively invoke-debugger
+	  restart-name ignore-errors show-restarts conditionp signal store-value
+	  read-evaluated-form restart-case muffle-warning)
+	:si)
 
-(DEFVAR *THIS-PACKAGE* (FIND-PACKAGE "CONDITIONS"))
+(defvar *this-package* (find-package :conditions))
 
 

@@ -1,5 +1,5 @@
 ;; -*-Lisp-*-
-(in-package 'si)
+(in-package :si)
 
 ;;  (load "gprof.o")
 ;;  You must have a kcl image with profiling information and monstartup

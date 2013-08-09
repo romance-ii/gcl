@@ -31,8 +31,23 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 static object
 current_readtable(void);
 
+DEFVAR("*SHARP-EQ-CONTEXT*",sSAsharp_eq_contextA,SI,sLnil,"");
+
+DEFUN("TYPE_OF",fixnum,fStype_of,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {
+  return type_of(x);
+}
+DEFUN("ALLOC-SPICE",object,fSalloc_spice,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+  return alloc_object(t_spice);
+}
+DEFUN("SPICE-P",object,fSspice_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  return type_of(x)==t_spice ? Ct : Cnil;
+}
+
+DEFVAR("PATCH-SHARP",sSpatch_sharp,SI,sLnil,"");
+DEFVAR("NEW-CONTEXT",sSnew_context,SI,sLnil,"");
+
 static object
-patch_sharp(object);
+patch_sharp(object x) {return ifuncall1(sSpatch_sharp,x);}
 
 static object
 parse_number(char *,int,int *,int);
@@ -51,29 +66,11 @@ object dispatch_reader;
 #define	trt(c)	(READtable->rt.rt_self[char_code((c))] \
 		 .rte_chatrait)
 
-#ifndef SHARP_EQ_CONTEXT_SIZE
-#define	SHARP_EQ_CONTEXT_SIZE	4096
-#endif
-
 static void
 setup_READtable()
 {
 	READtable = current_readtable();
 }
-
-struct sharp_eq_context_struct {
-	fixnum	sharp_index;
-	object	sharp_eq;
-	object	sharp_sharp;
-} sharp_eq_context[SHARP_EQ_CONTEXT_SIZE];
-
-/*
-	NOTE:
-
-		I believe that there is no need to enter
-		sharp_eq_context to mark_origin.
-*/
-
 
 /* FIXME What should this be? Apparently no reliable way to use value stack */ 
 #define MAX_PACKAGE_STACK 1024
@@ -107,7 +104,7 @@ setup_READ()
 	READbase = fix(x);
 	READsuppress = symbol_value(sLAread_suppressA) != Cnil;
 	READeval = symbol_value(sLAread_evalA) != Cnil;
-	sharp_eq_context_max = 0;
+	sSAsharp_eq_contextA->s.s_dbind=Cnil;
 
 	backq_level = 0;
 
@@ -125,7 +122,7 @@ setup_standard_READ()
 	READbase = 10;
 	READsuppress = FALSE;
 	READeval = TRUE;
-	sharp_eq_context_max = 0;
+	sSAsharp_eq_contextA->s.s_dbind=Cnil;
 	backq_level = 0;
 }
 
@@ -261,16 +258,13 @@ read_object_non_recursive(in)
 object in;
 {
 	VOL object x;
-	int i;
 	bool e;
 	object old_READtable;
 	int old_READdefault_float_format;
 	int old_READbase;
 	int old_READsuppress;
 	int old_READeval;
-	int old_sharp_eq_context_max;
-	struct sharp_eq_context_struct
-		old_sharp_eq_context[SHARP_EQ_CONTEXT_SIZE];
+	object old_READcontext;
 	int old_backq_level;
 
 	old_READtable = READtable;
@@ -278,12 +272,10 @@ object in;
 	old_READbase = READbase;
 	old_READsuppress = READsuppress;
 	old_READeval = READeval;
-	old_sharp_eq_context_max = sharp_eq_context_max;
+	old_READcontext=sSAsharp_eq_contextA->s.s_dbind;
+
 	/* BUG FIX by Toshiba */
 	vs_push(old_READtable);
-	for (i = 0;  i < sharp_eq_context_max;  i++)
-		old_sharp_eq_context[i] = sharp_eq_context[i];
-	memset(old_sharp_eq_context+i,0,sizeof(old_sharp_eq_context)-i*sizeof(*old_sharp_eq_context));
 	old_backq_level = backq_level;
 	setup_READ();
 
@@ -306,7 +298,7 @@ object in;
 	}
 #endif        
 
-	if (sharp_eq_context_max > 0)
+	if (sSAsharp_eq_contextA->s.s_dbind!=Cnil)
 		x = vs_head = patch_sharp(x);
 
 	e = FALSE;
@@ -319,9 +311,7 @@ L:
 	READbase = old_READbase;
 	READsuppress = old_READsuppress;
 	READeval = old_READeval;
-	sharp_eq_context_max = old_sharp_eq_context_max;
-	for (i = 0;  i < sharp_eq_context_max;  i++)
-		sharp_eq_context[i] = old_sharp_eq_context[i];
+	sSAsharp_eq_contextA->s.s_dbind=old_READcontext;
 	backq_level = old_backq_level;
 	if (e) {
 		nlj_active = FALSE;
@@ -333,72 +323,6 @@ L:
 	return(x);
 }
 
-/* static object
-standard_read_object_non_recursive(in)
-object in;
-{
-	VOL object x;
-	int i;
-	bool e;
-	object old_READtable;
-	int old_READdefault_float_format;
-	int old_READbase;
-	int old_READsuppress;
-	int old_READeval;
-	int old_sharp_eq_context_max;
-	struct sharp_eq_context_struct
-		old_sharp_eq_context[SHARP_EQ_CONTEXT_SIZE];
-	int old_backq_level;
-
-	old_READtable = READtable;
-	old_READdefault_float_format = READdefault_float_format;
-	old_READbase = READbase;
-	old_READsuppress = READsuppress;
-	old_READeval = READeval;
-	old_sharp_eq_context_max = sharp_eq_context_max;
-	BUG FIX by Toshiba
-	vs_push(old_READtable);
-	for (i = 0;  i < sharp_eq_context_max;  i++)
-		old_sharp_eq_context[i] = sharp_eq_context[i];
-	old_backq_level = backq_level;
-
-	setup_standard_READ();
-
-	frs_push(FRS_PROTECT, Cnil);
-	if (nlj_active) {
-		e = TRUE;
-		goto L;
-	}
-
-	x = read_object(in);
-	vs_push(x);
-
-	if (sharp_eq_context_max > 0)
-		x = vs_head = patch_sharp(x);
-
-	e = FALSE;
-
-L:
-	frs_pop();
-
-	READtable = old_READtable;
-	READdefault_float_format = old_READdefault_float_format;
-	READbase = old_READbase;
-	READsuppress = old_READsuppress;
-	READeval = old_READeval;
-	sharp_eq_context_max = old_sharp_eq_context_max;
-	for (i = 0;  i < sharp_eq_context_max;  i++)
-		sharp_eq_context[i] = old_sharp_eq_context[i];
-	backq_level = old_backq_level;
-	if (e) {
-		nlj_active = FALSE;
-		unwind(nlj_fr, nlj_tag);
-	}
-	vs_popp;
-	BUG FIX by Toshiba
-	vs_popp;
-	return(x);
-}*/
 #ifdef UNIX  /* faster code for inner loop from file stream */
 #define xxxread_char_to(res,in,eof_code) \
   do{FILE *fp; \
@@ -749,7 +673,7 @@ double pow();
 static double
 new_fraction(char *s,int end,int exp_pos) {
 
-  char ch,ch1;
+  char ch,ch1=0;
   double fraction;
 
   ch=s[end];
@@ -778,7 +702,7 @@ parse_number(char *s, int end, int *ep, int radix) {
   object x=Cnil;
   fixnum sign;
   object integer_part;
-  double fraction, fraction_unit, f;
+  double fraction, fraction_unit;
   char exponent_marker;
   int exponent,exp_pos=-1;
   int i, j, k;
@@ -947,7 +871,6 @@ parse_number(char *s, int end, int *ep, int radix) {
     i++;
   } while (i < end && (d = digitp(s[i], radix)) >= 0);
   d = exponent;
-  f = 10.0;
   /* Use pow because it is more accurate */
   { double po = pow(10.0,(double)(sign * d));
   if (po == 0.0)
@@ -1133,17 +1056,25 @@ object in;
 	
 }
 
-static void
-Ldouble_quote_reader()
-{
-  object c;
-  check_arg(2);
-  c=vs_base[1];
-  vs_popp;
-  read_string(char_code(c), vs_base[0]);
-  vs_base[0] = copy_simple_string(token);
+DEFUN("DOUBLE-QUOTE-READER",object,fSdouble_quote_reader,SI,2,2,NONE,OO,OO,OO,OO,
+	  (object s,object c),"") {
+
+  read_string(char_code(c),s);
+  RETURN1(copy_simple_string(token));
 
 }
+
+/* static void */
+/* Ldouble_quote_reader() */
+/* { */
+/*   object c; */
+/*   check_arg(2); */
+/*   c=vs_base[1]; */
+/*   vs_popp; */
+/*   read_string(char_code(c), vs_base[0]); */
+/*   vs_base[0] = copy_simple_string(token); */
+
+/* } */
 
 static void
 Ldispatch_reader()
@@ -1185,49 +1116,73 @@ Ldispatch_reader()
 	super_funcall(x);
 }
 
-static void
-Lsingle_quote_reader()
-{
-	check_arg(2);
-	vs_popp;
-	vs_push(sLquote);
-	vs_push(read_object(vs_base[0]));
-	vs_push(Cnil);
-	stack_cons();
-	stack_cons();
-	vs_base[0] = vs_pop;
+DEFUN("SINGLE-QUOTE-READER",object,fSsingle_quote_reader,SI,2,2,NONE,OO,OO,OO,OO,
+	  (object s,object c),"") {
+  RETURN1(MMcons(sLquote,MMcons(read_object(s),Cnil)));
 }
 
-static void
-Lright_parenthesis_reader()
-{
-	check_arg(2);
-	if (!inlp)
-	  READER_ERROR(vs_base[0],"Right paren found with no left.");
-	vs_popp;
-	vs_popp;
-		/*  no result  */
+/* static void */
+/* Lsingle_quote_reader() */
+/* { */
+/* 	check_arg(2); */
+/* 	vs_popp; */
+/* 	vs_push(sLquote); */
+/* 	vs_push(read_object(vs_base[0])); */
+/* 	vs_push(Cnil); */
+/* 	stack_cons(); */
+/* 	stack_cons(); */
+/* 	vs_base[0] = vs_pop; */
+/* } */
+
+DEFUN("RIGHT-PARENTHESIS-READER",object,fSright_parenthesis_reader,SI,2,2,NONE,OO,OO,OO,OO,
+	  (object s,object c),"") {
+  if (!inlp)
+    READER_ERROR(vs_base[0],"Right paren found with no left.");
+  RETURN1(Cnil);
 }
+
+/* static void */
+/* Lright_parenthesis_reader() */
+/* { */
+/* 	check_arg(2); */
+/* 	if (!inlp) */
+/* 	  READER_ERROR(vs_base[0],"Right paren found with no left."); */
+/* 	vs_popp; */
+/* 	vs_popp; */
+/* 		/\*  no result  *\/ */
+/* } */
 
 /*
 Lcomma_reader(){}
 */
 
-static void
-Lsemicolon_reader()
-{
-	object c;
-	object str= vs_base[0];
-	check_arg(2);
-	vs_popp;
-	do
-	{ read_char_to(c,str, goto L); }
-		while (char_code(c) != '\n');
-L:	
-	vs_popp;
-	vs_base[0] = Cnil;
-	/*  no result  */
+DEFUNM("SEMICOLON-READER",object,fSsemicolon_reader,SI,2,2,NONE,OO,OO,OO,OO,
+	  (object str,object c),"") {
+
+  fixnum vals=fcall.valp;
+
+  do
+    { read_char_to(c,str, goto L); }
+  while (char_code(c) != '\n');
+ L:	
+  RETURN0;
 }
+
+/* static void */
+/* Lsemicolon_reader() */
+/* { */
+/* 	object c; */
+/* 	object str= vs_base[0]; */
+/* 	check_arg(2); */
+/* 	vs_popp; */
+/* 	do */
+/* 	{ read_char_to(c,str, goto L); } */
+/* 		while (char_code(c) != '\n'); */
+/* L:	 */
+/* 	vs_popp; */
+/* 	vs_base[0] = Cnil; */
+/* 	/\*  no result  *\/ */
+/* } */
 
 /*
 Lbackquote_reader(){}
@@ -1239,112 +1194,212 @@ Lbackquote_reader(){}
 static void
 extra_argument(int);
 
-static void
-Lsharp_C_reader()
-{
-	object x=OBJNULL;
+DEFUN("SHARP-C-READER",object,fSsharp_c_reader,SI,3,3,NONE,OO,OO,OO,OO,(object s,object x,object y),"") {
+  
+  object r,i;
 
-	check_arg(3);
-	if (vs_base[2] != Cnil && !READsuppress)
-		extra_argument('C');
-	vs_popp;
-	vs_popp;
+  x=OBJNULL;
+  if (y!=Cnil && !READsuppress)
+    extra_argument('C');
+  if (READsuppress) {
+    read_object(s);
+    s= Cnil;
+  } else {
+    do {read_char_to(x,s, {READER_ERROR(s,"A left parenthesis is expected.");});
+    } while (cat(x) == cat_whitespace);
+    if (char_code(x) != '(')
+      READER_ERROR(s,"A left parenthesis is expected.");
+    delimiting_char = code_char(')');
+    x = read_object(s);
+    if (x==OBJNULL || !realp(x))
+      TYPE_ERROR(x,TSor_rational_float);
+    r=x;
+    delimiting_char = code_char(')');
+    x = read_object(s);
+    if (x==OBJNULL || !realp(x))
+      TYPE_ERROR(x,TSor_rational_float);
+    i=x;
+    delimiting_char = code_char(')');
+    x = read_object(s);
+    if (x != OBJNULL)
+      READER_ERROR(s,"A right parenthesis is expected.");
+    if (contains_sharp_comma(r) || contains_sharp_comma(i)) {
+      s = alloc_object(t_complex);
+      s->cmp.cmp_real = r;
+      s->cmp.cmp_imag = i;
+    } else {
+      check_type_number(&r);
+      check_type_number(&i);
+      s = make_complex(r, i);
+    }
+  }
+  RETURN1(s);
 
-	if (READsuppress) {
-	  read_object(vs_base[0]);
-	  vs_base[0]= Cnil;
-	} else {
-	  do {read_char_to(x,vs_base[0], {
-	    READER_ERROR(vs_base[0],"A left parenthesis is expected.");
-	  });
-	  } while (cat(x) == cat_whitespace);
-	  if (char_code(x) != '(')
-	    READER_ERROR(vs_base[0],"A left parenthesis is expected.");
-	  delimiting_char = code_char(')');
-	  x = read_object(vs_base[0]);
-	  if (x==OBJNULL || !realp(x))
-	    TYPE_ERROR(x,TSor_rational_float);
-	  vs_push(x);
-	  delimiting_char = code_char(')');
-	  x = read_object(vs_base[0]);
-	  if (x==OBJNULL || !realp(x))
-	    TYPE_ERROR(x,TSor_rational_float);
-	  vs_push(x);
-	  delimiting_char = code_char(')');
-	  x = read_object(vs_base[0]);
-	  if (x != OBJNULL)
-	    READER_ERROR(vs_base[0],"A right parenthesis is expected.");
-	  if (contains_sharp_comma(vs_base[1]) ||
-	      contains_sharp_comma(vs_base[2])) {
-	    vs_base[0] = alloc_object(t_complex);
-	    vs_base[0]->cmp.cmp_real = vs_base[1];
-	    vs_base[0]->cmp.cmp_imag = vs_base[2];
-	  } else {
-	    check_type_number(&vs_base[1]);
-	    check_type_number(&vs_base[2]);
-	    vs_base[0] = make_complex(vs_base[1], vs_base[2]);
-	  }
-	}
-	vs_top = vs_base + 1;
 }
 
-static void
-Lsharp_backslash_reader()
-{
-	object c;
+/* static void */
+/* Lsharp_C_reader() */
+/* { */
+/* 	object x=OBJNULL; */
 
-	check_arg(3);
-	if (vs_base[2] != Cnil && !READsuppress)
-		if (type_of(vs_base[2]) != t_fixnum ||
-		    fix(vs_base[2]) != 0)
-			FEerror("~S is an illegal CHAR-FONT.", 1, vs_base[2]);
-			/*  assuming that CHAR-FONT-LIMIT is 1  */
-	vs_popp;
-	vs_popp;
-	{
-	  union lispunion u;
-	  u.ch=character_table['\\'];
-	  unread_char(&u, vs_base[0]);
-	}
-	if (READsuppress) {
-		(void)read_object(vs_base[0]);
-		vs_base[0] = Cnil;
-		return;
-	}
-	READsuppress = TRUE;
-	(void)read_object(vs_base[0]);
-	READsuppress = FALSE;
-	c = token;
-	if (c->s.s_fillp == 1) {
-		vs_base[0] = code_char(c->ust.ust_self[0]);
-		return;
-	}
-	if (string_equal(c, STreturn))
-		vs_base[0] = code_char('\r');
-	else if (string_equal(c, STspace))
-		vs_base[0] = code_char(' ');
-	else if (string_equal(c, STrubout))
-		vs_base[0] = code_char('\177');
-	else if (string_equal(c, STpage))
-		vs_base[0] = code_char('\f');
-	else if (string_equal(c, STtab))
-		vs_base[0] = code_char('\t');
-	else if (string_equal(c, STbackspace))
-		vs_base[0] = code_char('\b');
-	else if (string_equal(c, STlinefeed) || string_equal(c, STnewline))
-		vs_base[0] = code_char('\n');
-	else if (c->s.s_fillp == 2 && c->s.s_self[0] == '^')
-		vs_base[0] = code_char(c->s.s_self[1] & 037);
-	else if (c->s.s_self[0] =='\\' && c->s.s_fillp > 1) {
-		int i, n;
-		for (n = 0, i = 1;  i < c->s.s_fillp;  i++)
-			if (c->s.s_self[i] < '0' || '7' < c->s.s_self[i])
-				FEerror("Octal digit expected.", 0);
-			else
-				n = 8*n + c->s.s_self[i] - '0';
-		vs_base[0] = code_char(n & 0377);
-	} else
-		FEerror("~S is an illegal character name.", 1, c);
+/* 	check_arg(3); */
+/* 	if (vs_base[2] != Cnil && !READsuppress) */
+/* 		extra_argument('C'); */
+/* 	vs_popp; */
+/* 	vs_popp; */
+
+/* 	if (READsuppress) { */
+/* 	  read_object(vs_base[0]); */
+/* 	  vs_base[0]= Cnil; */
+/* 	} else { */
+/* 	  do {read_char_to(x,vs_base[0], { */
+/* 	    READER_ERROR(vs_base[0],"A left parenthesis is expected."); */
+/* 	  }); */
+/* 	  } while (cat(x) == cat_whitespace); */
+/* 	  if (char_code(x) != '(') */
+/* 	    READER_ERROR(vs_base[0],"A left parenthesis is expected."); */
+/* 	  delimiting_char = code_char(')'); */
+/* 	  x = read_object(vs_base[0]); */
+/* 	  if (x==OBJNULL || !realp(x)) */
+/* 	    TYPE_ERROR(x,TSor_rational_float); */
+/* 	  vs_push(x); */
+/* 	  delimiting_char = code_char(')'); */
+/* 	  x = read_object(vs_base[0]); */
+/* 	  if (x==OBJNULL || !realp(x)) */
+/* 	    TYPE_ERROR(x,TSor_rational_float); */
+/* 	  vs_push(x); */
+/* 	  delimiting_char = code_char(')'); */
+/* 	  x = read_object(vs_base[0]); */
+/* 	  if (x != OBJNULL) */
+/* 	    READER_ERROR(vs_base[0],"A right parenthesis is expected."); */
+/* 	  if (contains_sharp_comma(vs_base[1]) || */
+/* 	      contains_sharp_comma(vs_base[2])) { */
+/* 	    vs_base[0] = alloc_object(t_complex); */
+/* 	    vs_base[0]->cmp.cmp_real = vs_base[1]; */
+/* 	    vs_base[0]->cmp.cmp_imag = vs_base[2]; */
+/* 	  } else { */
+/* 	    check_type_number(&vs_base[1]); */
+/* 	    check_type_number(&vs_base[2]); */
+/* 	    vs_base[0] = make_complex(vs_base[1], vs_base[2]); */
+/* 	  } */
+/* 	} */
+/* 	vs_top = vs_base + 1; */
+/* } */
+
+DEFUN("SHARP-\\-READER",object,fSsharp_sl_reader,SI,3,3,NONE,OO,OO,OO,OO,(object s,object x,object y),"") {
+
+  object c;
+  
+  if (y!=Cnil && !READsuppress)
+    if (type_of(y)!=t_fixnum ||	fix(y) != 0)
+      FEerror("~S is an illegal CHAR-FONT.", 1, y);
+  /*  assuming that CHAR-FONT-LIMIT is 1  */
+  {
+    union lispunion u;
+    u.ch=character_table['\\'];
+    unread_char(&u, s);
+  }
+  if (READsuppress) {
+    (void)read_object(s);
+    RETURN1(Cnil);
+  }
+  READsuppress = TRUE;
+  (void)read_object(s);
+  READsuppress = FALSE;
+  c = token;
+  if (c->s.s_fillp == 1) {
+    RETURN1(code_char(c->ust.ust_self[0]));
+  }
+  if (string_equal(c, STreturn))
+    s = code_char('\r');
+  else if (string_equal(c, STspace))
+    s = code_char(' ');
+  else if (string_equal(c, STrubout))
+    s = code_char('\177');
+  else if (string_equal(c, STpage))
+    s = code_char('\f');
+  else if (string_equal(c, STtab))
+    s = code_char('\t');
+  else if (string_equal(c, STbackspace))
+    s = code_char('\b');
+  else if (string_equal(c, STlinefeed) || string_equal(c, STnewline))
+    s = code_char('\n');
+  else if (c->s.s_fillp == 2 && c->s.s_self[0] == '^')
+    s = code_char(c->s.s_self[1] & 037);
+  else if (c->s.s_self[0] =='\\' && c->s.s_fillp > 1) {
+    int i, n;
+    for (n = 0, i = 1;  i < c->s.s_fillp;  i++)
+      if (c->s.s_self[i] < '0' || '7' < c->s.s_self[i])
+	FEerror("Octal digit expected.", 0);
+      else
+	n = 8*n + c->s.s_self[i] - '0';
+    s = code_char(n & 0377);
+  } else
+    FEerror("~S is an illegal character name.", 1, c);
+  RETURN1(s);
+}
+
+/* static void */
+/* Lsharp_backslash_reader() */
+/* { */
+/* 	object c; */
+
+/* 	check_arg(3); */
+/* 	if (vs_base[2] != Cnil && !READsuppress) */
+/* 		if (type_of(vs_base[2]) != t_fixnum || */
+/* 		    fix(vs_base[2]) != 0) */
+/* 			FEerror("~S is an illegal CHAR-FONT.", 1, vs_base[2]); */
+/* 			/\*  assuming that CHAR-FONT-LIMIT is 1  *\/ */
+/* 	vs_popp; */
+/* 	vs_popp; */
+/* 	unread_char(code_char('\\'), vs_base[0]); */
+/* 	if (READsuppress) { */
+/* 		(void)read_object(vs_base[0]); */
+/* 		vs_base[0] = Cnil; */
+/* 		return; */
+/* 	} */
+/* 	READsuppress = TRUE; */
+/* 	(void)read_object(vs_base[0]); */
+/* 	READsuppress = FALSE; */
+/* 	c = token; */
+/* 	if (c->s.s_fillp == 1) { */
+/* 		vs_base[0] = code_char(c->ust.ust_self[0]); */
+/* 		return; */
+/* 	} */
+/* 	if (string_equal(c, STreturn)) */
+/* 		vs_base[0] = code_char('\r'); */
+/* 	else if (string_equal(c, STspace)) */
+/* 		vs_base[0] = code_char(' '); */
+/* 	else if (string_equal(c, STrubout)) */
+/* 		vs_base[0] = code_char('\177'); */
+/* 	else if (string_equal(c, STpage)) */
+/* 		vs_base[0] = code_char('\f'); */
+/* 	else if (string_equal(c, STtab)) */
+/* 		vs_base[0] = code_char('\t'); */
+/* 	else if (string_equal(c, STbackspace)) */
+/* 		vs_base[0] = code_char('\b'); */
+/* 	else if (string_equal(c, STlinefeed) || string_equal(c, STnewline)) */
+/* 		vs_base[0] = code_char('\n'); */
+/* 	else if (c->s.s_fillp == 2 && c->s.s_self[0] == '^') */
+/* 		vs_base[0] = code_char(c->s.s_self[1] & 037); */
+/* 	else if (c->s.s_self[0] =='\\' && c->s.s_fillp > 1) { */
+/* 		int i, n; */
+/* 		for (n = 0, i = 1;  i < c->s.s_fillp;  i++) */
+/* 			if (c->s.s_self[i] < '0' || '7' < c->s.s_self[i]) */
+/* 				FEerror("Octal digit expected.", 0); */
+/* 			else */
+/* 				n = 8*n + c->s.s_self[i] - '0'; */
+/* 		vs_base[0] = code_char(n & 0377); */
+/* 	} else */
+/* 		FEerror("~S is an illegal character name.", 1, c); */
+/* } */
+
+DEFUN("SHARP-'-READER",object,fSsharp_q_reader,SI,3,3,NONE,OO,OO,OO,OO,(object s,object x,object y),"") {
+
+  if(y != Cnil && !READsuppress)
+    extra_argument('#');
+  RETURN1(MMcons(sLfunction,MMcons(read_object(s),Cnil)));
+
 }
 
 static void
@@ -1665,7 +1720,7 @@ Lsharp_exclamation_reader()
 		return;
 	}
 	vs_base[0] = read_object(vs_base[0]);
-	if (sharp_eq_context_max > 0)
+	if (sSAsharp_eq_contextA->s.s_dbind!=Cnil)
 		vs_base[0]=patch_sharp(vs_base[0]);
 	ieval(vs_base[0]);
 	vs_popp;
@@ -1774,158 +1829,9 @@ Lsharp_R_reader()
 			1, vs_base[0]);
 }
 
-/*static void Lsharp_A_reader(){}*/
-
-/*static void Lsharp_S_reader(){}*/
-
-static void
-Lsharp_eq_reader()
-{
-	int i;
-	fixnum f;
-
-	check_arg(3);
-	if (READsuppress) {
-		vs_top = vs_base;
-		return;
-	}
-	if (vs_base[2] == Cnil)
-		FEerror("The #= readmacro requires an argument.", 0);
-	if (type_of(vs_base[2])!=t_fixnum)
-		FEerror("The #= readmacro requires a fixnum argument.", 0);
-	f=fix(vs_base[2]);
-	for (i = 0;  i < sharp_eq_context_max;  i++)
-	  if (sharp_eq_context[i].sharp_index==f)
-	    FEerror("Duplicate definitions for #~D=.",1, vs_base[2]);
-	if (sharp_eq_context_max >= SHARP_EQ_CONTEXT_SIZE)
-	  FEerror("Too many #= definitions.", 0);
-	i = sharp_eq_context_max++;
-	sharp_eq_context[i].sharp_index = f;
-	sharp_eq_context[i].sharp_sharp = OBJNULL;
-	vs_base[0]
-	= sharp_eq_context[i].sharp_eq
-	= read_object(vs_base[0]);
-	if (sharp_eq_context[i].sharp_eq==sharp_eq_context[i].sharp_sharp)
-	  FEerror("#~D# is defined by itself.",1,make_fixnum(sharp_eq_context[i].sharp_index));
-	vs_top = vs_base+1;
-}
-
-static void
-Lsharp_sharp_reader()
-{
-	int i;
-	fixnum f;
-
-	check_arg(3);
-	if (READsuppress) {
-		vs_popp;
-		vs_popp;
-		vs_base[0] = Cnil;
-		return;
-	}
-	if (vs_base[2] == Cnil)
-	  FEerror("The ## readmacro requires an argument.", 0);
-	if (type_of(vs_base[2])!=t_fixnum)
-	  FEerror("The ## readmacro requires a fixnum argument.", 0);
-	f=fix(vs_base[2]);
-	for (i = 0;  ;  i++)
-	  if (i >= sharp_eq_context_max)
-	    FEerror("#~D# is undefined.", 1, vs_base[2]);
-	  else if (sharp_eq_context[i].sharp_index==f)
-	    break;
-	if (sharp_eq_context[i].sharp_sharp == OBJNULL)
-	  sharp_eq_context[i].sharp_sharp = alloc_object(t_spice);
-	vs_base[0] = sharp_eq_context[i].sharp_sharp;
-	vs_top = vs_base+1;
-}
-
-static void
-patch_sharp_cons(x)
-object x;
-{
-	for (;;) {
-		x->c.c_car = patch_sharp(x->c.c_car);
-		if (consp(x->c.c_cdr))
-			x = x->c.c_cdr;
-		else {
-			x->c.c_cdr = patch_sharp(x->c.c_cdr);
-			break;
-		}
-	}
-}
-
-static object
-patch_sharp(x)
-object x;
-{
-	cs_check(x);
-
-	switch (type_of(x)) {
-	case t_spice:
-	{
-		int i;
-
-		for (i = 0;  i < sharp_eq_context_max;  i++)
-			if (sharp_eq_context[i].sharp_sharp == x)
-				return(sharp_eq_context[i].sharp_eq);
-		break;
-	}
-	case t_cons:
-	/*
-		x->c.c_car = patch_sharp(x->c.c_car);
-		x->c.c_cdr = patch_sharp(x->c.c_cdr);
-	*/
-		patch_sharp_cons(x);
-		break;
-
-	case t_vector:
-	{
-		int i;
-
-		if ((enum aelttype)x->v.v_elttype != aet_object)
-		  break;
-
-		for (i = 0;  i < x->v.v_fillp;  i++)
-			x->v.v_self[i] = patch_sharp(x->v.v_self[i]);
-		break;
-	}
-	case t_array:
-	{
-		int i, j;
-		
-		if ((enum aelttype)x->a.a_elttype != aet_object)
-		  break;
-
-		for (i = 0, j = 1;  i < x->a.a_rank;  i++)
-			j *= x->a.a_dims[i];
-		for (i = 0;  i < j;  i++)
-			x->a.a_self[i] = patch_sharp(x->a.a_self[i]);
-		break;
-	}
-	case t_structure:
-	{object def = x->str.str_def;
-	 int i;
-	 i=S_DATA(def)->length;
-	 while (i--> 0)
-	   structure_set(x,def,i,patch_sharp(structure_ref(x,def,i)));
-	 break;
-       }
-	
-	default:
-		break;
-	}
-	return(x);
-}
-
 static void Lsharp_plus_reader(){}
 
 static void Lsharp_minus_reader(){}
-
-/*static void Lsharp_less_than_reader(){}*/
-
-/*static void Lsharp_whitespace_reader(){}*/
-
-/*static void Lsharp_right_parenthesis_reader(){}*/
 
 static void
 Lsharp_vertical_bar_reader() {
@@ -2024,8 +1930,9 @@ Lsharp_dollar_reader()
 	    if (vs_base[0]->rnd.rnd_state._mp_seed->_mp_size!=1)
 	      FEerror("Cannot make a random-state with the value ~S.",1, x);
 	    mpz_set_ui(vs_base[0]->rnd.rnd_state._mp_seed,fix(x));
-	  } else if (x->big.big_mpz_t._mp_size!=vs_base[0]->rnd.rnd_state._mp_seed->_mp_size) {
-	    FEerror("Cannot make a random-state with the value ~S.",1, x);
+	  } else {
+	    if (x->big.big_mpz_t._mp_size!=vs_base[0]->rnd.rnd_state._mp_seed->_mp_size)
+	      FEerror("Cannot make a random-state with the value ~S.",1, x);
 	    memcpy(vs_base[0]->rnd.rnd_state._mp_seed->_mp_d,x->big.big_mpz_t._mp_d,
 		   vs_base[0]->rnd.rnd_state._mp_seed->_mp_size*sizeof(*vs_base[0]->rnd.rnd_state._mp_seed->_mp_d));
 	  }
@@ -2096,290 +2003,342 @@ current_readtable()
 }
 
 
-@(defun read (&optional (strm `symbol_value(sLAstandard_inputA)`)
-			(eof_errorp Ct)
-			eof_value
-			recursivep
-	      &aux x)
-@
-	if (strm == Cnil)
-		strm = symbol_value(sLAstandard_inputA);
-	else if (strm == Ct)
-		strm = symbol_value(sLAterminal_ioA);
-	check_type_stream(&strm);
-	if (recursivep == Cnil)
-		preserving_whitespace_flag = FALSE;
-	detect_eos_flag = TRUE;
-	if (recursivep == Cnil)
-		x = read_object_non_recursive(strm);
-	else
-		x = read_object_recursive(strm);
-	if (x == OBJNULL) {
-		if (eof_errorp == Cnil && recursivep == Cnil)
-			@(return eof_value)
-		end_of_stream(strm);
-	}
-	@(return x)
-@)
 
-@(static defun read_preserving_whitespace
-	(&optional (strm `symbol_value(sLAstandard_inputA)`)
-		   (eof_errorp Ct)
-		   eof_value
-		   recursivep
-	 &aux x)
-	object c;
-@
-	if (strm == Cnil)
-		strm = symbol_value(sLAstandard_inputA);
-	else if (strm == Ct)
-		strm = symbol_value(sLAterminal_ioA);
-	check_type_stream(&strm);
-	while (!stream_at_end(strm)) {
-		c = read_char(strm);
-		if (cat(c) != cat_whitespace) {
-			unread_char(c, strm);
-			goto READ;
-		}
-	}
-	if (eof_errorp == Cnil && recursivep == Cnil)
-		@(return eof_value)
-	end_of_stream(strm);
+DEFUN("READ",object,fLread,LISP,0,4,NONE,OO,OO,OO,OO,(object f,...),"") {
 
-READ:
-	if (recursivep == Cnil)
-		preserving_whitespace_flag = TRUE;
-	if (recursivep == Cnil)
-		x = read_object_non_recursive(strm);
-	else
-		x = read_object_recursive(strm);
-	@(return x)
-@)
+  fixnum nargs=INIT_NARGS(0);
+  object l=Cnil,x,strm,eof_errorp,eof_value,recursivep;
+  va_list ap;
+  
+  va_start(ap,f);
+  strm=NEXT_ARG(nargs,ap,l,f,sLAstandard_inputA->s.s_dbind);
+  eof_errorp=NEXT_ARG(nargs,ap,l,f,Ct);
+  eof_value= NEXT_ARG(nargs,ap,l,f,Cnil);
+  recursivep=NEXT_ARG(nargs,ap,l,f,Cnil);
+  va_end(ap);
+  
+  if (strm == Cnil)
+    strm = symbol_value(sLAstandard_inputA);
+  else if (strm == Ct)
+    strm = symbol_value(sLAterminal_ioA);
+  check_type_stream(&strm);
+  if (recursivep == Cnil)
+    preserving_whitespace_flag = FALSE;
+  detect_eos_flag = TRUE;
+  if (recursivep == Cnil)
+    x = read_object_non_recursive(strm);
+  else
+    x = read_object_recursive(strm);
+  if (x == OBJNULL) {
+    if (eof_errorp == Cnil && recursivep == Cnil)
+      RETURN1(eof_value);
+    end_of_stream(strm);
+  }
+  
+  RETURN1(x);
+  
+}
 
-@(defun read_delimited_list
-	(d
-	 &optional (strm `symbol_value(sLAstandard_inputA)`)
-		   recursivep
-	 &aux l x)
+DEFUN("READ-PRESERVING-WHITESPACE",object,fLread_preserving_whitespace,LISP,
+	  0,4,NONE,OO,OO,OO,OO,(object f,...),"") {
 
-	object *p;
+  fixnum nargs=INIT_NARGS(0);
+  object l=Cnil,c,x,strm,eof_errorp,eof_value,recursivep;
+  va_list ap;
 
-	int i;
-	bool e;
-	volatile int old_sharp_eq_context_max=0;
-	struct sharp_eq_context_struct
-		old_sharp_eq_context[SHARP_EQ_CONTEXT_SIZE];
-	volatile int old_backq_level=0;
+  va_start(ap,f);
+  strm=NEXT_ARG(nargs,ap,l,f,sLAstandard_inputA->s.s_dbind);
+  eof_errorp=NEXT_ARG(nargs,ap,l,f,Ct);
+  eof_value= NEXT_ARG(nargs,ap,l,f,Cnil);
+  recursivep=NEXT_ARG(nargs,ap,l,f,Cnil);
+  va_end(ap);
 
-@
+  if (strm == Cnil)
+    strm = symbol_value(sLAstandard_inputA);
+  else if (strm == Ct)
+    strm = symbol_value(sLAterminal_ioA);
+  check_type_stream(&strm);
+  while (!stream_at_end(strm)) {
+    c = read_char(strm);
+    if (cat(c) != cat_whitespace) {
+      unread_char(c, strm);
+      goto READ;
+    }
+  }
+  if (eof_errorp == Cnil && recursivep == Cnil)
+    RETURN1(eof_value);
+  end_of_stream(strm);
+  
+ READ:
+  if (recursivep == Cnil)
+    preserving_whitespace_flag = TRUE;
+  if (recursivep == Cnil)
+    x = read_object_non_recursive(strm);
+  else
+    x = read_object_recursive(strm);
+  RETURN1(x);
+}
+    
+DEFUN("READ-DELIMITED-LIST",object,fLread_delimited_list,LISP,1,3,NONE,OO,OO,OO,OO,(object d,...),"") {
 
-	check_type_character(&d);
-	if (strm == Cnil)
-		strm = symbol_value(sLAstandard_inputA);
-	else if (strm == Ct)
-		strm = symbol_value(sLAterminal_ioA);
-	check_type_stream(&strm);
-	if (recursivep == Cnil) {
-		old_sharp_eq_context_max = sharp_eq_context_max;
-		for (i = 0;  i < sharp_eq_context_max;  i++)
-			old_sharp_eq_context[i] = sharp_eq_context[i];
-		old_backq_level = backq_level;
-		setup_READ();
-		frs_push(FRS_PROTECT, Cnil);
-		if (nlj_active) {
-			e = TRUE;
-			goto L;
-		}
-	}
-	l = Cnil;
-	p = &l;
-	preserving_whitespace_flag = FALSE;	/*  necessary?  */
-	for (;;) {
-		delimiting_char = d;
-		x = read_object_recursive(strm);
-		if (x == OBJNULL)
-			break;
-		*p = make_cons(x, Cnil);
-		p = &((*p)->c.c_cdr);
-	}
-	if (recursivep == Cnil) {
-		if (sharp_eq_context_max > 0)
-			l = patch_sharp(l);
-		e = FALSE;
-	L:
-		frs_pop();
-		sharp_eq_context_max = old_sharp_eq_context_max;
-		for (i = 0;  i < sharp_eq_context_max;  i++)
-			sharp_eq_context[i] = old_sharp_eq_context[i];
-		backq_level = old_backq_level;
-		if (e) {
-			nlj_active = FALSE;
-			unwind(nlj_fr, nlj_tag);
-		}
-	}
-	@(return l)
-@)
+  fixnum nargs=INIT_NARGS(1);
+  object l=Cnil,x,f=OBJNULL,strm,recursivep,*p;
+  va_list ap;
+  bool e;
+  volatile object old_READcontext;
+  volatile int old_backq_level=0;
 
-@(defun read_line (&optional (strm `symbol_value(sLAstandard_inputA)`)
-			     (eof_errorp Ct)
-			     eof_value
-			     recursivep
-		   &aux c)
-	int i;
-@
-	if (strm == Cnil)
-		strm = symbol_value(sLAstandard_inputA);
-	else if (strm == Ct)
-		strm = symbol_value(sLAterminal_ioA);
-	check_type_stream(&strm);
-	if (stream_at_end(strm)) {
-		if (eof_errorp == Cnil && recursivep == Cnil)
-			@(return eof_value Ct)
-		else
-			end_of_stream(strm);
-	}
-	i = 0;
-	for (;;) {
-	        read_char_to(c,strm,c = Ct; goto FINISH);
-		if (char_code(c) == '\n') {
-			c = Cnil;
-			break;
-		}
-		if (i >= token->st.st_dim)
-			too_long_string();
-		token->st.st_self[i++] = char_code(c);
-	}
+
+  va_start(ap,d);
+  strm=NEXT_ARG(nargs,ap,l,f,sLAstandard_inputA->s.s_dbind);
+  recursivep=NEXT_ARG(nargs,ap,l,f,Cnil);
+  va_end(ap);
+
+  check_type_character(&d);
+  if (strm == Cnil)
+    strm = symbol_value(sLAstandard_inputA);
+  else if (strm == Ct)
+    strm = symbol_value(sLAterminal_ioA);
+  check_type_stream(&strm);
+  if (recursivep == Cnil) {
+
+    old_READcontext=sSAsharp_eq_contextA->s.s_dbind;
+    old_backq_level = backq_level;
+    setup_READ();
+    frs_push(FRS_PROTECT, Cnil);
+    if (nlj_active) {
+      e = TRUE;
+      goto L;
+    }
+  }
+  l = Cnil;
+  p = &l;
+  preserving_whitespace_flag = FALSE;	/*  necessary?  */
+  for (;;) {
+    delimiting_char = d;
+    x = read_object_recursive(strm);
+    if (x == OBJNULL)
+      break;
+    *p = make_cons(x, Cnil);
+    p = &((*p)->c.c_cdr);
+  }
+  if (recursivep == Cnil) {
+    if (sSAsharp_eq_contextA->s.s_dbind!=Cnil)
+      l = patch_sharp(l);
+    e = FALSE;
+  L:
+    frs_pop();
+    sSAsharp_eq_contextA->s.s_dbind=old_READcontext;
+    backq_level = old_backq_level;
+    if (e) {
+      nlj_active = FALSE;
+      unwind(nlj_fr, nlj_tag);
+    }
+  }
+  RETURN1(l);
+}
+
+DEFUNM("READ-LINE",object,fLread_line,LISP,0,4,NONE,OO,OO,OO,OO,(object f,...),"") {
+
+  fixnum vals=(fixnum)fcall.valp,nargs=INIT_NARGS(0),i;
+  object l=Cnil,c,strm,eof_errorp,eof_value,recursivep,*base=vs_top;
+  va_list ap;
+
+  va_start(ap,f);
+  strm=NEXT_ARG(nargs,ap,l,f,sLAstandard_inputA->s.s_dbind);
+  eof_errorp=NEXT_ARG(nargs,ap,l,f,Ct);
+  eof_value= NEXT_ARG(nargs,ap,l,f,Cnil);
+  recursivep=NEXT_ARG(nargs,ap,l,f,Cnil);
+  va_end(ap);
+  
+  if (strm == Cnil)
+    strm = symbol_value(sLAstandard_inputA);
+  else if (strm == Ct)
+    strm = symbol_value(sLAterminal_ioA);
+  check_type_stream(&strm);
+  if (stream_at_end(strm)) {
+    if (eof_errorp == Cnil && recursivep == Cnil)
+      RETURN2(eof_value,Ct);
+    else
+      end_of_stream(strm);
+  }
+  i = 0;
+  for (;;) {
+    read_char_to(c,strm,c = Ct; goto FINISH);
+    if (char_code(c) == '\n') {
+      c = Cnil;
+      break;
+    }
+    if (i >= token->st.st_dim)
+      too_long_string();
+    token->st.st_self[i++] = char_code(c);
+  }
  FINISH:
 #ifdef DOES_CRLF
-	if (i > 0 && token->st.st_self[i-1] == '\r') i--;
+  if (i > 0 && token->st.st_self[i-1] == '\r') i--;
 #endif
-	token->st.st_fillp = i;
+  token->st.st_fillp = i;
   /* no disadvantage to returning an adjustable string */
   
-  {object uu= copy_simple_string(token);
-/*   uu->st.st_hasfillp=TRUE;
-   uu->st.st_adjustable=TRUE;
-*/
-   @(return uu c)
-   }
-@)
+  RETURN2(copy_simple_string(token),c);
 
-@(defun read_char (&optional (strm `symbol_value(sLAstandard_inputA)`)
-			     (eof_errorp Ct)
-			     eof_value
-			     recursivep)
-@
-	if (strm == Cnil)
-		strm = symbol_value(sLAstandard_inputA);
-	else if (strm == Ct)
-		strm = symbol_value(sLAterminal_ioA);
-	check_type_stream(&strm);
-        {object x ;
-        read_char_to(x,strm,goto AT_EOF);
-        @(return `x`)
-          AT_EOF:
-	 if (eof_errorp == Cnil && recursivep == Cnil)
-		@(return eof_value)
-	 else
-		end_of_stream(strm);
-       }
-@)
+}
 
-@(defun unread_char (c &optional (strm `symbol_value(sLAstandard_inputA)`))
-@
-	check_type_character(&c);
-	if (strm == Cnil)
-		strm = symbol_value(sLAstandard_inputA);
-	else if (strm == Ct)
-		strm = symbol_value(sLAterminal_ioA);
-	check_type_stream(&strm);
+DEFUN("READ-CHAR",object,fLread_char,LISP,0,4,NONE,OO,OO,OO,OO,(object f,...),"") {
+
+  fixnum nargs=INIT_NARGS(0);
+  object l=Cnil,strm,eof_errorp,eof_value,recursivep;
+  va_list ap;
+
+  va_start(ap,f);
+  strm=NEXT_ARG(nargs,ap,l,f,sLAstandard_inputA->s.s_dbind);
+  eof_errorp=NEXT_ARG(nargs,ap,l,f,Ct);
+  eof_value= NEXT_ARG(nargs,ap,l,f,Cnil);
+  recursivep=NEXT_ARG(nargs,ap,l,f,Cnil);
+  va_end(ap);
+  
+  if (strm == Cnil)
+    strm = symbol_value(sLAstandard_inputA);
+  else if (strm == Ct)
+    strm = symbol_value(sLAterminal_ioA);
+  check_type_stream(&strm);
+  {object x ;
+    read_char_to(x,strm,goto AT_EOF);
+    RETURN1(x);
+  AT_EOF:
+    if (eof_errorp == Cnil && recursivep == Cnil)
+      RETURN1(eof_value);
+    else
+      end_of_stream(strm);
+    RETURN1(Cnil);
+  }
+}
+
+DEFUN("UNREAD-CHAR",object,fLunread_char,LISP,1,2,NONE,OO,OO,OO,OO,(object c,...),"") {
+
+  fixnum nargs=INIT_NARGS(1);
+  object l=Cnil,f=OBJNULL,strm;
+  va_list ap;
+
+  va_start(ap,c);
+  strm=NEXT_ARG(nargs,ap,l,f,sLAstandard_inputA->s.s_dbind);
+  va_end(ap);
+  
+  check_type_character(&c);
+  if (strm == Cnil)
+    strm = symbol_value(sLAstandard_inputA);
+  else if (strm == Ct)
+    strm = symbol_value(sLAterminal_ioA);
+  check_type_stream(&strm);
+  unread_char(c, strm);
+  RETURN1(Cnil);
+}
+
+DEFUN("PEEK-CHAR",object,fLpeek_char,LISP,0,5,NONE,OO,OO,OO,OO,(object peek_type,...),"") {
+
+  fixnum nargs=INIT_NARGS(0);
+  object l=Cnil,c,f=peek_type,strm,eof_errorp,eof_value,recursivep;
+  va_list ap;
+
+  va_start(ap,peek_type);
+  peek_type=NEXT_ARG(nargs,ap,l,f,Cnil);
+  strm=NEXT_ARG(nargs,ap,l,f,sLAstandard_inputA->s.s_dbind);
+  eof_errorp=NEXT_ARG(nargs,ap,l,f,Ct);
+  eof_value= NEXT_ARG(nargs,ap,l,f,Cnil);
+  recursivep=NEXT_ARG(nargs,ap,l,f,Cnil);
+  va_end(ap);
+  
+  if (strm == Cnil)
+    strm = symbol_value(sLAstandard_inputA);
+  else if (strm == Ct)
+    strm = symbol_value(sLAterminal_ioA);
+  check_type_stream(&strm);
+  setup_READtable();
+  if (peek_type == Cnil) {
+    if (stream_at_end(strm)) {
+      if (eof_errorp == Cnil && recursivep == Cnil)
+	RETURN1(eof_value);
+      else
+	end_of_stream(strm);
+    }
+    c = read_char_no_echo(strm);
+    unread_char(c, strm);
+    RETURN1(c);
+  }
+  if (peek_type == Ct) {
+    while (!stream_at_end(strm)) {
+      c = read_char(strm);
+      if (cat(c) != cat_whitespace) {
 	unread_char(c, strm);
-	@(return Cnil)
-@)
+	RETURN1(c);
+      }
+    }
+    if (eof_errorp == Cnil)
+      RETURN1(eof_value);
+    else
+      end_of_stream(strm);
+  }
+  check_type_character(&peek_type);
+  while (!stream_at_end(strm)) {
+    c = read_char(strm);
+    if (char_eq(c, peek_type)) {
+      unread_char(c, strm);
+      RETURN1(c);
+    }
+  }
+  if (eof_errorp == Cnil)
+    RETURN1(eof_value);
+  else
+    end_of_stream(strm);
+  RETURN1(Cnil);
+}
 
-@(defun peek_char (&optional peek_type
-			     (strm `symbol_value(sLAstandard_inputA)`)
-			     (eof_errorp Ct)
-			     eof_value
-			     recursivep)
-	object c;
-@
-	if (strm == Cnil)
-		strm = symbol_value(sLAstandard_inputA);
-	else if (strm == Ct)
-		strm = symbol_value(sLAterminal_ioA);
-	check_type_stream(&strm);
-	setup_READtable();
-	if (peek_type == Cnil) {
-		if (stream_at_end(strm)) {
-			if (eof_errorp == Cnil && recursivep == Cnil)
-				@(return eof_value)
-			else
-				end_of_stream(strm);
-		}
-		c = read_char_no_echo(strm);
-		unread_char(c, strm);
-		@(return c)
-	}
-	if (peek_type == Ct) {
-		while (!stream_at_end(strm)) {
-			c = read_char(strm);
-			if (cat(c) != cat_whitespace) {
-				unread_char(c, strm);
-				@(return c)
-			}
-		}
-		if (eof_errorp == Cnil)
-			@(return eof_value)
-		else
-			end_of_stream(strm);
-	}
-	check_type_character(&peek_type);
-	while (!stream_at_end(strm)) {
-		c = read_char(strm);
-		if (char_eq(c, peek_type)) {
-			unread_char(c, strm);
-			@(return c)
-		}
-	}
-	if (eof_errorp == Cnil)
-		@(return eof_value)
-	else
-		end_of_stream(strm);
-@)
 
-@(defun listen (&optional (strm `symbol_value(sLAstandard_inputA)`))
-@
-	if (strm == Cnil)
-		strm = symbol_value(sLAstandard_inputA);
-	else if (strm == Ct)
-		strm = symbol_value(sLAterminal_ioA);
-	check_type_stream(&strm);
-	if (listen_stream(strm))
-		@(return Ct)
-	else
-		@(return Cnil)
-@)
+DEFUN("LISTEN",object,fLlisten,LISP,0,1,NONE,OO,OO,OO,OO,(object f,...),"") {
 
-@(defun read_char_no_hang (&optional (strm `symbol_value(sLAstandard_inputA)`)
-			             (eof_errorp Ct)
-			             eof_value
-			             recursivep)
-@
-	if (strm == Cnil)
-		strm = symbol_value(sLAstandard_inputA);
-	else if (strm == Ct)
-		strm = symbol_value(sLAterminal_ioA);
-	check_type_stream(&strm);
-	if (stream_at_end(strm)) {
-		if (eof_errorp == Cnil)
-			@(return eof_value)
-		else
-			end_of_stream(strm);
-	}
-        if (!listen_stream(strm)) @(return Cnil)
-	@(return `read_char(strm)`)
-@)
+  fixnum nargs=INIT_NARGS(0);
+  object l=Cnil,strm;
+  va_list ap;
+
+  va_start(ap,f);
+  strm=NEXT_ARG(nargs,ap,l,f,sLAstandard_inputA->s.s_dbind);
+  va_end(ap);
+  
+  if (strm == Cnil)
+    strm = symbol_value(sLAstandard_inputA);
+  else if (strm == Ct)
+    strm = symbol_value(sLAterminal_ioA);
+  check_type_stream(&strm);
+  RETURN1(listen_stream(strm) ? Ct : Cnil);
+
+}
+
+DEFUN("READ-CHAR-NO-HANG",object,fLread_char_no_hang,LISP,0,4,NONE,OO,OO,OO,OO,(object f,...),"") {
+
+  fixnum nargs=INIT_NARGS(0);
+  object l=Cnil,strm,eof_errorp,eof_value/* ,recursivep */;
+  va_list ap;
+
+  va_start(ap,f);
+  strm=NEXT_ARG(nargs,ap,l,f,sLAstandard_inputA->s.s_dbind);
+  eof_errorp=NEXT_ARG(nargs,ap,l,f,Ct);
+  eof_value= NEXT_ARG(nargs,ap,l,f,Cnil);
+  /* FIXME: recursivep=NEXT_ARG(nargs,ap,l,f,Cnil); */
+  va_end(ap);
+
+  if (strm == Cnil)
+    strm = symbol_value(sLAstandard_inputA);
+  else if (strm == Ct)
+    strm = symbol_value(sLAterminal_ioA);
+  check_type_stream(&strm);
+  if (stream_at_end(strm)) {
+    if (eof_errorp == Cnil)
+      RETURN1(eof_value);
+    else
+      end_of_stream(strm);
+  }
+  RETURN1(listen_stream(strm) ? read_char(strm) : Cnil);
+}
 
 @(defun clear_input (&optional (strm `symbol_value(sLAstandard_inputA)`))
 @
@@ -2394,54 +2353,54 @@ READ:
 	@(return Cnil)
 @)
 
-@(defun parse_integer (strng
-		       &key start
-			    end
-			    (radix `make_fixnum(10)`)
-			    junk_allowed
-		       &aux x)
-	int s, e, ep;
-@
-        if (junk_allowed==Cnil)
-	    check_type_string(&strng);
-	get_string_start_end(strng, start, end, &s, &e);
-	if (type_of(radix) != t_fixnum ||
-	    fix(radix) < 2 || fix(radix) > 36)
-		FEerror("~S is an illegal radix.", 1, radix);
-	setup_READtable();
-	while (READtable->rt.rt_self[(unsigned char)strng->st.st_self[s]].rte_chattrib
-	       == cat_whitespace && s < e)
-		s++;
-	if (s >= e) {
-		if (junk_allowed != Cnil)
-			@(return Cnil `make_fixnum(s)`)
-		else
-			goto CANNOT_PARSE;
-	}
-        {char *tmp = OUR_ALLOCA(e-s);
-         bcopy( strng->st.st_self+s,tmp,e-s);
-	  x = parse_integer(tmp, e-s, &ep, fix(radix));
-         ALLOCA_FREE(tmp);
-         }
-	if (x == OBJNULL) {
-		if (junk_allowed != Cnil)
-			@(return Cnil `make_fixnum(ep+s)`)
-		else
-			goto CANNOT_PARSE;
-	}
-	if (junk_allowed != Cnil)
-		@(return x `make_fixnum(ep+s)`)
-	for (s += ep ;  s < e;  s++)
-		if (READtable->rt.rt_self[(unsigned char)strng->st.st_self[s]]
-		    .rte_chattrib
-		    != cat_whitespace)
-			goto CANNOT_PARSE;
-	@(return x `make_fixnum(e)`)
+DEFUNM("PARSE-INTEGER-INT",object,fSparse_integer_int,SI,5,5,NONE,OO,OO,IO,OO,
+	  (object strng,object start,object end,fixnum radix,object junk_allowed),"") {
 
-CANNOT_PARSE:
+  fixnum vals=(fixnum)fcall.valp;
+  int s,e,ep;
+  object *base=vs_top,x;
+
+  if (junk_allowed==Cnil)
+    check_type_string(&strng);
+  get_string_start_end(strng, start, end, &s, &e);
+  if (radix < 2 || radix > 36)
+    FEerror("~S is an illegal radix.", 1, radix);
+  setup_READtable();
+  while (READtable->rt.rt_self[(unsigned char)strng->st.st_self[s]].rte_chattrib
+	 == cat_whitespace && s < e)
+    s++;
+  if (s >= e) {
+    if (junk_allowed != Cnil)
+      RETURN2(Cnil,make_fixnum(s));
+    else
+      goto CANNOT_PARSE;
+  }
+  {char *tmp = OUR_ALLOCA(e-s);
+    bcopy( strng->st.st_self+s,tmp,e-s);
+    x = parse_integer(tmp, e-s, &ep, radix);
+    ALLOCA_FREE(tmp);
+  }
+  if (x == OBJNULL) {
+    if (junk_allowed != Cnil)
+      RETURN2(Cnil,make_fixnum(ep+s));
+    else
+      goto CANNOT_PARSE;
+  }
+  if (junk_allowed != Cnil)
+    RETURN2(x,make_fixnum(ep+s));
+  for (s += ep ;  s < e;  s++)
+    if (READtable->rt.rt_self[(unsigned char)strng->st.st_self[s]]
+	.rte_chattrib
+	!= cat_whitespace)
+      goto CANNOT_PARSE;
+  RETURN2(x,make_fixnum(e));
+  
+ CANNOT_PARSE:
   PARSE_ERROR("Cannot parse integer from string");
+  RETURN2(Cnil,make_fixnum(0));
+}
 
-@)
+
 
 /* @(defun read_byte (binary_input_stream */
 /* 		   &optional (eof_errorp Ct) eof_value) */
@@ -2458,18 +2417,18 @@ CANNOT_PARSE:
 /* 	@(return `make_fixnum(c)`) */
 /* @) */
 
-object
-read_byte1(strm,eof)
-object strm,eof;
-{
-  if (strm == Cnil)
-    strm = symbol_value(sLAstandard_inputA);
-  else if (strm == Ct)
-    strm = symbol_value(sLAterminal_ioA);
-  if (stream_at_end(strm))
-    return eof;
-  return make_fixnum(readc_stream(strm));
-}
+/* object */
+/* read_byte1(strm,eof) */
+/* object strm,eof; */
+/* { */
+/*   if (strm == Cnil) */
+/*     strm = symbol_value(sLAstandard_inputA); */
+/*   else if (strm == Ct) */
+/*     strm = symbol_value(sLAterminal_ioA); */
+/*   if (stream_at_end(strm)) */
+/*     return eof; */
+/*   return make_fixnum(readc_stream(strm)); */
+/* } */
 
 object
 read_char1(strm,eof)
@@ -2620,13 +2579,12 @@ LFD(Lreadtablep)()
 	@(return Ct)
 @)
 
-DEFUNO_NEW("READTABLE-CASE",object,fLreadtable_case,LISP,1,1,NONE,OO,OO,OO,OO,void,Lreadtable_case,(object rt),"") {
+DEFUN("READTABLE-CASE",object,fLreadtable_case,LISP,1,1,NONE,OO,OO,OO,OO,(object rt),"") {
   check_type_readtable_no_default(&rt);
   RETURN1(rt->rt.rt_case);
 }
 
-DEFUNO_NEW("SET-READTABLE-CASE",object,fSset_readtable_case,SI,2,2,NONE,
-	   OO,OO,OO,OO,void,siLset_readtable_case,(object rt,object cas),"") {
+DEFUN("SET-READTABLE-CASE",object,fSset_readtable_case,SI,2,2,NONE,OO,OO,OO,OO,(object rt,object cas),"") {
   check_type_readtable_no_default(&rt);
   if (cas!=sKupcase && cas!=sKdowncase && cas!=sKpreserve && cas!=sKinvert)
     TYPE_ERROR(cas,list(5,sLmember,sKupcase,sKdowncase,sKpreserve,sKinvert));
@@ -2720,18 +2678,15 @@ too_long_string(void)
 }
 
 static void
-extra_argument(c)
-int c;
-{
-	FEerror("~S is an extra argument for the #~C readmacro.",
-		2, vs_base[2], code_char(c));
+extra_argument(int c) {
+  FEerror("~S is an extra argument for the #~C readmacro.",2, vs_base[2], code_char(c));
 }
 
 
 #define	make_cf(f)	make_cfun((f), Cnil, Cnil, NULL, 0)
+#define make_f(f)       find_symbol(make_simple_string(f),find_package(make_simple_string("SI")))->s.s_gfdef;
 
-DEFVAR("*READ-DEFAULT-FLOAT-FORMAT*",sLAread_default_float_formatA,
-   LISP,sLsingle_float,"");
+DEFVAR("*READ-DEFAULT-FLOAT-FORMAT*",sLAread_default_float_formatA,LISP,sLsingle_float,"");
 DEFVAR("*READ-BASE*",sLAread_baseA,LISP,make_fixnum(10),"");
 DEFVAR("*READ-SUPPRESS*",sLAread_suppressA,LISP,Cnil,"");
 
@@ -2775,21 +2730,21 @@ gcl_init_read()
 	rtab['\f'].rte_chattrib = cat_whitespace;
 	rtab[' '].rte_chattrib = cat_whitespace;
 	rtab['"'].rte_chattrib = cat_terminating;
-	rtab['"'].rte_macro = make_cf(Ldouble_quote_reader);
+	rtab['"'].rte_macro = make_f("DOUBLE-QUOTE-READER");
 	rtab['#'].rte_chattrib = cat_non_terminating;
 	rtab['#'].rte_macro = dispatch_reader;
 	rtab['\''].rte_chattrib = cat_terminating;
-	rtab['\''].rte_macro = make_cf(Lsingle_quote_reader);
+	rtab['\''].rte_macro = make_f("SINGLE-QUOTE-READER");
 	rtab['('].rte_chattrib = cat_terminating;
 	rtab['('].rte_macro = make_cf(Lleft_parenthesis_reader);
 	rtab[')'].rte_chattrib = cat_terminating;
-	rtab[')'].rte_macro = make_cf(Lright_parenthesis_reader);
+	rtab[')'].rte_macro = make_f("RIGHT-PARENTHESIS-READER");
 /*
 	rtab[','].rte_chattrib = cat_terminating;
 	rtab[','].rte_macro = make_cf(Lcomma_reader);
 */
 	rtab[';'].rte_chattrib = cat_terminating;
-	rtab[';'].rte_macro = make_cf(Lsemicolon_reader);
+	rtab[';'].rte_macro = find_symbol(make_simple_string("SEMICOLON-READER"),find_package(make_simple_string("SI")))->s.s_gfdef;
 	rtab['\\'].rte_chattrib = cat_single_escape;
 /*
 	rtab['`'].rte_chattrib = cat_terminating;
@@ -2807,8 +2762,8 @@ gcl_init_read()
 	= (object *)alloc_contblock(RTABSIZE * sizeof(object));
 	for (i = 0;  i < RTABSIZE;  i++)
 		dtab[i] = default_dispatch_macro;
-	dtab['C'] = dtab['c'] = make_cf(Lsharp_C_reader);
-	dtab['\\'] = make_cf(Lsharp_backslash_reader);
+	dtab['C'] = dtab['c'] = make_f("SHARP-C-READER");
+	dtab['\\'] = make_f("SHARP-\\-READER");
 	dtab['\''] = make_cf(Lsharp_single_quote_reader);
 	dtab['('] = make_cf(Lsharp_left_parenthesis_reader);
 	dtab['*'] = make_cf(Lsharp_asterisk_reader);
@@ -2828,8 +2783,8 @@ gcl_init_read()
 	dtab['A'] = dtab['a'] = make_si_ordinary("SHARP-A-READER");
 	dtab['S'] = dtab['s'] = make_si_ordinary("SHARP-S-READER");
 
-	dtab['='] = make_cf(Lsharp_eq_reader);
-	dtab['#'] = make_cf(Lsharp_sharp_reader);
+	dtab['='] = make_si_ordinary("SHARP-EQ-READER");
+	dtab['#'] = make_si_ordinary("SHARP-SHARP-READER");
 	dtab['+'] = make_cf(Lsharp_plus_reader);
 	dtab['-'] = make_cf(Lsharp_minus_reader);
 /*
@@ -2877,7 +2832,7 @@ gcl_init_read()
 	READsuppress = FALSE;
 	READeval = TRUE;
 
-	sharp_eq_context_max = 0;
+	sSAsharp_eq_contextA->s.s_dbind=Cnil;
 
 	siSsharp_comma = make_si_ordinary("#,");
 	enter_mark_origin(&siSsharp_comma);
@@ -2904,19 +2859,18 @@ gcl_init_read()
 void
 gcl_init_read_function()
 {
-	make_function("READ", Lread);
-	make_function("READ-PRESERVING-WHITESPACE",
-		      Lread_preserving_whitespace);
-	make_function("READ-DELIMITED-LIST", Lread_delimited_list);
-	make_function("READ-LINE", Lread_line);
-	make_function("READ-CHAR", Lread_char);
-	make_function("UNREAD-CHAR", Lunread_char);
-	make_function("PEEK-CHAR", Lpeek_char);
-	make_function("LISTEN", Llisten);
-	make_function("READ-CHAR-NO-HANG", Lread_char_no_hang);
+/* 	make_function("READ", Lread); */
+/* 	make_function("READ-PRESERVING-WHITESPACE",Lread_preserving_whitespace); */
+/* 	make_function("READ-DELIMITED-LIST", Lread_delimited_list); */
+/* 	make_function("READ-LINE", Lread_line); */
+/* 	make_function("READ-CHAR", Lread_char); */
+/* 	make_function("UNREAD-CHAR", Lunread_char); */
+/* 	make_function("PEEK-CHAR", Lpeek_char); */
+/* 	make_function("LISTEN", Llisten); */
+/* 	make_function("READ-CHAR-NO-HANG", Lread_char_no_hang); */
 	make_function("CLEAR-INPUT", Lclear_input);
 
-	make_function("PARSE-INTEGER", Lparse_integer);
+/* 	make_function("PARSE-INTEGER", Lparse_integer); */
 
 /* 	make_function("READ-BYTE", Lread_byte); */
 
@@ -2925,19 +2879,15 @@ gcl_init_read_function()
 	make_function("SET-SYNTAX-FROM-CHAR", Lset_syntax_from_char);
 	make_function("SET-MACRO-CHARACTER", Lset_macro_character);
 	make_function("GET-MACRO-CHARACTER", Lget_macro_character);
-	make_function("MAKE-DISPATCH-MACRO-CHARACTER",
-		      Lmake_dispatch_macro_character);
-	make_function("SET-DISPATCH-MACRO-CHARACTER",
-		      Lset_dispatch_macro_character);
-	make_function("GET-DISPATCH-MACRO-CHARACTER",
-		      Lget_dispatch_macro_character);
+	make_function("MAKE-DISPATCH-MACRO-CHARACTER",Lmake_dispatch_macro_character);
+	make_function("SET-DISPATCH-MACRO-CHARACTER",Lset_dispatch_macro_character);
+	make_function("GET-DISPATCH-MACRO-CHARACTER",Lget_dispatch_macro_character);
 
-	make_si_function("SHARP-COMMA-READER-FOR-COMPILER",
-			 siLsharp_comma_reader_for_compiler);
+	make_si_function("SHARP-COMMA-READER-FOR-COMPILER",siLsharp_comma_reader_for_compiler);
 
-	make_si_function("STRING-TO-OBJECT", siLstring_to_object);
+	make_si_function("STRING-TO-OBJECT",siLstring_to_object);
 
-	make_si_function("STANDARD-READTABLE", siLstandard_readtable);
+	make_si_function("STANDARD-READTABLE",siLstandard_readtable);
 }
 
 object sSPinit;
@@ -2957,9 +2907,7 @@ object in;
 	int old_READbase;
 	int old_READsuppress;
 	int old_READeval;
-	int old_sharp_eq_context_max;
-	struct sharp_eq_context_struct
-		old_sharp_eq_context[SHARP_EQ_CONTEXT_SIZE];
+	volatile object old_READcontext;
 	int old_backq_level;
 
         /* to prevent longjmp clobber */
@@ -2970,11 +2918,9 @@ object in;
 	old_READbase = READbase;
 	old_READsuppress = READsuppress;
 	old_READeval = READeval;
-	old_sharp_eq_context_max = sharp_eq_context_max;
+	old_READcontext=sSAsharp_eq_contextA->s.s_dbind;
 	/* BUG FIX by Toshiba */
 	vs_push(old_READtable);
-	for (i = 0;  i < sharp_eq_context_max;  i++)
-		old_sharp_eq_context[i] = sharp_eq_context[i];
 	old_backq_level = backq_level;
 
 	setup_standard_READ();
@@ -2992,7 +2938,7 @@ object in;
 	vsp = vs_top;
 	dimcount = 0;
 	for (;;) {
-		sharp_eq_context_max = 0;
+                sSAsharp_eq_contextA->s.s_dbind=Cnil;
 		backq_level = 0;
 		delimiting_char = code_char(')');
 		preserving_whitespace_flag = FALSE;
@@ -3001,7 +2947,7 @@ object in;
 		if (x == OBJNULL)
 			break;
 		vs_check_push(x);
-		if (sharp_eq_context_max > 0)
+		if (sSAsharp_eq_contextA->s.s_dbind!=Cnil)
 			x = vs_head = patch_sharp(x);
 		dimcount++;
 	}
@@ -3032,9 +2978,7 @@ L:
 	READbase = old_READbase;
 	READsuppress = old_READsuppress;
 	READeval = old_READeval;
-	sharp_eq_context_max = old_sharp_eq_context_max;
-	for (i = 0;  i < sharp_eq_context_max;  i++)
-		sharp_eq_context[i] = old_sharp_eq_context[i];
+	sSAsharp_eq_contextA->s.s_dbind=old_READcontext;
 	backq_level = old_backq_level;
 	if (e) {
 		nlj_active = FALSE;

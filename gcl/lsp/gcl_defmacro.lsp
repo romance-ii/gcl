@@ -23,14 +23,11 @@
 ;;;;         defines SI:DEFMACRO*, the defmacro preprocessor
 
 
-(in-package 'lisp)
-(export '(&whole &environment &body))
+;; (in-package :lisp)
+;; (export '(lambda defvar import &whole &environment &body))
 
 
-(in-package 'system)
-
-
-;(eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))
+(in-package :system)
 
 
 ;;; valid lambda-list to DEFMACRO is:
@@ -84,38 +81,101 @@
 	((stringp x) (gensym1s x))
 	((gensym1ig x))))
 			 
-(defun si:defmacro* (name vl body
-                          &aux *dl* (*key-check* nil)
-			  (*arg-check* nil)
-			  doc decls whole ppn (env nil) envp)
+(export '(blocked-body-name parse-body-header))
+
+(defun parse-body-header (x &optional doc decl ctps &aux (a (car x)))
+  (cond 
+   ((unless (or doc ctps) (and (stringp a) (cdr x))) (parse-body-header (cdr x) a decl ctps))
+   ((unless ctps (when (consp a) (eq (car a) 'declare)))  (parse-body-header (cdr x) doc (cons a decl) ctps))
+   ((when (consp a) (eq (car a) 'check-type)) (parse-body-header (cdr x) doc decl (cons a ctps)))
+   (t (values doc (nreverse decl) (nreverse ctps) x))))
+
+(defun make-blocked-lambda (ll decls ctps body block)
+  (let ((body (if (eq block (blocked-body-name body)) body `((block ,block ,@body)))))
+    `(lambda ,ll ,@decls ,@ctps ,@body)))
+
+(defun blocked-body-name (body)
+  (when (and (not (cdr body))
+	     (consp (car body))
+	     (eq (caar body) 'block))
+    (cadar body)))
+
+
+(defun defmacro-lambda (name vl body &aux whole)
+
   (cond ((listp vl))
         ((symbolp vl) (setq vl (list '&rest vl)))
-        (t (error "The defmacro-lambda-list ~s is not a list." vl)))
-  (multiple-value-setq (doc decls body) (find-doc body nil))
+        ((error "The defmacro-lambda-list ~s is not a list." vl)))
+  
   (cond ((and (listp vl) (eq (car vl) '&whole))
-         (setq whole (cadr vl)) (setq vl (cddr vl)))
-        (t (setq whole (gensym))))
-  (multiple-value-setq (vl env)
-		       (get-&environment vl))
-  (setq envp env)
-  (or env (setq env (gensym)))
-  (setq *dl* `(&aux ,env ,whole))
-  (setq ppn (dm-vl vl whole t))
-  (dolist (kc *key-check*)
-          (push `(unless (getf ,(car kc) :allow-other-keys);FIXME order?
-                         (do ((vl ,(car kc) (cddr vl)))
-                             ((endp vl))
-                             (unless (member (car vl) ',(cons :allow-other-keys (cdr kc)))
-                                     (dm-key-not-allowed (car vl))
-                                     )))
-                body))
-  (dolist (ac *arg-check*)
-          (push `(when ,(dm-nth-cdr (cdr ac) (car ac))
-                         (dm-too-many-arguments)) body))
-  (unless envp (push `(declare (ignore ,env)) decls))
-;  (list doc ppn `(lambda-block ,name ,(reverse *dl*) ,@(append decls body)))
-;  (list doc ppn (eval `(lambda ,(reverse *dl*) ,@decls (block ,name ,@body))))
-  (list doc ppn (let ((nn (gensym))) (eval `(defun ,nn ,(reverse *dl*) ,@decls (block ,name ,@body))) (symbol-function nn))))
+	 (setq whole (cadr vl)) (setq vl (cddr vl)))
+	((setq whole (gensym))))  
+  
+  (multiple-value-bind
+   (doc decls ctps body)
+   (parse-body-header body)
+
+   (declare (ignore doc))
+   
+   (multiple-value-bind
+    (vl env)
+    (get-&environment vl)
+    
+    (let* ((envp env)
+	   (env (or env (gensym)))
+	   (*dl* `(&aux ,env ,whole))
+	   *key-check* *arg-check*
+	   (ppn (dm-vl vl whole t)))
+
+      (declare (ignore ppn))
+      
+      (dolist (kc *key-check*)
+	(push `(unless (getf ,(car kc) :allow-other-keys);FIXME order?
+		 (do ((vl ,(car kc) (cddr vl)))
+		     ((endp vl))
+		     (unless (member (car vl) ',(cons :allow-other-keys (cdr kc)))
+		       (dm-key-not-allowed (car vl)))))
+	      body))
+      
+      (dolist (ac *arg-check*)
+	(push `(when ,(dm-nth-cdr (cdr ac) (car ac)) (dm-too-many-arguments)) body))
+
+      (unless envp (push `(declare (ignore ,env)) decls))
+
+      (make-blocked-lambda (nreverse *dl*) decls ctps body name)))))
+
+;; (defun si:defmacro* (name vl body
+;;                           &aux *dl* (*key-check* nil)
+;; 			  (*arg-check* nil)
+;; 			  doc decls whole ppn (env nil) envp)
+;;   (cond ((listp vl))
+;;         ((symbolp vl) (setq vl (list '&rest vl)))
+;;         (t (error "The defmacro-lambda-list ~s is not a list." vl)))
+;;   (multiple-value-setq (doc decls body) (find-doc body nil))
+;;   (cond ((and (listp vl) (eq (car vl) '&whole))
+;;          (setq whole (cadr vl)) (setq vl (cddr vl)))
+;;         (t (setq whole (gensym))))
+;;   (multiple-value-setq (vl env)
+;; 		       (get-&environment vl))
+;;   (setq envp env)
+;;   (or env (setq env (gensym)))
+;;   (setq *dl* `(&aux ,env ,whole))
+;;   (setq ppn (dm-vl vl whole t))
+;;   (dolist (kc *key-check*)
+;;     (push `(unless (getf ,(car kc) :allow-other-keys);FIXME order?
+;; 	     (do ((vl ,(car kc) (cddr vl)))
+;; 		 ((endp vl))
+;; 		 (unless (member (car vl) ',(cons :allow-other-keys (cdr kc)))
+;; 		   (dm-key-not-allowed (car vl)))))
+;; 	  body))
+;;   (dolist (ac *arg-check*)
+;;     (push `(when ,(dm-nth-cdr (cdr ac) (car ac))
+;; 	     (dm-too-many-arguments)) body))
+;;   (unless envp (push `(declare (ignore ,env)) decls))
+;; ;  (list doc ppn `(lambda-block ,name ,(reverse *dl*) ,@(append decls body)))
+;;   (list doc ppn (eval `(function (lambda ,(reverse *dl*) ,@decls (block ,name ,@body)))))
+;; ;  (list doc ppn (let ((nn (gensym))) (eval `(defun ,nn ,(reverse *dl*) ,@decls (block ,name ,@body))) (symbol-function nn)))
+;;   )
 
 (defun dm-vl (vl whole top)
   (when (consp whole)
@@ -241,40 +301,16 @@
         )))
 
 (defun dm-bad-key (key)
-       (error "Defmacro-lambda-list contains illegal use of ~s." key))
+       (error 'program-error :format-control "Defmacro-lambda-list contains illegal use of ~s." :format-arguments (list key)))
 
 (defun dm-too-few-arguments ()
-       (error "Too few arguments are supplied to defmacro-lambda-list."))
+       (error 'program-error :format-control "Too few arguments are supplied to defmacro-lambda-list."))
 
 (defun dm-too-many-arguments ()
-       (error "Too many arguments are supplied to defmacro-lambda-list."))
+       (error 'program-error :format-control "Too many arguments are supplied to defmacro-lambda-list."))
 
 (defun dm-key-not-allowed (key)
-       (error "The key ~s is not allowed." key))
-
-(defun find-doc (body ignore-doc)
-  (if (endp body)
-      (values nil nil nil)
-    (let ((d (macroexpand (car body))))
-      (cond ((stringp d)
-	     (if (or (endp (cdr body)) ignore-doc)
-		 (values nil nil (cons d (cdr body)))
-	       (multiple-value-bind
-		(doc decls b)
-		(find-doc (cdr body) t)
-		(declare (ignore doc))
-		(values d decls b))))
-	    ((and (consp d) (eq (car d) 'declare))
-	     (multiple-value-bind
-	      (doc decls b)
-	      (find-doc (cdr body) ignore-doc)
-	      (values doc (cons d decls) b)))
-	    ((and (consp (car body)) (eq (caar body) 'check-type))
-	     (multiple-value-bind
-	      (doc decls b)
-	      (find-doc (cdr body) ignore-doc)
-	      (values doc (cons (car body) decls) b)))
-	    (t (values nil nil body))))))
+       (error 'program-error :format-control "The key ~s is not allowed." :format-arguments (list key)))
 
 (defun find-declarations (body)
   (if (endp body)
@@ -293,3 +329,21 @@
               (t
                (values nil (cons d (cdr body))))))))
 
+(defmacro symbol-to-function (sym)
+  (let* ((n (gensym))
+	 (gf (find-symbol "C-SYMBOL-GFDEF" (find-package :s))))
+    `(when (symbolp ,sym)
+       ,(if (fboundp gf) `(let ((,n (address (,gf ,sym))))
+			    (unless (= +objnull+ ,n) (nani ,n)))
+	  `(let* ((,n (when (fboundp ,sym) (symbol-function ,sym)))
+		  (,n (if (and (consp ,n) (eq (car ,n) 'macro)) (cdr ,n) ,n)))
+	     (unless (consp ,n) ,n))))))
+
+(defmacro call (sym &optional f &rest keys) ;FIXME macro
+  (let* ((fnf (gensym))(n (gensym)))
+    `(let* ((,fnf (if (functionp ,sym) ,sym (symbol-to-function ,sym))));(coerce ,sym 'function)
+       (or (when ,fnf (cfun-call ,fnf))
+	   (when ,f
+	     (let ((,n (make-call ,@keys)))
+	       (when ,fnf (set-cfun-call ,n ,fnf))
+	       ,n))))))

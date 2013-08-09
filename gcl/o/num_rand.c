@@ -82,7 +82,7 @@ rando(object x, object rs) {
 #define RS_DEF_INIT 0
 #endif
 
-#if __GNU_MP_VERSION >= 4 && __GNU_MP_VERSION_MINOR >= 2
+#if __GNU_MP_VERSION > 4 || (__GNU_MP_VERSION == 4 && __GNU_MP_VERSION_MINOR >= 2)
 extern void * (*gcl_gmp_allocfun) (size_t);
 static void * (*old_gcl_gmp_allocfun) (size_t);
 static void * trap_result;
@@ -103,7 +103,7 @@ trap_gcl_gmp_allocfun(size_t size){
 }
 #endif
 
-#if __GNU_MP_VERSION >= 4 && __GNU_MP_VERSION_MINOR >= 2
+#if __GNU_MP_VERSION > 4 || (__GNU_MP_VERSION == 4 && __GNU_MP_VERSION_MINOR >= 2)
 extern void
 __gmp_randget_mt ();
 extern void
@@ -123,7 +123,7 @@ static gmp_randfnptr_t Mersenne_Twister_Generator_Noseed = {
 void
 reinit_gmp() {
 
-#if __GNU_MP_VERSION >= 4 && __GNU_MP_VERSION_MINOR >= 2
+#if __GNU_MP_VERSION > 4 || (__GNU_MP_VERSION == 4 && __GNU_MP_VERSION_MINOR >= 2)
   Mersenne_Twister_Generator_Noseed.b=__gmp_randget_mt;
   Mersenne_Twister_Generator_Noseed.c=__gmp_randclear_mt;
   Mersenne_Twister_Generator_Noseed.d=__gmp_randiset_mt;
@@ -138,14 +138,14 @@ init_gmp_rnd_state(__gmp_randstate_struct *x) {
 
   bzero(x,sizeof(*x));
   
-#if __GNU_MP_VERSION >= 4 && __GNU_MP_VERSION_MINOR >= 2
+#if __GNU_MP_VERSION > 4 || (__GNU_MP_VERSION == 4 && __GNU_MP_VERSION_MINOR >= 2)
 /*   if (!trap_size) { */
   old_gcl_gmp_allocfun=gcl_gmp_allocfun;
   gcl_gmp_allocfun=trap_gcl_gmp_allocfun;
 /*   } */
 #endif
   gmp_randinit_default(x);
-#if __GNU_MP_VERSION >= 4 && __GNU_MP_VERSION_MINOR >= 2
+#if __GNU_MP_VERSION > 4 || (__GNU_MP_VERSION == 4 && __GNU_MP_VERSION_MINOR >= 2)
   if (!n) {
 
     if (x->_mp_seed->_mp_d!=trap_result)
@@ -192,7 +192,7 @@ make_random_state(object rs) {
     memcpy(z->rnd.rnd_state._mp_seed->_mp_d,rs->rnd.rnd_state._mp_seed->_mp_d,
 	   rs->rnd.rnd_state._mp_seed->_mp_alloc*sizeof(*z->rnd.rnd_state._mp_seed->_mp_d));
   
-#if __GNU_MP_VERSION >= 4 && __GNU_MP_VERSION_MINOR >= 2
+#if __GNU_MP_VERSION > 4 || (__GNU_MP_VERSION == 4 && __GNU_MP_VERSION_MINOR >= 2)
   z->rnd.rnd_state._mp_algdata._mp_lc=&Mersenne_Twister_Generator_Noseed;
 #endif
   return(z);

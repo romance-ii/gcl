@@ -2,11 +2,8 @@
 ;;Copyright William F. Schelter 1990, All Rights Reserved 
 
 
-(In-package "SYSTEM")
+(In-package :SYSTEM)
 (import 'sloop::sloop)
-
-;(eval-when (compile eval)
-;  (proclaim '(optimize (safety 2) (space 3)))
 
 (defmacro f (op &rest args)
     `(the fixnum (,op ,@ (mapcar #'(lambda (x) `(the fixnum ,x)) args) )))
@@ -59,7 +56,7 @@
 ;;make hack in compiler to remember the local variable names for the 
 ;;vs variables and associate it with the function name
 
-(defun search-stack (sym &aux string)
+(defun search-stack (sym &aux string);FIXME
   (setq string (cond((symbolp sym)(symbol-name sym))
 		    (t sym)))
   (sloop
@@ -69,7 +66,7 @@
      (cond ((compiled-function-p fun)
 	    (setq name (compiled-function-name fun)))
 	   ((symbolp fun ) (setq name fun))
-	   ((when (interpreted-function-p fun) (setq fun (interpreted-function-lambda fun)) nil))
+;	   ((when (interpreted-function-p fun) (setq fun (interpreted-function-lambda fun)) nil))
 	   ((and (listp fun)
 		 (member (car fun) '(lambda lambda-block)))
 	    (setq name (second fun)))
@@ -81,11 +78,11 @@
 
 (defvar *debug-print-level* 3)
 
-(defun break-locals (&optional (n 1)
+(defun break-locals (&optional (n 1) ;FIXME
 			       &aux (ihs *current-ihs*)
 			       (base  (ihs-vs ihs))
 			       (*print-level* *debug-print-level*)
-			       *print-circle*
+			       (*print-circle* t)
 			       (*print-length* *debug-print-level*)
 			       (current-ihs *current-ihs*)
 			       (fun (ihs-fun ihs)) name args)
@@ -98,7 +95,7 @@
 	(t
 	 (cond ((compiled-function-p fun)
 		(setq name (compiled-function-name fun)))
-	       ((when (interpreted-function-p fun) (setq fun (interpreted-function-lambda fun)) nil))
+;	       ((when (interpreted-function-p fun) (setq fun (interpreted-function-lambda fun)) nil))
 	       (t (setq name fun)))
          (if (symbolp name)(setq args (get name 'debugger)))
 	 (let ((next (ihs-vs (f + 1 *current-ihs*))))
@@ -185,6 +182,15 @@
 (defun dbl ()
   (break-level nil nil))
 
+(eval-when 
+ (eval)
+ (defun stream-name (str) (namestring (pathname str))))
+(clines "static object stream_name(str) object str;{
+     if (str->sm.sm_object1 != 0 && type_of(str->sm.sm_object1)==t_string)
+     return str->sm.sm_object1; else return Cnil; }")
+
+(defentry stream-name (object) (static object "stream_name"))
+
 (defstruct instream stream (line 0 :type fixnum) stream-name)
 
 
@@ -208,7 +214,8 @@
                                                (stream-name str))
    ) *stream-alist*)))))
 
-(defun newline (str ch) ch
+(defun newline (str ch)
+  (declare (ignore ch))
   (let ((in (get-instream str)))
     (setf (instream-line in) (the fixnum (f + 1 (instream-line in)))))
   ;; if the next line begins with '(', then record all cons's eg arglist )
@@ -343,16 +350,6 @@
 (defun instream-name (instr)
   (or (instream-stream-name instr)
       (stream-name (instream-stream instr))))
-
-(eval-when (eval)
-
-(defun stream-name (str) (namestring (pathname str)))
-)  
-(clines "static object stream_name(str) object str;{
-     if (str->sm.sm_object1 != 0 && type_of(str->sm.sm_object1)==t_string)
-     return str->sm.sm_object1; else return Cnil; }")
-
-(defentry stream-name (object) (static object "stream_name"))
 
 (clines "static object closedp(str) object str;{return (str->sm.sm_fp==0 ? Ct :Cnil); }")
 
@@ -628,12 +625,12 @@
        (mv-values nil j))
     (let
 	((na  (ihs-fname j)))
-      (cond ((special-form-p na))
+      (cond ((special-operator-p na))
 	    ((get na 'dbl-invisible))
 	    ((fboundp na)(return (mv-values na j)))))))
 
 (defun dbl-what-frame (ihs &aux (j *ihs-top*) (i 0) na)
-  (declare (fixnum ihs j i))
+  (declare (fixnum ihs j i) (ignorable na))
   (loop
    (mv-setq (na j)   (get-next-visible-fun j))
    (cond ((fb <= j ihs) (return i)))
@@ -655,7 +652,7 @@
 			  break-level   evalhook find-line-in-fun))
   (setf (get v 'dbl-invisible) t))
 
-(defun next-stack-frame (ihs  &aux line-info li i k na)
+(defun next-stack-frame (ihs &aux line-info li i k na)
   (cond
    ((fb < ihs *ihs-base*) (mv-values nil nil nil nil nil))
    (t (let (fun)
@@ -665,10 +662,10 @@
 	(cond
 	 ((and
 	   (setq line-info (get fun 'line-info))
-	   (do ((j (f + ihs 1) (f - j 1))
-		(form ))
+	   (do ((j (f + ihs 1) (f - j 1)))
+;		(form ))
 	       ((<= j i) nil)
-	     (setq form (ihs-fun j))
+;	     (setq form (ihs-fun j))
 	     (cond ((setq li (get-line-of-form (ihs-fun j) line-info))
 		    (return-from next-stack-frame 
 				 (mv-values
@@ -680,7 +677,7 @@
 					(vs (1+ k))
 					(vs (+ k 2)))
 				  )))))))
-	 ((special-form-p na) nil)
+	 ((special-operator-p na) nil)
 	 ((get na 'dbl-invisible))
 	 ((fboundp na)
 	  (mv-values i na nil nil
@@ -719,13 +716,12 @@
 				      (base (ihs-vs ihs))
 				      (end (min (ihs-vs (1+ ihs)) (vs-top))))
   (format *display-string* "")
-  (do ((i base )
+  (do ((i base)
        (v (get (ihs-fname ihs) 'debugger) (cdr v)))
-      ((or (fb >= i end)(fb > (fill-pointer *display-string*) plength)))
+      ((or (fb >= i end)(fb > (fill-pointer *display-string*) plength)(= 0 (address (vs i)))));FIXME
     (format *display-string* "~a~@[~d~]=~s~@[,~]"
 	    (or (car v)  'loc) (if (not (car v)) (f - i base)) (vs i)
-	    (fb < (setq i (f + i 1)) end)))
-  )
+	    (fb < (setq i (f + i 1)) end))))
 
 (defun computing-args-p (ihs)
   ;; When running interpreted we want a line like

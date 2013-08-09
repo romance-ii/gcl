@@ -20,7 +20,7 @@
 ;; Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-(in-package 'compiler)
+(in-package :compiler)
 
 (defstruct (fasd (:type vector))
   stream
@@ -156,8 +156,10 @@
 (defun data-symbol (x)
 ;  (or (setf-function-base-symbol x)
   (when (and *compiler-compile* (symbolp x))
-    (unless (symbol-package x)
-      (setq *tmp-pack* (or *tmp-pack* (make-package (symbol-name (gensym)))))
+    (unless (let ((p (symbol-package x))) (and p (package-name p)));FIXME delete-package leaves nil package name hpack
+      (setq *tmp-pack* (or *tmp-pack* (make-package (symbol-name (tmpsym)))))
+      (let ((s (find-symbol (symbol-name x) *tmp-pack*)))
+	(when s (unintern s *tmp-pack*)))
       (import x *tmp-pack*)
       x)))
 

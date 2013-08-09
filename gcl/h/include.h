@@ -23,6 +23,9 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	include.h
 */
 
+#ifndef INCLUDE_H
+
+#define INCLUDE_H
 
 /* whether to use prototypes or not */
 #ifdef __STDC__
@@ -30,7 +33,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #else
 #define P__(x)
 #endif
-
 
 #include "options.h"
 #include "gclincl.h"
@@ -94,9 +96,12 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define EXTER extern 
 #endif
 
+
 #if defined(GMP) || defined(NEED_MP_H)
 #include "../h/mp.h"
 #endif
+
+
 
 #include "../h/sfun_argd.h"
 #include "../h/compbas.h"
@@ -120,3 +125,4 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "../h/rgbc.h"
 #include "../o/regexp.h"
 
+#endif

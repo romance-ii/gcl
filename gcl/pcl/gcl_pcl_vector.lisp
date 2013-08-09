@@ -465,7 +465,9 @@
 (defun optimize-slot-value (slots sparameter form)
   (if sparameter
     ; FIXME use regular destructuring-bind
-      (pcl-destructuring-bind (ignore ignore slot-name-form) form
+      (destructuring-bind 
+       (ignore ignore slot-name-form) form
+       (declare (ignore ignore))
 	(let ((slot-name (eval slot-name-form)))
 	  (optimize-instance-access slots :read sparameter slot-name nil)))
       `(accessor-slot-value ,@(cdr form))))
@@ -473,17 +475,21 @@
 (defun optimize-set-slot-value (slots sparameter form)
   (if sparameter
     ; FIXME use regular destructuring-bind
-      (pcl-destructuring-bind (ignore ignore slot-name-form new-value) form
-	(let ((slot-name (eval slot-name-form)))
-	  (optimize-instance-access slots :write sparameter slot-name new-value)))
+      (destructuring-bind
+       (ignore ignore slot-name-form &optional new-value) form
+       (declare (ignore ignore))
+       (let ((slot-name (eval slot-name-form)))
+	 (optimize-instance-access slots :write sparameter slot-name new-value)))
       `(accessor-set-slot-value ,@(cdr form))))
 
 (defun optimize-slot-boundp (slots sparameter form)
   (if sparameter
     ; FIXME use regular destructuring-bind
-      (pcl-destructuring-bind (ignore ignore slot-name-form new-value) form
-	(let ((slot-name (eval slot-name-form)))
-	  (optimize-instance-access slots :boundp sparameter slot-name new-value)))
+      (destructuring-bind
+       (ignore ignore slot-name-form &optional new-value) form
+       (declare (ignore ignore))
+       (let ((slot-name (eval slot-name-form)))
+	 (optimize-instance-access slots :boundp sparameter slot-name new-value)))
       `(accessor-slot-boundp ,@(cdr form))))
 
 (defun optimize-reader (slots sparameter gf-name form)
@@ -494,8 +500,10 @@
 (defun optimize-writer (slots sparameter gf-name form)
   (if sparameter
     ; FIXME use regular destructuring-bind
-      (pcl-destructuring-bind (ignore ignore new-value) form
-	(optimize-accessor-call slots :write sparameter gf-name new-value))
+      (destructuring-bind
+       (ignore ignore &optional new-value) form
+       (declare (ignore ignore))
+       (optimize-accessor-call slots :write sparameter gf-name new-value))
       form))
 ;;;
 ;;; The <slots> argument is an alist, the CAR of each entry is the name of
@@ -879,8 +887,8 @@
      ,@(when (symbolp pv-table-symbol)
 	 `((declare (special ,pv-table-symbol))))
      ,@(progn
-	#-cmu `(,pv ,calls)
-	#+cmu `(declare (ignorable ,pv ,calls)))
+;	#-cmu `(,pv ,calls)#+cmu
+	`(declare (ignorable ,pv ,calls)))
      ,@forms))
 
 (defvar *non-variable-declarations*
@@ -968,6 +976,7 @@
 	    (when (eq arg '&aux) (return nil))
 	    (incf nreq)(push arg args))
 	  (setq args (nreverse args))
+;	  (print (list 'baz lambda-list nreq restp)) (break)
 	  (setf (getf (getf initargs ':plist) ':arg-info) (cons nreq restp))
 	  (make-method-initargs-form-internal1
 	   initargs (cddr lmf) args lmf-params restp)))))
@@ -981,7 +990,7 @@
       `(list* :fast-function
 	#'(lambda (.pv-cell. .next-method-call. ,@args+rest-arg)
 	    ,@outer-decls
-	    .pv-cell. .next-method-call.
+	    (declare (ignorable .pv-cell. .next-method-call. ,@(when rest-arg (list rest-arg))))
 	    (macrolet ((pv-env ((pv calls pv-table-symbol pv-parameters)
 				&rest forms)
 			 (declare (ignore pv-table-symbol pv-parameters))
@@ -989,7 +998,7 @@
 				(,calls (cdr .pv-cell.)))
 			   (declare ,(make-pv-type-declaration pv)
 			    ,(make-calls-type-declaration calls))
-			   ,pv ,calls
+			   (declare (ignorable ,pv ,calls))
 			   ,@forms)))
 	      (fast-lexical-method-functions 
 	       (,(car lmf-params) .next-method-call. ,req-args ,rest-arg

@@ -1,6 +1,6 @@
 ;;; -*- Mode: Lisp; Syntax: Common-Lisp; Package: "CONDITIONS"; Base: 10 -*-
 
-(in-package "CONDITIONS")
+(in-package :CONDITIONS)
 
 (defun condition-backtrace (condition)
   (let* ((*debug-io* *error-output*)

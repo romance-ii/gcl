@@ -14,7 +14,7 @@
 ;; Additionally cross reference information about functions in the system is
 ;; collected.
 
-(in-package 'compiler)
+(in-package :compiler)
 (import 'sloop::sloop)
 
 (defstruct fn
@@ -114,7 +114,7 @@
 
 
 (defun get-var-types (lis)
-  (sloop::sloop for v in lis collect (or (si::classp (var-type v)) (si::structurep (var-type v)) (var-type v))))
+  (sloop::sloop for v in lis collect (or (si::si-classp (var-type v)) (si::structurep (var-type v)) (var-type v))))
 
 (defun record-arg-info( lambda-list &aux (cf (current-fn)))
   (setf (fn-arg-types cf) (get-var-types (car lambda-list)))
@@ -162,7 +162,6 @@
 		(setf (fn-return-type tem) typ)
 		(return typ)
 		)))
-	((get fname 'return-type))
 	((get fname 'proclaimed-return-type))
 	(t '*)))
 	
@@ -200,7 +199,7 @@
 ;	 (concatenate 'string si::*system-directory*
 ;		      "../cmpnew/lfun_list.lsp"))
   
-  (print `(in-package ,(package-name *package*)) st)
+  (print `(in-package :,(package-name *package*)) st)
   (sloop::sloop with ret with at
 		for (ke val) in-table *call-table* 
 		do
@@ -258,7 +257,7 @@
 			       (*print-level* nil)
 			       )
   (with-open-file (st file :direction :output)
-    (format st "(in-package 'compiler)(init-fn)~%(~s '(" 'add-fn-data)
+    (format st "(in-package :compiler)(init-fn)~%(~s '(" 'add-fn-data)
     (sloop::sloop for (ke val) in-table *call-table*
 		  do (progn ke) (print val st))
     (princ "))" st)
@@ -357,13 +356,13 @@
 	      (establish
 	       (let ((SYSTEM::*PRINT-PACKAGE* t))
 		 (pr 
-		  `(in-package ,(package-name p) :use nil
+		  `(in-package :,(package-name p) :use nil
 			       ,@ (if (package-nicknames p)
 				      `(:nicknames ',(package-nicknames p)))))))
 	      (export
 	       (let ((SYSTEM::*PRINT-PACKAGE* t))
 		 (pr 
-		  `(in-package ,(package-name p)
+		  `(in-package :,(package-name p)
 			       :use
 			       '(,@
 				 (mapcar 'package-name (package-use-list p)))
@@ -378,7 +377,7 @@
 		 (pr `(export ',ext))))
 	      (shadow
 	       (let ((SYSTEM::*PRINT-PACKAGE* t))
-		 (pr `(in-package ,(package-name p))))
+		 (pr `(in-package :,(package-name p))))
 	       (let (in out (*package* (find-package "LISP")))
 		 (dolist (v (package-shadowing-symbols p))
 			 (cond ((eq (symbol-package v) p)

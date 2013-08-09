@@ -1,6 +1,6 @@
 ;;; -*- Mode: Lisp; Syntax: Common-Lisp; Package: "CONDITIONS"; Base: 10 -*-
 
-(IN-PACKAGE "CONDITIONS")
+(IN-PACKAGE :CONDITIONS)
 
 ;; (EVAL-WHEN (EVAL COMPILE LOAD)
 

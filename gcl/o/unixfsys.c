@@ -169,7 +169,10 @@ coerce_to_filename1(object pathname, char *p,unsigned sz) {
     for (n=1;n<namestring->st.st_fillp && q[n]!='/'; n++);
     if (n==1)
 
-      ASSERT(!getpwuid_r(getuid(),&pw,b,r,&pwent));
+      if ((pw.pw_dir=getenv("HOME")))
+	pwent=&pw;
+      else
+	ASSERT(!getpwuid_r(getuid(),&pw,b,r,&pwent));
 
     else {
 
@@ -513,7 +516,7 @@ DEF_ORDINARY("FILE",sKfile,KEYWORD,"");
 
 /* extern char *ctime_r(const time_t *,char *); */
 
-DEFUN_NEW("STAT",object,fSstat,SI,1,1,NONE,OO,OO,OO,OO,(object path),"") {
+DEFUN("STAT",object,fSstat,SI,1,1,NONE,OO,OO,OO,OO,(object path),"") {
 
   char filename[MAXPATHLEN];
   struct stat ss;
@@ -535,7 +538,7 @@ DEFUN_NEW("STAT",object,fSstat,SI,1,1,NONE,OO,OO,OO,OO,(object path),"") {
   }
 }
 
-DEFUN_NEW("SETENV",object,fSsetenv,SI,2,2,NONE,OO,OO,OO,OO,(object variable,object value),"Set environment VARIABLE to VALUE")
+DEFUN("SETENV",object,fSsetenv,SI,2,2,NONE,OO,OO,OO,OO,(object variable,object value),"Set environment VARIABLE to VALUE")
 
 {
 
@@ -557,23 +560,21 @@ DEFUN_NEW("SETENV",object,fSsetenv,SI,2,2,NONE,OO,OO,OO,OO,(object variable,obje
   RETURN1((res == 0 ? Ct : Cnil ));
 }
 
-DEFUNO_NEW("DELETE-FILE",object,fLdelete_file,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Ldelete_file,(object path),"")
+DEFUN("DELETE-FILE",object,fLdelete_file,LISP,1,1,NONE,OO,OO,OO,OO,(object path),"") {
 
-{
-	char filename[MAXPATHLEN];
+  char filename[MAXPATHLEN];
+  
+  check_type_or_pathname_string_symbol_stream(&path);
+  
+  if (wild_pathname_p(path,Cnil) == Ct)
+    RETURN1(WILD_PATH(path));
+  
+  coerce_to_local_filename(path, filename);
+  if (unlink(filename) < 0 && rmdir(filename) < 0)
+    FEerror("Cannot delete the file ~S: ~s.", 2, path, make_simple_string(strerror(errno)));
+  path = Ct;
+  RETURN1(path);
 
-	/* 1 args */
-	check_type_or_pathname_string_symbol_stream(&path);
-
-	if (wild_pathname_p(path,Cnil) == Ct)
-	    RETURN1(WILD_PATH(path));
-
-	coerce_to_local_filename(path, filename);
- 	if (unlink(filename) < 0 && rmdir(filename) < 0)
- 		FEerror("Cannot delete the file ~S: ~s.", 2, path, make_simple_string(strerror(errno)));
-	path = Ct;
-	RETURN1(path);
 }
 #ifdef STATIC_FUNCTION_POINTERS
 object
@@ -654,30 +655,12 @@ LFD(Lfile_author)(void)
 static void
 FFN(Luser_homedir_pathname)(void)
 {
-#if !defined(NO_PWD_H) && !defined(STATIC_LINKING)
-	struct passwd *pwent;
-	char filename[MAXPATHLEN];
-	register int i;
-#ifndef __STDC__
-	extern struct passwd *getpwuid();
-#endif
+  char filename[MAXPATHLEN];
 
-	if (vs_top - vs_base > 1)
-		too_many_arguments();
-	pwent = getpwuid(getuid());
-	strcpy(filename, pwent->pw_dir);
-	i = strlen(filename);
-	if (filename[i-1] != '/') {
-		filename[i++] = '/';
-		filename[i] = '\0';
-	}
-#else
-	 char *filename= "~/" ;
-#endif	
-	vs_base[0] = make_simple_string(filename);
-	vs_top = vs_base+1;
-	vs_base[0] = coerce_to_pathname(vs_base[0]);
-	
+  coerce_to_filename(make_simple_string("~/"),filename);
+  vs_base[0]=coerce_to_pathname(make_simple_string(filename));
+  vs_top = vs_base+1; 
+
 }
 
 #ifdef BSD
@@ -924,6 +907,90 @@ FFN(siLrmdir)(void)
 		FEerror("Cannot remove the directory ~S.",
 			1, vs_base[0]);
 }
+
+DEFVAR("*LOAD-WITH-FREAD*",sSAload_with_freadA,SI,Cnil,"");
+
+#ifdef _WIN32
+
+void *
+get_mmap(FILE *fp,void **ve) {
+  
+  int n;
+  void *st;
+  size_t sz;
+  HANDLE handle;
+
+  massert((sz=file_len(fp))>0);
+  if (sSAload_with_freadA->s.s_dbind==Cnil) {
+    n=fileno(fp);
+    massert((n=fileno(fp))>2);
+    massert(handle = CreateFileMapping((HANDLE)_get_osfhandle(n), NULL, PAGE_WRITECOPY, 0, 0, NULL));
+    massert(st=MapViewOfFile(handle,FILE_MAP_COPY,0,0,sz));
+    CloseHandle(handle);
+  } else {
+    massert(st=malloc(sz));
+    massert(fread(st,sz,1,fp)==1);
+  }
+
+  *ve=st+sz;
+
+  return st;
+
+}
+
+int
+un_mmap(void *v1,void *ve) {
+
+  if (sSAload_with_freadA->s.s_dbind==Cnil)
+    return UnmapViewOfFile(v1) ? 0 : -1;
+  else {
+    free(v1);
+    return 0;
+  }
+
+}
+
+
+#else
+
+#include <sys/mman.h>
+
+void *
+get_mmap(FILE *fp,void **ve) {
+  
+  int n;
+  void *v1;
+  struct stat ss;
+
+  massert((n=fileno(fp))>2);
+  massert(!fstat(n,&ss));
+  if (sSAload_with_freadA->s.s_dbind==Cnil) {
+    massert((v1=mmap(0,ss.st_size,PROT_READ|PROT_WRITE,MAP_PRIVATE,n,0))!=(void *)-1);
+  } else {
+    massert(v1=malloc(ss.st_size));
+    massert(fread(v1,ss.st_size,1,fp)==1);
+  }
+
+  *ve=v1+ss.st_size;
+  return v1;
+
+}
+ 
+
+int
+un_mmap(void *v1,void *ve) {
+
+  if (sSAload_with_freadA->s.s_dbind==Cnil)
+    return munmap(v1,ve-v1);
+  else {
+    free(v1);
+    return 0;
+  }
+
+}
+
+#endif
+
 
 void
 gcl_init_unixfsys(void)

@@ -101,7 +101,7 @@ int w32_socket_exit(void)
 #define BIND_LAST_ADDRESS	65534
 static unsigned int iLastAddressUsed = BIND_INITIAL_ADDRESS;
 
-DEFUN_NEW("OPEN-NAMED-SOCKET",object,fSopen_named_socket,SI,1,1,NONE,OI,OO,OO,OO,(fixnum port),
+DEFUN("OPEN-NAMED-SOCKET",object,fSopen_named_socket,SI,1,1,NONE,OI,OO,OO,OO,(fixnum port),
 "Open a socket on PORT and return (cons fd portname) where file \
 descriptor is a small fixnum which is the write file descriptor for \
 the socket.  If PORT is zero do automatic allocation of port") 
@@ -188,12 +188,12 @@ the socket.  If PORT is zero do automatic allocation of port")
   return make_cons(make_fixnum(s), make_fixnum(ntohs(addr.sin_port)));
 }
 
-DEFUN_NEW("CLOSE-FD",object,fSclose_fd,SI,1,1,NONE,OI,OO,OO,OO,(fixnum fd),
+DEFUN("CLOSE-FD",object,fSclose_fd,SI,1,1,NONE,OI,OO,OO,OO,(fixnum fd),
       "Close the file descriptor FD")
 
 {RETURN1(0==close(fd) ? Ct : Cnil);}
 
-DEFUN_NEW("CLOSE-SD",object,fSclose_sfd,SI,1,1,NONE,OO,OO,OO,OO,(object sfd),
+DEFUN("CLOSE-SD",object,fSclose_sfd,SI,1,1,NONE,OO,OO,OO,OO,(object sfd),
       "Close the socket connection sfd")
 
 { int res;
@@ -207,7 +207,7 @@ DEFUN_NEW("CLOSE-SD",object,fSclose_sfd,SI,1,1,NONE,OO,OO,OO,OO,(object sfd),
 }
 
 
-DEFUN_NEW("ACCEPT-SOCKET-CONNECTION",object,fSaccept_socket_connection,
+DEFUN("ACCEPT-SOCKET-CONNECTION",object,fSaccept_socket_connection,
 	  SI,1,1,NONE,OO,OO,OO,OO,(object named_socket),
       "Given a NAMED_SOCKET it waits for a connection on this \
 and returns (list* named_socket fd name1) when one is established")
@@ -255,7 +255,7 @@ and returns (list* named_socket fd name1) when one is established")
     
       
 
-DEFUN_NEW("HOSTNAME-TO-HOSTID",object,fShostname_to_hostid,SI,1,1,
+DEFUN("HOSTNAME-TO-HOSTID",object,fShostname_to_hostid,SI,1,1,
       NONE,OO,OO,OO,OO,(object host),"")
 {
   struct hostent *h;
@@ -275,7 +275,7 @@ DEFUN_NEW("HOSTNAME-TO-HOSTID",object,fShostname_to_hostid,SI,1,1,
   else return Cnil;
 }
 
-DEFUN_NEW("GETHOSTNAME",object,fSgethostname,SI,0,0,NONE,OO,OO,OO,OO,(void),
+DEFUN("GETHOSTNAME",object,fSgethostname,SI,0,0,NONE,OO,OO,OO,OO,(void),
       "Returns HOSTNAME of the local host")
      
 {char buf[300];
@@ -284,7 +284,7 @@ DEFUN_NEW("GETHOSTNAME",object,fSgethostname,SI,0,0,NONE,OO,OO,OO,OO,(void),
  else return Cnil;
 }
 
-DEFUN_NEW("HOSTID-TO-HOSTNAME",object,fShostid_to_hostname,SI,
+DEFUN("HOSTID-TO-HOSTNAME",object,fShostid_to_hostname,SI,
       1,10,NONE,OO,OO,OO,OO,(object host_id),"")
 
 {char *hostid;
@@ -325,16 +325,16 @@ DEFUN_NEW("HOSTID-TO-HOSTNAME",object,fShostid_to_hostname,SI,
 #include "comm.c"
 
 
-DEFUN_NEW("CONNECTION-STATE-FD",object,fSconnection_state_fd,SI,1,1,NONE,OO,OO,OO,OO,(object sfd),"") 
+DEFUN("CONNECTION-STATE-FD",object,fSconnection_state_fd,SI,1,1,NONE,OO,OO,OO,OO,(object sfd),"") 
 { return make_fixnum(OBJ_TO_CONNECTION_STATE(sfd)->fd);
 }
      
-DEFUN_NEW("OUR-WRITE",object,fSour_write,SI,3,3,NONE,OO,OI,OO,OO,(object sfd,object buffer,fixnum nbytes),"")
+DEFUN("OUR-WRITE",object,fSour_write,SI,3,3,NONE,OO,OI,OO,OO,(object sfd,object buffer,fixnum nbytes),"")
 
 { return make_fixnum(write1(OBJ_TO_CONNECTION_STATE(sfd),buffer->st.st_self,nbytes));
 }
 
-DEFUN_NEW("OUR-READ-WITH-OFFSET",object,fSour_read_with_offset,SI,5,5,NONE,
+DEFUN("OUR-READ-WITH-OFFSET",object,fSour_read_with_offset,SI,5,5,NONE,
 	  OO,OI,II,OO,(object fd,object buffer,fixnum offset,fixnum nbytes,fixnum timeout),
       "Read from STATE-FD into string BUFFER putting data at OFFSET and reading NBYTES, waiting for TIMEOUT before failing")
 
@@ -368,7 +368,7 @@ enum print_arglist_codes {
 
 static int needs_quoting[256];
 
-DEFUN_NEW("PRINT-TO-STRING1",object,fSprint_to_string1,SI,3,3,NONE,OO,OO,OO,OO,(object str,object x,object the_code),
+DEFUN("PRINT-TO-STRING1",object,fSprint_to_string1,SI,3,3,NONE,OO,OO,OO,OO,(object str,object x,object the_code),
       "Print to STRING the object X according to CODE.   The string must have \
 fill pointer, and this will be advanced.")
 
@@ -494,7 +494,7 @@ not_defined_for_os()
 { FEerror("Function not defined for this operating system",0);}
 
 
-DEFUN_NEW("SET-SIGIO-FOR-FD",object,fSset_sigio_for_fd,SI,1,1,NONE,OI,OO,OO,OO,(fixnum fd),"")
+DEFUN("SET-SIGIO-FOR-FD",object,fSset_sigio_for_fd,SI,1,1,NONE,OI,OO,OO,OO,(fixnum fd),"")
 
 { 
   /* for the moment we will use SIGUSR1 to notify, instead of depending on SIGIO,
@@ -523,7 +523,7 @@ DEFUN_NEW("SET-SIGIO-FOR-FD",object,fSset_sigio_for_fd,SI,1,1,NONE,OI,OO,OO,OO,(
 
 }
      
-DEFUN_NEW("RESET-STRING-INPUT-STREAM",object,fSreset_string_input_stream,SI,4,4,NONE,OO,OI,IO,OO,(object strm,object string,fixnum start,fixnum end),
+DEFUN("RESET-STRING-INPUT-STREAM",object,fSreset_string_input_stream,SI,4,4,NONE,OO,OI,IO,OO,(object strm,object string,fixnum start,fixnum end),
       "Reuse a string output STREAM by setting its output to STRING \
 and positioning the ouput/input to start at START and end at END")
 
@@ -533,14 +533,14 @@ and positioning the ouput/input to start at START and end at END")
   return strm;
 }
 
-DEFUN_NEW("CHECK-STATE-INPUT",object,fScheck_state_input,SI,2,2,NONE,OO,IO,OO,OO,(object osfd,fixnum timeout),
+DEFUN("CHECK-STATE-INPUT",object,fScheck_state_input,SI,2,2,NONE,OO,IO,OO,OO,(object osfd,fixnum timeout),
       "") 
 {
   return fScheck_dsfd_for_input(OBJ_TO_CONNECTION_STATE(osfd),timeout);
 
 }
 
-DEFUN_NEW("CLEAR-CONNECTION-STATE",object,fSclear_connection_state,
+DEFUN("CLEAR-CONNECTION-STATE",object,fSclear_connection_state,
 	  SI,1,1,NONE,OO,OO,OO,OO,(object osfd),
       "Read on FD until nothing left to read.  Return number of bytes read")
 

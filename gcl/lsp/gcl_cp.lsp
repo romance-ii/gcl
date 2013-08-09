@@ -1,4 +1,4 @@
-(in-package 'compiler)
+(in-package :compiler)
 
 (eval-when
  (compile) 
@@ -8,7 +8,7 @@
    (let ((x (read-delimited-list #\} stream)))
      (let (zz z r) 
        (mapc (lambda (x) 
-	       (cond ((member x '(|enum| |struct| |unsigned|)) (setq zz x))
+	       (cond ((member x '(|enum| |union| |struct| |unsigned|)) (setq zz x))
 		     ((not z) (setq z (if zz (list zz x) x)))
 		     ((integerp x) (setq r (cons (list z (cadar r) x) (cdr r))))
 		     ((eq x '|;|) (setq z nil zz nil))
@@ -47,7 +47,7 @@
  (defun td (k l)
    (let* ((kn (when (symbolp k) (symbol-name k)))
 	  (kk (when kn (find-symbol (string-upcase kn) 'keyword)))
-	  (kk (when (get kk 'lisp-type) kk))
+	  (kk (when (get kk 'compiler::lisp-type) kk))
 	  (x (car (member k l :key (lambda (x) (car (last x)))))))
      (cond (kk)
 	   ((not x) k)
@@ -74,7 +74,7 @@
 	  (u (search "_" x))
 	  (x (if u (subseq x 0 u) x))
 	  (x (find-symbol (string-upcase x) 'compiler)))
-     (unless (type>= (cmp-norm-tp x) '*) x)))
+     (unless (compiler::type>= (compiler::cmp-norm-tp x) '*) x)))
  
  (defun csd (b sn x)
    (let* ((z (car x))
@@ -84,48 +84,219 @@
      (when (keywordp z)
        (unless (eq (cadr x) '|pad|)
 	 (let* ((e (string (cadr x)))
-		(s (when (eql #\* (aref e 0)) `(i)))
+		(s (when (eql #\* (aref e 0)) `(c::i)))
 		(e (if s (subseq e 1) e))
 		(es (search "_" e))
 		(ee (if es (subseq e (1+ es)) e))
-		(n (intern (string-upcase (strcat (symbol-name b) "-" ee)) 'c))
-		(ns (intern (string-upcase (strcat "set-" n)) 'c))
-		(f `(el ,z x (cstr ,(string sn)) (cstr ,e) ,@s))
+		(n (intern (string-upcase (compiler::strcat (symbol-name b) "-" ee)) 'c))
+		(ns (intern (string-upcase (compiler::strcat "set-" n)) 'c))
+		(zz (if (member z '(:integer :real :plist :pack :string :structure :keyword :direl :symbol)) :object z))
+		(ss (concatenate 'string "->"  (string sn) "." (string e) (if s "[" "")))
+		(f `(si::lit ,zz (:object c::x) ,ss ,@(when s `((:fixnum c::i) "]"))));FIXME
 		(fp f)
 		(i (third x))
 		(tt1 (when i (if y `(integer 0 (,(ash 1 i)))
 			       `(integer ,(- (ash 1 (1- i))) (,(ash 1 (1- i)))))))
-		(tt1 (or tt1 (get z 'lisp-type)))
+		(tt1 (or tt1 (get z 'compiler::lisp-type)))
 		(f (if tt1 `(the ,tt1 ,f) f))
-		(fs (sublis (list (cons fp `(set-el y ,@(cdr fp)))) f))
+		(fs (sublis
+		     (list (cons fp (append `(si::lit ,zz "(") (cddr fp) `("=" (,zz c::y) ")")))) f))
 		(v (member e '("FIXVAL" "LFVAL" "SFVAL" "CODE") :test 'equal))
 		(fs (unless v fs));could be an immediate fixnum, unsettable
-		(f (if v `x f)));use default coersion
-	   `(progn (eval-when (compile load eval) (remprop ',n 'compiler::lfun))
-		   (defun ,n (x ,@s) 
-		     (declare (optimize (safety 2)))
-		     ,@(when s `((declare (seqind i))))
-		     (check-type x ,b)
+		(f (if v `c::x f)));use default coersion
+	   `(progn (defun ,n (c::x ,@s) 
+		     (declare (optimize (safety 1)))
+		     ,@(when s `((declare (seqind c::i))))
+		     (check-type c::x ,b)
 		     ,f)
 		   ,@(when fs
-		       `((defun ,ns (y x ,@s) 
-			   (declare (optimize (safety 2)) (ignorable y))
-			   ,@(when s `((declare (seqind i))))
-			   (check-type x ,b)
-			   ,@(when tt1 `((check-type y ,tt1)))
+		       `((defun ,ns (c::y c::x ,@s) 
+			   (declare (optimize (safety 1)) (ignorable c::y))
+			   ,@(when s `((declare (seqind c::i))))
+			   (check-type c::x ,b)
+			   ,@(when tt1 `((check-type c::y ,tt1)))
+			   (compiler::side-effects)
 			   ,fs)))))))))
  
- (defun cs (def)
+ (defun cs (def d)
    (let ((b (ft (cadar def))))
      (when b
        (let* ((sn (cadr def))
 	      (def (caddr def))
-	      (def (if (eq 'CONS b) def (nthcdr 7 def))))
+;	      (def (set-difference def d :test 'equal));No early set-difference FIXME
+	      (def (remove-if (lambda (x) (member x d :test 'equal)) def)))
 	 `(progn
 	    ,@(mapcar (lambda (x) (csd b sn x)) def))))))
  
  (defmacro bar nil
    `(progn
-      ,@(remove-if-not 'identity (mapcar 'cs (slist))))))
+      ,@(let* ((s (slist))
+	       (d (caddar (member '(|struct| |dummy|) s :test 'equal :key 'car))))
+	  (remove-if-not 'identity (mapcar (lambda (x) (cs x d)) s))))))
  
 (bar)
+
+(in-package :compiler)
+
+(defun c::hashtable-self (x i)
+  (declare (optimize (safety 1)))
+  (declare (seqind i))
+  (check-type x hash-table)
+  (lit :fixnum "(fixnum)(" (:object x)  "->ht.ht_self+" (:fixnum i) ")"))
+
+(defun c::gethash-int (x y)
+  (declare (optimize (safety 1)))
+  (check-type y hash-table)
+  (lit :fixnum "(fixnum)gethash(" (:object x) "," (:object y) ")"))
+
+(defun c::sxhash-int (x)
+  (declare (optimize (safety 1)))
+  (lit :fixnum "ihash_equal1(" (:object x) ",0)"))
+
+(defun c::close-int (x)
+  (declare (optimize (safety 1)))
+  (check-type x stream)
+  (lit :fixnum "(close_stream(" (:object x) "),1)"))
+
+(defun c::read-object-non-recursive (x)
+  (declare (optimize (safety 1)))
+  (check-type x stream)
+  (lit :object "read_object_non_recursive(" (:object x) ")"))
+
+(defun c::read-object-recursive (x)
+  (declare (optimize (safety 1)))
+  (check-type x stream)
+  (lit :object "read_object_non_recursive(" (:object x) ")"))
+
+(defun c::htent-value (x)
+  (declare (optimize (safety 1)))
+  (check-type x fixnum)
+  (lit :object "((struct htent *)" (:fixnum x) ")->hte_value"))
+
+(defun c::htent-key (x)
+  (declare (optimize (safety 1)))
+  (check-type x fixnum)
+  (lit :object "((struct htent *)" (:fixnum x) ")->hte_key"))
+
+(defun c::set-htent-value (y x)
+  (declare (optimize (safety 1)))
+  (check-type x fixnum)
+  (lit :object "((struct htent *)" (:fixnum x) ")->hte_value=" (:object y)))
+
+(defun c::set-htent-key (y x)
+  (declare (optimize (safety 1)))
+  (check-type x fixnum)
+  (lit :object "((struct htent *)" (:fixnum x) ")->hte_key=" (:object y)))
+
+(defun c::make-string-output-stream nil
+  (declare (optimize (safety 1)))
+  (lit :object "make_string_output_stream(64)"))
+
+(defun funcallable-symbol-p (s)
+  (and (symbolp s)
+       (/= (si::address (c-symbol-gfdef s)) 0)
+       (= (c-symbol-mflag s) 0)
+       (= (c-symbol-sfdef s) (si::address nil))))
+(setf (get 'funcallable-symbol-p 'cmp-inline) t)
+
+(defun fsf (s)
+  (declare (optimize (safety 1)))
+;  (check-type s funcallable-symbol); FIXME
+  (assert (funcallable-symbol-p s))
+  (the function (c-symbol-gfdef s)));FIXME
+(setf (get 'fsf 'cmp-inline) t)
+
+(defun tt3 (x) (lit :fixnum "fto(" (:object x) ")"))
+(si::putprop 'tt3 t 'cmp-inline)
+(defun tt30 (x) (lit :boolean "!fto0(" (:object x) ")"))
+(si::putprop 'tt30 t 'cmp-inline)
+
+(defun fn-env (x) ;FIXME expose pointers above, rename function type to type-spec
+  (declare (optimize (safety 1)))
+  (typecase x
+   (compiled-function (c::function-env x 0))))
+
+(eval-when
+ (compile)
+ (defmacro baz (&aux res)
+   `(progn
+      ,@(mapcan (lambda (l &aux (s (intern (cadar l) 'c)) (w (cddr l)) (k1 (cadr l)) (k2 (car (last l))))
+		  `((defun ,s (,@(when w `(x)) z)
+		      (declare (optimize (safety 1)))
+		      ,@(when w `((check-type x ,(export-type (get k1 'lisp-type)))))
+		      (check-type z ,(export-type (get k2 'lisp-type)))
+		      (lit ,(caar l) ,@(when w `((,k1 x))) ,(cadar l) (,k2 z)))
+		    (export ',s :c)))
+		'(((:fixnum   "&")  :fixnum :fixnum)
+		  ((:fixnum  "\|")  :fixnum :fixnum)
+		  ((:fixnum   "^")  :fixnum :fixnum)
+		  ((:fixnum  "<<")  :fixnum :fixnum)
+		  ((:fixnum  ">>")  :fixnum :fixnum)
+		  ((:fixnum   "~")  :fixnum)
+		  ((:boolean "==")  :cnum :cnum)
+		  ((:boolean "!=")  :cnum :cnum)
+		  ((:boolean ">=")  :creal :creal);FIXME creal, immfix, obj
+		  ((:boolean "<=")  :creal :creal)
+		  ((:boolean  ">")  :creal :creal)
+		  ((:boolean  "<")  :creal :creal))))))
+
+(baz)
+
+(setf (symbol-function 'si::package-internal) (symbol-function 'c::package-internal)
+      (symbol-function 'si::package-internal_size) (symbol-function 'c::package-internal_size)
+      (symbol-function 'si::package-external) (symbol-function 'c::package-external)
+      (symbol-function 'si::package-external_size) (symbol-function 'c::package-external_size));FIXME
+
+(setf (symbol-function 'array-rank) (symbol-function 'c::array-rank)
+      (symbol-function 'array-total-size) (symbol-function 'c::array-dim)
+      (symbol-function 'si::array-hasfillp) (symbol-function 'c::array-hasfillp)
+      (symbol-function 'si::array-offset) (symbol-function 'c::array-offset)
+      (symbol-function 'si::array-dims) (symbol-function 'c::array-dims)
+      (symbol-function 'si::array-elttype) (symbol-function 'c::array-elttype)
+      (symbol-function 'si::array-eltsize) (symbol-function 'c::array-eltsize)
+      (symbol-function 'si::array-mode) (symbol-function 'c::array-mode)
+      (symbol-function 'si::vector-dim) (symbol-function 'c::vector-dim))
+
+(defun c::set-d-tt (i o);FIXME automate
+  (declare (optimize (safety 1)))
+  (check-type i (mod 16))
+  (side-effects)
+  (lit :fixnum (:object o) "->d.tt=" (:fixnum i)))
+
+(in-package :si)
+
+(eval-when 
+ (compile)
+
+ (defmacro make-ref (&optional r &aux (fn (if r `rref `ref)) (ik (if +sfix+ :fixnum :int))(dk (unless +sfix+ :fixnum)))
+   (labels ((l1 (s k u &optional v)
+		`(lit ,k ,(strcat "((u" (format nil "~s" (* 8 s)) "*)") 
+		      (,(if r :object :fixnum) a) ,(if r "->a.a_self" "") ")[" (:fixnum i) "]." 
+		      ,(ecase u (0 "i")((1 4) "u")(2 "f")(3 "c")(5 "o")) ,@(when v `("=" (,k v)))))
+	    (l2 (u s k) `(if vp ,(l1 s k u t) ,(l1 s k u)))
+	    (l3 (s k fk &optional tp)
+		`(ecase 
+		  u
+		  ,@(when k `((0 ,(l2 0 s k)) 
+			      ,@(unless (eq k :fixnum) `((1 (the ,tp ,(l2 1 s k)))))))
+		  ,@(when fk `((2 ,(l2 2 s fk))))
+		  ,@(when (eq k :char) `((4 (let ((v (if vp (char-code v) #\Space))) (code-char ,(l2 4 s k))))))
+		  ,@(when (eq k :fixnum) `((5 ,(l2 5 s :object)))))))
+	   `(progn
+	      (defun ,fn (a i s u &optional (v nil vp))
+		(declare (optimize (safety 1)))
+		(check-type a array)
+		(check-type i seqind)
+		(check-type s seqind)
+		(check-type u seqind)
+		(compiler::side-effects);FIXME
+		(ecase 
+		 s
+		 (1 ,(l3 1 :char  nil 'unsigned-char))
+		 (2 ,(l3 2 :short nil 'unsigned-short))
+		 (4 ,(l3 4 ik  :float))
+		 (8 ,(l3 8 dk :double))))
+	      (putprop ',fn t 'compiler::cmp-inline)))))
+
+(make-ref)
+(make-ref t)

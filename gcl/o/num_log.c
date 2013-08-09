@@ -24,6 +24,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	Logical operations on number
 */
 #define NEED_MP_H
+#define EXPORT_GMP
 #include <stdlib.h>
 #include "include.h"
 #include "num_include.h"
@@ -49,6 +50,118 @@ xor_op(int i, int j)
 {
 	return(i ^ j);
 }
+
+
+/* #define IF1(a_) BF(1,a_,f,b) */
+
+/* IF1(bitcount) */
+/* IF1(popcount) */
+/* IF1(bitlength) */
+/* BF(2,sizeinbase,f,b,f) */
+/* IF1(get_si) */
+/* IF1(get_ui) */
+/* IF1(sgn) */
+
+/* BF(1,fac_ui,b,f) */
+/* BF(1,fib_ui,b,f) */
+
+/* BF(3,powm,b,b,b,b) */
+/* BF(3,powm_ui,b,b,f,b) */
+/* BF(2,tdiv_qr,m,b,b) */
+
+/* #define BF1(a_) BF(1,a_,b,b) */
+
+/* BF1(com) */
+/* BF1(sqrt) */
+/* BF1(neg) */
+
+/* BF(2,cmp,f,b,b) */
+
+/* #define BF2(a_) BF(2,a_,b,b,b) */
+
+/* BF2(invert) */
+/* BF2(remove) */
+/* BF2(add) */
+/* BF2(mul) */
+/* BF2(sub) */
+/* BF2(and) */
+/* BF2(ior) */
+/* BF2(xor) */
+/* BF2(gcd) */
+/* BF2(lcm) */
+/* BF2(divexact) */
+
+/* BF(2,tstbit,f,b,f) */
+/* BF(2,jacobi,f,b,b) */
+
+/* #define BF2I(a_) BF(2,a_,b,b,f) */
+
+/* BF2I(root) */
+/* BF2I(divexact_ui) */
+/* BF2I(gcd_ui) */
+/* BF2I(bin_ui) */
+/* BF2I(lcm_ui) */
+/* BF2I(sub_ui) */
+/* BF2I(add_ui) */
+/* BF2I(mul_ui) */
+/* BF2I(mul_si) */
+/* BF2I(mul_2exp) */
+/* BF2I(fdiv_q_2exp) */
+
+
+#define BI(n_)\
+  DEFUN(#n_,fixnum,Join(fS,n_),SI,1,1,NONE,II,OO,OO,OO,(fixnum x),"") {\
+\
+  RETURN1(Join(__builtin_,n_)(x));\
+\
+}
+
+BI(clzl)
+BI(ctzl)
+BI(ffsl)
+BI(parityl)
+BI(popcountl)
+
+
+DEFUN("SHFT",object,fSshft,SI,2,2,NONE,OO,IO,OO,OO,(object x,fixnum y),"") {
+
+  object u=new_bignum();
+
+  ENSURE_MP(x,1);
+  shifti(MP(u),MP(x),y);
+  RETURN1(normalize_big(u));
+
+}
+
+
+DEFUN("LOGCB1",object,fSlogcb1,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+
+  object u=new_bignum();
+
+  ENSURE_MP(x,1);
+  mpz_com(MP(u),MP(x));
+  RETURN1(normalize_big(u));
+
+}
+
+#define B2OP(n_,b_)						\
+DEFUN(#n_ "B2",object,Join(Join(fSlog,n_),b2),SI,3,3,NONE,OO,OO,OO,OO,(object x,object y,object z),"") { \
+\
+  object u=new_bignum();\
+\
+  ENSURE_MP(x,1);\
+  ENSURE_MP(y,2);\
+  Join(mpz_,b_)(MP(u),MP(x),MP(y));\
+  if (z!=Cnil) mpz_com(MP(u),MP(u));\
+  RETURN1(normalize_big(u));\
+\
+}
+
+B2OP(AND,and)
+B2OP(IOR,ior)
+B2OP(XOR,xor)
+
+
 
 static int
 and_op(int i, int j)
@@ -403,7 +516,7 @@ LFD(Llogbitp)(void)
 		vs_push(Cnil);
 }
 
-DEFUN_NEW("ASH",object,fLash,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+DEFUN("ASH",object,fLash,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
 
   int w,sign_x;
   
@@ -505,23 +618,25 @@ LFD(Linteger_length)(void)
 /* } */
 
   
+DEFUN("BIT-ARRAY-OP",object,fSbit_array_op,SI,4,4,NONE,OO,OO,OO,OO,
+	  (object o,object x,object y,object r),"") {
 
-LFD(siLbit_array_op)(void)
-{
+/* LFD(siLbit_array_op)(void) */
+/* { */
 	int i, j, n, d;
-	object  o, x, y, r, r0=Cnil;
+	object  r0=Cnil;
 	int (*op)()=NULL;
 	bool replace = FALSE;
 	int xi, yi, ri;
 	char *xp, *yp, *rp;
 	int xo, yo, ro;
-	object *base = vs_base;
+/* 	object *base = vs_base; */
 
-	check_arg(4);
-	o = vs_base[0];
-	x = vs_base[1];
-	y = vs_base[2];
-	r = vs_base[3];
+/* 	check_arg(4); */
+/* 	o = vs_base[0]; */
+/* 	x = vs_base[1]; */
+/* 	y = vs_base[2]; */
+/* 	r = vs_base[3]; */
 	if (type_of(x) == t_bitvector) {
 		d = x->bv.bv_dim;
 		xp = x->bv.bv_self;
@@ -554,18 +669,8 @@ LFD(siLbit_array_op)(void)
 			}
 		}
 	L1:
-		if (r == Cnil) {
-			vs_base = vs_top;
-			vs_push(sLbit);
-			vs_push(make_fixnum(d));
-			vs_push(Cnil);
-			vs_push(Cnil);
-			vs_push(Cnil);
-			vs_push(Cnil);
-			vs_push(Cnil);
-			siLmake_vector();
-			r = vs_base[0];
-		}
+		if (r == Cnil)
+		  r=fSmake_vector(sLbit,d,Cnil,Cnil,Cnil,0,Cnil,Cnil);
 	} else {
 		if (type_of(x) != t_array)
 			goto ERROR;
@@ -628,7 +733,7 @@ LFD(siLbit_array_op)(void)
 		  } else
 		    b=Cnil;
 
-		  r = fSmake_array1(aet_bit,Cnil,small_fixnum(0),Cnil,0,b);
+		  r = fSmake_array1(sLbit,Cnil,small_fixnum(0),Cnil,0,b);
 
 		  /* 		  object b[F_ARG_LIMIT]; */
 		  /* 		  b[0]=Cnil; */
@@ -687,9 +792,10 @@ LFD(siLbit_array_op)(void)
 		if ((j = d%8) > 0)
 			set_high(rp[n], j, (*op)(xp[n], yp[n]));
 		if (!replace) {
-			vs_top = vs_base = base;
-			vs_push(r);
-			return;
+		  RETURN1(r);
+/* 			vs_top = vs_base = base; */
+/* 			vs_push(r); */
+/* 			return; */
 		}
 	} else {
 		for (n = d/8, i = 0;  i <= n;  i++) {
@@ -705,9 +811,10 @@ LFD(siLbit_array_op)(void)
 			store_byte(rp, i, ro, ri);
 		}
 		if (!replace) {
-			vs_top = vs_base = base;
-			vs_push(r);
-			return;
+		  RETURN1(r);
+/* 			vs_top = vs_base = base; */
+/* 			vs_push(r); */
+/* 			return; */
 		}
 	}
 	rp = r0->bv.bv_self;
@@ -722,12 +829,14 @@ LFD(siLbit_array_op)(void)
 			ri = r->bv.bv_self[i];
 		store_byte(rp, i, ro, ri);
 	}
-	vs_top = vs_base = base;
-	vs_push(r0);
-	return;
+	RETURN1(r0);
+/* 	vs_top = vs_base = base; */
+/* 	vs_push(r0); */
+/* 	return; */
 
 ERROR:
 	FEerror("Illegal arguments for bit-array operation.", 0);
+	RETURN1(Cnil);
 }
 
 void
@@ -763,6 +872,6 @@ gcl_init_num_log(void)
 	make_function("INTEGER-LENGTH", Linteger_length);
 
 	sLbit = make_ordinary("BIT");
-	make_si_function("BIT-ARRAY-OP", siLbit_array_op);
+/* 	make_si_function("BIT-ARRAY-OP", siLbit_array_op); */
 }
 

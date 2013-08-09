@@ -36,7 +36,7 @@ extern char *mach_brkpt;
 extern char *get_dbegin ();
 
 #undef SET_REAL_MAXPAGE
-#define SET_REAL_MAXPAGE { my_sbrk(0); real_maxpage = (int) mach_maplimit/PAGESIZE; }
+#define SET_REAL_MAXPAGE real_maxpage = MAXPAGE
 
 #include <unistd.h> /* to get sbrk defined */
 extern void *my_sbrk(int incr);
@@ -72,7 +72,7 @@ extern void *my_sbrk(int incr);
 #define SEPARATE_SFASL_FILE "sfaslbfd.c"
 #else
 #define SPECIAL_RSYM "rsym_macosx.c"
-#define SEPARATE_SFASL_FILE "sfaslmacosx.c"
+#define SEPARATE_SFASL_FILE "sfaslmacho.c"
 #endif
 
 /* The file has non Mach-O stuff appended.  We need to know where the Mach-O stuff ends.  */

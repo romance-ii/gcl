@@ -1,5 +1,5 @@
 ;; -*-Lisp-*-
-(in-package 'si)
+(in-package :si)
 ;;; Autoloaders.
 
 
@@ -20,7 +20,7 @@
 (autoload 'asin '|numlib|)
 (autoload 'asinh  '|numlib|)
 (autoload 'atanh '|numlib|)
-(autoload 'best-array-element-type '|arraylib|)
+;(autoload 'best-array-element-type '|arraylib|)
 (autoload 'bit '|arraylib|)
 (autoload 'bit-and '|arraylib|)
 (autoload 'bit-andc1 '|arraylib|)

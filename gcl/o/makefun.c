@@ -1,100 +1,146 @@
 #include "include.h"
 #include "funlink.h"
 
-#define PADDR(i) ((void *)(sSPinit->s.s_dbind->fixa.fixa_self[Mfix(i)]))
-/* eg:
-MakeAfun(addr,F_ARGD(min,max,flags,ARGTYPES(a,b,c,d)),0);
-MakeAfun(addr,F_ARGD(2,3,NONE,ARGTYPES(OO,OO,OO,OO)),0);
-*/
-object MakeAfun(object (*addr)(object,object), unsigned int argd, object data)
-{int type = (F_ARG_FLAGS_P(argd,F_requires_fun_passed) ? t_closure : t_afun);
-  object x = alloc_object(type);
-  x->sfn.sfn_name = Cnil;
-  x->sfn.sfn_self = addr;
-  x->sfn.sfn_argd = argd;
-  x->sfn.sfn_nval = 0;
-  if (type == t_closure)
-    { x->cl.cl_env = 0;
-      x->cl.cl_envdim=0;}
-  x->sfn.sfn_data = data;
+DEFUN("SET-FUNCTION-ENVIRONMENT",object,fSset_function_environment,SI,2,2,NONE,OO,OO,OO,OO, \
+	  (object f,object env),"") { 
+
+  ufixnum n;
+  object x,*p;
+
+  if (type_of(f)!=t_function)
+    TYPE_ERROR(f,sLcompiled_function);
+  
+  for (n=0,x=env;x!=Cnil;x=x->c.c_cdr,n++);
+
+  if (n++) {
+
+    {
+      BEGIN_NO_INTERRUPT; 
+      p=(object *)alloc_relblock(n*sizeof(object));
+      END_NO_INTERRUPT;
+    }
+
+    *p++=(object)n;
+    f->fun.fun_env=p;
+    
+    for (;env!=Cnil;env=env->c.c_cdr)
+      *p++=env;
+
+  }
+
+  RETURN1(f);
+
+}
+
+#define PADDR(i) ((void *)(((fixnum *)sSPinit->s.s_dbind->a.a_self)[Mfix(i)]))
+
+#define POP_BITS(x_,y_) ({ufixnum _t=x_&((1<<y_)-1);x_>>=y_;_t;})
+object
+make_fun(void *addr,object data,object call,object env,ufixnum argd,ufixnum sizes) {
+  
+  object x;
+  /* ufixnum n; */
+
+  /* for (n=0,x=env;x!=Cnil;x=x->c.c_cdr,n++); */
+
+  x=alloc_object(t_function);
+  x->fun.fun_self=addr;
+  x->fun.fun_data=data;
+  x->fun.fun_argd=argd;
+  x->fun.fun_plist=call;/*FIXME*/
+  x->fun.fun_minarg=POP_BITS(sizes,6);
+  x->fun.fun_maxarg=POP_BITS(sizes,6);
+  x->fun.fun_neval =POP_BITS(sizes,5);
+  x->fun.fun_vv    =POP_BITS(sizes,1);
+  x->fun.fun_env=def_env;
+
+  FFN(fSset_function_environment)(x,env);
+
+  /* if (n++) { */
+
+  /*   object *p; */
+
+  /*   { */
+  /*     BEGIN_NO_INTERRUPT;  */
+  /*     p=(object *)alloc_relblock(n*sizeof(object)); */
+  /*     END_NO_INTERRUPT; */
+  /*   } */
+
+  /*   *p++=(object)n; */
+  /*   x->fun.fun_env=p; */
+    
+  /*   for (;env!=Cnil;env=env->c.c_cdr) */
+  /*     *p++=env; */
+
+  /* } */
+
   return x;
-}
- 
 
-static object
-fSmakefun(object sym, object (*addr) (/* ??? */), unsigned int argd)
-{object ans = MakeAfun(addr,argd,
-		      (sSPmemory && sSPmemory->s.s_dbind &&
-		       type_of(sSPmemory->s.s_dbind)==t_cfdata) ?
-		      sSPmemory->s.s_dbind : 0);
- ans->sfn.sfn_name = sym;
- return ans;
 }
 
-/* static object */
-/* ImakeClosure(object (*addr)(),int argd,int n,...) */
-/* { object x = fSmakefun(Cnil,addr,argd); */
-/*   va_list ap; */
-/*   va_start(ap,n); */
-/*   IsetClosure(x,n,ap); */
-/*   va_end(ap); */
-/*   return x; */
-/* } */
+#define GET_DATA(d_,a_) ((d_)!=Cnil ? (d_) : ((a_) && (a_)->s.s_dbind!=OBJNULL && type_of((a_)->s.s_dbind)==t_cfdata ? (a_)->s.s_dbind : 0))
 
-static void     
-IsetClosure(object x, int n, va_list ap)
-{  /* this will change so that we can allocate 'hunks' which will be little
-   blocks the size of an array header say with only one header word.   This
-   will be more economical. Because of gc, we can't allocate relblock, it
-   might move while in the closure.  */
-  object *p;
-  if (type_of(x) != t_closure)
-    { FEerror("Not a closure",0);}
-  if (x->cl.cl_envdim < n)
-    {BEGIN_NO_INTERRUPT; x->cl.cl_env = (object *)alloc_contblock(n);
-     x->cl.cl_envdim = n;
-     END_NO_INTERRUPT;
-   }
-  p = x->cl.cl_env;
-  while (--n >= 0)
-    { *p++ = va_arg(ap,object);
-    }
+DEFUN("ANONYMOUS-CLOSURE",object,fSanonymous_closure,SI,0,0,NONE,OO,OO,OO,OO,(),"") {
+  object f=fcall.fun;
+  RETURN1(f->fun.fun_env[0]->c.c_car);
 }
 
-DEFUN_NEW("INITFUN",object,fSinitfun,SI,3,ARG_LIMIT,NONE,OO,OO,OO,OO,
-      (object sym,object addr_ind,object argd,...),
-      "Store a compiled function on SYMBOL whose body is in the VV array at \
-INDEX, and whose argd descriptor is ARGD.  If more arguments IND1, IND2,.. \
-are supplied these are indices in the VV array for the environment of this \
-closure.")
-{ int nargs = F_NARGS(VFUN_NARGS) -3;
-  va_list ap;
-  object fun = fSmakefun(IisSymbol(sym),PADDR(addr_ind),Mfix(argd));
-  if (nargs > 0)
-    { va_start(ap,argd);
-      IsetClosure(fun,nargs,ap);
-      while (--nargs >= 0)
-	/* the things put in by IsetClosure were only the indices
-	   of the closure variables not the actual variables */
-	{ fun->cl.cl_env[nargs]= (object) PADDR(fun->cl.cl_env[nargs]);}
-      va_end(ap);
-    }
-  fSfset(sym,fun);
-  return sym;
+DEFUN("MAKE-ANONYMOUS-CLOSURE",object,fSmake_anonymous_closure,SI,0,0,NONE,OO,OO,OO,OO,(),"") {
+  
+  RETURN1(FFN(fSinit_function)(list(5,Cnil,Cnil,Cnil,Cnil,Cnil),(void *)fSanonymous_closure,Cnil,MMcons(MMcons(Cnil,Cnil),Cnil),-1,0,0));
+
 }
 
-DEFUN_NEW("INITMACRO",object,fSinitmacro,SI,4,ARG_LIMIT,NONE,OO,OO,OO,OO,(object first,...),
-      "Like INITFUN, but makes then sets the 'macro' flag on this symbol")
-{va_list ap;
- object res;
- va_start(ap,first);
- res = Iapply_ap_new((object (*)())FFN(fSinitfun),first,ap);
- va_end(ap);
- res->s.s_mflag = 1;
- return res;
+DEFUN("FUNCTION-ENVIRONMENT",object,fSfunction_environment,SI,1,1,NONE,OO,OO,OO,OO,(object f),"") {
+
+  RETURN1(f->fun.fun_env[0]);
+
 }
 
-DEFUN_NEW("SET-KEY-STRUCT",object,fSset_key_struct,SI,1,1,NONE,OO,OO,OO,OO,(object key_struct_ind),
+DEFUN("INIT-FUNCTION",object,fSinit_function,SI,7,7,NONE,OO,OO,OI,II, \
+	  (object sc,object addr,object data,object env,\
+	   fixnum key,fixnum argd,fixnum sizes),\
+	  "Store a compiled function on SYMBOL whose body is in the VV array at \
+           INDEX, and whose argd descriptor is ARGD.  If more arguments IND1, IND2,.. \
+           are supplied these are indices in the VV array for the environment of this \
+           closure.") { 
+
+  object s,d,m,i,fun,c;
+  fixnum z;
+
+  m=sSPmemory;
+  m=m ? m->s.s_dbind : m;
+  m=m && m!=OBJNULL && type_of(m)==t_cfdata ? m : 0;
+  d=data!=Cnil ? data : m;
+  i=sSPinit;
+  i=i ? i->s.s_dbind : i;
+  s=i && i!=OBJNULL && type_of(addr)==t_fixnum ? i->v.v_self[fix(addr)] : addr;
+  z=type_of(sc)==t_cons && sc->c.c_car==sLmacro; /*FIXME limited no. of args.*/
+  sc=z ? sc->c.c_cdr : sc;
+  sc=type_of(sc)==t_function ? sc->fun.fun_plist : sc;
+  c=type_of(sc)==t_symbol ? Cnil : sc;
+
+  fun=make_fun(s,d,c,env,argd,sizes);
+
+  if (i && key>=0 && d)
+    set_key_struct((void *)i->v.v_self[key],d);
+
+  if (sc!=c) {
+    fSfset(sc,fun);
+    if (z) sc->s.s_mflag=TRUE;
+  }
+  
+  return fun;
+
+}
+#ifdef STATIC_FUNCTION_POINTERS
+object
+fSinit_function(object x,object y,object z,object w,fixnum a,fixnum b,fixnum c) {
+  return FFN(fSinit_function)(x,y,z,w,a,b,c);
+}
+#endif
+
+DEFUN("SET-KEY-STRUCT",object,fSset_key_struct,SI,1,1,NONE,OO,OO,OO,OO,(object key_struct_ind),
       "Called inside the loader.  The keystruct is set up in the file with \
    indexes rather than the actual entries.  We change these indices to \
    the objects")
@@ -108,7 +154,7 @@ DEFUN_NEW("SET-KEY-STRUCT",object,fSset_key_struct,SI,1,1,NONE,OO,OO,OO,OO,(obje
 
 
 static void
-put_fn_procls(object sym,int argd,int oneval) {
+put_fn_procls(object sym,fixnum argd,fixnum oneval,object def,object rdef) {
 
   unsigned int atypes=F_TYPES(argd) >> F_TYPE_WIDTH;
   unsigned int minargs=F_MIN_ARGS(argd);
@@ -120,7 +166,7 @@ put_fn_procls(object sym,int argd,int oneval) {
   for (i=0;i<minargs;i++,atypes >>=F_TYPE_WIDTH) 
     switch(maxargs!=minargs ? F_object : atypes & MASK_RANGE(0,F_TYPE_WIDTH)) {
     case F_object:
-      collect(ta,na,Ct);
+      collect(ta,na,def);
       break;
     case F_int:
       collect(ta,na,sLfixnum);
@@ -142,7 +188,7 @@ put_fn_procls(object sym,int argd,int oneval) {
   if (oneval) 
     switch(rettype) {
     case F_object:
-      ta=Ct;
+      ta=rdef;
       break;
     case F_int:
       ta=sLfixnum;
@@ -168,56 +214,87 @@ put_fn_procls(object sym,int argd,int oneval) {
 
 
 void
-SI_makefun(char *strg, object (*fn) (/* ??? */), unsigned int argd)
-{ object sym = make_si_ordinary(strg);
- fSfset(sym, fSmakefun(sym,fn,argd));
- put_fn_procls(sym,argd,1);
+SI_makefun(char *strg, object (*fn) (/* ??? */), unsigned int argd) { 
+
+  object sym = make_si_ordinary(strg);
+  ufixnum at=F_TYPES(argd)>>F_TYPE_WIDTH;
+  ufixnum ma=F_MIN_ARGS(argd);
+  ufixnum xa=F_MAX_ARGS(argd);
+  ufixnum rt=F_RESULT_TYPE(argd);
+
+  fSinit_function(sym,(void *)fn,Cnil,Cnil,-1,
+		  rt | (at<<F_TYPE_WIDTH),ma|(xa<<6)|(0<<12)|(0<<17)|((xa>ma? 1 : 0)<<18));
+/*   fSfset(sym, fSmakefun(sym,fn,argd)); */
+  put_fn_procls(sym,argd,1,Ct,Ct);
+
 }
 
 void
-LISP_makefun(char *strg, object (*fn) (/* ??? */), unsigned int argd)
-{ object sym = make_ordinary(strg);
- fSfset(sym, fSmakefun(sym,fn,argd));
- put_fn_procls(sym,argd,1);
+LISP_makefun(char *strg, object (*fn) (/* ??? */), unsigned int argd) { 
+
+  object  sym = make_ordinary(strg);
+  ufixnum at=F_TYPES(argd)>>F_TYPE_WIDTH;
+  ufixnum ma=F_MIN_ARGS(argd);
+  ufixnum xa=F_MAX_ARGS(argd);
+  ufixnum rt=F_RESULT_TYPE(argd);
+  
+  fSinit_function(sym,(void *)fn,Cnil,Cnil,-1,
+		  rt | (at<<F_TYPE_WIDTH),ma|(xa<<6)|(0<<12)|(0<<17)|((xa>ma? 1 : 0)<<18));
+  put_fn_procls(sym,argd,1,Ct,Ct);
+
 }
 
 void
-SI_makefunm(char *strg, object (*fn) (/* ??? */), unsigned int argd)
-{ object sym = make_si_ordinary(strg);
- fSfset(sym, fSmakefun(sym,fn,argd));
- put_fn_procls(sym,argd,0);
+GMP_makefunb(char *strg, object (*fn)(),unsigned int argd,object p) { 
+
+  object sym = make_gmp_ordinary(strg);
+  ufixnum at=F_TYPES(argd)>>F_TYPE_WIDTH;
+  ufixnum ma=F_MIN_ARGS(argd);
+  ufixnum xa=F_MAX_ARGS(argd);
+  ufixnum rt=F_RESULT_TYPE(argd);
+
+  fSinit_function(sym,(void *)fn,Cnil,Cnil,-1,
+		  rt | (at<<F_TYPE_WIDTH),ma|(xa<<6)|((type_of(p)==t_symbol ? 0 : 1)<<12)|
+		  (0<<17)|((xa>ma? 1 : 0)<<18));
+  put_fn_procls(sym,argd,1,sLinteger,p);
+
 }
 
 void
-LISP_makefunm(char *strg, object (*fn) (/* ??? */), unsigned int argd)
-{ object sym = make_ordinary(strg);
- fSfset(sym, fSmakefun(sym,fn,argd));
- put_fn_procls(sym,argd,0);
+SI_makefunm(char *strg, object (*fn) (/* ??? */), unsigned int argd) { 
+
+  object sym = make_si_ordinary(strg);
+  ufixnum at=F_TYPES(argd)>>F_TYPE_WIDTH;
+  ufixnum ma=F_MIN_ARGS(argd);
+  ufixnum xa=F_MAX_ARGS(argd);
+  ufixnum rt=F_RESULT_TYPE(argd);
+  
+  fSinit_function(sym,(void *)fn,Cnil,Cnil,-1,
+		  rt | (at<<F_TYPE_WIDTH),ma|(xa<<6)|(31<<12)|(1<<17)|((xa>ma? 1 : 0)<<18));
+  
+  /*  fSfset(sym, fSmakefun(sym,fn,argd)); */
+  put_fn_procls(sym,argd,0,Ct,Ct);
+  
 }
 
+void
+LISP_makefunm(char *strg, object (*fn) (/* ??? */), unsigned int argd) { 
 
-/* static object  */
-/* MakeClosure(int n,int argd,object data,object (*fn)(),...) */
-/* { object x; */
-/*   va_list ap; */
-/*   x = alloc_object(t_closure); */
-/*   x->cl.cl_name = Cnil; */
-/*   x->cl.cl_self = fn; */
-/*   x->cl.cl_data = data; */
-/*   x->cl.cl_argd = argd; */
-/*   x->cl.cl_env = 0; */
-/*   x->cl.cl_env = (object *)alloc_contblock(n*sizeof(object)); */
-/*   x->cl.cl_envdim=n; */
-/*   va_start(ap,fn); */
-/*   { object *p = x->cl.cl_env; */
-/*   while (--n>= 0) */
-/*     { *p++ = va_arg(ap,object);} */
-/*   va_end(ap); */
-/*   } */
-/*   return x; */
-/* } */
+  object sym = make_ordinary(strg);
+  ufixnum at=F_TYPES(argd)>>F_TYPE_WIDTH;
+  ufixnum ma=F_MIN_ARGS(argd);
+  ufixnum xa=F_MAX_ARGS(argd);
+  ufixnum rt=F_RESULT_TYPE(argd);
+  
+  fSinit_function(sym,(void *)fn,Cnil,Cnil,-1,
+		  rt | (at<<F_TYPE_WIDTH),ma|(xa<<6)|(31<<12)|(1<<17)|((xa>ma? 1 : 0)<<18));
+  
+  /*  fSfset(sym, fSmakefun(sym,fn,argd)); */
+  put_fn_procls(sym,argd,0,Ct,Ct);
+  
+}
       
-DEFUN_NEW("INVOKE",object,fSinvoke,SI,1,ARG_LIMIT,NONE,OO,OO,OO,OO,(object x),
+DEFUN("INVOKE",object,fSinvoke,SI,1,ARG_LIMIT,NONE,OO,OO,OO,OO,(object x),
       "Invoke a C function whose body is at INDEX in the VV array")
 { int (*fn)();
   fn = (void *) PADDR(x);

@@ -1,9 +1,5 @@
 ;; -*-Lisp-*-
-(in-package 'lisp)
-(export
- '(float realpart imagpart numerator denominator))
-
-(in-package 'si)
+(in-package :si)
 
 (defun cnum-type (x)
   (let ((y (c-type x)))
@@ -22,15 +18,18 @@
 
 (defun ratio-to-double (x &aux nx ny)
   (declare (inline isnormal))
-  (let ((y (denominator x))
-	(x (numerator x)))
-    (do ((dx (float x)) (dy (float y)))
-	((or (zerop dx) (zerop dy)
-	     (progn (setq nx (isnormal dx) ny (isnormal dy))
-		    (and nx ny)))
-	 (/ dx dy))
-	(if nx (setq dx (* 0.5 dx)) (setq x (ash x -1) dx (float x)))
-	(if ny (setq dy (* 0.5 dy)) (setq y (ash y -1) dy (float y))))))
+  (multiple-value-bind 
+   (r x) (round x)
+   (+ (float r)
+      (let ((y (denominator x))
+	    (x (numerator x)))
+	(do ((dx (float x)) (dy (float y)))
+	    ((or (zerop dx) (zerop dy)
+		 (progn (setq nx (isnormal dx) ny (isnormal dy))
+			(and nx ny)))
+	     (/ dx dy))
+	    (if nx (setq dx (* 0.5 dx)) (setq x (ash x -1) dx (float x)))
+	    (if ny (setq dy (* 0.5 dy)) (setq y (ash y -1) dy (float y))))))))
 
 (defun float (x &optional z)
   (declare (optimize (safety 2)))
@@ -51,7 +50,7 @@
   (typecase
    x
    (real x)
-   (otherwise (complex-real x))))
+   (otherwise (c-ocomplex-real x))))
 
 (defun imagpart (x)
   (declare (optimize (safety 2)))
@@ -59,7 +58,7 @@
   (typecase
    x
    (real (if (floatp x) (float 0 x) 0))
-   (otherwise (complex-imag x))))
+   (otherwise (c-ocomplex-imag x))))
 
 (defun numerator (x)
   (declare (optimize (safety 2)))
@@ -67,7 +66,7 @@
   (typecase
    x
    (integer x)
-   (otherwise (ratio-numerator x))))
+   (otherwise (c-ratio-num x))))
 
 (defun denominator (x)
   (declare (optimize (safety 2)))
@@ -75,4 +74,4 @@
   (typecase
    x
    (integer 1)
-   (otherwise (ratio-denominator x))))
+   (otherwise (c-ratio-den x))))

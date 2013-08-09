@@ -1187,28 +1187,23 @@
 
 #+lcl3.0 (dont-use-production-compiler)
 
-(defun generate-discrimination-net-internal 
-    (gf methods types methods-function test-function type-function)
-  #+cmu
-  (declare (type function methods-function test-function type-function))
+(defun generate-discrimination-net-internal (gf methods types methods-function test-function type-function)
+  (declare (function methods-function test-function type-function))
   (let* ((arg-info (gf-arg-info gf))
 	 (precedence (arg-info-precedence arg-info))
 	 (nreq (arg-info-number-required arg-info))
 	 (metatypes (arg-info-metatypes arg-info)))
     (labels ((do-column (p-tail contenders known-types)
-	       (if p-tail
-		   (let* ((position (car p-tail))
-			  (known-type (or (nth position types) t)))
-		     (if (eq (nth position metatypes) 't)
-			 (do-column (cdr p-tail) contenders
-				    (cons (cons position known-type) known-types))
-			 (do-methods p-tail contenders 
-				     known-type () known-types)))
-		   (funcall methods-function contenders 
-			    (let ((k-t (make-list nreq)))
-			      (dolist (index+type known-types)
-				(setf (nth (car index+type) k-t) (cdr index+type)))
-			      k-t))))
+			(if p-tail
+			    (let* ((position (car p-tail))
+				   (known-type (or (nth position types) t)))
+			      (if (eq (nth position metatypes) t)
+				  (do-column (cdr p-tail) contenders (cons (cons position known-type) known-types))
+				(do-methods p-tail contenders known-type nil known-types)))
+			  (funcall methods-function contenders 
+				   (let ((k-t (make-list nreq)))
+				     (dolist (index+type known-types k-t)
+				       (setf (nth (car index+type) k-t) (cdr index+type)))))))
 	     (do-methods (p-tail contenders known-type winners known-types)
 	       ;;
                ;; <contenders>
@@ -1220,32 +1215,27 @@
 	       ;;   after the discrimination has been made.
 	       ;;   
                (if (null contenders)
-		   (do-column (cdr p-tail) winners
-			      (cons (cons (car p-tail) known-type) known-types))
-                   (let* ((position (car p-tail))
-			  (method (car contenders))
-			  (specl (nth position (method-specializers method)))
-                          (type (funcall type-function (type-from-specializer specl))))
-		     (multiple-value-bind (app-p maybe-app-p)
-			 (specializer-applicable-using-type-p type known-type)
-		       (flet ((determined-to-be (truth-value)
-				(if truth-value app-p (not maybe-app-p)))
-			      (do-if (truth &optional implied)
-				(let ((ntype (if truth type `(not ,type))))
-				  (do-methods p-tail
-				    (cdr contenders)
-				    (if implied
-					known-type
-					(augment-type ntype known-type))
-				    (if truth
-					(append winners `(,method))
-					winners)
-				    known-types))))
-			 (cond ((determined-to-be nil) (do-if nil t))
-			       ((determined-to-be t)   (do-if t   t))
-			       (t (funcall test-function position type 
-					   (do-if t) (do-if nil))))))))))
-      (do-column precedence methods ()))))
+		   (do-column (cdr p-tail) winners (cons (cons (car p-tail) known-type) known-types))
+		 (let* ((position (car p-tail))
+			(method (car contenders))
+			(specl (nth position (method-specializers method)))
+			(type (funcall type-function (type-from-specializer specl))))
+		   (multiple-value-bind
+		    (app-p maybe-app-p)
+		    (specializer-applicable-using-type-p type known-type)
+		    (flet ((determined-to-be (truth-value) (if truth-value app-p (not maybe-app-p)))
+			   (do-if (truth &optional implied)
+				  (let ((ntype (if truth type `(not ,type))))
+				    (do-methods p-tail
+						(cdr contenders)
+						(if implied known-type (augment-type ntype known-type))
+						(if truth (append winners `(,method)) winners)
+						known-types))))
+			  (cond ((determined-to-be nil) (do-if nil t))
+				((determined-to-be t)   (do-if t   t))
+				(t (funcall test-function position type (do-if t) (do-if nil))))))))))
+	    (do-column precedence methods nil))))
+      
 
 #+lcl3.0 (use-previous-compiler)
 

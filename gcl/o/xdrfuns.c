@@ -23,12 +23,12 @@ License for more details.
 #include <rpc/rpc.h>
 
 extern aet_type_struct aet_types[];
-static object
-FFN(siGxdr_open)(f)
-     object f;
-{ XDR *xdrs;
+
+DEFUN("XDR-OPEN",object,fSxdr_open,SI,1,1,NONE,OO,OO,OO,OO,(object f),"") {
+
+  XDR *xdrs;
   object ar= alloc_simple_string(sizeof(XDR));
-  array_allocself(ar,1,0);
+  array_allocself(ar,1,OBJNULL);
   xdrs= (XDR *) ar->a.a_self;
   if (f->sm.sm_fp == 0) FEerror("stream not ok for xdr io",0);
   xdrstdio_create(xdrs, f->sm.sm_fp,
@@ -39,8 +39,7 @@ FFN(siGxdr_open)(f)
   return ar;
 }
 
-static object
-FFN(siGxdr_write)(object str,object elt) {
+DEFUN("XDR-WRITE",object,fSxdr_write,SI,2,2,NONE,OO,OO,OO,OO,(object str,object elt),"") {
 
   XDR *xdrp= (XDR *) str->ust.ust_self;
   xdrproc_t e;
@@ -98,8 +97,7 @@ FFN(siGxdr_write)(object str,object elt) {
   return elt;
 }
 
-static object
-FFN(siGxdr_read)(object str,object elt) {
+DEFUN("XDR-READ",object,fSxdr_read,SI,2,2,NONE,OO,OO,OO,OO,(object str,object elt),"") {
 
   XDR *xdrp= (XDR *) str->ust.ust_self;
   xdrproc_t e;
@@ -162,13 +160,13 @@ FFN(siGxdr_read)(object str,object elt) {
 }
 static void
 gcl_init_xdrfuns()
-{ make_si_sfun("XDR-WRITE",siGxdr_write,
-	       ARGTYPE2(f_object,f_object)|RESTYPE(f_object));
+{/*  make_si_sfun("XDR-WRITE",siGxdr_write, */
+/* 	       ARGTYPE2(f_object,f_object)|RESTYPE(f_object)); */
 
-  make_si_sfun("XDR-READ",siGxdr_read,
-	       ARGTYPE2(f_object,f_object)|RESTYPE(f_object));
-  make_si_sfun("XDR-OPEN",siGxdr_open,
-	       ARGTYPE1(f_object)|RESTYPE(f_object));
+/*   make_si_sfun("XDR-READ",siGxdr_read, */
+/* 	       ARGTYPE2(f_object,f_object)|RESTYPE(f_object)); */
+/*   make_si_sfun("XDR-OPEN",siGxdr_open, */
+/* 	       ARGTYPE1(f_object)|RESTYPE(f_object)); */
   
 }
 #else

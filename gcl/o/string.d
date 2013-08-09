@@ -43,7 +43,8 @@ int l;
 	x = alloc_object(t_string);
 	x->st.st_hasfillp = FALSE;
 	x->st.st_adjustable = FALSE;
-	x->st.st_elttype = aet_ch;
+	x->st.tt=x->st.st_elttype = aet_ch;
+	x->st.st_eltsize = elt_size(aet_ch);
 	x->st.st_defrank = 1;
 	x->st.st_displaced = Cnil;
 	x->st.st_dim = x->st.st_fillp = l;
@@ -148,7 +149,8 @@ object x;
 	y->st.st_dim = y->st.st_fillp = x->st.st_fillp;
 	y->st.st_hasfillp = FALSE;
 	y->st.st_adjustable = FALSE;
-	y->st.st_elttype = aet_ch;
+	y->st.tt=y->st.st_elttype = aet_ch;
+	y->st.st_eltsize = elt_size(aet_ch);
 	y->st.st_defrank = 1;
 	y->st.st_displaced = Cnil;
 	y->st.st_self = NULL;
@@ -569,29 +571,30 @@ LFD(Lnstring_capitalize)() { casefun = char_capitalize;  FFN(Lnstring_case)(); }
 	@(return `coerce_to_string(x)`)
 @)
 
-DEFUNO_NEW("STRING-CONCATENATE",object,fLstring_concatenate,SI,
-	   0,63,NONE,OO,OO,OO,OO,void,siLstring_concatenate,(object first,...),"") {
+DEFUN("STRING-CONCATENATE",object,fLstring_concatenate,SI,0,63,NONE,OO,OO,OO,OO,(object first,...),"") {
 
-  int narg, i, l, m;
-  object x;
+  fixnum i,l,m,narg=INIT_NARGS(0);
+  object x,ll=Cnil,z;
   va_list ap;
-  
-  narg = VFUN_NARGS;
+
   va_start(ap,first);
   vs_base=vs_top;
-  for (i = 0, l = 0;  i < narg;  i++) {
-    vs_push(coerce_to_string(i ? va_arg(ap,object) : first));
-    l += vs_base[i]->st.st_fillp;
+  for (l=i=0;(z=NEXT_ARG(narg,ap,ll,first,OBJNULL))!=OBJNULL;i++) {
+    vs_push(coerce_to_string(z));
+    l += vs_head->st.st_fillp;
   }
-  {BEGIN_NO_INTERRUPT;	
-  x=alloc_simple_string(l);
-  (x)->st.st_self = alloc_relblock(l);
-  for (i = 0, l = 0;  i < narg;  i++)
-    for (m = 0;  m < vs_base[i]->st.st_fillp;  m++)
-      (x)->st.st_self[l++]=vs_base[i]->st.st_self[m];
-  END_NO_INTERRUPT;}	
-
   va_end(ap);
+
+  {
+    object *p;
+    BEGIN_NO_INTERRUPT;	
+    x=alloc_simple_string(l);
+    (x)->st.st_self = alloc_relblock(l);
+    for (l=0,p=vs_base;p<vs_top && (m=(*p)->st.st_fillp)>=0;p++,l+=m)
+      memcpy(x->st.st_self+l,(*p)->st.st_self,m);
+    END_NO_INTERRUPT;
+
+  }	
 
   RETURN1(x);
 

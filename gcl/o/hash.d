@@ -70,39 +70,59 @@ typedef union {
 } D2ul;
 
 
-static unsigned long
+static ufixnum rtb[256];
+
+#define MASK(n) (~(~0L << (n)))
+
+static ufixnum
+ufixhash(ufixnum g) {
+  ufixnum i,h;
+  for (h=i=0;i<sizeof(g);g>>=CHAR_SIZE,i++)
+    h^=rtb[g&MASK(CHAR_SIZE)];
+  return h;
+}
+
+static ufixnum
+uarrhash(void *v,void *ve,uchar off,uchar bits) {
+
+  uchar *c=v,*ce=ve-(bits+(off ? off : CHAR_SIZE)>CHAR_SIZE ? 1 : 0),i;
+  ufixnum h=0,*u=v,*ue=u+(ce-c)/sizeof(*u);
+  
+  if (!off)
+    for (;u<ue;) h^=ufixhash(*u++);
+
+  for (c=(void *)u;c+(off ? 1 : 0)<ce;c++)
+    h^=rtb[(uchar)(((*c)<<off)|(off ? c[1]>>(CHAR_SIZE*sizeof(*c)-off) : 0))];
+
+  for (i=off;bits--;i=(i+1)%CHAR_SIZE,c=i ? c : c+1)
+    h^=rtb[((*c)>>(CHAR_SIZE-1-i))&0x1];
+
+  return h;
+
+}
+
+
+static ufixnum
 hash_eql(object x) {
 
-  unsigned long h = 0;
+  ufixnum h;
 
   switch (type_of(x)) {
 
-  case t_cons:
-  case t_symbol:
-    h = (unsigned long) x;
-    break;
-
   case t_fixnum:
-/*     h=fix(x); */
-/*     h ^= (h >> 11); */
-/*     h ^= (h <<  7) & 0x9D2C5680U; */
-/*     h ^= (h << 15) & 0xEFC60000U; */
-/*     h ^= (h >> 18); */
-    h=fix(x)<<3;
+    h=ufixhash(fix(x));
     break;
 
   case t_character:
-    h = char_code(x);
+    h = rtb[char_code(x)];
     break;
     
   case t_bignum:
     { 
       MP_INT *mp = MP(x);
-      int l = mpz_size (mp);
-      mp_limb_t *u = mp->_mp_d;
-      if (l > 5) l = 5;
-      while (-- l >= 0) 
-	h += *u++;
+      void *v1=mp->_mp_d,*ve=v1+mpz_size(mp);
+
+      h=uarrhash(v1,ve,0,0);
     }
     break;
 
@@ -114,7 +134,7 @@ hash_eql(object x) {
     { 
       F2ul u;
       u.f=sf(x);
-      return(u.ul);
+      h=ufixhash(u.ul);
     }
     break;
     
@@ -122,7 +142,7 @@ hash_eql(object x) {
     { 
       D2ul u;
       u.d=lf(x);
-      return(u.ul[0]+u.ul[1]);
+      h=ufixhash(u.ul[0])^ufixhash(u.ul[1]);
     }
     break;
 
@@ -136,99 +156,55 @@ hash_eql(object x) {
 
   }
 
-  /* Randomization Code */
-  /*  h ^= (h >> 11);*/
-  /*  h ^= (h <<  7) & 0x9D2C5680U;*/
-  /*  h ^= (h << 15) & 0xEFC60000U;*/
-  /*  h ^= (h >> 18);*/
   return MHSH(h);
 
 }
 
+
 #define ihash_equal(a_,b_) ((type_of(a_)==t_symbol && (a_)->s.s_hash) ? (a_)->s.s_hash : ihash_equal1(a_,b_))
-unsigned long
+ufixnum
 ihash_equal1(object x,int depth) {
 
   enum type tx;
-  unsigned long h = 0;
-  long i;
-  char *s;
+  ufixnum h=0;
   
   cs_check(x);
 
 BEGIN:
-  if (depth++ <=3)
+  if (depth++<=3)
     switch ((tx=type_of(x))) {
     case t_cons:
-      h += ihash_equal(x->c.c_car,depth);
+      h^=ihash_equal(x->c.c_car,depth)^rtb[abs(depth%(sizeof(rtb)/sizeof(*rtb)))];
       x = x->c.c_cdr;
       goto BEGIN;
       break;
     case t_symbol:
     case t_string:
-      {
-	long len=x->st.st_fillp;
-	s=x->st.st_self;
-	len=len>sizeof(len) ? sizeof(len) : len;
-	for (s+=len-1;len--;s--)
-	  h+= *s << CHAR_SIZE*len;
-      }
+      h^=uarrhash(x->st.st_self,x->st.st_self+x->st.st_fillp,0,0);
       break;
-
     case t_package: 
       break;
     case t_bitvector:
       {
-	static char ar[10];
-	i = x->bv.bv_fillp;
-	h += i;
-	i = i/8;
-	if (i > 10) i= 10;
-	s = x->bv.bv_self;
-	if (x->bv.bv_offset) {
-	  long k,j,e=i;
-	  s = ar;
-	  /* 8 should be CHAR_SIZE but this needs to be changed
-	     everywhere .. */
-	  e = e * 8;
-	  bzero(ar,sizeof(ar));
-	  for (k = x->bv.bv_offset, j = 0;  k < e;  k++, j++)
-	    if (x->bv.bv_self[k/8]&(0200>>k%8))
-	      ar[j/8]  |= 0200>>j%8;
-	}
-	for (;  i > 0;  --i, s++)
-	  h += (*s & 0377)*12345 + 1;
+	ufixnum l=x->bv.bv_offset+x->bv.bv_fillp;
+	void *v1=x->bv.bv_self+x->bv.bv_offset/CHAR_SIZE,*ve=v1+l/CHAR_SIZE+(x->bv.bv_fillp && l%CHAR_SIZE ? 1 : 0);
+	h^=uarrhash(v1,ve,x->bv.bv_offset%CHAR_SIZE,x->bv.bv_fillp%CHAR_SIZE);
       }
       break;
     case t_pathname:
-      h += ihash_equal(x->pn.pn_host,depth);
-      h += ihash_equal(x->pn.pn_device,depth);
-      h += ihash_equal(x->pn.pn_directory,depth);
-      h += ihash_equal(x->pn.pn_name,depth);
-      h += ihash_equal(x->pn.pn_type,depth);
+      h^=ihash_equal(x->pn.pn_host,depth);
+      h^=ihash_equal(x->pn.pn_device,depth);
+      h^=ihash_equal(x->pn.pn_directory,depth);
+      h^=ihash_equal(x->pn.pn_name,depth);
+      h^=ihash_equal(x->pn.pn_type,depth);
       /* version is ignored unless logical host */
       if ((type_of(x->pn.pn_host) == t_string) &&
 	  (pathname_lookup(x->pn.pn_host,sSApathname_logicalA) != Cnil))
-	h += ihash_equal(x->pn.pn_version,depth);
-      h += ihash_equal(x->pn.pn_version,depth);
+	h^=ihash_equal(x->pn.pn_version,depth);
+      h^=ihash_equal(x->pn.pn_version,depth);
       break;
-/*  CLTLII says don't descend into structures
-	case t_structure:
-		{unsigned char *s_type;
-		 struct s_data *def;
-		 def=S_DATA(x->str.str_def);
-		 s_type= & SLOT_TYPE(x->str.str_def,0);
-		 h += ihash_equal(def->name,depth);
-		 for (i = 0;  i < def->length;  i++)
-		   if (s_type[i]==0)
-		     h += ihash_equal(x->str.str_self[i],depth);
-		   else
-		     h += ((int)x->str.str_self[i]) + depth++;
-		 return(h);}
-*/
-
     default:
-      h +=  hash_eql(x);
+      h^=hash_eql(x);
       break;
     }
   
@@ -237,11 +213,8 @@ BEGIN:
 }
 
 	
-DEFUN_NEW("HASH-EQUAL",object,fShash_equal,SI
-	  ,2,2,NONE,OO,IO,OO,OO,(object x,fixnum depth),"") {
-/* static object */
-/* FFN(hash_equal)(object x,int depth) { */
-  RETURN1(make_fixnum(ihash_equal(x,depth)));
+DEFUN("HASH-EQUAL",fixnum,fShash_equal,SI,2,2,NONE,IO,IO,OO,OO,(object x,fixnum depth),"") {
+  return ihash_equal(x,depth);
 }
 
 #define ihash_equalp(a_,b_) ((type_of(a_)==t_symbol && (a_)->s.s_hash) ? (a_)->s.s_hash : ihash_equalp1(a_,b_))
@@ -251,7 +224,6 @@ ihash_equalp1(object x,int depth) {
   enum type tx;
   unsigned long h = 0,j;
   long i;
-  char *s;
   
   cs_check(x);
 
@@ -265,98 +237,72 @@ BEGIN:
       break;
     case t_symbol:
       {
-	long len=x->st.st_fillp;
-	s=x->st.st_self;
-	len=len>sizeof(len) ? sizeof(len) : len;
-	for (s+=len-1;len--;s--)
-	  h+= toupper(*s) << CHAR_SIZE*len;
+	ufixnum len=x->st.st_fillp;
+	uchar *s=(void *)x->st.st_self;
+	for (;len--;)
+	  h^=rtb[toupper(*s++)];
       }
       break;
 
     case t_package: 
       break;
-/*     case t_bitvector: */
-/*       { */
-/* 	static char ar[10]; */
-/* 	i = x->bv.bv_fillp; */
-/* 	h += i; */
-/* 	i = i/8; */
-/* 	if (i > 10) i= 10; */
-/* 	s = x->bv.bv_self; */
-/* 	if (x->bv.bv_offset) { */
-/* 	  long k,j,e=i; */
-/* 	  s = ar; */
-	  /* 8 should be CHAR_SIZE but this needs to be changed
-	     everywhere .. */
-/* 	  e = e * 8; */
-/* 	  bzero(ar,sizeof(ar)); /\*FIXME is this not a generic copy? *\/ */
-/* 	  for (k = x->bv.bv_offset, j = 0;  k < e;  k++, j++) */
-/* 	    if (x->bv.bv_self[k/8]&(0200>>k%8)) */
-/* 	      ar[j/8]  |= 0200>>j%8; */
-/* 	} */
-/* 	for (;  i > 0;  --i, s++) */
-/* 	  h += (*s & 0377)*12345 + 1; */
-/*       } */
-/*       break; */
 
     case t_string:
     case t_bitvector:
     case t_vector:
-      j=x->v.v_fillp;
-      h+=j*12345;
+      h^=ufixhash(j=x->v.v_fillp);
       j=j>10 ? 10 : j;
       for (i=0;i<j;i++)
-	h+=ihash_equalp(aref(x,i),depth);
+	h^=ihash_equalp(aref(x,i),depth);
       break;
 			
     case t_array:
-      j=x->a.a_rank;
-      h+=j*12345;
+      h^=ufixhash(j=x->a.a_rank);
       for (i=0;i<j-1;i++)
-	h+=x->a.a_dims[i]*54321;
+	h^=ufixhash(x->a.a_dims[i]);
       j=x->a.a_dim;
       j=j>10 ? 10 : j;
       for (i=0;i<j;i++)
-	h+=ihash_equalp(aref(x,i),depth);
+	h^=ihash_equalp(aref(x,i),depth);
       break;
 			
     case t_hashtable:
-      j=x->ht.ht_nent;
-      h+=j*12345+x->ht.ht_test*54321;
+      h^=ufixhash(j=x->ht.ht_nent);
+      h^=ufixhash(x->ht.ht_test);
       j=j>10 ? 10 : j;
       for (i=0;i<j;i++)
-	if (x->ht.ht_self[i].hte_key!=OBJNULL)
+	if (x->ht.ht_self[i].c_cdr!=OBJNULL)
 	  switch (x->ht.ht_test) {
 	  case htt_eq:
-	    h+=(((unsigned long)x->ht.ht_self[i].hte_key)>>3) +
-	      ihash_equalp(x->ht.ht_self[i].hte_value,depth);
+	    h^=(((unsigned long)x->ht.ht_self[i].c_cdr)>>3) ^
+	      ihash_equalp(x->ht.ht_self[i].c_car,depth);
 	    break;
 	  case htt_eql:
-	    h+=hash_eql(x->ht.ht_self[i].hte_key) +
-	      ihash_equalp(x->ht.ht_self[i].hte_value,depth);
+	    h^=hash_eql(x->ht.ht_self[i].c_cdr) ^
+	      ihash_equalp(x->ht.ht_self[i].c_car,depth);
 	    break;
 	  case htt_equal:
-	    h+=ihash_equal(x->ht.ht_self[i].hte_key,depth) +
-	      ihash_equalp(x->ht.ht_self[i].hte_value,depth);
+	    h^=ihash_equal(x->ht.ht_self[i].c_cdr,depth) ^
+	      ihash_equalp(x->ht.ht_self[i].c_car,depth);
 	    break;
 	  case htt_equalp:
-	    h+=ihash_equalp(x->ht.ht_self[i].hte_key,depth) +
-	      ihash_equalp(x->ht.ht_self[i].hte_value,depth);
+	    h^=ihash_equalp(x->ht.ht_self[i].c_cdr,depth) ^
+	      ihash_equalp(x->ht.ht_self[i].c_car,depth);
 	    break;
 	  }
       break;
 
     case t_pathname:
-      h += ihash_equalp(x->pn.pn_host,depth);
-      h += ihash_equalp(x->pn.pn_device,depth);
-      h += ihash_equalp(x->pn.pn_directory,depth);
-      h += ihash_equalp(x->pn.pn_name,depth);
-      h += ihash_equalp(x->pn.pn_type,depth);
+      h^=ihash_equalp(x->pn.pn_host,depth);
+      h^=ihash_equalp(x->pn.pn_device,depth);
+      h^=ihash_equalp(x->pn.pn_directory,depth);
+      h^=ihash_equalp(x->pn.pn_name,depth);
+      h^=ihash_equalp(x->pn.pn_type,depth);
       /* version is ignored unless logical host */
       if ((type_of(x->pn.pn_host) == t_string) &&
 	  (pathname_lookup(x->pn.pn_host,sSApathname_logicalA) != Cnil))
-	h += ihash_equalp(x->pn.pn_version,depth);
-      h += ihash_equalp(x->pn.pn_version,depth);
+	h^=ihash_equalp(x->pn.pn_version,depth);
+      h^=ihash_equalp(x->pn.pn_version,depth);
       break;
 
     case t_structure:
@@ -365,12 +311,12 @@ BEGIN:
 	struct s_data *def;
 	def=S_DATA(x->str.str_def);
 	s_type= & SLOT_TYPE(x->str.str_def,0);
-	h += ihash_equalp(def->name,depth);
-	for (i = 0;  i < def->length;  i++)
+	h^=ihash_equalp(def->name,depth);
+	for (i=0;i<def->length;i++)
 	  if (s_type[i]==aet_object)
-	    h += ihash_equalp(x->str.str_self[i],depth);
+	    h^=ihash_equalp(x->str.str_self[i],depth);
 	  else
-	    h += ((long)x->str.str_self[i]) + depth++;
+	    h^=ufixhash((long)x->str.str_self[i]);
 	break;
       }
 
@@ -384,7 +330,7 @@ BEGIN:
 	x=vs_base[0];
 	vs_base=base;
 	vs_reset;
-	h +=  hash_eql(x);
+	h^=hash_eql(x);
 	break;
       }
       
@@ -394,11 +340,11 @@ BEGIN:
     case t_shortfloat:
     case t_longfloat:
 
-      h+=hash_eql(make_longfloat(number_to_double(x)));
+      h^=hash_eql(make_longfloat(number_to_double(x)));
       break;
 
     default:
-      h +=  hash_eql(x);
+      h^=hash_eql(x);
       break;
     }
   
@@ -407,10 +353,7 @@ BEGIN:
 }
 
 	
-DEFUN_NEW("HASH-EQUALP",object,fShash_equalp,SI
-	  ,2,2,NONE,OO,IO,OO,OO,(object x,fixnum depth),"") {
-/* static object */
-/* FFN(hash_equalp)(object x,int depth) { */
+DEFUN("HASH-EQUALP",object,fShash_equalp,SI,2,2,NONE,OO,IO,OO,OO,(object x,fixnum depth),"") {
   RETURN1(make_fixnum(ihash_equalp(x,depth)));
 }
 
@@ -448,16 +391,16 @@ and wrappping if necessary.
 
 */
 
-struct htent *
+struct cons *
 gethash(object key, object hashtable) {
 
   enum httest htest;
   long hsize,j,s,q;
-  struct htent *e,*first_objnull;
+  struct cons *e,*first_objnull;
   object hkey;
   unsigned long i=0;
   bool (*f)(object,object)=NULL;
-  static struct htent dummy={OBJNULL,OBJNULL};
+  static struct cons dummy={OBJNULL,OBJNULL};
   
   if (!hashtable->ht.ht_size)
     return &dummy;
@@ -491,9 +434,9 @@ gethash(object key, object hashtable) {
  SEARCH:
   for (j=s;j<q;j++) {
     e = &hashtable->ht.ht_self[j];
-    hkey = e->hte_key;
+    hkey = e->c_cdr;
     if (hkey==OBJNULL) {
-      if (e->hte_value==OBJNULL) return first_objnull ? first_objnull : e;
+      if (e->c_car==OBJNULL) return first_objnull ? first_objnull : e;
       if (!first_objnull) first_objnull=e;
     } else
       if (key == hkey || (f && f(key,hkey))) return e;
@@ -525,7 +468,7 @@ extend_hashtable(object hashtable) {
 
   object old;
   fixnum new_size=0,new_max_ent=0,i;
-  struct htent *hte;
+  struct cons *hte;
   
   /* Compute new size for the larger hashtable */
   
@@ -571,20 +514,20 @@ extend_hashtable(object hashtable) {
 	make_fixnum(fix(hashtable->ht.ht_rhthresh) +
 		    (new_size - old->ht.ht_size));
     hashtable->ht.ht_self =
-      (struct htent *)alloc_relblock(new_size * sizeof(struct htent));
+      (struct cons *)alloc_relblock(new_size * sizeof(struct cons));
     for (i = 0;  i < new_size;  i++) {
-      hashtable->ht.ht_self[i].hte_key = OBJNULL;
-      hashtable->ht.ht_self[i].hte_value = OBJNULL;
+      hashtable->ht.ht_self[i].c_cdr = OBJNULL;
+      hashtable->ht.ht_self[i].c_car = OBJNULL;
     }
 
     for (i=0;i<old->ht.ht_size;i++) 
 
-      if (old->ht.ht_self[i].hte_key != OBJNULL) {
+      if (old->ht.ht_self[i].c_cdr != OBJNULL) {
 
-	hte = gethash(old->ht.ht_self[i].hte_key, hashtable);
+	hte = gethash(old->ht.ht_self[i].c_cdr, hashtable);
 	/* Initially empty, only empty locations. */
-	hte->hte_key = old->ht.ht_self[i].hte_key;
-	hte->hte_value = old->ht.ht_self[i].hte_value;
+	hte->c_cdr = old->ht.ht_self[i].c_cdr;
+	hte->c_car = old->ht.ht_self[i].c_car;
 
       }
 
@@ -600,16 +543,16 @@ extend_hashtable(object hashtable) {
 void
 sethash(object key, object hashtable, object value) {
 
-  struct htent *e;
+  struct cons *e;
   
   if (hashtable->ht.ht_nent+1>=hashtable->ht.ht_max_ent)
     extend_hashtable(hashtable);
 
   e = gethash(key, hashtable);
-  if (e->hte_key == OBJNULL)
+  if (e->c_cdr == OBJNULL)
     hashtable->ht.ht_nent++;
-  e->hte_key = key;
-  e->hte_value = value;
+  e->c_cdr = key;
+  e->c_car = value;
 
 }
 	
@@ -657,16 +600,12 @@ print_hash_table (object ht,char *procedure_name) {
 }
 */
 
-@(defun make_hash_table (&key (test sLeql)
-			 (size `make_fixnum(1024)`)
-			 (rehash_size
-			  `make_shortfloat((shortfloat)1.5)`)
-			 (rehash_threshold
-			  `make_shortfloat((shortfloat)0.7)`)
-			 &aux h)
+DEFUN("MAKE-HASH-TABLE-INT",object,fSmake_hash_table_int,SI,4,4,NONE,OO,OO,OO,OO,
+	  (object test,object size,object rehash_size,object rehash_threshold),"") {
+
   enum httest htt=0;
   fixnum i,max_ent,err;
-@
+  object h;
 
   if (test == sLeq || test == sLeq->s.s_gfdef)
      htt = htt_eq;
@@ -732,147 +671,198 @@ print_hash_table (object ht,char *procedure_name) {
   {
     BEGIN_NO_INTERRUPT;
     h = alloc_object(t_hashtable);
-    h->ht.ht_test = (short)htt;
+    h->ht.tt=h->ht.ht_test = (short)htt;
     h->ht.ht_size = fix(size);
     h->ht.ht_rhsize = rehash_size;
     h->ht.ht_rhthresh = rehash_threshold;
     h->ht.ht_nent = 0;
     h->ht.ht_max_ent = max_ent;
     h->ht.ht_self = NULL;
-    h->ht.ht_self = (struct htent *)
-      alloc_relblock(fix(size) * sizeof(struct htent));
+    h->ht.ht_self = (struct cons *)
+      alloc_relblock(fix(size) * sizeof(struct cons));
     for(i = 0;  i < fix(size);  i++) {
-      h->ht.ht_self[i].hte_key = OBJNULL;
-      h->ht.ht_self[i].hte_value = OBJNULL;
+      h->ht.ht_self[i].c_cdr = OBJNULL;
+      h->ht.ht_self[i].c_car = OBJNULL;
     }
     END_NO_INTERRUPT;
   }
+  RETURN1(h);
+}
+
+@(defun make_hash_table (&key (test sLeql)
+			 (size `make_fixnum(1024)`)
+			 (rehash_size
+			  `make_shortfloat((shortfloat)1.5)`)
+			 (rehash_threshold
+			  `make_shortfloat((shortfloat)0.7)`)
+			 &aux h)
+@
+  h=FFN(fSmake_hash_table_int)(test,size,rehash_size,rehash_threshold);
   @(return h)
 @)
 
-LFD(Lhash_table_p)(void)
-{
-	check_arg(1);
-
-	if(type_of(vs_base[0]) == t_hashtable)
-		vs_base[0] = Ct;
-	else   
-		vs_base[0] = Cnil;
+DEFUN("HASH-TABLE-P",object,fLhash_table_p,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x)==t_hashtable ? Ct : Cnil);
 }
 
-LFD(Lgethash)()
-{
-	int narg;
-	struct htent *e;
+DEFUN("HASH-TABLE-EQ-P",object,fShash_table_eq_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x)==t_hashtable && x->ht.ht_test==htt_eq ? Ct : Cnil);
+}
+
+DEFUN("HASH-TABLE-EQL-P",object,fShash_table_eql_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x)==t_hashtable && x->ht.ht_test==htt_eql  ? Ct : Cnil);
+}
+
+DEFUN("HASH-TABLE-EQUAL-P",object,fShash_table_equal_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x)==t_hashtable && x->ht.ht_test==htt_equal  ? Ct : Cnil);
+}
+
+DEFUN("HASH-TABLE-EQUALP-P",object,fShash_table_equalp_p,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(type_of(x)==t_hashtable && x->ht.ht_test==htt_equalp  ? Ct : Cnil);
+}
+
+DEFUN("GETHASH-INT",fixnum,fSgethash_int,SI,2,2,NONE,IO,OO,OO,OO,(object x,object y),"") {
+  return (fixnum)gethash(x,y);
+}
+
+DEFUNM("GETHASH",object,fLgethash,LISP,2,3,NONE,OO,OO,OO,OO,(object x,object y,...),"") {
+
+  fixnum nargs=INIT_NARGS(2),vals=(fixnum)fcall.valp;
+  object *base=vs_top,l=Cnil,f=OBJNULL,z;
+  va_list ap;
+  struct cons *e;
+
+  check_type_hash_table(&y);
+  e=gethash(x,y);
+  if (e->c_cdr != OBJNULL)
+    RETURN2(e->c_car,Ct);
+  else {
+    va_start(ap,y);
+    z=NEXT_ARG(nargs,ap,l,f,Cnil);
+    va_end(ap);
+    RETURN2(z,Cnil);
+  }
+
+}
+  
+/* /\* LFD(Lgethash)() *\/ */
+/* /\* { *\/ */
+/* 	int narg; */
+/* 	struct cons *e; */
 	
-	narg = vs_top - vs_base;
-	if (narg < 2)
-		too_few_arguments();
-	else if (narg == 2)
-		vs_push(Cnil);
-	else if (narg > 3)
-		too_many_arguments();
-	check_type_hash_table(&vs_base[1]);
-	e = gethash(vs_base[0], vs_base[1]);
-	if (e->hte_key != OBJNULL) {
-		vs_base[0] = e->hte_value;
-		vs_base[1] = Ct;
-	} else {
-		vs_base[0] = vs_base[2];
-		vs_base[1] = Cnil;
-	}
-	vs_popp;
+/* 	narg = vs_top - vs_base; */
+/* 	if (narg < 2) */
+/* 		too_few_arguments(); */
+/* 	else if (narg == 2) */
+/* 		vs_push(Cnil); */
+/* 	else if (narg > 3) */
+/* 		too_many_arguments(); */
+/* 	check_type_hash_table(&vs_base[1]); */
+/* 	e = gethash(vs_base[0], vs_base[1]); */
+/* 	if (e->c_cdr != OBJNULL) { */
+/* 		vs_base[0] = e->c_car; */
+/* 		vs_base[1] = Ct; */
+/* 	} else { */
+/* 		vs_base[0] = vs_base[2]; */
+/* 		vs_base[1] = Cnil; */
+/* 	} */
+/* 	vs_popp; */
+/* } */
+
+DEFUN("GETHASH1",object,fSgethash1,SI,2,2,NONE,OO,OO,OO,OO,(object k,object h),"") {
+
+  struct cons *e;
+
+  check_type_hash_table(&h);
+  e = gethash(k,h);
+  return e->c_cdr != OBJNULL ? e->c_car : Cnil;
+
 }
 
-LFD(siLhash_set)()
-{
-	check_arg(3);
+DEFUN("HASH-SET",object,fShash_set,SI,3,3,NONE,OO,OO,OO,OO,(object x,object y,object z),"") {
+/* LFD(siLhash_set)() */
+/* { */
+/* 	check_arg(3); */
 
-	check_type_hash_table(&vs_base[1]);
-	sethash(vs_base[0], vs_base[1], vs_base[2]);
-	vs_base += 2;
+  check_type_hash_table(&y);
+  sethash(x,y,z);
+  RETURN1(z);
+/* 	vs_base += 2; */
 }
  	
-LFD(Lremhash)()
-{
-	struct htent *e;
+DEFUN("REMHASH",object,fLremhash,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
 
-	check_arg(2);
-	check_type_hash_table(&vs_base[1]);
-	e = gethash(vs_base[0], vs_base[1]);
-	if (e->hte_key != OBJNULL) {
-		e->hte_key = OBJNULL;
-		e->hte_value = Cnil;
-		vs_base[1]->ht.ht_nent--;
-		vs_base[0] = Ct;
-	} else
-		vs_base[0] = Cnil;
-	vs_top = vs_base + 1;
+  struct cons *e;
+  
+  check_type_hash_table(&y);
+  e = gethash(x,y);
+  if (e->c_cdr != OBJNULL) {
+    e->c_cdr = OBJNULL;
+    e->c_car = Cnil;
+    y->ht.ht_nent--;
+    RETURN1(Ct);
+  } else
+    RETURN1(Cnil);
+
 }
 
-LFD(Lclrhash)()
-{
-	int i;
+DEFUN("CLRHASH",object,fLclrhash,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
-	check_arg(1);
-	check_type_hash_table(&vs_base[0]);
-	for(i = 0; i < vs_base[0]->ht.ht_size; i++) {
-		vs_base[0]->ht.ht_self[i].hte_key = OBJNULL;
-		vs_base[0]->ht.ht_self[i].hte_value = OBJNULL;
-	}
-	vs_base[0]->ht.ht_nent = 0;
+  int i;
+  
+  check_type_hash_table(&x);
+  for(i = 0; i < x->ht.ht_size; i++) {
+    x->ht.ht_self[i].c_cdr = OBJNULL;
+    x->ht.ht_self[i].c_car = OBJNULL;
+  }
+  x->ht.ht_nent = 0;
+  RETURN1(x);
 }
 
-LFD(Lhash_table_count)()
-{
-
-	check_arg(1);
-	check_type_hash_table(&vs_base[0]);
-	vs_base[0] = make_fixnum(vs_base[0]->ht.ht_nent);
+DEFUN("HASH-TABLE-COUNT",fixnum,fLhash_table_count,LISP,1,1,NONE,IO,OO,OO,OO,(object x),"") {
+  
+  check_type_hash_table(&x);
+  RETURN1(x->ht.ht_nent);
 }
 
 
-LFD(Lsxhash)()
-{
-	check_arg(1);
-
-	/*FIXME 64*/
-	vs_base[0] = make_fixnum(ihash_equal(vs_base[0],0)/*  & 0x7fffffff */);
+DEFUN("SXHASH",fixnum,fLsxhash,LISP,1,1,NONE,IO,OO,OO,OO,(object x),"") {
+  /*FIXME 64*/
+  RETURN1(ihash_equal(x,0));/*  & 0x7fffffff */
 }
 
-LFD(Lmaphash)()
-{
-	object *base = vs_base;
-        object hashtable;
-	int i;
+DEFUN("MAPHASH",object,fLmaphash,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
 
-	check_arg(2);
-	check_type_hash_table(&vs_base[1]);
-	hashtable = vs_base[1];
-	for (i = 0;  i < hashtable->ht.ht_size;  i++) {
-		if(hashtable->ht.ht_self[i].hte_key != OBJNULL)
-			ifuncall2(base[0],
-				  hashtable->ht.ht_self[i].hte_key,
-				  hashtable->ht.ht_self[i].hte_value);
-	}
-	vs_base[0] = Cnil;
-	vs_popp;
+  int i;
+  
+  check_type_hash_table(&y);
+  for (i = 0;  i < y->ht.ht_size;  i++) {
+    if(y->ht.ht_self[i].c_cdr != OBJNULL)
+      ifuncall2(x,y->ht.ht_self[i].c_cdr,y->ht.ht_self[i].c_car);
+  }
+  RETURN1(Cnil);
 }
 
-DEFUNM_NEW("NEXT-HASH-TABLE-ENTRY",object,fSnext_hash_table_entry,SI,2,2,NONE,OO,OO,OO,OO,(object table,object ind),"For HASH-TABLE and for index I return three values: NEXT-START, the next KEY and its  VALUE.   NEXT-START will be -1 if there are no more entries, otherwise it will be a value suitable for passing as an index")
-{ int i = fix(ind);
+DEFUNM("NEXT-HASH-TABLE-ENTRY",object,fSnext_hash_table_entry,SI,2,2,NONE,OO,OO,OO,OO,
+	   (object table,object ind),"For HASH-TABLE and for index I return three values: NEXT-START, the next KEY and its  VALUE.   NEXT-START will be -1 if there are no more entries, otherwise it will be a value suitable for passing as an index")
+{ 
+  int i = fix(ind);
+  fixnum vals=(fixnum)fcall.valp;
+  object *base=vs_top;
+
   check_type_hash_table(&table);
   if ( i < 0) { FEerror("needs non negative index",0);}
   while ( i <  table->ht.ht_size) {
-     if (table->ht.ht_self[i].hte_key != OBJNULL) {
-         RETURN(3,object,make_fixnum(i+1),
-                        (RV(table->ht.ht_self[i].hte_key),
-		         RV(table->ht.ht_self[i].hte_value)));}
-        i++;}
-   RETURN(3,object,small_fixnum(-1),(RV(sLnil),RV(sLnil)));
+    if (table->ht.ht_self[i].c_cdr != OBJNULL) {
+      RETURN(3,object,make_fixnum(i+1),
+	     (RV(table->ht.ht_self[i].c_cdr),
+	      RV(table->ht.ht_self[i].c_car)));}
+    i++;}
+  RETURN(3,object,small_fixnum(-1),(RV(sLnil),RV(sLnil)));
+
 }
 
-DEFUN_NEW("NEXT-HASH-TABLE-INDEX",object,fSnext_hash_table_index,SI,2,2,NONE,OO,OO,OO,OO,(object table,object ind),"For HASH-TABLE and for index I return the index of the next valid entry, or -1.") { 
+DEFUN("NEXT-HASH-TABLE-INDEX",object,fSnext_hash_table_index,SI,2,2,NONE,OO,OO,OO,OO,(object table,object ind),"For HASH-TABLE and for index I return the index of the next valid entry, or -1.") { 
 
   fixnum i = fix(ind);
 
@@ -881,7 +871,7 @@ DEFUN_NEW("NEXT-HASH-TABLE-INDEX",object,fSnext_hash_table_index,SI,2,2,NONE,OO,
     FEerror("needs non negative index",0);
 
   while ( i <  table->ht.ht_size) {
-    if (table->ht.ht_self[i].hte_key != OBJNULL)
+    if (table->ht.ht_self[i].c_cdr != OBJNULL)
       return make_fixnum(i);
     i++;}
 
@@ -889,33 +879,33 @@ DEFUN_NEW("NEXT-HASH-TABLE-INDEX",object,fSnext_hash_table_index,SI,2,2,NONE,OO,
 
 }
 
-DEFUN_NEW("HASH-ENTRY-BY-INDEX",object,fShash_entry_by_index,SI,2,2,NONE,OO,OO,OO,OO,(object table,object ind),"For HASH-TABLE and for index I return the index of the next valid entry, or -1.") { 
+DEFUN("HASH-ENTRY-BY-INDEX",object,fShash_entry_by_index,SI,2,2,NONE,OO,OO,OO,OO,(object table,object ind),"For HASH-TABLE and for index I return the index of the next valid entry, or -1.") { 
 
   fixnum i = fix(ind);
 
   check_type_hash_table(&table);
   if ( i < 0) 
     FEerror("needs non negative index",0);
-  if (table->ht.ht_self[i].hte_key == OBJNULL)
+  if (table->ht.ht_self[i].c_cdr == OBJNULL)
     FEerror("invalid index",0);
-  return table->ht.ht_self[i].hte_value;
+  return table->ht.ht_self[i].c_car;
 
 }
 
-DEFUN_NEW("HASH-KEY-BY-INDEX",object,fShash_key_by_index,SI,2,2,NONE,OO,OO,OO,OO,(object table,object ind),"For HASH-TABLE and for index I return the index of the next valid key, or -1.") { 
+DEFUN("HASH-KEY-BY-INDEX",object,fShash_key_by_index,SI,2,2,NONE,OO,OO,OO,OO,(object table,object ind),"For HASH-TABLE and for index I return the index of the next valid key, or -1.") { 
 
   fixnum i = fix(ind);
 
   check_type_hash_table(&table);
   if ( i < 0) 
     FEerror("needs non negative index",0);
-  if (table->ht.ht_self[i].hte_key == OBJNULL)
+  if (table->ht.ht_self[i].c_cdr == OBJNULL)
     FEerror("invalid index",0);
-  return table->ht.ht_self[i].hte_key;
+  return table->ht.ht_self[i].c_cdr;
 
 }
 
-DEFUN_NEW("HASH-TABLE-TEST",object,fLhash_table_test,LISP,1,1,NONE,OO,OO,OO,OO,(object table),
+DEFUN("HASH-TABLE-TEST",object,fLhash_table_test,LISP,1,1,NONE,OO,OO,OO,OO,(object table),
  "Given a HASH-TABLE return a symbol which specifies the function used in its test") 
 { 
   check_type_hash_table(&table);
@@ -929,47 +919,65 @@ DEFUN_NEW("HASH-TABLE-TEST",object,fLhash_table_test,LISP,1,1,NONE,OO,OO,OO,OO,(
   RETURN1(sLnil);
 }
 
-DEFUN_NEW("HASH-TABLE-SIZE",object,fLhash_table_size,LISP,1,1,NONE,OO,OO,OO,OO,(object table),"")
+DEFUN("HASH-TABLE-SIZE",object,fLhash_table_size,LISP,1,1,NONE,OO,OO,OO,OO,(object table),"")
 {
   check_type_hash_table(&table);
   RETURN1(make_fixnum(table->ht.ht_size));
 }
 
-DEFUN_NEW("HASH-TABLE-REHASH-SIZE",object,fLhash_table_rehash_size,LISP,1,1,NONE,OO,OO,OO,OO,(object table),"")
+DEFUN("HASH-TABLE-REHASH-SIZE",object,fLhash_table_rehash_size,LISP,1,1,NONE,OO,OO,OO,OO,(object table),"")
 {
   check_type_hash_table(&table);
   RETURN1(table->ht.ht_rhsize);
 }
 
-DEFUN_NEW("HASH-TABLE-REHASH-THRESHOLD",object,fLhash_table_rehash_threshold,LISP,1,1,NONE,OO,OO,OO,OO,(object table),"")
+DEFUN("EXTEND-HASHTABLE",fixnum,fSextent_hashtable,SI,1,1,NONE,OO,OO,OO,OO,(object table),"") {
+  extend_hashtable(table);
+  return table->ht.ht_size;
+}
+
+DEFUN("HASH-TABLE-REHASH-THRESHOLD",object,fLhash_table_rehash_threshold,LISP,1,1,NONE,OO,OO,OO,OO,(object table),"")
 {
   check_type_hash_table(&table);
   RETURN1(table->ht.ht_rhthresh);
 }
 
 void
-gcl_init_hash()
-{
-	sLeq = make_ordinary("EQ");
-	sLeql = make_ordinary("EQL");
-	sLequal = make_ordinary("EQUAL");
-	sLequalp = make_ordinary("EQUALP");
-	sKsize = make_keyword("SIZE");
-	sKtest = make_keyword("TEST");
-	sKrehash_size = make_keyword("REHASH-SIZE");
-	sKrehash_threshold = make_keyword("REHASH-THRESHOLD");
-	
-	make_function("MAKE-HASH-TABLE", Lmake_hash_table);
-	make_function("HASH-TABLE-P", Lhash_table_p);
-	make_function("GETHASH", Lgethash);
-	make_function("REMHASH", Lremhash);
-   	make_function("MAPHASH", Lmaphash);
-	make_function("CLRHASH", Lclrhash);
-	make_function("HASH-TABLE-COUNT", Lhash_table_count);
-   	make_function("SXHASH", Lsxhash);
-/* 	make_si_sfun("HASH-EQUAL",hash_equal,ARGTYPE2(f_object,f_fixnum) */
-/* 						| RESTYPE(f_object)); */
-/* 	make_si_sfun("HASH-EQUALP",hash_equalp,ARGTYPE2(f_object,f_fixnum) */
-/* 						| RESTYPE(f_object)); */
-	make_si_function("HASH-SET", siLhash_set);
+gcl_init_hash() {
+
+  ufixnum i;
+
+  sLeq = make_ordinary("EQ");
+  sLeql = make_ordinary("EQL");
+  sLequal = make_ordinary("EQUAL");
+  sLequalp = make_ordinary("EQUALP");
+  sKsize = make_keyword("SIZE");
+  sKtest = make_keyword("TEST");
+  sKrehash_size = make_keyword("REHASH-SIZE");
+  sKrehash_threshold = make_keyword("REHASH-THRESHOLD");
+  
+  make_function("MAKE-HASH-TABLE", Lmake_hash_table);
+  
+  {
+    object x=find_symbol(make_simple_string("MOST-NEGATIVE-FIXNUM"),find_package(make_simple_string("SI")));
+    x=number_negate(x->s.s_dbind);
+    for (i=0;i<sizeof(rtb)/sizeof(*rtb);i++) {
+      vs_push(x);
+      Lrandom();
+      rtb[i]=fixint(vs_pop);
+    }
+  }
+/*   make_function("HASH-TABLE-P", Lhash_table_p); */
+/*   /\* 	make_function("GETHASH", Lgethash); *\/ */
+/*   make_function("REMHASH", Lremhash); */
+/*   make_function("MAPHASH", Lmaphash); */
+/*   make_function("CLRHASH", Lclrhash); */
+/*   make_function("HASH-TABLE-COUNT", Lhash_table_count); */
+/*   make_function("SXHASH", Lsxhash); */
+  /* 	make_si_sfun("HASH-EQUAL",hash_equal,ARGTYPE2(f_object,f_fixnum) */
+  /* 						| RESTYPE(f_object)); */
+  /* 	make_si_sfun("HASH-EQUALP",hash_equalp,ARGTYPE2(f_object,f_fixnum) */
+  /* 						| RESTYPE(f_object)); */
+  /* 	make_si_function("HASH-SET", siLhash_set); */
 }
+

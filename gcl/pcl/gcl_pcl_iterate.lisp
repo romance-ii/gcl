@@ -934,31 +934,21 @@ NIL => never; :USER => those resulting from user code; T => always, even if it's
 (defvar *anonymous-gathering-site* nil "Variable used in formal expansion of an abbreviated GATHERING form (one with anonymous gathering site)."
        )
 
-(defun
- optimize-gathering-form
- (clauses body gathering-env)
- (let*
-  (acc-info leftover-body top-bindings finish-forms top-decls)
-  (dolist (clause (if (symbolp clauses)
-                                               ; A shorthand
-                      `((*anonymous-gathering-site* (,clauses)))
-                      clauses))
-      (multiple-value-bind
-       (let-body binding-type let-bindings localdecls otherdecls extra-body)
-       (expand-into-let (second clause)
-              'gathering gathering-env)
-       (prog*
-        ((acc-var (first clause))
-         renamed-vars accumulator realizer)
-        (when (and (consp let-body)
-                   (eq (car let-body)
-                       'values)
-                   (consp (setq let-body (cdr let-body)))
-                   (setq accumulator (function-lambda-p (car let-body)))
-                   (consp (setq let-body (cdr let-body)))
-                   (setq realizer (function-lambda-p (car let-body)
-                                         0))
-                   (null (cdr let-body)))
+(defun optimize-gathering-form (clauses body gathering-env)
+ (let* (acc-info leftover-body top-bindings finish-forms top-decls)
+   (dolist (clause (if (symbolp clauses) `((*anonymous-gathering-site* (,clauses))) clauses))
+     (multiple-value-bind
+      (let-body binding-type let-bindings localdecls otherdecls extra-body)
+      (expand-into-let (second clause) 'gathering gathering-env)
+      (prog*
+       ((acc-var (first clause)) renamed-vars accumulator realizer)
+       (when (and (consp let-body)
+		  (eq (car let-body) 'values)
+		  (consp (setq let-body (cdr let-body)))
+		  (setq accumulator (function-lambda-p (car let-body)))
+		  (consp (setq let-body (cdr let-body)))
+		  (setq realizer (function-lambda-p (car let-body) 0))
+		  (null (cdr let-body)))
             
             ;; Macro returned something of the form (VALUES #'(lambda (value)
             ;; ...) #'(lambda () ...)), a function to accumulate values and a
@@ -966,11 +956,12 @@ NIL => never; :USER => those resulting from user code; T => always, even if it's
             (when binding-type
                 
                 ;; Gatherer expanded into a LET
-                (cond (otherdecls (maybe-warn :definition "Couldn't optimize GATHERING clause ~S because its expansion carries declarations about more than the bound variables: ~S"
-                                         (second clause)
-                                         `(declare ,@otherdecls))
-                             (go punt)))
-                (when let-bindings
+	      (when otherdecls 
+		(maybe-warn :definition "Couldn't optimize GATHERING clause ~S because its expansion carries declarations about more than the bound variables: ~S"
+			    (second clause) `(declare ,@otherdecls))
+		(go punt))
+
+	      (when let-bindings
                     
                     ;; The first transformation we want to perform is a
                     ;; variant of "LET-eversion": turn (mv-bind (acc real)
@@ -982,41 +973,32 @@ NIL => never; :USER => those resulting from user code; T => always, even if it's
                     ;; alpha-converting the inner let (substituting new names
                     ;; for each var).  Of course, none of those vars can be
                     ;; special, but we already checked for that above.
-                    (multiple-value-setq (let-bindings renamed-vars)
-                           (rename-let-bindings let-bindings binding-type 
-                                  gathering-env leftover-body))
+                    (multiple-value-setq
+		     (let-bindings renamed-vars)
+		     (rename-let-bindings let-bindings binding-type gathering-env leftover-body))
                     (setq top-bindings (nconc top-bindings let-bindings))
-                    (setq leftover-body nil)
-                                               ; If there was any leftover
+                    (setq leftover-body nil))) ; If there was any leftover
                                                ; from previous, it is now
                                                ; consumed
-                    ))
-            (setq leftover-body (nconc leftover-body extra-body))
-                                               ; Computation to do after these
-                                               ; bindings
-            (push (cons acc-var (rename-and-capture-variables accumulator 
-                                       renamed-vars gathering-env))
-                  acc-info)
-            (setq realizer (rename-variables realizer renamed-vars 
-                                  gathering-env))
-            (push (cond ((null (cdddr realizer))
-                                               ; Simple (LAMBDA () expr) =>
-                                               ; expr
-                         (third realizer))
-                        (t                     ; There could be declarations
-                                               ; or something, so leave as a
-                                               ; LET
-                           (cons 'let (cdr realizer))))
-                  finish-forms)
+            (setq leftover-body (nconc leftover-body extra-body)); Computation to do after these bindings
+            (push (cons acc-var (rename-and-capture-variables accumulator renamed-vars gathering-env)) acc-info)
+            (setq realizer (rename-variables realizer renamed-vars gathering-env))
+            (push (if (null (cdddr realizer)) (third realizer) (cons 'let (cdr realizer))) finish-forms)
+					; Simple (LAMBDA () expr) => expr
+					; There could be declarations
+					; or something, so leave as a
+					; LET
+
+					; Declarations about the LET
+					; variables also has to
+					; percolate up
             (unless (null localdecls)
-                                               ; Declarations about the LET
-                                               ; variables also has to
-                                               ; percolate up
-                (setq top-decls (nconc top-decls (sublis renamed-vars 
-                                                        localdecls))))
+                (setq top-decls (nconc top-decls (sublis renamed-vars localdecls))))
             (return))
-        (maybe-warn :definition "Couldn't optimize GATHERING clause ~S because its expansion is not of the form (VALUES #'(LAMBDA ...) #'(LAMBDA () ...))"
-               (second clause))
+       (maybe-warn :definition (concatentate 'string 
+					     "Couldn't optimize GATHERING clause ~S because its expansion is not of the form"
+					     "(VALUES #'(LAMBDA ...) #'(LAMBDA () ...))")
+		   (second clause))
         punt
         (let
          ((gs (gensym))
@@ -1024,30 +1006,21 @@ NIL => never; :USER => those resulting from user code; T => always, even if it's
                                                ; Slow way--bind gensym to the
                                                ; macro expansion, and we will
                                                ; funcall it in the body
-         (push (list acc-var gs)
-               acc-info)
-         (push `(funcall (cadr ,gs))
-               finish-forms)
+         (push (list acc-var gs) acc-info)
+         (push `(funcall (cadr ,gs)) finish-forms)
          (setq
           top-bindings
           (nconc
            top-bindings
-           (list (list gs (cond (leftover-body
-                                 `(progn ,@(prog1 leftover-body
-                                                  (setq leftover-body nil))
-                                         ,expansion))
-                                (t expansion))))))))))
-  (setq body (walk-gathering-body body gathering-env acc-info))
-  (cond ((eq body :abort)
-                                               ; Couldn't finish expansion
-         nil)
-        (t `(let* ,top-bindings
-                  ,@(and top-decls `((declare ,@top-decls)))
-                  ,body
-                  ,(cond ((null (cdr finish-forms))
-                                               ; just a single value
-                          (car finish-forms))
-                         (t `(values ,@(reverse finish-forms)))))))))
+           (list (list gs (if leftover-body (prog1 `(progn ,@leftover-body ,expansion) (setq leftover-body nil)) expansion)))))))))
+   (setq body (walk-gathering-body body gathering-env acc-info))
+   (unless (eq body :abort)
+     `(let* ,top-bindings
+	,@(when top-decls `((declare ,@top-decls)))
+	,body
+	,(if (null (cdr finish-forms))		; just a single value			
+	     (car finish-forms)
+	   `(values ,@(reverse finish-forms)))))))
 
 (defun rename-and-capture-variables (form alist env)
        
@@ -1076,16 +1049,13 @@ NIL => never; :USER => those resulting from user code; T => always, even if it's
                                           form)))))
                   closed)))
 
-(defun
- walk-gathering-body
- (body gathering-env acc-info)
+(defun walk-gathering-body (body gathering-env acc-info)
  
  ;; Walk the body of (GATHERING (...) . BODY) in environment GATHERING-ENV. 
  ;; ACC-INFO is a list of information about each of the gathering "bindings"
  ;; in the form, in the form (var gatheringfn freevars env)
  (let
-  ((*active-gatherers* (nconc (mapcar #'car acc-info)
-                              *active-gatherers*)))
+  ((*active-gatherers* (nconc (mapcar #'car acc-info) *active-gatherers*)))
   
   ;; *ACTIVE-GATHERERS* tells us what vars are currently legal as GATHER
   ;; targets.  This is so that when we encounter a GATHER not belonging to us
@@ -1099,8 +1069,7 @@ NIL => never; :USER => those resulting from user code; T => always, even if it's
       (let (info site)
            (cond ((consp form)
                   (cond
-                   ((not (eq (car form)
-                             'gather))
+                   ((not (eq (car form) 'gather))
                                                ; We only care about GATHER
                     (when (and (eq (car form)
                                    'function)

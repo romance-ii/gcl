@@ -388,7 +388,8 @@ number_minus(object x, object y)
 	case t_fixnum:
 		switch(type_of(y)) {
 		case t_fixnum:
-		  MPOP(return,subss,fix(x),fix(y));
+		  return fixnum_sub(fix(x),fix(y));
+/* 		  MPOP(return,subss,fix(x),fix(y)); */
 		case t_bignum:
 		  MPOP(return, subsi,fix(x),MP(y));
 		case t_ratio:
@@ -962,6 +963,65 @@ get_gcd(object x, object y)
 }
 
 /* (+          )   */
+
+DEFUN("P2",object,fSp2,SI
+	  ,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+
+  RETURN1(number_plus(x,y));
+
+}
+
+DEFUN("M2",object,fSs2,SI
+	  ,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+
+  RETURN1(number_minus(x,y));
+
+}
+
+DEFUN("*2",object,fSt2,SI
+	  ,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+
+  RETURN1(number_times(x,y));
+
+}
+
+DEFUN("/2",object,fSd2,SI
+	  ,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+
+  RETURN1(number_divide(x,y));
+
+}
+
+
+DEFUN("NUMBER-PLUS",object,fSnumber_plus,SI
+	  ,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+
+  RETURN1(number_plus(x,y));
+
+}
+
+DEFUN("NUMBER-MINUS",object,fSnumber_minus,SI
+	  ,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+
+  RETURN1(number_minus(x,y));
+
+}
+
+DEFUN("NUMBER-TIMES",object,fSnumber_times,SI
+	  ,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+
+  RETURN1(number_times(x,y));
+
+}
+
+DEFUN("NUMBER-DIVIDE",object,fSnumber_divide,SI
+	  ,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+
+  RETURN1(number_divide(x,y));
+
+}
+
+
 LFD(Lplus)(void)
 {
         int i, j;
@@ -1119,13 +1179,13 @@ LFD(Llcm)(void)
 	vs_top = vs_base+1;
 }
 
-DEFUNO_NEW("FACTORIAL",object,fSfactorial,SI,1,1,NONE,OI,OO,OO,OO,void,siLfactorial,(fixnum x),"") {
+DEFUN("FACTORIAL",object,fSfactorial,SI,1,1,NONE,OI,OO,OO,OO,(fixnum x),"") {
 
   object r;
 
   if (x<0) {
     object y=make_fixnum(x);
-    TYPE_ERROR(y,sLnon_negative_fixnum);
+    TYPE_ERROR(y,sSnon_negative_fixnum);
     x=fix(y);
   }
   r=new_bignum();

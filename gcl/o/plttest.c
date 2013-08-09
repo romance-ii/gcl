@@ -3,14 +3,19 @@
 #include <setjmp.h>
 #include <stdio.h>
 #include <math.h>
-#include <complex.h>
 
 /*  We try here to compile in function addresses to which it is known
     that the compiler will make *direct* reference.  20040308 CM */
 
+#if defined (__APPLE__) && defined (__MACH__)
+#define DARWIN
+#endif
+
+#ifndef DARWIN
 extern int _mcount();
 #define mmcount _mcount
 extern void sincos(double,double *,double *);
+#endif
 
 int
 main(int argc,char * argv[],char *envp[]) {
@@ -21,7 +26,6 @@ main(int argc,char * argv[],char *envp[]) {
   double d=0.1;
   long l;
   unsigned long ul;
-  double complex dc;
 
   sscanf(argv[1],"%lf",&d);
   bzero(&env,sizeof(env));
@@ -42,17 +46,18 @@ main(int argc,char * argv[],char *envp[]) {
   l=read(l,&l,sizeof(l));
   l=write(l,&l,sizeof(l));
 
+#ifndef DARWIN
   ch&=mmcount();
+#endif
 
   setjmp(env);
 
   d=cos(d);
   d=sin(d);
+#ifndef DARWIN
   sincos(d,&d,&d);
+#endif
   d=tan(d);
-  dc=d+d*I;
-  dc*=dc;
-  d=creal(dc);
 
   d=acos(d);
   d=asin(d);

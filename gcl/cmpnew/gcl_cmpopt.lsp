@@ -1,5 +1,5 @@
 ;; -*-Lisp-*-
-(in-package 'compiler)
+(in-package :compiler)
 
 ;; The optimizers have been redone to allow more flags
 ;; The old style optimizations  correspond to the first 2
@@ -25,12 +25,6 @@
 
 (or (fboundp 'flags) (load "../cmpnew/cmpeval.lsp"))
 
-;; (defmacro pushn (a b)
-;;   (let ((tmp (gensym)))
-;;     `(let ((,tmp `(,',(if (listp (caadr a)) (mapcar 'cmp-norm-tp (caadr a)) (caadr a)) 
-;; 		   ,',(cmp-norm-tp (cadadr a)) 
-;; 		   ,,@(mapcar (lambda (x) `',x) (cddadr a)))))
-;;        (push ,tmp ,b))))
 
 ;;BOOLE3
  (push '((fixnum fixnum fixnum) fixnum #.(flags rfa)INLINE-BOOLE3)
@@ -53,22 +47,22 @@
    (get 'long-float-p 'inline-always))
 
 ;;SFEOF
- (push '((t) boolean #.(flags set rfa)(lambda (x) (add-libc "feof") (wt "(feof((" x ")->sm.sm_fp))")))
+ (push `((t) boolean #.(flags set rfa) ,(lambda (x) (add-libc "feof") (wt "(feof((" x ")->sm.sm_fp))")))
    (get 'sfeof 'inline-unsafe))
 
 
 ;;SGETC1
- (push '((t) fixnum #.(flags set rfa) (lambda (x) (add-libc "getc") (wt "(getc((" x ")->sm.sm_fp))")))
+ (push `((t) fixnum #.(flags set rfa) ,(lambda (x) (add-libc "getc") (wt "(getc((" x ")->sm.sm_fp))")))
    (get 'sgetc1 'inline-unsafe))
 
 ;;SPUTC
- (push '((fixnum t) fixnum #.(flags set rfa)(lambda (x y) (add-libc "putc") (wt "(putc(" x ",(" y ")->sm.sm_fp))")))
+ (push `((fixnum t) fixnum #.(flags set rfa) ,(lambda (x y) (add-libc "putc") (wt "(putc(" x ",(" y ")->sm.sm_fp))")))
    (get 'sputc 'inline-always))
-(push '((character t) fixnum #.(flags set rfa)(lambda (x y) (add-libc "putc") (wt "(putc(" x ",(" y ")->sm.sm_fp))")))
+(push `((character t) fixnum #.(flags set rfa) ,(lambda (x y) (add-libc "putc") (wt "(putc(char_code(" x "),(" y ")->sm.sm_fp))")))
    (get 'sputc 'inline-always))
 
 ;;FORK
- (push '(() t #.(flags)(lambda nil (add-libc "memset")(add-libc "pipe")(add-libc "close")(add-libc "fork")(wt "myfork()")))
+ (push `(() t #.(flags) ,(lambda nil (add-libc "memset")(add-libc "pipe")(add-libc "close")(add-libc "fork")(wt "myfork()")))
    (get 'si::fork 'inline-unsafe))
 
 ;;READ-POINTER-OBJECT
@@ -136,51 +130,51 @@
   "@0;(type_of(#0) == t_vector && (#0)->v.v_elttype == (#1))")
    (get 'vector-type 'inline-always))
 
-;;SYSTEM:ASET
- (push '((t t t) t #.(flags set)"aset1(#0,fixint(#1),#2)")
-   (get 'system:aset 'inline-always))
-(push '((t fixnum t) t #.(flags set)"aset1(#0,#1,#2)")
-   (get 'system:aset 'inline-always))
-(push '((t t t) t #.(flags set)"aset1(#0,fix(#1),#2)")
-   (get 'system:aset 'inline-unsafe))
-(push '(((array t) fixnum t) t #.(flags set)"(#0)->v.v_self[#1]= (#2)")
-   (get 'system:aset 'inline-unsafe))
-(push '(((array character) fixnum character) character #.(flags rfa set)"(#0)->ust.ust_self[#1]= (#2)")
-   (get 'system:aset 'inline-unsafe))
-(push '(((array fixnum) fixnum fixnum) fixnum #.(flags set rfa)"(#0)->fixa.fixa_self[#1]= (#2)")
-   (get 'system:aset 'inline-unsafe))
-(push '(((array signed-short) fixnum fixnum) fixnum #.(flags rfa set)"((short *)(#0)->ust.ust_self)[#1]=(#2)")
-   (get 'system:aset 'inline-unsafe))
-(push '(((array signed-char) fixnum fixnum) fixnum #.(flags rfa set)"((#0)->ust.ust_self)[#1]=(#2)")
-   (get 'system:aset 'inline-unsafe))
-(push '(((array unsigned-short) fixnum fixnum) fixnum #.(flags rfa set)
-  "((unsigned short *)(#0)->ust.ust_self)[#1]=(#2)")
-   (get 'system:aset 'inline-unsafe))
-(push '(((array unsigned-char) fixnum fixnum) fixnum #.(flags rfa set)"((#0)->ust.ust_self)[#1]=(#2)")
-   (get 'system:aset 'inline-unsafe))
-(push '(((array short-float) fixnum short-float) short-float #.(flags rfa set)"(#0)->sfa.sfa_self[#1]= (#2)")
-   (get 'system:aset 'inline-unsafe))
-(push '(((array long-float) fixnum long-float) long-float #.(flags rfa set)"(#0)->lfa.lfa_self[#1]= (#2)")
-   (get 'system:aset 'inline-unsafe))
-(push '((t t t t) t #.(flags set)
-  "@0;aset(#0,fix(#1)*(#0)->a.a_dims[1]+fix(#2),#3)")
-   (get 'system:aset 'inline-unsafe))
-(push '(((array t) fixnum fixnum t) t #.(flags set)
-  "@0;(#0)->a.a_self[(#1)*(#0)->a.a_dims[1]+#2]= (#3)")
-   (get 'system:aset 'inline-unsafe))
-(push '(((array character) fixnum fixnum character) character
-	#.(flags rfa set)
-  "@0;(#0)->ust.ust_self[(#1)*(#0)->a.a_dims[1]+#2]= (#3)")
-   (get 'system:aset 'inline-unsafe))
-(push '(((array fixnum) fixnum fixnum fixnum) fixnum #.(flags set rfa)
-  "@0;(#0)->fixa.fixa_self[(#1)*(#0)->a.a_dims[1]+#2]= (#3)")
-   (get 'system:aset 'inline-unsafe))
-(push '(((array short-float) fixnum fixnum short-float) short-float #.(flags rfa set)
-  "@0;(#0)->sfa.sfa_self[(#1)*(#0)->a.a_dims[1]+#2]= (#3)")
-   (get 'system:aset 'inline-unsafe))
-(push '(((array long-float) fixnum fixnum long-float) long-float #.(flags rfa set)
-  "@0;(#0)->lfa.lfa_self[(#1)*(#0)->a.a_dims[1]+#2]= (#3)")
-   (get 'system:aset 'inline-unsafe))
+;; ;;SYSTEM:ASET
+;; (push '((t t t) t #.(flags set)"aset1(#1,fixint(#2),#0)")
+;;    (get 'system:aset 'inline-always))
+;; (push '((t t fixnum) t #.(flags set)"aset1(#1,#2,#0)")
+;;    (get 'system:aset 'inline-always))
+;; (push '((t t t) t #.(flags set)"aset1(#1,fix(#2),#0)")
+;;    (get 'system:aset 'inline-unsafe))
+;; (push '((t (array t) fixnum) t #.(flags set)"(#1)->v.v_self[#2]= (#0)")
+;;    (get 'system:aset 'inline-unsafe))
+;; (push '((character (array character) fixnum) character #.(flags rfa set)"(#1)->ust.ust_self[#2]= (#0)")
+;;    (get 'system:aset 'inline-unsafe))
+;; (push '((fixnum (array fixnum) fixnum) fixnum #.(flags set rfa)"(#1)->fixa.fixa_self[#2]= (#0)")
+;;    (get 'system:aset 'inline-unsafe))
+;; (push '((fixnum (array signed-short) fixnum) fixnum #.(flags rfa set)"((short *)(#1)->ust.ust_self)[#2]=(#0)")
+;;    (get 'system:aset 'inline-unsafe))
+;; (push '((fixnum (array signed-char) fixnum) fixnum #.(flags rfa set)"((#1)->ust.ust_self)[#2]=(#0)")
+;;    (get 'system:aset 'inline-unsafe))
+;; (push '((fixnum (array unsigned-short) fixnum) fixnum #.(flags rfa set)
+;;   "((unsigned short *)(#1)->ust.ust_self)[#2]=(#0)")
+;;    (get 'system:aset 'inline-unsafe))
+;; (push '((fixnum (array unsigned-char) fixnum) fixnum #.(flags rfa set)"((#1)->ust.ust_self)[#2]=(#0)")
+;;    (get 'system:aset 'inline-unsafe))
+;; (push '((short-float (array short-float) fixnum) short-float #.(flags rfa set)"(#1)->sfa.sfa_self[#2]= (#0)")
+;;    (get 'system:aset 'inline-unsafe))
+;; (push '((long-float (array long-float) fixnum) long-float #.(flags rfa set)"(#1)->lfa.lfa_self[#2]= (#0)")
+;;    (get 'system:aset 'inline-unsafe))
+;; (push '((t t t t) t #.(flags set)
+;;   "@1;aset(#1,fix(#2)*(#1)->a.a_dims[1]+fix(#3),#0)")
+;;    (get 'system:aset 'inline-unsafe))
+;; (push '((t (array t) fixnum fixnum) t #.(flags set)
+;;   "@1;(#1)->a.a_self[(#2)*(#1)->a.a_dims[1]+#3]= (#0)")
+;;    (get 'system:aset 'inline-unsafe))
+;; (push '((character (array character) fixnum fixnum) character
+;; 	#.(flags rfa set)
+;;   "@1;(#1)->ust.ust_self[(#2)*(#1)->a.a_dims[1]+#3]= (#0)")
+;;    (get 'system:aset 'inline-unsafe))
+;; (push '((fixnum (array fixnum) fixnum fixnum) fixnum #.(flags set rfa)
+;;   "@1;(#1)->fixa.fixa_self[(#2)*(#1)->a.a_dims[1]+#3]= (#0)")
+;;    (get 'system:aset 'inline-unsafe))
+;; (push '((short-float (array short-float) fixnum fixnum) short-float #.(flags rfa set)
+;;   "@1;(#1)->sfa.sfa_self[(#2)*(#1)->a.a_dims[1]+#3]= (#0)")
+;;    (get 'system:aset 'inline-unsafe))
+;; (push '((long-float (array long-float) fixnum fixnum) long-float #.(flags rfa set)
+;;   "@1;(#1)->lfa.lfa_self[(#2)*(#1)->a.a_dims[1]+#3]= (#0)")
+;;    (get 'system:aset 'inline-unsafe))
 
 ;;SYSTEM:CHAR-SET
  (push '((t t t) t #.(flags set)"elt_set(#0,fixint(#1),#2)")
@@ -190,7 +184,7 @@
 (push '((t t t) t #.(flags set)
   "@2;((#0)->ust.ust_self[fix(#1)]=char_code(#2),(#2))")
    (get 'system:char-set 'inline-unsafe))
-(push '((t fixnum character) character #.(flags rfa set)"(#0)->ust.ust_self[#1]= (#2)")
+(push '((t fixnum character) character #.(flags rfa set)"(code_char((#0)->ust.ust_self[#1]= char_code(#2)))")
    (get 'system:char-set 'inline-unsafe))
 
 ;;SYSTEM:ELT-SET
@@ -208,18 +202,18 @@
    (get 'system:fill-pointer-set 'inline-always))
 
 ;;SYSTEM:FIXNUMP
- (push '((t) boolean #.(flags rfa)"type_of(#0)==t_fixnum")
-   (get 'system:fixnump 'inline-always))
-(push '((fixnum) boolean #.(flags rfa)"1")
-   (get 'system:fixnump 'inline-always))
+;;  (push '((t) boolean #.(flags rfa)"type_of(#0)==t_fixnum")
+;;    (get 'system:fixnump 'inline-always))
+;; (push '((fixnum) boolean #.(flags rfa)"1")
+;;    (get 'system:fixnump 'inline-always))
 
 ;;SYSTEM:SEQINDP
- (push '((t) boolean #.(flags rfa) #.(format nil "(type_of(#0)==t_fixnum && ({fixnum _t=fix(#0);_t>=0 && _t<=~s;}))" array-dimension-limit))
-   (get 'system::seqindp 'inline-always))
-(push '((fixnum) boolean #.(flags rfa)#.(format nil "(#0>=0 && #0<=~s)" array-dimension-limit))
-   (get 'system::seqindp 'inline-always))
-(push '((seqind) boolean #.(flags rfa)"1")
-   (get 'system::seqindp 'inline-always))
+;;  (push '((t) boolean #.(flags rfa) #.(format nil "(type_of(#0)==t_fixnum && ({fixnum _t=fix(#0);_t>=0 && _t<=~s;}))" array-dimension-limit))
+;;    (get 'system::seqindp 'inline-always))
+;; (push '((fixnum) boolean #.(flags rfa)#.(format nil "(#0>=0 && #0<=~s)" array-dimension-limit))
+;;    (get 'system::seqindp 'inline-always))
+;; (push '((seqind) boolean #.(flags rfa)"1")
+;;    (get 'system::seqindp 'inline-always))
 
 ;;SYSTEM:MV-REF
  (push '((fixnum) t #.(flags)"(MVloc[(#0)])")
@@ -237,7 +231,7 @@
 (push '((t t t) t #.(flags set)
   "@2;((#0)->ust.ust_self[fix(#1)]=char_code(#2),(#2))")
    (get 'system:schar-set 'inline-unsafe))
-(push '((t fixnum character) character #.(flags set rfa)"(#0)->ust.ust_self[#1]= (#2)")
+(push '((t fixnum character) character #.(flags set rfa)"(code_char((#0)->ust.ust_self[#1]= char_code(#2))")
    (get 'system:schar-set 'inline-unsafe))
 
 ;;SYSTEM:SET-MV
@@ -293,28 +287,28 @@
 
 
 ;;+
-(push '((t t) t #.(flags ans)"immnum_plus(#0,#1)")
-   (get '+ 'inline-always))
-(push '((cnum cnum) cnum #.(flags)"(#0)+(#1)") (get '+ 'inline-always))
+(push '((t t) t #.(flags ans)"immnum_plus(#0,#1)") (get 'si::number-plus 'inline-always))
+(push '((cnum cnum) cnum #.(flags)"(#0)+(#1)") (get 'si::number-plus 'inline-always))
 
 
 ;;-
-(push '((t) t #.(flags ans)"immnum_negate(#0)") (get '- 'inline-always))
-(push '((cnum) cnum #.(flags)"-(#0)") (get '- 'inline-always))
-(push '(((integer #.most-negative-fixnum #.most-negative-fixnum)) t #.(flags)"immnum_negate(#0)") (get '- 'inline-always))
+;(push '((t) t #.(flags ans)"immnum_negate(#0)") (get '- 'inline-always))
+;(push '((cnum) cnum #.(flags)"-(#0)") (get '- 'inline-always))
+;(push '(((integer #.most-negative-fixnum #.most-negative-fixnum)) t #.(flags)"immnum_negate(#0)") (get '- 'inline-always))
 
-(push '((t t) t #.(flags ans)"immnum_minus(#0,#1)")
-   (get '- 'inline-always))
-(push '((cnum cnum) cnum #.(flags)"(#0)-(#1)") (get '- 'inline-always))
+(push '((t t) t #.(flags ans)"immnum_minus(#0,#1)") (get 'si::number-minus 'inline-always))
+(push '((cnum cnum) cnum #.(flags)"(#0)-(#1)") (get 'si::number-minus 'inline-always))
+(push '(((integer 0 0) t) t #.(flags ans)"immnum_negate(#1)") (get 'si::number-minus 'inline-always))
+(push '(((integer 0 0) cnum) cnum #.(flags ans)"-(#1)") (get 'si::number-minus 'inline-always))
 
 ;;*
 ;(si::putprop '* 'super-range 'type-propagator)
-(push '((t t) t #.(flags ans)"number_times(#0,#1)") (get '* 'inline-always))
-(push '((cnum cnum) cnum #.(flags)"(#0)*(#1)") (get '* 'inline-always))
+(push '((t t) t #.(flags ans)"number_times(#0,#1)") (get 'si::number-times 'inline-always))
+(push '((cnum cnum) cnum #.(flags)"(#0)*(#1)") (get 'si::number-times 'inline-always))
 
 ;;/
-(push '((t t) t #.(flags ans)"number_divide(#0,#1)") (get '/ 'inline-always))
-(push '((cnum cnum) cnum #.(flags)"(#0)/(#1)") (get '/ 'inline-always))
+(push '((t t) t #.(flags ans) "number_divide(#0,#1)") (get 'si::number-divide 'inline-always))
+(push '((cnum cnum) cnum #.(flags) "(#0)/(#1)") (get 'si::number-divide 'inline-always))
 
 ;;/=
  (push '((t t) boolean #.(flags rfa)"immnum_ne(#0,#1)")
@@ -366,9 +360,9 @@
 ;   (get 'array-dimension 'inline-unsafe))
 
 ;;CMP-ARRAY-DIMENSION
-(setf (symbol-function 'cmp-array-dimension) (symbol-function 'array-dimension))
-(push '(cmp-array-dimension-inline-types nil #.(flags itf) cmp-array-dimension-inline)
-   (get 'cmp-array-dimension 'inline-always))
+;; (setf (symbol-function 'cmp-array-dimension) (symbol-function 'array-dimension))
+;; (push '(cmp-array-dimension-inline-types nil #.(flags itf) cmp-array-dimension-inline)
+;;    (get 'cmp-array-dimension 'inline-always))
 
 ;;ARRAY-TOTAL-SIZE
  (push '((t) fixnum #.(flags rfa)"((#0)->st.st_dim)")
@@ -394,23 +388,21 @@
    (get 'boundp 'inline-always))
 
 ;;CONS-CAR
- (push '((list) t #.(flags rfa)"(#0)->c.c_car") (get 'si::cons-car 'inline-always))
+; (push '((list) t #.(flags rfa)"(#0)->c.c_car") (get 'si::cons-car 'inline-always))
 ;;CONS-CDR
- (push '((list) t #.(flags rfa)"(#0)->c.c_cdr") (get 'si::cons-cdr 'inline-always))
+; (push '((list) t #.(flags rfa)"(#0)->c.c_cdr") (get 'si::cons-cdr 'inline-always))
 
 ;;CHAR
  (push '((t t) t #.(flags ans)"elt(#0,fixint(#1))")
    (get 'char 'inline-always))
 (push '((t fixnum) t #.(flags ans)"elt(#0,#1)")
    (get 'char 'inline-always))
-(push '((t t) t #.(flags)"code_char((#0)->ust.ust_self[fix(#1)])")
-   (get 'char 'inline-unsafe))
-(push '((t fixnum) character #.(flags rfa)"(#0)->ust.ust_self[#1]")
+(push '((t t) character #.(flags rfa)"code_char((#0)->ust.ust_self[fix(#1)])")
    (get 'char 'inline-unsafe))
 
 ;;CHAR-CODE
- (push '((character) fixnum #.(flags rfa)"(#0)")
-   (get 'char-code 'inline-always))
+; (push '((character) fixnum #.(flags rfa)"(#0)")
+;   (get 'char-code 'inline-always))
 
 ;;CHAR/=
 (push '((t t) boolean #.(flags rfa)"!eql(#0,#1)")
@@ -461,8 +453,8 @@
    (get 'rplacd 'inline-unsafe))
 
 ;;CODE-CHAR
- (push '((fixnum) character #.(flags)"(#0)")
-   (get 'code-char 'inline-always))
+; (push '((fixnum) character #.(flags)"(#0)")
+;   (get 'code-char 'inline-always))
 
 ;;CONS
  (push '((t t) t #.(flags ans) CONS-INLINE)
@@ -475,8 +467,8 @@
    (get 'consp 'inline-always))
 
 ;;DIGIT-CHAR-P
- (push '((character) boolean #.(flags rfa)"@0; ((#0) <= '9' && (#0) >= '0')")
-   (get 'digit-char-p 'inline-always))
+; (push '((character) (or null (integer 0 9)) #.(flags rfa)"@0; ((#0) <= '9' && (#0) >= '0')")
+;   (get 'digit-char-p 'inline-always))
 
 ;;ELT
  (push '((t t) t #.(flags ans)"elt(#0,fixint(#1))")
@@ -494,6 +486,8 @@
 
 ;;EQ
  (push '((t t) boolean #.(flags rfa)"(#0)==(#1)")
+   (get 'eq 'inline-always))
+ (push '((cnum cnum) boolean #.(flags rfa)"(#0)==(#1)")
    (get 'eq 'inline-always))
 ;(push '((fixnum fixnum) boolean #.(flags rfa)"0")
 ;   (get 'eq 'inline-always))
@@ -530,26 +524,18 @@
 ;;EXPT
  (push '((t t) t #.(flags ans)"number_expt(#0,#1)")
    (get 'expt 'inline-always))
- (push '((fixnum fixnum) fixnum #.(flags)(LAMBDA (LOC1 LOC2)
-						 (IF
-						  (AND (CONSP LOC1)
-						       (EQ (CAR LOC1) 'FIXNUM-LOC)
-						       (CONSP (CADR LOC1))
-						       (EQ (CAADR LOC1)
-							   'FIXNUM-VALUE)
-						       (EQUAL (CADDR (CADR LOC1))
-							      2))
-						  (WT "(1<<(" LOC2 "))")
-						  (WT "fixnum_expt(" LOC1 #\,
-						      LOC2 #\)))))
-       (get 'expt 'inline-always))
+(push `((fixnum fixnum) fixnum #.(flags) "fixnum_expt((#0),(#1))")
+      (get 'expt 'inline-always))
+(push `(((integer 2 2) fixnum) fixnum #.(flags) "(1<<(#1))")
+      (get 'expt 'inline-always))
 
 
-;;si::FILL-POINTER-INTERNAL
- (push '((t) seqind #.(flags rfa)"((#0)->v.v_fillp)")
-   (get 'si::fill-pointer-internal 'inline-unsafe))
- (push '((vector) seqind #.(flags rfa)"((#0)->v.v_fillp)")
-   (get 'si::fill-pointer-internal 'inline-always))
+
+;; ;;si::FILL-POINTER-INTERNAL
+;;  (push '((t) seqind #.(flags rfa)"((#0)->v.v_fillp)")
+;;    (get 'si::fill-pointer-internal 'inline-unsafe))
+;;  (push '((vector) seqind #.(flags rfa)"((#0)->v.v_fillp)")
+;;    (get 'si::fill-pointer-internal 'inline-always))
 
 ;;ARRAY-HAS-FILL-POINTER-P
  (push '((t) boolean #.(flags rfa)"((#0)->v.v_hasfillp)")
@@ -680,8 +666,8 @@
    (get 'length 'inline-always))
 
 ;;CMP-VEC-LENGTH
-(push '((t) seqind #.(flags rfa)"(#0)->v.v_fillp")
-   (get 'cmp-vec-length 'inline-always))
+;; (push '((t) seqind #.(flags rfa)"(#0)->v.v_fillp")
+;;    (get 'cmp-vec-length 'inline-always))
 ;;si::VEC-LENGTH
 (push '((t) seqind #.(flags rfa)"(#0)->v.v_fillp")
    (get 'si::vec-length 'inline-always))
@@ -804,18 +790,6 @@
  (push '((fixnum fixnum) fixnum #.(flags rfa set)"@01;({register fixnum _t=(#0)%(#1);((#1)<0 && _t<=0) || ((#1)>0 && _t>=0) ? _t : _t + (#1);})")
    (get 'mod 'inline-always))
 
-;;NCONC
-;;  (push '((t t) t #.(flags set)"nconc(#0,#1)")
-;;    (get 'nconc 'inline-always))
-
-;;NOT
- (push '((t) boolean #.(flags rfa)"(#0)==Cnil")
-   (get 'not 'inline-always))
-
-;;NREVERSE
- (push '((t) t #.(flags ans set)"nreverse(#0)")
-   (get 'nreverse 'inline-always))
-
 ;;CMP-NTHCDR
 (push '((seqind t) list #.(flags rfa)"({register fixnum _i=#0;register object _x=#1;for (;_i--;_x=_x->c.c_cdr);_x;})")
    (get 'cmp-nthcdr 'inline-unsafe))
@@ -886,37 +860,18 @@
       (get 'ratiop 'inline-always))
 
 ;;REM
-
-
 #+intdiv
 (push '((fixnum fixnum) fixnum #.(flags rfa)"(#0)%(#1)")
    (get 'rem 'inline-always))
-
-
-
-
-;;REMPROP
- (push '((t t) t #.(flags set)"remprop(#0,#1)")
-   (get 'remprop 'inline-always))
-
-;;REST
- (push '((t) t #.(flags)"cdr(#0)")
-   (get 'rest 'inline-safe))
-;(push '((t) t #.(flags)"CMPcdr(#0)")
-;   (get 'rest 'inline-unsafe))
-
-;;REVERSE
- (push '((t) t #.(flags ans)"reverse(#0)")
-   (get 'reverse 'inline-always))
 
 ;;SCHAR
  (push '((t t) t #.(flags ans)"elt(#0,fixint(#1))")
    (get 'schar 'inline-always))
 (push '((t fixnum) t #.(flags ans)"elt(#0,#1)")
    (get 'schar 'inline-always))
-(push '((t t) t #.(flags rfa)"code_char((#0)->ust.ust_self[fix(#1)])")
+(push '((t t) character #.(flags rfa)"code_char((#0)->ust.ust_self[fix(#1)])")
    (get 'schar 'inline-unsafe))
-(push '((t fixnum) character #.(flags rfa)"(#0)->ust.ust_self[#1]")
+(push '((t fixnum) character #.(flags rfa)"code_char((#0)->ust.ust_self[#1])")
    (get 'schar 'inline-unsafe))
 
 ;;SECOND
@@ -956,24 +911,12 @@
  (push '((t) string #.(flags ans rfa)"symbol_name(#0)")
    (get 'symbol-name 'inline-always))
 
-;;SYMBOL-PLIST
-(push '((t) si::proper-list #.(flags rfa) "((#0)->s.s_plist)")
-    (get 'symbol-plist 'inline-unsafe))
-(push '((symbol) si::proper-list #.(flags rfa) "((#0)->s.s_plist)")
-    (get 'symbol-plist 'inline-always))
-
-;;SYMBOL-PACKAGE
-(push '((t) (or null package) #.(flags rfa) "((#0)->s.s_hpack)")
-    (get 'symbol-package 'inline-unsafe))
-(push '((symbol) (or null package) #.(flags rfa) "((#0)->s.s_hpack)")
-    (get 'symbol-package 'inline-always))
-
 ;;SYMBOL-VALUE
 (push '((t) t #.(flags) "((#0)->s.s_dbind)")
     (get 'symbol-value 'inline-unsafe))
 
-;;SYMBOL-FUNCTION
-(push '((t) function #.(flags rfa) "({register object _sym=#0;_sym->s.s_sfdef!=NOT_SPECIAL ? make_cons(sLspecial,make_fixnum((long)_sym->s.s_sfdef)) : (_sym->s.s_mflag ? make_cons(sLmacro,_sym->s.s_gfdef) : _sym->s.s_gfdef);})")
+;;SYMBOL-FUNCTION FIXME
+(push '((t) (or cons function) #.(flags rfa) "({register object _sym=#0;_sym->s.s_sfdef!=NOT_SPECIAL ? make_cons(sLspecial,make_fixnum((long)_sym->s.s_sfdef)) : (_sym->s.s_mflag ? make_cons(sLmacro,_sym->s.s_gfdef) : _sym->s.s_gfdef);})")
       (get 'symbol-function 'inline-unsafe))
 
 ;;FUNCALLABLE-SYMBOL-FUNCTION
@@ -981,14 +924,10 @@
       (get 'funcallable-symbol-function 'inline-always))
 
 ;;SI::FBOUNDP-SYM
-(push '((t) boolean #.(flags rfa) "@0;(#0->s.s_sfdef!=NOT_SPECIAL || #0->s.s_gfdef)")
+(push '((t) boolean #.(flags rfa) "@0;(#0->s.s_sfdef!=NOT_SPECIAL || #0->s.s_gfdef!=OBJNULL)")
       (get 'si::fboundp-sym 'inline-unsafe))
-(push '((symbol) boolean #.(flags rfa) "@0;(#0->s.s_sfdef!=NOT_SPECIAL || #0->s.s_gfdef)")
+(push '((symbol) boolean #.(flags rfa) "@0;(#0->s.s_sfdef!=NOT_SPECIAL || #0->s.s_gfdef!=OBJNULL)")
       (get 'si::fboundp-sym 'inline-always))
-
-;;SYMBOLP
- (push '((t) boolean #.(flags rfa)"type_of(#0)==t_symbol")
-   (get 'symbolp 'inline-always))
 
 ;;TERPRI
  (push '((t) t #.(flags set)"terpri(#0)")
@@ -1039,13 +978,11 @@
    (get 'sequencep 'inline-always))
 
 ;;FUNCTIONP
- (push '((t) boolean #.(flags rfa)
-  "@0;({enum type _tp=type_of(#0);_tp>=t_ifun && _tp<=t_closure;})")
+ (push '((t) boolean #.(flags rfa) "(functionp(#0))")
    (get 'functionp 'inline-always))
 
 ;;COMPILED-FUNCTION-P
- (push '((t) boolean #.(flags rfa)
-  "@0;({enum type _tp=type_of(#0);_tp>=t_cfun && _tp<=t_closure;})")
+ (push '((t) boolean #.(flags rfa) "(compiled_functionp(#0))")
    (get 'compiled-function-p 'inline-always))
 
 ;;WRITE-CHAR
@@ -1093,21 +1030,6 @@
  (push '((t fixnum) t #.(flags) "(#0)->ht.ht_self[(#1)].hte_key")
    (get 'si::hash-key-by-index 'inline-unsafe))
 
-;;GETHASH
-(push '((t t *) (returns-exactly t t) #.(flags)(lambda (key hash &optional default)
-				(let ((*value-to-go* (or
-						      (pop *values-to-go*)
-						      (and (member *value-to-go* '(top return) :test (function eq))
-							   (list 'vs (vs-push)))
-						      'trash)))
-				    (wt "({struct htent *_t=gethash(" key "," hash "); _t->hte_key==OBJNULL ? ({")
-				    (set-loc nil)
-				    (wt default ";}) : ({")
-				    (set-loc t)
-				    (wt "_t->hte_value;});})"))))
-      (get 'gethash 'inline-unsafe))
-
-
 ;;si::GENSYM0
 (push '(nil symbol #.(flags ans set rfa) "fSgensym0()") (get 'si::gensym0 'inline-always))
 
@@ -1125,12 +1047,18 @@
 ;;
 (defstruct opaque)
 
-(push '((t fixnum opaque *) opaque #.(flags rfa) "((#0)((#1)))(#2#*)") (get 'addr-call 'inline-always))
+;(push '((t fixnum opaque *) opaque #.(flags rfa) "(#0(#1))(#2#*)") (get 'addr-call 'inline-always))
+;(push '((t fixnum) opaque #.(flags rfa) "(#0(#1))()") (get 'addr-call 'inline-always))
 
 (push '(((member :address) t) fixnum #.(flags rfa) "object_to_fixnum(#1)") (get 'unbox 'inline-always))
 (push '(((member :address) fixnum) fixnum #.(flags rfa) "(#1)") (get 'unbox 'inline-always))
 
 (deftype long nil 'fixnum)
+
+(setf (get :boolean 'lisp-type) 'boolean)
+(setf (get :void 'lisp-type) nil)
+(setf (get :cnum 'lisp-type) #tcnum)
+(setf (get :creal 'lisp-type) #t(and real cnum))
 
 (dolist (l '((:float      "make_shortfloat"      short-float     cnum)
 	     (:double     "make_longfloat"       long-float      cnum)
@@ -1138,69 +1066,78 @@
 	     (:char       "make_fixnum"          char            cnum)
 	     (:short      "make_fixnum"          short           cnum)
 	     (:int        "make_fixnum"          int             cnum)
+	     (:uchar      "make_fixnum"          unsigned-char   cnum)
+	     (:ushort     "make_fixnum"          unsigned-short  cnum)
+	     (:uint       "make_fixnum"          unsigned-int    cnum)
 	     (:fixnum     "make_fixnum"          fixnum          cnum)
 	     (:long       "make_fixnum"          fixnum          cnum)
 	     (:fcomplex   "make_fcomplex"        fcomplex        cnum)
 	     (:dcomplex   "make_dcomplex"        dcomplex        cnum)
 	     (:string     "make_simple_string"   string)
+	     (:object     ""                     t)
 	     (:float*     nil                    nil             (array short-float) "->sfa.sfa_self")
 	     (:double*    nil                    nil             (array long-float)  "->lfa.lfa_self")
 	     (:long*      nil                    nil             (array fixnum)      "->fixa.fixa_self")
-	     (:void*      nil                    nil             (array)             "->v.v_self")))
+	     (:void*      nil                    nil             (or array symbol character) "->v.v_self")))
   (setf (get (car l) 'lisp-type) (if (cadr l) (caddr l) (cadddr l)))
   (when (cadr l)
     (push `(((member ,(car l)) opaque) t #.(flags rfa) ,(strcat (cadr l) "(#1)")) 
 	  (get 'box   'inline-always))
-    (push `(((member ,(car l)) t) opaque #.(flags rfa) ,(strcat "object_to_" (car l) "(#1)"))  
-	       (get 'unbox 'inline-always)))
+    (push `(((member ,(car l)) t) opaque #.(flags rfa) ,(if (eq (car l) :object) "(#1)" (strcat "object_to_" (car l) "(#1)")))  
+	  (get 'unbox 'inline-always)))
   (when (cadddr l)
     (push `(((member ,(car l)) ,(cadddr l)) opaque
 	    #.(flags rfa) ,(if (fifth l) (strcat "(#1)" (fifth l)) (strcat "(" (car l) ")" "(#1)")))   
 	  (get 'unbox 'inline-always))))
 
 
- (defun register-key (l tt)
+;; (defun register-key (l tt)
+  
+;;   (push `(((member ,l) t t t) ,tt ,(flags rfa) "((#1)->#2.#3)") 
+;; 	(get 'el 'inline-always))
+;;   (push `(((member ,l) t t t seqind) ,tt ,(flags rfa) "((#1)->#2.#3[#4])")
+;; 	(get 'el 'inline-always))
+;;   (push `((,tt (member ,l) t t t) ,tt ,(flags rfa) "((#2)->#3.#4=(#0))")
+;; 	(get 'set-el 'inline-always))
+;;   (push `((,tt (member ,l) t t t seqind) ,tt ,(flags rfa) "((#2)->#3.#4[#5]=(#0))")
+;; 	(get 'set-el 'inline-always))
 
-   (push `(((member ,l) t t t) ,tt #.(flags rfa) "((#1)->#2.#3)") 
-	 (get 'el 'inline-always))
-   (push `(((member ,l) t t t seqind) ,tt #.(flags rfa) "((#1)->#2.#3[#4])")
-	 (get 'el 'inline-always))
-   (push `((,tt (member ,l) t t t) ,tt #.(flags rfa) "((#2)->#3.#4=(#0))")
-	 (get 'set-el 'inline-always))
-   (push `((,tt (member ,l) t t t seqind) ,tt #.(flags rfa) "((#2)->#3.#4[#5]=(#0))")
-	 (get 'set-el 'inline-always)))
+;; )
 
- (dolist (l '(char short long int integer keyword character real string structure symbol fixnum))
-   (let ((s (intern (symbol-name l) 'keyword)))
-     (register-key s (setf (get s 'lisp-type) (cmp-norm-tp l)))))
+(dolist (l '(char short long int integer keyword character real string structure symbol fixnum))
+  (let ((s (intern (symbol-name l) 'keyword)))
+    (setf (get s 'lisp-type) (cmp-norm-tp l))))
 
- (dolist (l '((object t)(plist proper-list)(float short-float)(double long-float)
-	      (pack (or null package)) (direl (or keyword null string))))
-   (let ((s (intern (symbol-name (car l)) 'keyword)))
-     (register-key s (setf (get s 'lisp-type) (cmp-norm-tp (cadr l))))))
+(dolist (l '((object t)(plist proper-list)(float short-float)(double long-float)
+	     (pack (or null package)) (direl (or keyword null string))))
+  (let ((s (intern (symbol-name (car l)) 'keyword)))
+    (setf (get s 'lisp-type) (cmp-norm-tp (cadr l)))))
 
- (deftype longfloat nil 'long-float)
- (deftype shortfloat nil 'short-float)
- (deftype hashtable nil 'hash-table)
- (deftype ocomplex nil 'complex)
- (deftype bitvector nil 'bit-vector)
- (deftype random nil 'random-state)
- (deftype cfun nil 'compiled-function);FIXME
- (deftype cclosure nil 'compiled-function);FIXME
- (deftype closure nil 'compiled-function);FIXME
- (deftype sfun nil 'compiled-function);FIXME
- (deftype ifun nil 'function);FIXME
- (deftype vfun nil 'compiled-function);FIXME
- (deftype ustring nil 'string);FIXME
- (deftype fixarray nil '(array fixnum))
- (deftype sfarray nil '(array short-float))
- (deftype lfarray nil '(array long-float))
- 
+(defvar *box-alist* (mapcar (lambda (x) (cons x (cmp-norm-tp (get x 'lisp-type)))) '(:char :fixnum :float :double :fcomplex :dcomplex)))
+
+(deftype stdesig nil '(or string symbol character))
+(deftype longfloat nil 'long-float)
+(deftype shortfloat nil 'short-float)
+(deftype hashtable nil 'hash-table)
+(deftype ocomplex nil 'complex)
+(deftype bitvector nil 'bit-vector)
+(deftype random nil 'random-state)
+(deftype cfun nil 'function);FIXME
+					; (deftype cclosure nil 'function);FIXME
+					; (deftype closure nil 'function);FIXME
+					; (deftype sfun nil 'function);FIXME
+(deftype ifun nil 'function);FIXME
+					; (deftype vfun nil 'function);FIXME
+(deftype ustring nil 'string);FIXME
+(deftype fixarray nil '(array fixnum))
+(deftype sfarray nil '(array short-float))
+(deftype lfarray nil '(array long-float))
+
 
 
 ;;si::c-type
-(push '((t) t #.(flags) "make_fixnum(type_of(#0))") (get 'si::c-type 'inline-always))
-(push '((t) fixnum #.(flags) "type_of(#0)") (get 'si::c-type 'inline-always))
+(push '((t) #.(c-type-propagator 'si::c-type #tt) #.(flags rfa) "type_of(#0)") 
+      (get 'si::c-type 'inline-always))
 
 (push '((long-float) short-float #.(flags rfa) "((float)#0)" ) (get 'si::long-to-short 'inline-always))
 (push '((t) short-float #.(flags) "((float)lf(#0))" ) (get 'si::long-to-short 'inline-unsafe))
@@ -1229,5 +1166,5 @@
 (push '((ratio)  integer        #.(flags rfa) "(#0)->rat.rat_num") (get 'ratio-numerator 'inline-always))
 (push '((ratio)  integer        #.(flags rfa) "(#0)->rat.rat_den") (get 'ratio-denominator 'inline-always))
 
-(push '((long-float) boolean #.(flags rfa) (lambda (x) (add-libc "isinf") (wt "(isinf(" x "))"))) (get 'si::isinf 'inline-always))
-(push '((long-float) boolean #.(flags rfa) (lambda (x) (add-libc "isnan") (wt "(isnan(" x "))"))) (get 'si::isnan 'inline-always))
+(push `((long-float) boolean #.(flags rfa) ,(lambda (x) (add-libc "isinf") (wt "(isinf(" x "))"))) (get 'si::isinf 'inline-always))
+(push `((long-float) boolean #.(flags rfa) ,(lambda (x) (add-libc "isnan") (wt "(isnan(" x "))"))) (get 'si::isnan 'inline-always))

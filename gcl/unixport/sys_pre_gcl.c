@@ -57,20 +57,26 @@ load1(x)
 void
 gcl_init_init()
 {
+  object features;
+  extern int pre_gcl;
 
   build_symbol_table();
 
-  lsp_init("../lsp/gcl_export.lsp");
-  lsp_init("../lsp/gcl_pl.lsp");
+  features=find_symbol(make_simple_string("*FEATURES*"),system_package);
+  features->s.s_dbind=make_cons(make_keyword("PRE-GCL"),features->s.s_dbind);
+  pre_gcl=1;
 
-  lsp_init("../lsp/gcl_callhash.lsp");
+  lsp_init("../lsp/gcl_export.lsp");
+
+  lsp_init("../lsp/gcl_s.lsp");
+  lsp_init("../lsp/gcl_sf.lsp");
 
   lsp_init("../lsp/gcl_defmacro.lsp");
   lsp_init("../lsp/gcl_evalmacros.lsp");
+
   lsp_init("../lsp/gcl_top.lsp");
   lsp_init("../lsp/gcl_module.lsp");
 
-  lsp_init("../lsp/gcl_autoload.lsp");
 
 }
 
@@ -82,18 +88,32 @@ gcl_init_system(object no_init)
     error("Supplied no_init is not of type symbol\n");
 
   lsp_init("../lsp/gcl_predlib.lsp");
+  lsp_init("../lsp/gcl_type.lsp");
+  lsp_init("../lsp/gcl_typep.lsp");
+  lsp_init("../lsp/gcl_typecase.lsp");
   lsp_init("../lsp/gcl_assert.lsp");
-/*   lsp_init("../lsp/gcl_listlib.lsp"); */
-  lsp_init("../lsp/gcl_mislib.lsp");
+
+
+  lsp_init("../lsp/gcl_dl.lsp");
+  lsp_init("../lsp/gcl_rm.lsp");
+  lsp_init("../lsp/gcl_autoload.lsp");
+
+  lsp_init("../lsp/gcl_fle.lsp");
+
+
   lsp_init("../lsp/gcl_setf.lsp");
   lsp_init("../lsp/gcl_arraylib.lsp");
 
   lsp_init("../lsp/gcl_seq.lsp");
   lsp_init("../lsp/gcl_seqlib.lsp");
+  lsp_init("../lsp/gcl_mislib.lsp");
+  lsp_init("../lsp/gcl_nr.lsp");
   lsp_init("../lsp/gcl_bnum.lsp");
   lsp_init("../lsp/gcl_numlib.lsp");
 
   lsp_init("../lsp/gcl_defstruct.lsp");
+  lsp_init("../lsp/gcl_sharp.lsp");
+  lsp_init("../lsp/gcl_callhash.lsp");
   lsp_init("../lsp/gcl_describe.lsp");
 #ifdef HAVE_JAPI_H
   lsp_init("../mod/gcl_japi.lsp");
@@ -121,10 +141,11 @@ gcl_init_system(object no_init)
 
   lsp_init("../cmpnew/gcl_cmpbind.lsp");
   lsp_init("../cmpnew/gcl_cmpblock.lsp");
+  lsp_init("../cmpnew/gcl_cmpvar.lsp");
+  lsp_init("../cmpnew/gcl_cmpeval.lsp");
   lsp_init("../cmpnew/gcl_cmpcall.lsp");
   lsp_init("../cmpnew/gcl_cmpcatch.lsp");
   lsp_init("../cmpnew/gcl_cmpenv.lsp");
-  lsp_init("../cmpnew/gcl_cmpeval.lsp");
   lsp_init("../cmpnew/gcl_cmpflet.lsp");
   lsp_init("../cmpnew/gcl_cmpfun.lsp");
   lsp_init("../cmpnew/gcl_cmpif.lsp");
@@ -137,7 +158,7 @@ gcl_init_system(object no_init)
   lsp_init("../cmpnew/gcl_cmpspecial.lsp");
   lsp_init("../cmpnew/gcl_cmptag.lsp");
   lsp_init("../cmpnew/gcl_cmptop.lsp");
-  lsp_init("../cmpnew/gcl_cmpvar.lsp");
+  /* lsp_init("../cmpnew/gcl_cmpvar.lsp"); */
   lsp_init("../cmpnew/gcl_cmpvs.lsp");
   lsp_init("../cmpnew/gcl_cmpwt.lsp");
   lsp_init("../cmpnew/gcl_cmpmain.lsp");

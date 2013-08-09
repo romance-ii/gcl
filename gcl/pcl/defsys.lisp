@@ -84,7 +84,7 @@
 ;;; about order of export and all that stuff, we can't put it in PKG before
 ;;; we want to use it.
 ;;; 
-(defvar *the-pcl-package* (find-package :pcl))
+#-gcl(defvar *the-pcl-package* (find-package :pcl))
 
 (defvar *pcl-system-date* "September 16 92 PCL (g)")
 
@@ -670,7 +670,7 @@ and load your system with:
 ;;;
 ;;; ***                                                                   ***
 
-(defun load-truename (&optional (errorp nil))
+#-gcl(defun load-truename (&optional (errorp nil))
   #+cmu (declare (ignore errorp))
   (flet (#+(or Lispm Xerox LUCID)
 	 (bad-time ()
@@ -692,7 +692,7 @@ and load your system with:
     #-(or Lispm excl Xerox (and dec vax common) LUCID akcl gcl cmu17) nil))
 
 #-(or cmu Symbolics)
-(defvar *pcl-directory* (concatenate 'string user::*system-directory* "../pcl/"))
+(defvar *pcl-directory* (concatenate 'string si::*system-directory* "../pcl/"))
 ;	(or (load-truename t)
 ;	    (error "Because load-truename is not implemented in this port~%~
 ;                    of PCL, you must manually edit the definition of the~%~

@@ -81,7 +81,7 @@ FFN(Lsystem)(void)
        }
 }
 
-DEFUN_NEW("GETPID",object,fSgetpid,SI,0,0,NONE,OO,OO,OO,OO,(void),
+DEFUN("GETPID",object,fSgetpid,SI,0,0,NONE,OO,OO,OO,OO,(void),
       "getpid  returns  the  process  ID  of the current process")
 { return make_fixnum(getpid());
 }
@@ -89,5 +89,5 @@ DEFUN_NEW("GETPID",object,fSgetpid,SI,0,0,NONE,OO,OO,OO,OO,(void),
 void
 gcl_init_unixsys(void)
 {
-	make_function("SYSTEM", Lsystem);
+	make_si_function("SYSTEM", Lsystem);
 }

@@ -25,7 +25,7 @@
 ;;;		*****************
 
 
-(in-package 'compiler)
+(in-package :compiler)
 
 
 (export '(*compile-print* *compile-verbose* *compile-file-truename* *compile-file-pathname*))
@@ -117,6 +117,15 @@
 
 (defvar *sigs* (make-hash-table :test 'eq))
 (defvar *new-sigs-in-file* nil)
+
+(defun set-first-sig (x y)
+  (unless (gethash x *sigs*) (setf (gethash x *sigs*) y)))
+
+(defun setup-sigs nil
+  (clrhash *sigs*)
+  (mapc (lambda (x) (set-first-sig (car x) (cdr x))
+	  (mapc (lambda (x) (set-first-sig (car x) (list (cdr x) nil nil nil nil nil))) (caddr x))) si::*sig-discovery-props*))
+
 (defun compile-file  (filename &rest args
 			    &aux (*print-pretty* nil)
 			    (*package* *package*) (*split-files* *split-files*)
@@ -137,7 +146,9 @@
 
   (loop 
 
-   (clrhash *sigs*)
+   (setup-sigs)
+;   (clrhash *sigs*)
+;   (purge-member-types)
 
    (do nil ((not (eq (setq tem (let (*new-sigs-in-file*) (apply 'compile-file1 filename args))) 'again))))
 
@@ -162,6 +173,7 @@
        (setf (car *split-files*) (+ (third *split-files*) section-length)))))
 
 (defvar *init-name*)
+(defvar *c-debug* nil)
 (defun compile-file1 (input-pathname
                       &key (output-file (merge-pathnames *o-ext* input-pathname))
                            (o-file t)
@@ -185,7 +197,7 @@
 			   (*data* (list (make-array 50 :fill-pointer 0 :adjustable t) nil nil nil))
 			   (*fasd-data* *fasd-data*)
                            (*error-count* 0))
-  (declare (special *c-debug* system-p))
+;  (declare (special *c-debug* system-p))
 
   (when input-pathname
     (setq input-pathname (si:search-local-pathname input-pathname)))
@@ -275,7 +287,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	  (unwind-protect
 	      (do ((form (read *compiler-input* nil eof) (read *compiler-input* nil eof))
 		   (load-flag (or (eq :defaults *eval-when-defaults*)
-				  (intersection '(load :load-toplevel) *eval-when-defaults*))))
+				  (list-split '(load :load-toplevel) *eval-when-defaults*))))
 		  (nil)
 		  
 		  (unless (eq form eof)
@@ -286,9 +298,11 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 		  (when (or (eq form eof) (and *split-files* (> (file-position *compiler-input*) (car *split-files*))))
 		    
 		    (when *new-sigs-in-file*
-		      (cmpnote "Caller ~s appears after callee ~s,~%   whose sig changed from ~s to ~s, restart pass1~%"
-			       (car *new-sigs-in-file*) (cadr *new-sigs-in-file*) (caddr *new-sigs-in-file*)
-			       (cadddr *new-sigs-in-file*))
+		      (keyed-cmpnote 
+		       (list 'signatures (car *new-sigs-in-file*))
+		       "Caller ~s appears after callee ~s,~%   whose sig changed from ~s to ~s, restart pass1~%"
+		       (car *new-sigs-in-file*) (cadr *new-sigs-in-file*) (caddr *new-sigs-in-file*)
+		       (cadddr *new-sigs-in-file*))
 		      (return-from compile-file1 'again))
 		    
 		    (when *split-files*
@@ -391,37 +405,73 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
     (wt-data1 form)  ;; this binds all the print stuff
     ))
 
-(defun compile (name &optional def &aux mac tem gaz (*default-pathname-defaults* #"."))
+(defun fun-env (name)
+  (let ((fun (when (fboundp name) (or (macro-function name) (symbol-function name)))))
+    (multiple-value-bind
+	    (src clo blk)
+	    (function-lambda-expression fun)
+	    (declare (ignore src blk))
+	    (mapcar 'cadr clo))))
+
+    ;; (cond ((si::interpreted-function-p fun) 
+    ;; 	   (multiple-value-bind
+    ;; 	    (src clo blk)
+    ;; 	    (function-lambda-expression fun)
+    ;; 	    (declare (ignore src blk))
+    ;; 	    (mapcar 'cadr clo)))
+    ;; 	  ((compiled-function-p fun) (c::function-env fun 0)))))
+
+
+(defun get-named-form (name)
+  (when (fboundp name) 
+    (let* ((mac (macro-function name))
+	   (na (if (symbol-package name) name 'cmp-anon))
+	   (fun (or mac (symbol-function name))))
+      (multiple-value-bind
+       (lam clo) 
+       (function-lambda-expression fun)
+       (let ((form `(,(if mac 'defmacro 'defun) ,(if mac (cons 'macro na) na) ,(cadr lam) ,@(cddr lam))))
+;       (let ((form `(,(if mac 'defmacro 'defun) ,na ,(cadr lam) ,@(cddr lam))))
+	 (values (if clo 
+		     (let ((f (tmpsym))(v (tmpsym))(o (tmpsym)))
+		       `(let* (,@(mapcar (lambda (x) (list (car x) `(tmpsym))) (reverse clo))
+			       (,o (fun-env ',name));FIXME share structure
+			       (,v ,form)
+			       (,f (c-symbol-gfdef ,v)))
+			  (si::set-function-environment ,f ,o)
+			  ,v)) form) na))))))
+
+(defun compile (name &optional def &aux na tem gaz (*default-pathname-defaults* #"."))
   
   (when (eq name 'cmp-anon)
-    (remhash name si::*call-hash-table*)
+;    (remhash name si::*call-hash-table*)
     (dolist (l '(proclaimed-function proclaimed-arg-types proclaimed-return-type))
       (remprop name l)))
 
-  (cond ((not(symbolp name)) (error "Must be a name"))
-	((or (si::interpreted-function-p def) (and (consp def) (eq (car def) 'lambda)))
+  (cond ((not (symbolp name)) (error "Must be a name"))
+	((and (consp def) (eq (car def) 'lambda));(or (si::interpreted-function-p def) );FIXME
+	 (compile nil (coerce def 'function)))
+	((functionp def)
 	 (or name (setf name 'cmp-anon))
-	 (setf (symbol-function name) (coerce def 'function))
+	 (setf (symbol-function name) def)
 	 (compile name))
 	(def (error "def not a lambda expression"))
 	 ;; FIXME -- support warnings-p and failures-p.  CM 20041119
-	((and (fboundp name) (setq tem (function-lambda-expression (or (setq mac (macro-function name)) (symbol-function name)))))
-	 (let ((na (if (symbol-package name) name 'cmp-anon)) warnings failures)
+	((multiple-value-setq (tem na) (get-named-form name))
+	 (let (warnings failures)
 	   (unless (and (fboundp 'si::init-cmp-anon) (or (si::init-cmp-anon) (fmakunbound 'si::init-cmp-anon)))
 	     (with-open-file
 	      (st (setq gaz (gazonk-name)) :direction :output))
 	     (multiple-value-bind 
 	      (fn w f)
-	      (let ((*compiler-compile* `(,(if mac 'defmacro 'defun) ,na 
-					   ,@(ecase (car tem)
-						    (lambda (cdr tem))
-						    (lambda-block (cddr tem)))))) (compile-file gaz))
+	      (let ((*compiler-compile* tem))
+		(compile-file gaz))
 	      (when fn 
 		(load fn)
 		(unless *keep-gaz* (delete-file fn)))
 	      (setq warnings w failures f))
 	     (unless *keep-gaz* (delete-file gaz)))
-	   (or (eq na name) (setf (symbol-function name) (symbol-function na)))
+	   (unless (eq na name) (setf (symbol-function name) (symbol-function na)))
 	   (when *tmp-pack*
 	     (delete-package *tmp-pack*)
 	     (setq *tmp-pack* nil))
@@ -429,22 +479,63 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	(t (error "can't compile ~a" name))))
 
 
-(defun disassemble (name &optional (asm t) &aux tem mac)
+(defvar *codes* '((lambda (x) (code-char x))
+		  (lambda (x) (char-code x))
+		  (lambda (x y) (+ x y))
+		  (lambda (x y) (declare (seqind x y)) (+ x y))
+		  (lambda (x y) (- x y))
+		  (lambda (x y) (declare (seqind x y)) (- x y))
+		  (lambda (x) (- x))
+		  (lambda (x) (declare (seqind x)) (- x))
+		  (lambda (x y) (member x y))
+		  (lambda (x y) (declare (symbol x)) (member x y))
+		  (lambda (f x) (mapl f x))
+		  (lambda (x) (mapc (lambda (x) (1+ x)) x))
+		  (lambda (x) (coerce x 'function))
+		  (lambda (x) (declare (function x)) (coerce x 'function))
+		  (lambda (x) (declare (symbol x)) (coerce x 'function))
+		  (lambda (x y) (eq x y))
+		  (lambda (x y) (eql x y))
+		  (lambda (x y) (declare (symbol x)) (eql x y))
+		  (lambda (x y) (declare (fixnum x)) (eql x y))
+		  (lambda (x y) (declare (symbol x) (fixnum x)) (eql x y))))
+
+
+(defun code-size (f)
+  (let* ((x (with-output-to-string 
+	     (s)
+	     (let ((*standard-output* s))
+	       (disassemble f))))
+	 (b (string-match #v"\n[0-9a-f]* <[^>\n]*>:" x))
+	 (e (string-match #v"\n[0-9a-f]* <[^>\n]*>:" x (match-end 0)))
+	 (x (subseq x b e))(i 0)(zb 0)(ze 0))
+    (do nil ((>= 0 (string-match #v"\n *\([0-9a-f]*\):" x i))) (setq zb (match-beginning 1) ze (match-end 1) i (match-end 0)))
+    (let ((*read-base* 16)) (read-from-string (subseq x zb ze)))))
+
+(defun vec-to-list (x)
+  (typecase
+   x
+   (string (if (find-if-not 'standard-char-p x) "fasl code" x))
+   (vector (vec-to-list (coerce x 'list)))
+   (cons (let ((a (vec-to-list (car x)))(d (vec-to-list (cdr x))))
+	   (if (and (eq a (car x)) (eq d (cdr x))) x (cons a d))))
+   (otherwise x)))
+
+(defun disassemble (name &optional (asm t) file &aux tem)
   (check-type name (or function function-identifier))
   (cond ((and (consp name)
 	      (eq (car name) 'lambda))
 	 (dolist (l '(proclaimed-function proclaimed-return-type proclaimed-arg-types))
 	   (remprop 'cmp-anon l))
-	 (remhash 'cmp-anon si::*call-hash-table*)
+;	 (remhash 'cmp-anon si::*call-hash-table*)
 	 (eval `(defun cmp-anon ,@ (cdr name)))
-	 (disassemble 'cmp-anon asm))
+	 (disassemble 'cmp-anon asm file))
 	((not(symbolp name)) (princ "Not a lambda or a name") nil)
-	((and (setq tem (and (fboundp name) (or (setq mac (macro-function name)) (symbol-function name))))
-	      (or (consp tem) (setq tem (function-lambda-expression tem))))
-	 (let ((gaz (gazonk-name)))
+	((setq tem (get-named-form name))
+	 (let ((gaz (gazonk-name))(*compiler-compile* (unless file tem)))
 	   (with-open-file
 	     (st gaz :direction :output)
-	     (prin1-cmp `(,(if mac 'defmacro 'defun) ,name ,@(cdr tem)) st))
+	     (prin1-cmp tem st))
 	   (let (*fasd-data*)
 	     (compile-file gaz 
 			   :h-file t 
@@ -463,12 +554,14 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 					 a))))
 			     (si::copy-stream st *standard-output*))
 	     (with-open-file (st dn)
-			     (do (form) ((eq 'eof (setq form (read st nil 'eof)))) (princ form)))
+			     (princ
+			      (let (f) (do nil ((eq 'eof (car (push (read st nil 'eof) f))) 
+						(vec-to-list (nreverse (cdr f))))))))
 ;			     (si::copy-stream st *standard-output*))
 	     (with-open-file (st hn)
 			     (si::copy-stream st *standard-output*))
-	     (when asm (system (si::string-concatenate "objdump --source "
-					     (namestring on))))
+	     (when asm (si::copy-stream (open (concatenate 'string "|objdump --source " (namestring on)))
+					*standard-output*))
 	     (delete-file cn)
 	     (delete-file dn)
 	     (delete-file hn)
@@ -486,8 +579,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 				  (system-p (when (or (eq system-p 'disassemble) (probe-file ci)) system-p)))
   (declare (special *init-name*))
   (with-open-file (st c-pathname :direction :output)
-    (let ((*compiler-output1* (if (eq system-p 'disassemble) *standard-output*
-				st)))
+    (let ((*compiler-output1* (if (eq system-p 'disassemble) *standard-output* st)))
       (declare (special *compiler-output1*))
     (with-open-file 
      (*compiler-output2* h-pathname :direction :output)
@@ -528,46 +620,40 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 
 (defvar *use-buggy* nil)
 
-(defun  compiler-command (&rest args &aux na )
+(defun  compiler-command (&rest args )
   (declare (special *c-debug*))
-  (let ((dirlist (pathname-directory (first args)))
-	(name (pathname-name (first args)))
-	dir)
-    (cond (dirlist (setq dir (namestring (make-pathname :directory dirlist))))
-	  (t (setq dir ".")))
-    (setq na  (namestring
-	       (make-pathname :name name :type (pathname-type(first args)))))
-   #+(or dos winnt)
-      (format nil "~a -I~a ~a ~a -c -w ~s -o ~s"
-	      *cc*
-	      (concatenate 'string si::*system-directory* "../h")
-	      (if (and (boundp '*c-debug*) *c-debug*) " -g " "")
-	      (case *speed*
-		    (3 *opt-three* )
-		    (2 *opt-two*) 
-		    (t ""))	
-	      (namestring (make-pathname  :type "c" :defaults (first args)))
-	      (namestring (make-pathname  :type "o" :defaults (first args)))
-	      )
 
-   #-(or dos winnt)
-   (format nil  "~a -I~a ~a ~a -c ~a -o ~a ~a"
-	   *cc*
-	   (concatenate 'string si::*system-directory* "../h")
-	   (if (and (boundp '*c-debug*) *c-debug*) " -g " "")
-           (case *speed*
-		 (3 *opt-three* )
-		 (2 *opt-two*) 
-		 (t ""))	
-	   (namestring (first args))
-	   (namestring (second args))
-	   (prog1
-	       #+aix3
-	     (format nil " -w ;ar x /lib/libc.a fsavres.o  ; ar qc XXXfsave fsavres.o ; echo init_~a > XXexp ; mv  ~a  XXX~a ; ld -r -D-1 -bexport:XXexp -bgc XXX~a -o ~a XXXfsave ; rm -f XXX~a XXexp XXXfsave fsavres.o"
-		     *init-name*
-		     (setq na (namestring (get-output-pathname na "o" nil)))
-		     na na na na na)
-	     #+(or dlopen irix5)
+  #+(or dos winnt)
+  (format nil "~a -I~a ~a ~a -c -w ~s -o ~s"
+	  *cc*
+	  (concatenate 'string si::*system-directory* "../h")
+	  (if (and (boundp '*c-debug*) *c-debug*) " -g " "")
+	  (case *speed*
+		(3 *opt-three* )
+		(2 *opt-two*) 
+		(t ""))	
+	  (namestring (make-pathname  :type "c" :defaults (first args)))
+	  (namestring (make-pathname  :type "o" :defaults (first args)))
+	  )
+  
+  #-(or dos winnt)
+  (format nil  "~a -I~a ~a ~a -c ~a -o ~a ~a"
+	  *cc*
+	  (concatenate 'string si::*system-directory* "../h")
+	  (if (and (boundp '*c-debug*) *c-debug*) " -g " "")
+	  (case *speed*
+		(3 *opt-three* )
+		(2 *opt-two*) 
+		(t ""))	
+	  (namestring (first args))
+	  (namestring (second args))
+	  (prog1
+	      #+aix3
+	    (format nil " -w ;ar x /lib/libc.a fsavres.o  ; ar qc XXXfsave fsavres.o ; echo init_~a > XXexp ; mv  ~a  XXX~a ; ld -r -D-1 -bexport:XXexp -bgc XXX~a -o ~a XXXfsave ; rm -f XXX~a XXexp XXXfsave fsavres.o"
+		    *init-name*
+		    (setq na (namestring (get-output-pathname na "o" nil)))
+		    na na na na na)
+	    #+(or dlopen irix5)
 	     (if (not system-p)
 		 (format nil
 			 " -w ; mv ~a XX~a ; ld  ~a -shared XX~a  -o ~a -lc ; rm -f XX~a"  
@@ -575,15 +661,10 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 			 #+ignore-unresolved "-ignore_unresolved"
 			 #+expect-unresolved "-expect_unresolved '*'"
 			 na na na))	
-			    
-	     #+bsd ""
-;	     #+bsd "-w"
-	     #-(or aix3 bsd irix3) " 2> /dev/null ")
-		  
-		 
-	   )
-   )
-  )
+	     
+	     #+bsd ""	;	     #+bsd "-w"
+	     #-(or aix3 bsd irix3) " 2> /dev/null ")))
+
 
 ; Windows short form paths may contain tilde (~) which conflicts with
 ; format directives.
@@ -840,3 +921,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	(delete-file raw)
 	(delete-file init)
 	image))))
+
+(defun cdebug (&optional a) 
+  (setq *default-system-p* t *default-c-file* t *default-data-file* t *default-h-file* t *keep-gaz* a *annotate* a))
+

@@ -24,6 +24,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include <string.h>
+#include <ctype.h>
 #include "include.h"
 
 static void
@@ -170,6 +171,38 @@ char *s;
 	return(x);
 }
 
+object
+make_gmp_ordinary(s)
+char *s;
+{
+        int i,j;
+	object x, l, *ep;
+	vs_mark;
+	char *ss=alloca(strlen(s)+1);
+
+	for (i=0;s[i];i++)
+	  ss[i]=toupper(s[i]);
+	ss[i]=0;
+	set_up_string_register(ss);
+	j = pack_hash(string_register);
+	ep = & P_EXTERNAL(gmp_package,j);
+	for (l = *ep;  consp(l);  l = l->c.c_cdr)
+		if (string_eq(l->c.c_car, string_register))
+			return(l->c.c_car);
+	for (l =  P_EXTERNAL(lisp_package,j);
+	     consp(l);
+	     l = l->c.c_cdr)
+		if (string_eq(l->c.c_car, string_register))
+		    error("name conflict --- can't make_si_ordinary");
+	x = make_symbol(string_register);
+	vs_push(x);
+	x->s.s_hpack = gmp_package;
+	gmp_package->p.p_external_fp ++;
+	*ep = make_cons(x, *ep);
+	vs_reset;
+	return(x);
+}
+
 /*
 	Make_si_special(s, v) makes a special variable from C string s
 	with initial value v in system package.
@@ -224,6 +257,7 @@ char *s;
 	x = make_symbol(string_register);
 	vs_push(x);
 	x->s.s_hpack = keyword_package;
+	x->s.tt=2;
 	x->s.s_stype = (short)stp_constant;
 	x->s.s_dbind = x;
 	*ep = make_cons(x, *ep);
@@ -309,7 +343,7 @@ object s, v, p;
 	return(v);
 }
 
-DEFUN_NEW("SPUTPROP",object,fSsputprop,SI,3,3,NONE,OO,OO,OO,OO,(object s,object p,object v),"") {
+DEFUN("SPUTPROP",object,fSsputprop,SI,3,3,NONE,OO,OO,OO,OO,(object s,object p,object v),"") {
 
   if (type_of(s) != t_symbol)
     not_a_symbol(s);
@@ -397,7 +431,7 @@ LFD(Lremprop)()
 	vs_popp;
 }
 
-DEFUN_NEW("SYMBOL-PLIST",object,fLsymbol_plist,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+DEFUN("SYMBOL-PLIST",object,fLsymbol_plist,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
   check_type_symbol(&sym);
   RETURN1(sym->s.s_plist);
 }
@@ -426,6 +460,12 @@ DEFUN_NEW("SYMBOL-PLIST",object,fLsymbol_plist,LISP,1,1,NONE,OO,OO,OO,OO,(object
 	@(return Cnil Cnil Cnil)
 @)
 
+DEFUN("SYMBOL-STRING",object,fSsymbol_string,SI,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+  object y=alloc_simple_string(sym->st.st_fillp);
+  y->st.st_self=sym->st.st_self;
+  RETURN1(y);
+}
+
 
 object
 symbol_name(x)
@@ -451,12 +491,12 @@ object y;
     return(y);
 }
 
-DEFUN_NEW("SYMBOL-NAME",object,fLsymbol_name,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+DEFUN("SYMBOL-NAME",object,fLsymbol_name,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
 /* LFD(Lsymbol_name)() */
   RETURN1(symbol_name(sym));
 }
 
-DEFUN_NEW("MAKE-SYMBOL",object,fLmake_symbol,LISP,1,1,NONE,OO,OO,OO,OO,(object name),"") {
+DEFUN("MAKE-SYMBOL",object,fLmake_symbol,LISP,1,1,NONE,OO,OO,OO,OO,(object name),"") {
 /* LFD(Lmake_symbol)() */
   check_type_string(&name);
   RETURN1(make_symbol(name));
@@ -491,14 +531,10 @@ gensym_int(object this_gensym_prefix,object this_gensym_counter) {
   case t_bignum:
     big=this_gensym_counter;
     sign=BIG_SIGN(big);
-    size = mpz_sizeinbase(MP(big),10)+2+(sign<0? 1 : 0);
-    if (!(p=ZALLOCA(size)))
-      FEerror("Cannot alloca gensym name", 0);
-    mpz_get_strp(&p,10,MP(big));
-    j=size-5;
-    j=j<0 ? 0 : j;
-    while (p[j]) j++;
-    q=p+j;
+    size = mpz_sizeinbase(MP(big),10)+(BIG_SIGN(big)<0? 1 : 0)+1;
+    massert(p=alloca(size));
+    massert(p=mpz_get_str(p,10,MP(big)));
+    q=p+strlen(p);
     break;
   case t_fixnum:
     for (size=1,f=fix(this_gensym_counter);f;f/=10,size++);
@@ -531,7 +567,7 @@ gensym_int(object this_gensym_prefix,object this_gensym_counter) {
 
 }
 
-DEFUN_NEW("GENSYM0",object,fSgensym0,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+DEFUN("GENSYM0",object,fSgensym0,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
 
   object x;
 
@@ -541,7 +577,7 @@ DEFUN_NEW("GENSYM0",object,fSgensym0,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
 
 }
 
-DEFUN_NEW("GENSYM1S",object,fSgensym1s,SI,1,1,NONE,OO,OO,OO,OO,(object g),"") {
+DEFUN("GENSYM1S",object,fSgensym1s,SI,1,1,NONE,OO,OO,OO,OO,(object g),"") {
 
   object x;
 
@@ -551,10 +587,10 @@ DEFUN_NEW("GENSYM1S",object,fSgensym1s,SI,1,1,NONE,OO,OO,OO,OO,(object g),"") {
 
 }
 
-DEFUN_NEW("GENSYM1IG",object,fSgensym1ig,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("GENSYM1IG",object,fSgensym1ig,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
   check_type_non_negative_integer(&x);
-  RETURN1(gensym_int(NULL,x));
+  RETURN1(gensym_int(OBJNULL,x));
 
 }
 #ifdef STATIC_FUNCTION_POINTERS
@@ -612,12 +648,12 @@ ONCE_MORE:
 	@(return smbl)
 @)
 
-DEFUN_NEW("SYMBOL-PACKAGE",object,fLsymbol_package,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+DEFUN("SYMBOL-PACKAGE",object,fLsymbol_package,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
   check_type_symbol(&sym);
   RETURN1(sym->s.s_hpack);
 }
 
-DEFUN_NEW("KEYWORDP",object,fLkeywordp,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+DEFUN("KEYWORDP",object,fLkeywordp,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
   RETURN1(type_of(sym) == t_symbol && keywordp(sym) ? Ct : Cnil);
 }
 

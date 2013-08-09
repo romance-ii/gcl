@@ -88,6 +88,8 @@
 ;;; of caches will require corresponding port-specific modifications to the
 ;;; lap code assembler.
 ;;;
+#+gcl(import 'si::non-negative-fixnum)
+
 (defmacro cache-vector-ref (cache-vector location)
   `(svref (the simple-vector ,cache-vector)
           (#-cmu the #+cmu ext:truly-the non-negative-fixnum ,location)))

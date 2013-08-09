@@ -23,89 +23,39 @@
 ;;;;        The structure routines.
 
 
-(in-package 'lisp)
-(export 'defstruct)
+;; (in-package 'lisp)
+;; (export 'defstruct)
 
 
-(in-package 'system)
-
-
-;(proclaim '(optimize (safety 2) (space 3)))
-
-
-
-;(in-package 'system)
-
+(in-package :system)
 
 
 (defvar *accessors* (make-array 10 :adjustable t))
 (defvar *list-accessors* (make-array 2 :adjustable t))
 (defvar *vector-accessors* (make-array 2 :adjustable t))
 
-(or (fboundp 'record-fn) (setf (symbol-function 'record-fn)
-			       (lambda (&rest l) l nil)))
+(defun record-fn (&rest l) (declare (ignore l)) nil)
 
 (defun make-access-function (name conc-name no-conc type named include no-fun
 				  ;; from apply
 				  slot-name default-init slot-type read-only
-				  offset &optional predicate ) 
-  (declare (ignore named default-init predicate ))
-  (let ((access-function
-	 (if no-conc
-	     slot-name
-	   (intern (si:string-concatenate (string conc-name)
-					  (string slot-name)))))
-	accsrs dont-overwrite)
-    (ecase type
-      ((nil)
-       (setf accsrs *accessors*))
-      (list
-	(setf accsrs *list-accessors*))
-      (vector
-	(setf accsrs *vector-accessors*)))
-    (or (> (length  accsrs) offset)
-	(adjust-array accsrs (+ offset 10)))
-    (unless
-     dont-overwrite
-     (record-fn access-function 'defun '(t) slot-type)
-     (or no-fun
-	 (and (fboundp access-function)
-	      (eq (aref accsrs offset) (symbol-function access-function)))
-	 (progn 
-	   (setf (symbol-function access-function)
-		 (or (aref accsrs offset)
-		     (setf (aref accsrs offset)
-			   (cond  ((eq accsrs *accessors*)
-				   (lambda (x)
-				     (declare (optimize (safety 2)))
-				     (or (structurep x)
-					 (error "~a is not a structure" x))
-				     (structure-ref1 x offset)))
-				  ((eq accsrs *list-accessors*)
-				   (lambda(x)
-				     (declare (optimize (safety 2)))
-				     (si:list-nth offset x)))
-				  ((eq accsrs *vector-accessors*)
-				   (lambda(x)
-				     (declare (optimize (safety 2)))
-				     (aref x offset)))))))
-	        (add-hash access-function `((t) ,(or (not slot-type) slot-type)) nil nil nil))))
+				  offset &optional predicate) 
+  (declare (ignore named default-init predicate no-fun))
+  (let ((access-function (if no-conc slot-name
+			   (intern (si:string-concatenate conc-name slot-name)))))
+    (record-fn access-function 'defun '(t) slot-type)
     (cond (read-only
-	    (remprop access-function 'structure-access)
-	    (setf (get access-function 'struct-read-only) t))
+	   (remprop access-function 'structure-access)
+	   (setf (get access-function 'struct-read-only) t))
 	  (t (remprop access-function 'setf-update-fn)
 	     (remprop access-function 'setf-lambda)
 	     (remprop access-function 'setf-documentation)
 	     (let ((tem (get access-function 'structure-access)))
-	       (cond ((and (consp tem) include
-			   (subtypep include (car tem))
-			   (eql (cdr tem) offset))
-		      ;; don't change overwrite accessor of subtype.
-		      (setq dont-overwrite t)
-		      )
-		     (t  (setf (get access-function 'structure-access)
-			       (cons (if type type name) offset)))))))
-    nil))
+	       (unless (and (consp tem) include
+			    (subtypep include (car tem))
+			    (eql (cdr tem) offset))
+		 (setf (get access-function 'structure-access) (cons (if type type name) offset)))))))
+  nil)
 
 (defmacro key-name (key prior-keyword)
   `(cond
@@ -239,32 +189,6 @@
 	       (list ,@slot-names)))
 	   ((error "~S is an illegal structure type" type)))))
   
-(defun make-predicate (name predicate type named name-offset)
-  (cond ((null type))
-	 ; done in define-structure
-        ((or (eq type 'vector)
-             (and (consp type) (eq (car type) 'vector)))
-         ;; The name is at the NAME-OFFSET in the vector.
-         (unless named (error "The structure should be named."))
-         `(defun ,predicate (x)
-            (and (typep x '(vector t))
-                 (> (the fixnum (length x)) ,name-offset)
-                 (eq (aref (the (vector t) x) ,name-offset) ',name))))
-        ((eq type 'list)
-         ;; The name is at the NAME-OFFSET in the list.
-         (unless named (error "The structure should be named."))
-         (if (= name-offset 0)
-             `(defun ,predicate (x)
-                     (and (consp x)
-                          (eq (car x) ',name)))
-             `(defun ,predicate (x)
-                     (do ((i ,name-offset (1- i))
-                          (z x (cdr z)))
-                         ((= i 0) (and (consp z) (eq (car z) ',name)))
-			 (declare (fixnum i))
-                       (unless (consp z) (return nil))))))
-        ((error "~S is an illegal structure type."))))
-
 
 ;;; PARSE-SLOT-DESCRIPTION parses the given slot-description
 ;;;  and returns a list of the form:
@@ -312,7 +236,7 @@
                             sds))
 	       ;; If
 	       (setf (caddr (car sds))
-		     (best-array-element-type (caddr (car sds))))
+		     (upgraded-array-element-type (caddr (car sds))))
 	       (when (not  (equal (normalize-type (or (caddr (car sds)) t))
 				 (normalize-type (or (caddr (car olds)) t))))
 		     (error "Type mismmatch for included slot ~a" (car sds)))
@@ -335,7 +259,7 @@
 (defun make-t-type (n include slot-descriptions &aux i)
   (let ((res  (make-array n :element-type 'unsigned-char :static t)))
     (when include
-	  (let ((tem (get include 's-data))raw)
+	  (let ((tem (get include 's-data)) raw)
 	    (or tem (error "Included structure undefined ~a" include))
 	    (setq raw (s-data-raw tem))
 	  (dotimes (i (min n (length raw)))
@@ -354,16 +278,11 @@
 	  (t res))))
 
 (defvar *standard-slot-positions*
-  (let ((ar (make-array 50 :element-type 'unsigned-short
-			:static t))) 
+  (let ((ar (make-array 50 :element-type 'unsigned-short :static t))) 
     (dotimes (i 50)
 	     (declare (fixnum i))
 	     (setf (aref ar i)(*  (size-of t) i)))
     ar))
-
-;(eval-when (compile )
-;(proclaim '(function round-up (fixnum fixnum ) fixnum))
-;)
 
 (defun round-up (a b)
   (declare (fixnum a b))
@@ -373,11 +292,11 @@
 
 (defun get-slot-pos (leng include slot-descriptions &aux type small-types
 			  has-holes) 
-  (declare (special *standard-slot-positions*)) include
+  (declare (ignore include) (special *standard-slot-positions*)) 
   (dolist (v slot-descriptions)
 	  (when (and v (car v))
 		(setf type 
-		      (or (best-array-element-type (caddr v)) t)
+		      (upgraded-array-element-type (or (caddr v) t))
 		      (caddr v) type)
 		(let ((val (second v)))
 		  (unless (typep val type)
@@ -423,20 +342,13 @@
 			      static include print-function constructors
 			      offset predicate &optional documentation no-funs
 			      &aux def leng)
+  (declare (ignore copier))
   (and (consp type) (eq (car type) 'vector)(setq type 'vector))
-  (setq leng(length slot-descriptions))
+  (setq leng (length slot-descriptions))
   (dolist (x slot-descriptions)
     (and x (car x)
-	 (apply #'make-access-function
-		name conc-name no-conc type named include no-funs
-		x )))
-  (when (and copier (not no-funs))
-	(setf (symbol-function copier)
-	      (ecase type
-		((nil) #'si::copy-structure)
-		(list #'copy-list)
-		(vector #'copy-seq))))
-		
+	 (apply 'make-access-function
+		name conc-name no-conc type named include no-funs x)))
 
   (cond ((and (null type)
 	      (eq name 's-data))
@@ -498,27 +410,19 @@
 	   (or tem (setf (get name 's-data) def)))
 	  (tem 
 	   (check-s-data tem def name))
-	  (t (setf (get name 's-data) def)))
+	  (t (setf (get name 's-data) def)));(null type)
     (when documentation
-	  (setf (get name 'structure-documentation)
-		documentation))
-    (when (and  (null type)  predicate)
+	  (setf (get name 'structure-documentation) documentation))
+    (when (and (null type) predicate)
 	  (record-fn predicate 'defun '(t) t)
-	  
-	  (or no-funs
-	      (progn
-		(setf (symbol-function predicate)
-		      (lambda (x)
-			(declare (optimize (safety 2)))
-			(si::structure-subtype-p x name)))
-		(add-hash predicate `((t) boolean) nil nil nil)))
-	      (setf (get predicate 'compiler::co1)
-		'compiler::co1structure-predicate)
-	  (setf (get predicate 'struct-predicate) name)
-	  )
-  ) nil)
+	  (setf (get predicate 'compiler::co1)'compiler::co1structure-predicate)
+	  (setf (get predicate 'struct-predicate) name)))
+  nil)
 
 		  
+(defun str-ref (x y z) (declare (ignore y)) (structure-ref1 x z))
+(export 'str-ref)
+
 (defmacro defstruct (name &rest slots)
   (declare (optimize (safety 2)))
   (let ((slot-descriptions slots)
@@ -538,7 +442,7 @@
 	  ;; The defstruct options are supplied.
           (setq options (cdr name))
           (setq name (car name)))
-
+    
     ;; The default conc-name.
     (setq conc-name (si:string-concatenate (string name) "-"))
 
@@ -573,7 +477,7 @@
 		 (:copier (setq copier v))
 		 (:static (setq static v))
 		 (:predicate
-		   (setq predicate v)
+		   (setq predicate (or v (gensym)))
 		   (setq predicate-specified t))
 		 (:include
 		   (setq include (cdar os))
@@ -710,7 +614,11 @@
     (when (and print-function type)
           (error "A print function is supplied to a typed structure."))
 
-    (let* (new-slot-descriptions
+    (let* ((tp (cond ((not type) nil) 
+		     ((subtypep type 'list) 'list)
+		     ((subtypep type 'vector) 'vector)))
+	   (ctp (cond ((or (not type) named) name) (tp)))
+	   new-slot-descriptions
 	   (new-slot-descriptions ;(copy-list slot-descriptions)))
 	    (dolist (sd slot-descriptions (nreverse new-slot-descriptions))
 	      (if (and (consp sd) (eql (length sd) 5))
@@ -728,23 +636,64 @@
 	 (define-structure ',name  ',conc-name ',no-conc ',type
 	   ',named ',slot-descriptions ',copier ',static ',include 
 	   ',print-function ',constructors 
-	   ',offset ',predicate ',documentation 
-	   )
-	 
+	   ',offset ',predicate ',documentation)
 	 ,@(mapcar (lambda (constructor)
 		       (make-constructor name constructor type named new-slot-descriptions))
 		   constructors)
-	 ,@(if (and type predicate)
-	       (list (make-predicate name predicate type named
-				     name-offset)))
-	 ',name
-	 ))))
+	 ,@(when copier
+	     `((defun ,copier (x) 
+		 (declare (optimize (safety 1)))
+		 (check-type x ,ctp)
+		 (the ,ctp 
+		      ,(ecase tp
+			      ((nil) `(copy-structure x))
+			      (list `(copy-list x))
+			      (vector `(copy-seq x)))))))
+	 ,@(mapcar (lambda (y) 
+		     (let* ((sn (pop y))
+			   (nm (if no-conc sn
+				 (intern (si:string-concatenate (string conc-name) (string sn)))))
+			   (di (pop y))
+			   (st (pop y))
+			   (ro (pop y))
+			   (offset (pop y)))
+		       `(defun ,nm (x)
+			   (declare (optimize (safety 2)))
+			   (check-type x ,ctp)
+			   (the ,(or (not st) st)
+				,(ecase tp
+					((nil) `(str-ref x ',name ,offset))
+					(list `(let ((c (nthcdr ,offset x))) (check-type c cons) (car c)));(list-nth ,offset x))
+					(vector `(aref x ,offset)))))))
+		   slot-descriptions)
+	 ,@(mapcar (lambda (y) 
+		     (let* ((sn (car y))
+			    (y (if no-conc sn
+				 (intern (si:string-concatenate (string conc-name) (string sn))))))
+		       `(si::putprop ',y t 'compiler::cmp-inline))) slot-descriptions);FIXME
+	 ,@(when predicate
+	     `((defun ,predicate (x) 
+		 (declare (optimize (safety 2)))
+		 (the boolean 
+		      ,(ecase tp
+			      ((nil) `(structure-subtype-p x ',name))
+			      (list
+			       (unless named (error "The structure should be named."))
+			       `(let ((x (when (listp x) (nthcdr ,name-offset x)))) (when x (eq (car x) ',name))))
+			      (vector
+			       (unless named (error "The structure should be named."))
+			       `(and (typep x '(vector t))
+				     (> (length x) ,name-offset)
+				     (eq (aref x ,name-offset) ',name))))))))
+	 ,@(when predicate ;(and predicate named);predicate;
+	     `((deftype ,name nil (list 'satisfies ',predicate))))
+	 ',name))))
 
 ;; First several fields of this must coincide with the C structure
 ;; s_data (see object.h).
 
 
-(defstruct s-data name
+(defstruct s-data (name nil :type symbol)
 		 (length 0 :type fixnum)
 		 raw
 		 included

@@ -152,7 +152,7 @@ gcl_init_safety(void)
 }
   
 DO_INIT(gcl_init_safety();)
-DEFUN_NEW("SIGNAL-SAFETY-REQUIRED",object,sSsignal_safety_required,SI,2,2,
+DEFUN("SIGNAL-SAFETY-REQUIRED",object,sSsignal_safety_required,SI,2,2,
 	  NONE,OI,IO,OO,OO,(fixnum signo,fixnum safety),
       "Set the safety level required for handling SIGNO to SAFETY, or if \
 SAFETY is negative just return the current safety level for that \
@@ -433,7 +433,7 @@ raise_pending_signals(int cond)
  }}
 
 
-DEFUN_NEW("ALLOW-SIGNAL",object,fSallow_signal,SI,1,1,NONE,OI,OO,OO,OO,(fixnum n),
+DEFUN("ALLOW-SIGNAL",object,fSallow_signal,SI,1,1,NONE,OI,OO,OO,OO,(fixnum n),
       "Install the default signal handler on signal N")
 
 {

@@ -1,12 +1,5 @@
 ;; -*-Lisp-*-
-(in-package 'lisp)
-
-(export 'abs)
-
-(in-package 'si)
-
-(import 'compiler::defdlfun 'si)
-(import 'compiler::strcat 'si)
+(in-package :si)
 
 #+c99
 (progn
@@ -29,7 +22,7 @@
     `(progn
        (defdlfun (:float    ,(strcat "f" x "f") ) :float)
        (defdlfun (:double   ,(strcat "f" x)     ) :double)
-       (defdlfun (:fixnum   ,x                  ) :fixnum)
+       (defdlfun (:fixnum   ,(strcat "l" x)     ) :fixnum)
        (defdlfun (:float    ,(strcat "c" x "f") ) :fcomplex)
        (defdlfun (:double   ,(strcat "c" x)     ) :dcomplex))))
 
@@ -96,7 +89,7 @@
 	     body)))))
 
  (defmacro defmabs (x &optional n)
-   (let* ((i (mdlsym x))
+   (let* ((i (mdlsym (string-concatenate "l" x)))
 	  (b (mdlsym (string-concatenate "f" x)))
 	  (f (mdlsym (string-concatenate "f" x "f")))
 	  (c (mdlsym (string-concatenate "c" x)))
@@ -118,7 +111,7 @@
 	  (typecase x
 			 (long-float  (,b x))
 			 (short-float (,f x))
-			 (fixnum      (if (> x most-negative-fixnum) (,i x) (- most-negative-fixnum)))
+			 (fixnum      (if (= x most-negative-fixnum) (- most-negative-fixnum) (,i x)))
 			 (rational    (if (minusp x) (- x) x))
 			 (dcomplex    (,c x))
 			 (fcomplex    (,cf x))
@@ -231,3 +224,9 @@
 	  (let ((r (/  y x)))
 	    (* x (sqrt (+ 1 (* r r))))))))
   (if (minusp z) (- z) z))
+
+
+(defdlfun (:fixnum "__gmpz_cmp") :fixnum :fixnum)
+#.(let ((x (truncate fixnum-length char-length)))
+    `(defun mpz_cmp (x y) (|libgmp|:|__gmpz_cmp| (+ ,x (address x)) (+ ,x (address y)))));FIXME
+(setf (get 'mpz_cmp 'compiler::cmp-inline) t)

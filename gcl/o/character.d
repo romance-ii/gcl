@@ -599,22 +599,27 @@ gcl_init_character()
 	  object x=(object)(character_table+i);
 	  set_type_of(x,t_character);
 	  x->ch.ch_code = i;
+	  x->ch.tt=((' ' <= i && i < '\177') || i == '\n');
 	  x->ch.ch_font = 0;
 	  x->ch.ch_bits = 0;
+	  x->ch.ch_self=(void *)&x->ch.ch_code;
+	  x->ch.ch_fillp=1;
 	}
-#ifdef AV
-	for (i = -128;  i < 0;  i++) {
-	  object x=(object)(character_table+i);
-	  set_type_of(x,t_character);
-	  x->ch.ch_code = i+CHCODELIM;
-	  x->ch.ch_font = 0;
-	  x->ch.ch_bits = 0;
-	}
-#endif
+/* #ifdef AV */
+/* 	for (i = -128;  i < 0;  i++) { */
+/* 	  object x=(object)(character_table+i); */
+/* 	  int j=i+CHCODELIM; */
+/* 	  set_type_of(x,t_character); */
+/* 	  x->ch.ch_code = j; */
+/* 	  x->ch.tt=((' ' <= j && j < '\177') || j == '\n'); */
+/* 	  x->ch.ch_font = 0; */
+/* 	  x->ch.ch_bits = 0; */
+/* 	} */
+/* #endif */
 
  	make_constant("CHAR-CODE-LIMIT", make_fixnum(CHCODELIM));
- 	make_constant("CHAR-FONT-LIMIT", make_fixnum(CHFONTLIM));
- 	make_constant("CHAR-BITS-LIMIT", make_fixnum(CHBITSLIM));
+ 	make_si_constant("CHAR-FONT-LIMIT", make_fixnum(CHFONTLIM));
+ 	make_si_constant("CHAR-BITS-LIMIT", make_fixnum(CHBITSLIM));
 
 	STreturn = make_simple_string("Return");
 	enter_mark_origin(&STreturn);
@@ -634,10 +639,10 @@ gcl_init_character()
 	STnewline = make_simple_string("Newline");
 	enter_mark_origin(&STnewline);
 
-	make_constant("CHAR-CONTROL-BIT", make_fixnum(0));
-	make_constant("CHAR-META-BIT", make_fixnum(0));
-	make_constant("CHAR-SUPER-BIT", make_fixnum(0));
-	make_constant("CHAR-HYPER-BIT", make_fixnum(0));
+	make_si_constant("CHAR-CONTROL-BIT", make_fixnum(0));
+	make_si_constant("CHAR-META-BIT", make_fixnum(0));
+	make_si_constant("CHAR-SUPER-BIT", make_fixnum(0));
+	make_si_constant("CHAR-HYPER-BIT", make_fixnum(0));
 }
 
 void
@@ -665,17 +670,17 @@ gcl_init_character_function()
 	make_function("CHAR-NOT-LESSP", Lchar_not_lessp);
 	make_function("CHARACTER", Lcharacter);
 	make_function("CHAR-CODE", Lchar_code);
-	make_function("CHAR-BITS", Lchar_bits);
-	make_function("CHAR-FONT", Lchar_font);
+	make_si_function("CHAR-BITS", Lchar_bits);
+	make_si_function("CHAR-FONT", Lchar_font);
 	make_function("CODE-CHAR", Lcode_char);
-	make_function("MAKE-CHAR", Lmake_char);
+	make_si_function("MAKE-CHAR", Lmake_char);
 	make_function("CHAR-UPCASE", Lchar_upcase);
 	make_function("CHAR-DOWNCASE", Lchar_downcase);
 	make_function("DIGIT-CHAR", Ldigit_char);
 	make_function("CHAR-INT", Lchar_int);
-	make_function("INT-CHAR", Lint_char);
+	make_si_function("INT-CHAR", Lint_char);
 	make_function("CHAR-NAME", Lchar_name);
 	make_function("NAME-CHAR", Lname_char);
-	make_function("CHAR-BIT", Lchar_bit);
-	make_function("SET-CHAR-BIT", Lset_char_bit);
+	make_si_function("CHAR-BIT", Lchar_bit);
+	make_si_function("SET-CHAR-BIT", Lset_char_bit);
 }

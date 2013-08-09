@@ -1,0 +1,35 @@
+# powerpc-macosx.defs
+
+# Disable Apple's custom C preprocessor which gets confused when
+# preprocessing some of the *.d files in the o/ subdirectory.
+CC = gcc $(CPPFLAGS)
+
+# Set this to avoid warnings when linking against libncurses.
+# This is due to the requirements of the two level namespace.
+LIBS := `echo $(LIBS) | sed -e 's/-lncurses/ /'`
+
+# Set this for the linker to operate correctly.
+MACOSX_DEPLOYMENT_TARGET = 10.2
+
+# Define this to build an executable rsym.
+RSYM = rsym
+ifneq ($(findstring bfd,$(LIBS)),) 
+RSYM = 
+endif
+ifneq ($(BUILD_BFD),) 
+RSYM    = 
+endif
+
+# Define this in order to compile sfasl.c.
+SFASL = $(ODIR)/sfasl.o
+
+# When using SFASL it is good to have (si::build-symbol-table).
+# (However, I'm not sure this init form will ever get called.)
+INITFORM = (si::build-symbol-table)
+
+# This is Apple's libtool, completely unrelated to GNU libtool.
+# Other plateforms define this to be `ar rs`.
+# This appears to be no longer necessary on Panther.
+ARRS = libtool -static -o
+
+FINAL_CFLAGS := `echo $(FINAL_CFLAGS) | sed -e 's:-g::g'`

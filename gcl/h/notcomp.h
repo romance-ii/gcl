@@ -28,9 +28,9 @@ void segmentation_catcher();
 EXTER int gc_enabled, saving_system;
 
 EXTER object lisp_package,user_package;
-#ifdef ANSI_COMMON_LISP
-EXTER object common_lisp_package;
-#endif
+/* #ifdef ANSI_COMMON_LISP */
+/* /\* EXTER object common_lisp_package; *\/ */
+/* #endif */
 EXTER char *core_end;
 EXTER int catch_fatal;
 EXTER long real_maxpage;
@@ -60,8 +60,6 @@ EXTER object user_package;
   va_end(ap)
 
 #ifndef NO_DEFUN
-#undef DEFUN
-#define DEFUN(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,doc) ret fname
 /* eg.
    A function taking from 2 to 8 args
    returning object the first args is object, the next 6 int, and last defaults to object.
@@ -69,18 +67,13 @@ EXTER object user_package;
   DEFUN("AREF",object,fSaref,SI,2,8,NONE,oo,ii,ii,ii)
 */
 
-/* for defining old style */
-#define DEFUNO(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,old,doc) \
-  ret fname (); \
-void old(void) \
-{   Iinvoke_c_function_from_value_stack(fname,F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
-    return;} \
-  ret fname
-
 #define MAKEFUN(pack,string,fname,argd) \
   (pack == SI ? SI_makefun(string,fname,argd) : \
    pack == LISP ? LISP_makefun(string,fname,argd) : \
    error("Bad pack variable in MAKEFUN\n"))
+
+#define MAKEFUNB(pack,string,fname,argd,p)	\
+  (GMP_makefunb(string,fname,argd,p))
 
 #define MAKEFUNM(pack,string,fname,argd) \
   (pack == SI ? SI_makefunm(string,fname,argd) : \
@@ -123,15 +116,21 @@ void old(void) \
 #define STATD
 #endif
 
-#define DEFUN_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) STATD ret FFN(fname) args;\
+#define DEFUN(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) STATD ret FFN(fname) args;\
 void Mjoin(fname,_init) () {\
-   MAKEFUN(pack,string,(ret (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));\
+  MAKEFUN(pack,string,(void *)FFN(fname),F_ARGD(min,max,(flags|ONE_VAL),ARGTYPES(ret0a0,a12,a34,a56))); \
 }\
 STATD ret FFN(fname) args
 
-#define DEFUNM_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) STATD ret FFN(fname) args;\
+#define DEFUNB(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,p,doc) STATD ret FFN(fname) args; \
 void Mjoin(fname,_init) () {\
-   MAKEFUNM(pack,string,(ret (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));\
+  MAKEFUNB(pack,string,(void *)FFN(fname),F_ARGD(min,max,(flags|ONE_VAL),ARGTYPES(ret0a0,a12,a34,a56)),p); \
+}\
+STATD ret FFN(fname) args
+
+#define DEFUNM(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) STATD ret FFN(fname) args;\
+void Mjoin(fname,_init) () {\
+  MAKEFUNM(pack,string,(void *)FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
 }\
 STATD ret FFN(fname) args
 
@@ -142,29 +141,6 @@ STATD ret FFN(fname) args
   DEFUN("AREF",object,fSaref,SI,2,8,NONE,oo,ii,ii,ii)
 */
 
-/* for defining old style */
-#define DEFUNO_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,oldret,old,args,doc) \
-STATD  ret FFN(fname) args; \
-void Mjoin(fname,_init) () {\
-   MAKEFUN(pack,string,(ret (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));\
-}\
-LFD(old)(void) \
-{   Iinvoke_c_function_from_value_stack((object (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
-    return;} \
-STATD  ret FFN(fname) args
-
-#define DEFUNOM_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,oldret,old,args,doc) \
-STATD  ret FFN(fname) args; \
-void Mjoin(fname,_init) () {\
-   MAKEFUNM(pack,string,(ret (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));\
-}\
-LFD(old)(void) \
-{   Iinvoke_c_function_from_value_stack((object (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
-    return;} \
-STATD  ret FFN(fname) args
-
-  /* these will come later */
-#define DEFUNL DEFUN
   /* these are needed to be linked in to be called by incrementally
    loaded code */
 #define DEFCOMP(type,fun) type fun
@@ -190,14 +166,9 @@ TS_MEMBER(t0,TS(t1)|TS(t2)|TS(t3)...)
 #define TS(s) (1<<s)
 #define TS_MEMBER(t1,ts) ((TS(t1)) & (ts))
 
-/* #define ASSURE_TYPE(val,t) if(type_of(val)!=t) val= Icheck_one_type(val,t) */
-/* #define CHECK_TYPE(code,val,name) for (;code;val=Ieval(read_object(sLAstandard_inputA->s.s_dbind))) TYPE_ERROR(val,name) */
-/* #define ASSURE_TYPE(val,t) CHECK_TYPE(type_of(val)!=t,val,type_name(t)) */
 #define ASSURE_TYPE(val,t) if (type_of(val)!=t) TYPE_ERROR(val,type_name(t))
 
 object IisArray();
-
-/* void Wrong_type_error(char *,int,...); */
 
 /* array to which X is has its body displaced */
 #define DISPLACED_TO(x) Mcar(x->a.a_displaced)
@@ -287,9 +258,8 @@ EXTER struct printStruct *printStructBufp;
 
 #endif /* NULL_OR_ON_C_STACK */
 
-/* more readable name */
-#define siScomma sSY
-EXTER object sSY;
+#define	siScomma     sSXB
+EXTER object sSXB;
 
 #define	inheap(pp)	((char *)(pp) < heap_end)
 
@@ -312,7 +282,11 @@ gcl_init_cmp_anon(void);
 #define SAFE_FREAD(a_,b_,c_,d_) fread((a_),(b_),(c_),(d_))
 #endif
 
+#ifdef EXPORT_GMP
+#include "bfdef.h"
+#endif
 #include "gmp_wrappers.h"
+
 
 extern enum type t_vtype;
 extern int vtypep_fn(object);
@@ -344,11 +318,13 @@ PFN(hashtablep)
 PFN(arrayp)
 PFN(vectorp)
 PFN(readtablep)
+PFN(functionp)
 
 /* #define TPE(a_,b_,c_) Check_type(a_,b_,c_) */
 #define TPE(a_,b_,c_) if (!(b_)(*(a_))) FEwrong_type_argument((c_),*(a_))
 
 #define check_type(a_,b_)                               ({t_vtype=(b_);TPE(&a_,vtypep_fn,type_name(t_vtype));})
+#define check_type_function(a_)                         TPE(a_,functionp_fn,sLfunction)
 #define check_type_integer(a_)                          TPE(a_,integerp_fn,sLinteger)
 #define check_type_non_negative_integer(a_)             TPE(a_,non_negative_integerp_fn,TSnon_negative_integer)
 #define check_type_rational(a_)                         TPE(a_,rationalp_fn,sLrational)
@@ -466,7 +442,7 @@ object ihs_top_function_name(ihs_ptr h);
                                                   sLpackage_error,null_string,6,\
                                                   sKpackage,a_,\
                                                   sKformat_control,make_simple_string(c_),sKformat_arguments,list(d_))
-#define NEW_INPUT(a_) (a_)=Ieval(read_object(sLAstandard_inputA->s.s_dbind))
+#define NEW_INPUT(a_) (a_)=Ieval1(read_object(sLAstandard_inputA->s.s_dbind))
 
 
 #define CELL_ERROR(a_,b_) Icall_error_handler(sLcell_error,null_string,6,\
@@ -486,7 +462,7 @@ object ihs_top_function_name(ihs_ptr h);
 #define FLOATING_POINT_INEXACT(a_,b_) Icall_error_handler(sLfloating_point_inexact,null_string,4,sKoperation,a_,sKoperands,b_)
 #define FLOATING_POINT_INVALID_OPERATION(a_,b_) Icall_error_handler(sLfloating_point_invalid_operation,null_string,4,sKoperation,a_,sKoperands,b_)
 
-#define PATHNAME_ERROR(a_,b_,c_...) Icall_error_handler(sLpathname_error,null_string,6,\
+#define PATHNAME_ERROR(a_,b_,c_...) Icall_error_handler(sLfile_error,null_string,6,\
                                                         sKpathname,(a_),\
 				   		        sKformat_control,make_simple_string(b_),\
                                                         sKformat_arguments,list(c_))
@@ -513,3 +489,6 @@ object ihs_top_function_name(ihs_ptr h);
 
 #define coerce_to_filename(a_,b_) coerce_to_filename1(a_,b_,sizeof(b_))
 #define coerce_to_local_filename(a_,b_) coerce_to_local_filename1(a_,b_,sizeof(b_))
+
+#define massert(a_) if (!(a_)) assert_error(#a_,__LINE__,__FILE__,__FUNCTION__)
+

@@ -65,42 +65,18 @@
 ;;;
 ;;; -----------------------------------------------------------------
 
-
-(lisp:in-package :DEFPACKAGE)
+(unless (find-package :defpackage)
+  (make-package :defpackage :use '(:cl)))
+(in-package :defpackage)
 
 (export '(defpackage))
-;(provide :defpackage)
 
-(si:putprop 'defpackage:defpackage t 'compiler::package-operation)
+(si:putprop 'defpackage t 'compiler::package-operation)
 
 (use-package :SLOOP)
-;(use-package :DEFPACKAGE)
-
-(proclaim '(declaration values arglist))
-
-
-;#-gcl
-;(eval-when (compile load eval)
-;   #-lispm
-;   (unless (member :loop *features*)
-;     (require :loop #+excl (merge-pathnames "loop" excl::*library-code-fasl-pathname*)))
-;
-;   (unless (find-package :common-lisp)
-;     (rename-package :lisp :common-lisp (union '("CL" "LISP") (package-nicknames (find-package :lisp)) :test #'string=)))
-;   (unless (find-package :common-lisp-user)
-;     (rename-package :user :common-lisp-user (union '("CL-USER" "USER") (package-nicknames (find-package :user)) :test #'string=)))
-;
-;   #+lispm
-;   (shadow (intern "DEFPACKAGE" #+symbolics :scl #+ti :ticl) 'defpackage)
-;   (proclaim '(declaration values arglist))
-;   (export 'defpackage 'defpackage)
-;   )
 
 (defmacro DEFPACKAGE (name &rest options)
-  (declare (type (or symbol string) name)
-	   (arglist defined-package-name &rest options)
-	   (values package)
-	   (optimize (safety 1)))
+  (declare (optimize (safety 1)))
   "DEFPACKAGE - DEFINED-PACKAGE-NAME {OPTION}*			[Macro]
 
    This creates a new package, or modifies an existing one, whose name is
@@ -135,7 +111,6 @@
 	 :DOCUMENTATION is an extension to DEFPACKAGE.
 
 	 :SIZE is used only in Genera and Allegro.]"
-
   (sloop for option in options 
 	 unless (member 
 		 (first option) 
@@ -143,201 +118,165 @@
 				  :shadowing-import-from :use :import-from
 				  :intern :export :export-from))
 	 do (cerror "Proceed, ignoring this option." "~s is not a valid option." option))
-  (labels ((option-test (arg1 arg2) (when (consp arg2) (equal (car arg2) arg1)))
-	   (option-values-list (option options)
-			       (sloop for result = (member option options
-							   :test #'option-test)
-				      then (member option (rest result)
-						   :test #'option-test)
-				      until (null result) when result collect
-				      (rest (first result))))
-	   (option-values (option options)
-			  (sloop for result  = (member option options :test #'option-test)
-				 then (member option (rest result) :test #'option-test)
-				 until (null result) when result append
-				 (rest (first result)))))
-	  (sloop for option in '(:size :documentation)
-		 when (<= 2 (count option options :key #'car))
-		 do (error 'program-error :format-control "DEFPACKAGE option ~s specified more than once."
-				    :format-arguments (list option)))
-	  (setq name (string name))
-	  (let ((nicknames (mapcar #'string (option-values :nicknames options)))
-		(documentation (first (option-values :documentation options)))
-		(size (first (option-values :size options)))
-		(shadowed-symbol-names (mapcar #'string (option-values :shadow options)))
-		(interned-symbol-names (mapcar #'string (option-values :intern options)))
-		(exported-symbol-names (mapcar #'string (option-values :export options)))
-		(shadowing-imported-from-symbol-names-list 
-		 (sloop for list in (option-values-list :shadowing-import-from options)
-			collect (cons (string (first list)) (mapcar #'string (rest list)))))
-		(imported-from-symbol-names-list 
-		 (sloop for list in (option-values-list :import-from options)
-			collect (cons (string (first list)) (mapcar #'string (rest list)))))
-		(exported-from-package-names 
-		 (mapcar #'string (option-values :export-from options))))
-	    (flet ((find-duplicates 
-		    (&rest lists)
-		    (let (results)
-		      (sloop for list in lists
-			     for more on (cdr lists)
-			     for i from 1
-			     do
-			     (sloop for elt in list
-				    as entry = (find elt results :key #'car :test #'string=)
-				    unless (member i entry)
-				    do
-				    (sloop for l2 in more
-					   for j from (1+ i)
-					   do
-					   (if (member elt l2 :test #'string=)
-					       (if entry
-						   (nconc entry (list j))
-						 (setq entry 
-						       (car (push 
-							     (list elt i j) results))))))))
-		      results)))
-		  (sloop for duplicate in 
-			 (find-duplicates 
-			  shadowed-symbol-names 
-			  interned-symbol-names
-			  (sloop for list in shadowing-imported-from-symbol-names-list 
-				 append (rest list))
-			  (sloop for list in imported-from-symbol-names-list 
-				 append (rest list)))
-			 do
-			 (error 
-			  'program-error
-			  :format-control "The symbol ~s cannot coexist in these lists:~{ ~s~}" 
-			  :format-arguments 
-			  (list (first duplicate)
-			  (sloop for num in (rest duplicate)
-				 collect 
-				 (case num 
-				       (1 :SHADOW)
-				       (2 :INTERN)
-				       (3 :SHADOWING-IMPORT-FROM)
-				       (4 :IMPORT-FROM))))))
-		  (sloop for duplicate in 
-			 (find-duplicates exported-symbol-names interned-symbol-names)
-			 do
-			 (error 
-			  'program-error
-			  :format-control "The symbol ~s cannot coexist in these lists:~{ ~s~}" 
-			  :format-arguments 
-			  (list (first duplicate)
-			  (sloop for num in 
-				 (rest duplicate) 
-				 collect (case num 
-					       (1 :EXPORT)
-					       (2 :INTERN)))))))
-	    `(eval-when (load eval compile)
-			(if (find-package ,name)
-			    (progn (rename-package ,name ,name)
-				   ,@(when nicknames 
-				       `((rename-package ,name ,name ',nicknames)))
-				   #+(or symbolics excl)
-				   ,@(when size
-				       #+symbolics 
-				       `((when (> ,size (pkg-max-number-of-symbols 
-							 (find-package ,name)))
-					   (pkg-rehash (find-package ,name) ,size)))
-				       #+excl `((let 
-						    ((tab (excl::package-internal-symbols 
-							   (find-package ,name))))
-						  (when (hash-table-p tab)
-						    (setf (excl::ha_rehash-size tab) ,size)))))
-				   ,@(when (not (null (member :use options :key 'car)))
-				       `((unuse-package 
-					  (package-use-list (find-package ,name)) ,name))))
-			  (make-package 
-			   ,name 
-			   :use 'nil 
-			   :nicknames 
-			   ',nicknames 
-			   ,@(when size 
-			       #+lispm `(:size ,size) 
-			       #+excl `(:internal-symbols ,size))))
-			,@(progn
-			    `((setf (get ',(intern name :keyword) 
-					 'si::package-documentation) 
-				    ,documentation))
-			    )
-			(let ((*package* (find-package ,name)))
-			  ,@(when SHADOWed-symbol-names 
-			      `((SHADOW (mapcar #'intern ',SHADOWed-symbol-names))))
-			  ,@(when SHADOWING-IMPORTed-from-symbol-names-list
-			      (mapcar #'(lambda (list)
+  (let ((name (string name)))
+    (labels ((option-test (arg1 arg2) (when (consp arg2) (equal (car arg2) arg1)))
+	     (option-values-list (option options)
+				 (sloop for result = (member option options
+							     :test #'option-test)
+					then (member option (rest result)
+						     :test #'option-test)
+					until (null result) when result collect
+					(rest (first result))))
+	     (option-values (option options)
+			    (sloop for result  = (member option options :test #'option-test)
+				   then (member option (rest result) :test #'option-test)
+				   until (null result) when result append
+				   (rest (first result)))))
+	    (sloop for option in '(:size :documentation)
+		   when (<= 2 (count option options :key 'car))
+		   do (error 'program-error :format-control "DEFPACKAGE option ~s specified more than once."
+			     :format-arguments (list option)))
+	    (setq name (string name))
+	    (let ((nicknames (mapcar 'string (option-values :nicknames options)))
+		  (documentation (first (option-values :documentation options)))
+					;		(size (first (option-values :size options))) FIXME?  size support in gcl
+		  (shadowed-symbol-names (mapcar 'string (option-values :shadow options)))
+		  (interned-symbol-names (mapcar 'string (option-values :intern options)))
+		  (exported-symbol-names (mapcar 'string (option-values :export options)))
+		  (shadowing-imported-from-symbol-names-list 
+		   (sloop for list in (option-values-list :shadowing-import-from options)
+			  collect (cons (string (first list)) (mapcar 'string (rest list)))))
+		  (imported-from-symbol-names-list 
+		   (sloop for list in (option-values-list :import-from options)
+			  collect (cons (string (first list)) (mapcar 'string (rest list)))))
+		  (exported-from-package-names 
+		   (mapcar 'string (option-values :export-from options))))
+	      (flet ((find-duplicates 
+		      (&rest lists)
+		      (let (results)
+			(sloop for list in lists
+			       for more on (cdr lists)
+			       for i from 1
+			       do
+			       (sloop for elt in list
+				      as entry = (find elt results :key 'car :test 'string=)
+				      unless (member i entry)
+				      do
+				      (sloop for l2 in more
+					     for j from (1+ i)
+					     do
+					     (if (member elt l2 :test 'string=)
+						 (if entry
+						     (nconc entry (list j))
+						   (setq entry 
+							 (car (push 
+							       (list elt i j) results))))))))
+			results)))
+		    (sloop for duplicate in 
+			   (find-duplicates 
+			    shadowed-symbol-names 
+			    interned-symbol-names
+			    (sloop for list in shadowing-imported-from-symbol-names-list 
+				   append (rest list))
+			    (sloop for list in imported-from-symbol-names-list 
+				   append (rest list)))
+			   do
+			   (error 
+			    'program-error
+			    :format-control "The symbol ~s cannot coexist in these lists:~{ ~s~}" 
+			    :format-arguments 
+			    (list (first duplicate)
+				  (sloop for num in (rest duplicate)
+					 collect 
+					 (case num 
+					       (1 :SHADOW)
+					       (2 :INTERN)
+					       (3 :SHADOWING-IMPORT-FROM)
+					       (4 :IMPORT-FROM))))))
+		    (sloop for duplicate in 
+			   (find-duplicates exported-symbol-names interned-symbol-names)
+			   do
+			   (error 
+			    'program-error
+			    :format-control "The symbol ~s cannot coexist in these lists:~{ ~s~}" 
+			    :format-arguments 
+			    (list (first duplicate)
+				  (sloop for num in 
+					 (rest duplicate) 
+					 collect (case num 
+						       (1 :EXPORT)
+						       (2 :INTERN)))))))
+	      `(eval-when (load eval compile)
+			  (if (find-package ,name)
+			      (progn (rename-package ,name ,name)
+				     ,@(when nicknames 
+					 `((rename-package ,name ,name ',nicknames)))
+				     ,@(when (not (null (member :use options :key 'car)))
+					 `((unuse-package 
+					    (package-use-list (find-package ,name)) ,name))))
+			    (make-package 
+			     ,name 
+			     :use 'nil 
+			     :nicknames 
+			     ',nicknames))
+			  ,@(progn
+			      `((setf (get ',(intern name :keyword) 
+					   'si::package-documentation) 
+				      ,documentation))
+			      )
+			  (let ((*package* (find-package ,name)))
+			    ,@(when SHADOWed-symbol-names 
+				`((SHADOW (mapcar 'intern ',SHADOWed-symbol-names))))
+			    ,@(when SHADOWING-IMPORTed-from-symbol-names-list
+				(mapcar (lambda (list)
 					  `(SHADOWING-IMPORT 
-					    (mapcar #'(lambda (symbol) 
-							(multiple-value-bind (sym fnd) (find-symbol symbol ,(first list))
-							  (unless fnd
-							    (specific-correctable-error 
-							     :package-error
-							     "A package error occurred on ~S: ~S." ,(first list) 
-							     (format nil "~%Symbol ~a not present" symbol)))
-							  (intern symbol ,(first list))))
-; FIXME better error messages
-
+					    (mapcar (lambda (symbol) 
+						      (multiple-value-bind (sym fnd) (find-symbol symbol ,(first list))
+									   (unless fnd
+									     (specific-correctable-error 
+									      :package-error
+									      "A package error occurred on ~S: ~S." ,(first list) 
+									      (format nil "~%Symbol ~a not present" symbol)))
+									   (intern symbol ,(first list))))
+					; FIXME better error messages
 						    ',(rest list))))
-				      SHADOWING-IMPORTed-from-symbol-names-list))
-			  (USE-PACKAGE ',(if (member :USE options :test #'option-test)
-					     (mapcar #'string (option-values :USE options))
-					   "LISP"))
-			  ,@(when IMPORTed-from-symbol-names-list
-			      (mapcar #'(lambda (list) 
-					  `(IMPORT (mapcar #'(lambda (symbol) 
-							(multiple-value-bind (sym fnd) (find-symbol symbol ,(first list))
-							  (unless fnd
-							    (specific-correctable-error 
-							     :package-error
-							     "A package error occurred on ~S: ~S." ,(first list) 
-							     (format nil "~%Symbol ~a not present" symbol)))
-							  (intern symbol ,(first list))))
-; FIXME better error messages
+					SHADOWING-IMPORTed-from-symbol-names-list))
+			    (USE-PACKAGE ',(if (member :USE options :test #'option-test)
+					       (mapcar 'string (option-values :USE options))
+					     "CL"))
+			    ,@(when IMPORTed-from-symbol-names-list
+				(mapcar (lambda (list) 
+					  `(IMPORT (mapcar (lambda (symbol) 
+							     (multiple-value-bind (sym fnd) (find-symbol symbol ,(first list))
+										  (unless fnd
+										    (specific-correctable-error 
+										     :package-error
+										     "A package error occurred on ~S: ~S." ,(first list) 
+										     (format nil "~%Symbol ~a not present" symbol)))
+										  (intern symbol ,(first list))))
+					; FIXME better error messages
 							   ',(rest list))))
-				      IMPORTed-from-symbol-names-list))
-			  ,@(when INTERNed-symbol-names 
-			      `((mapcar #'INTERN ',INTERNed-symbol-names)))
-			  ,@(when EXPORTed-symbol-names 
-			      `((EXPORT (mapcar #'intern ',EXPORTed-symbol-names))))
-			  ,@(when EXPORTed-from-package-names
-			      `((dolist (package ',EXPORTed-from-package-names)
-					(do-external-symbols 
-					 (symbol (find-package package))
-					 (when (nth 1 (multiple-value-list 
-						       (find-symbol (string symbol))))
-					   (EXPORT (list (intern (string symbol)))))))))
-			  )
-			(find-package ,name)))))
-
-;#+excl
-;(excl::defadvice cl:documentation (look-for-package-type :around)
-;    (let ((symbol (first excl::arglist))
-;	   (type (second excl::arglist)))
-;       (if (or (eq :package (intern (string type) :keyword))
-;	       (eq :defpackage (intern (string type) :keyword)))
-;	   (or (get symbol 'excl::%package-documentation)
-;	       (get (intern (string symbol) :keyword) 'excl::%package-documentation))
-;	 (values :do-it))))
-
-;#+symbolics
-;(scl::advise cl:documentation :around look-for-package-type nil
-;   (let ((symbol (first scl::arglist))
-;	 (type (second scl::arglist)))
-;     (if (or (eq :package (intern (string type) :keyword))
-;	     (eq :defpackage (intern (string type) :keyword)))
-;	 (or (get symbol :package-documentation)
-;	     (get (intern (string symbol) :keyword) :package-documentation))
-;       (values :do-it))))
-
-;(pushnew :defpackage *features*)
-;(unintern 'defpackage 'user)
+					IMPORTed-from-symbol-names-list))
+			    ,@(when INTERNed-symbol-names 
+				`((mapcar 'INTERN ',INTERNed-symbol-names)))
+			    ,@(when EXPORTed-symbol-names 
+				`((EXPORT (mapcar 'intern ',EXPORTed-symbol-names))))
+			    ,@(when EXPORTed-from-package-names
+				`((dolist (package ',EXPORTed-from-package-names)
+				    (do-external-symbols 
+				     (symbol (find-package package))
+				     (when (nth 1 (multiple-value-list 
+						   (find-symbol (string symbol))))
+				       (EXPORT (list (intern (string symbol)))))))))
+			    )
+			  (find-package ,name))))))
+  
 
 (provide :defpackage)
 (pushnew :defpackage *features*)
 
 (eval-when (load)
-  (in-package "USER")
+  (in-package :USER)
   (unintern 'defpackage 'user)
   (use-package "DEFPACKAGE"))
 

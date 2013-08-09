@@ -1,5 +1,4 @@
-(make-package "C")
-(make-package "COMPILER" :use '("LISP"))
+(setq si::*optimize-maximum-pages* nil)
 (make-package "SLOOP" :use '("LISP"))
 (make-package "SERROR" :use '("LISP" "SLOOP"))
 (make-package "ANSI-LOOP" :use '("LISP"))
@@ -16,12 +15,29 @@
  (system:init-system) 
  (gbc t)
 
+ (in-package :si)
+ (use-package :gmp)
+ (do-symbols 
+  (s) 
+  (when (get s 'proclaimed-function)
+    (unless (sig s)
+      (clear-compiler-properties 
+       s
+       (let ((f (lambda nil nil))) 
+	 (c-set-function-plist
+	  f
+	  (make-function-plist
+	   (list (get s 'proclaimed-arg-types) (get s 'proclaimed-return-type))
+	   nil nil nil nil nil)) f)))
+    (dolist (l '(proclaimed-function proclaimed-arg-types proclaimed-return-type))
+      (remprop s l))))
+
  (in-package "USER")
 
  (load (concatenate 'string si::*system-directory* "../gcl-tk/tk-package.lsp"))
 
- (or lisp::*link-array*
-     (setq lisp::*link-array*
+ (or si::*link-array*
+     (setq si::*link-array*
 	   (make-array (ash 1 11)  :element-type 'character :fill-pointer 0)))
  (si::use-fast-links t)
  
@@ -58,16 +74,11 @@
  (setq compiler::*default-system-p* nil)
  (setq compiler::*keep-gaz* nil)
  
- (unintern 'system)
- (unintern 'lisp)
- (unintern 'compiler)
- (unintern 'user)
+ ;; (unintern 'system)
+ ;; (unintern 'lisp)
+ ;; (unintern 'compiler)
+ ;; (unintern 'user)
  (when (fboundp 'si::init-cmp-anon) (fmakunbound 'si::init-cmp-anon))
- 
- (eval-when (load)
-	    (if (fboundp 'get-system-time-zone)
-		(setf system:*default-time-zone* (get-system-time-zone))
-	      (setf system:*default-time-zone* 6)))
  
  (si::set-up-top-level)
  (if (fboundp 'si::user-init) (si::user-init))

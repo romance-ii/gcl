@@ -206,10 +206,10 @@ void run_process ( char *name )
 #endif
 
     stream_in = (object) alloc_object(t_stream);
-    stream_in->sm.sm_mode = smm_input;
+    stream_in->sm.tt=stream_in->sm.sm_mode = smm_input;
     stream_in->sm.sm_fp = ofp;
     stream_out = (object) alloc_object(t_stream);
-    stream_out->sm.sm_mode = smm_output;
+    stream_out->sm.tt=stream_out->sm.sm_mode = smm_output;
     stream_out->sm.sm_fp = ifp;
     setup_stream_buffer ( stream_in );
     setup_stream_buffer ( stream_out );
@@ -403,6 +403,9 @@ int	server;
 #else
 	res = fcntl(sock,F_SETFL,FASYNC);
 #endif
+	if (res==-1)
+	  FEerror("fnctl F_SETFL error",0);
+
 	return(sock);
 }
 
@@ -431,7 +434,7 @@ enum smmode smm;
 
 	fp = fdopen(socket,mode);
 	stream = (object)  alloc_object(t_stream);
-	stream->sm.sm_mode = (short)smm;
+	stream->sm.tt=stream->sm.sm_mode = (short)smm;
 	stream->sm.sm_fp = fp;
 
 	stream->sm.sm_object0 = sLcharacter;
@@ -501,12 +504,12 @@ make_socket_pair()
 
 
   stream_in = (object) alloc_object(t_stream);
-  stream_in->sm.sm_mode = smm_input;
+  stream_in->sm.tt=stream_in->sm.sm_mode = smm_input;
   stream_in->sm.sm_fp = fp1;
   stream_in->sm.sm_int0 = sockets_in[1];
   stream_in->sm.sm_int1 = 0;
   stream_out = (object) alloc_object(t_stream);
-  stream_out->sm.sm_mode = smm_output;
+  stream_out->sm.tt=stream_out->sm.sm_mode = smm_output;
   stream_out->sm.sm_fp = fp2;
   setup_stream_buffer(stream_in);
   setup_stream_buffer(stream_out);
@@ -600,7 +603,7 @@ FFN(siLmake_socket_pair)()
                                   c_=fix(a_->c.c_cdr);})
 
 
-DEFUNO_NEW("KILL",object,fSkill,SI,2,2,NONE,OO,IO,OO,OO,void,siLkill,(object x,fixnum err),"") {
+DEFUN("KILL",object,fSkill,SI,2,2,NONE,OO,IO,OO,OO,(object x,fixnum err),"") {
 
   fixnum k,l;
   int e,status;
@@ -633,8 +636,8 @@ DEFUNO_NEW("KILL",object,fSkill,SI,2,2,NONE,OO,IO,OO,OO,void,siLkill,(object x,f
   return Cnil;
 }
   
-DEFUNO_NEW("SELECT-READ",object,fSselect_read,SI,2,2,NONE,IO,IO,OO,OO,void,siLselect_read,
-	   (object x,fixnum usec),"") {
+DEFUN("SELECT-READ",object,fSselect_read,SI,2,2,NONE,IO,IO,OO,OO,(object x,fixnum usec),"") {
+
   fd_set fds;
   fixnum max=-1,k,mask,i;
   object y=x;
@@ -659,13 +662,13 @@ DEFUNO_NEW("SELECT-READ",object,fSselect_read,SI,2,2,NONE,IO,IO,OO,OO,void,siLse
   return (object)mask;
 }
   
-DEFUNO_NEW("WRITE-POINTER-OBJECT",object,fSwrite_pointer_object,SI,2,2,NONE,OO,OO,OO,OO,
-	   void,siLwrite_pointer_object,(object x,object z),"") {
+DEFUN("WRITE-POINTER-OBJECT",object,fSwrite_pointer_object,SI,2,2,NONE,OO,OO,OO,OO,(object x,object z),"") {
 
   object y;
   fixnum pid,s;
 
   unpack_handle(z,pid,s);
+  ASSERT(pid);
 
   y=x;
   if (stack_alloc_end<=stack_alloc_start || !writable_ptr(x)) 
@@ -681,13 +684,13 @@ DEFUNO_NEW("WRITE-POINTER-OBJECT",object,fSwrite_pointer_object,SI,2,2,NONE,OO,O
   return Cnil;
 }
 
-DEFUNO_NEW("READ-POINTER-OBJECT",object,fSread_pointer_object,SI,1,1,NONE,OO,OO,OO,OO,
-	   void,siLread_pointer_object,(object z),"") {
+DEFUN("READ-POINTER-OBJECT",object,fSread_pointer_object,SI,1,1,NONE,OO,OO,OO,OO,(object z),"") {
 
   object x;
   fixnum pid,s;
 
   unpack_handle(z,pid,s);
+  ASSERT(pid);
 
   ASSERT(read(s,&x,sizeof(x))==sizeof(x));
   if (x==OBJNULL) {
@@ -706,7 +709,8 @@ DEFUNO_NEW("READ-POINTER-OBJECT",object,fSread_pointer_object,SI,1,1,NONE,OO,OO,
 
 DEFVAR("*CHILD-STACK-ALLOC*",sSAchild_stack_allocA,SI,make_shortfloat(0.8),"");
 
-DEFUNO_NEW("FORK",object,fSfork,SI,0,0,NONE,OO,OO,OO,OO,void,siLfork,(void),"") {
+DEFUN("FORK",object,fSfork,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+
   int p[2],j=0;
   pid_t pid;
 

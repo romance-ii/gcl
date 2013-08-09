@@ -26,27 +26,62 @@
 ; rather than recursion, as needed for large data sets.
 
 
-(in-package 'lisp)
-(export '(endp nthcdr last butlast nbutlast ldiff tailp list-length make-list 
-	       rest acons pairlis copy-list copy-alist nconc nreconc nth first
-	       second third fourth fifth sixth seventh eighth ninth tenth copy-tree
-	       tree-equal mapl mapcar maplist mapc mapcan mapcon append revappend 
-	       member member-if member-if-not adjoin adjoin-if adjoin-if-not assoc
-	       assoc-if assoc-if-not rassoc rassoc-if rassoc-if-not subst subst-if
-	       subst-if-not nsubst nsubst-if nsubst-if-not sublis nsublis intersection
-	       nintersection union nunion set-difference nset-difference set-exclusive-or
-	       nset-exclusive-or subsetp nth-value))
+;; (in-package 'lisp)
+;; (export '(endp nthcdr last butlast nbutlast ldiff tailp list-length make-list 
+;; 	       rest acons pairlis copy-list copy-alist nconc nreconc nth first
+;; 	       second third fourth fifth sixth seventh eighth ninth tenth copy-tree
+;; 	       tree-equal mapl mapcar maplist mapc mapcan mapcon append revappend 
+;; 	       member member-if member-if-not adjoin adjoin-if adjoin-if-not assoc
+;; 	       assoc-if assoc-if-not rassoc rassoc-if rassoc-if-not subst subst-if
+;; 	       subst-if-not nsubst nsubst-if nsubst-if-not sublis nsublis intersection
+;; 	       nintersection union nunion set-difference nset-difference set-exclusive-or
+;; 	       nset-exclusive-or subsetp nth-value))
 
-(in-package 'system)
+(in-package :system)
 
 (eval-when
  (compile eval)
-	   
+ 
+ (defmacro defktn (fn ll &rest args &aux (a (member '&aux ll))(ll (ldiff ll a)))
+   `(progn
+      (defun ,fn (,@ll &key test test-not key &aux ,@(cdr a)
+		       (kf (when key (coerce key 'function)))
+		       (tf (when test (coerce test 'function)))
+		       (tnf (when test-not (coerce test-not 'function))))
+	(declare (optimize (safety 1)))
+	(check-type ,(cadr ll) proper-list)
+	(check-type key (or null function-designator))
+	(check-type test (or null function-designator))
+	(check-type test-not (or null function-designator))
+	,@(sublis '((key . kf)(test . tf)(test-not . tnf)) args))
+      ,@(let* ((s (gensym))(ts (gensym))
+	       (x `(defun ,s 
+		     (fd list &key key)
+		     (declare (optimize (safety 1)))
+		     (check-type fd function-designator)
+		     (check-type list proper-list)
+		     (check-type key (or null function-designator))
+		     (,fn (coerce fd 'function) list ,ts 'funcall :key key))))
+	  (list (sublis `((,s . ,(intern (concatenate 'string (string fn) "-IF")))(,ts . :test)) x)
+		(sublis `((,s . ,(intern (concatenate 'string (string fn) "-IF-NOT")))(,ts . :test-not)) x)))))
+ 
+ (defmacro defnfn (n ll &rest body &aux (a (member '&aux ll))(ll (ldiff ll a)))
+   `(defun ,n ,(append ll `(&key test test-not key &aux ,@(cdr a)
+				 (kf (when key (coerce key 'function)))
+				 (tf (when test (coerce test 'function)))
+				 (tnf (when test-not (coerce test-not 'function)))))  
+      (declare (optimize (safety 1)))
+      ,@(mapcar (lambda (x) `(check-type ,x proper-list)) ll)
+      (check-type key (or null function-designator))
+      (check-type test (or null function-designator))
+      (check-type test-not (or null function-designator))
+      ,@(sublis '((key . kf)(test . tf)(test-not . tnf)) body)))
+ 
  (defmacro comp-key (key) 
    `(if (eq ,key #'identity) 0 1))
  
  (defmacro do-key (key n x) 
-   (let ((xx (gens x)))
+   (let ((xx (sgen)))
      `(let ((,xx ,x)) (case ,n (0 ,xx) (otherwise (funcall ,key ,xx))))))
  
  (defmacro comp-test (test test-not) 
@@ -59,7 +94,7 @@
 		 (if (eq ,test #'funcall) 8 10))))))))
  
  (defmacro do-test (test nn x y) 
-   (let ((n (gens nn))(nx (gens x))(ny (gens y)))
+   (let ((n (sgen))(nx (sgen))(ny (sgen)))
      `(let* ((,n ,nn)(,nx ,x)(,ny ,y))
 	(case ,n 
 	      (0 (eq ,nx ,ny))
@@ -77,7 +112,7 @@
  
  
  (defmacro bump-test (nn i) 
-   (let ((n (gens nn)))
+   (let ((n (sgen)))
      `(let ((,n ,nn))
 	(case ,n 
 	      (2 (if (eql-is-eq ,i) 0 ,n))
@@ -132,6 +167,7 @@
 	(let* ((key (or key #'identity))(key (if (functionp key) key (funcallable-symbol-function key)))
 	       (key-comp  (comp-key key)))
 	  ,@body))))
+
  (defmacro collect (r rp form)
    `(let ((tmp ,form))
       (setq ,rp (cond (,rp (rplacd ,rp tmp) tmp) ((setq ,r tmp))))))
@@ -145,6 +181,163 @@
 	    (cond ((eq s f) (return i))
 		  ((endp f) (return (1+ (- (+ i i)))))
 		  ((endp (cdr f)) (return (- (+ i i))))))))))
+
+
+
+(defun mapl (fd list &rest r &aux (fun (coerce fd 'function)))
+  (declare (optimize (safety 1))(:dynamic-extent r)(notinline make-list));FIXME
+  (check-type fd function-designator)
+  (check-type list proper-list)
+  (let ((q (when r (make-list (length r)))))
+    (declare (:dynamic-extent q))
+    (labels ((a-cons (x) (check-type x list) (or x (return-from mapl list)))
+	     (lmap (f x h) (cond (x (funcall f x) (lmap f (cdr x) h)) (h)))
+	     (last nil (lmap (lambda (x) (rplaca x (if r (a-cons (pop r)) (a-cons (cdar x))))) q q)))
+	    (lmap (lambda (x) (apply fun x (last))) list list))))
+
+;; (defun mapl (fd list &rest r &aux (fun (coerce fd 'function)))
+;;   (declare (optimize (safety 1))(:dynamic-extent r)(notinline make-list));FIXME
+;;   (check-type fd function-designator)
+;;   (check-type list proper-list)
+;;   (let ((q (when r (make-list (length r)))))
+;;     (declare (:dynamic-extent q))
+;;     (labels ((a-cons (x) (check-type x list) (or x (return-from mapl list)))
+;; 	     (lmap (f x) (when x (funcall f x) (lmap f (cdr x))))
+;; 	     (last nil (lmap (lambda (x) (rplaca x (if r (a-cons (pop r)) (a-cons (cdar x))))) q) q))
+;; 	    (lmap (lambda (x) (apply fun x (last))) list) list)))
+
+
+(defun mapc (fd list &rest r &aux (fun (coerce fd 'function)))
+  (declare (optimize (safety 1))(:dynamic-extent r))
+  (check-type fd function-designator)
+  (check-type list proper-list)
+  (let ((q (when r (make-list (length r)))))
+    (declare (:dynamic-extent q))
+    (apply 'mapl (lambda (x &rest r) (apply fun (car x) (mapl (lambda (x) (setf (car x) (car (pop r)))) q))) list r)))
+
+
+(defun mapcar (fd list &rest r &aux (fun (coerce fd 'function)) res rp)
+  (declare (optimize (safety 1))(:dynamic-extent r))
+  (check-type fd function-designator)
+  (check-type list proper-list)
+  (apply 'mapc (lambda (x &rest z &aux (tem (cons (apply fun x z) nil)))
+		 (setq rp (if rp (cdr (rplacd rp tem)) (setq res tem)))) list r)
+  res)
+
+(defun mapcan (fd list &rest r &aux (fun (coerce fd 'function)) res rp)
+  (declare (optimize (safety 1))(:dynamic-extent r))
+  (check-type fd function-designator)
+  (check-type list proper-list)
+  (apply 'mapc (lambda (x &rest z &aux (tem (apply fun x z)))
+		 (if rp (rplacd rp tem) (setq res tem))
+		 (when (consp tem) (setq rp (last tem)))) list r)
+  res)
+
+(defun maplist (fd list &rest r &aux (fun (coerce fd 'function)) res rp)
+  (declare (optimize (safety 1))(:dynamic-extent r))
+  (check-type fd function-designator)
+  (check-type list proper-list)
+  (apply 'mapl (lambda (x &rest z &aux (tem (cons (apply fun x z) nil)))
+		 (setq rp (if rp (cdr (rplacd rp tem)) (setq res tem)))) list r)
+  res)
+
+(defun mapcon(fd list &rest r &aux (fun (coerce fd 'function)) res rp)
+  (declare (optimize (safety 1))(:dynamic-extent r))
+  (check-type fd function-designator)
+  (check-type list proper-list)
+  (apply 'mapl (lambda (x &rest z &aux (tem (apply fun x z)))
+		 (if rp (rplacd rp tem) (setq res tem))
+		 (when (consp tem) (setq rp (last tem)))) list r)
+  res)
+
+
+
+(defktn member (item list &aux (tx (tp8 item)))
+  (unless (mapl (lambda (x &aux (k (car x))(k (if key (funcall key k) k))) 
+		  (when (cond (test (funcall test item k)) (test-not (not (funcall test-not item k))) ((eql-with-tx item k tx)))
+		    (return-from member x))) list)))
+
+(defktn adjoin (item list)
+  (if (member (if key (funcall key item) item) list :key key :test test :test-not test-not)
+      list
+    (cons item list)))
+
+(defktn assoc (item list &aux (tx (tp8 item)))
+  (unless (mapc (lambda (x) (check-type x list)
+		  (when x
+		    (let* ((k (car x))(k (if key (funcall key k) k)))
+		      (when (cond (test (funcall test item k)) (test-not (not (funcall test-not item k))) ((eql-with-tx item k tx)))
+			(return-from assoc x))))) list)))
+
+
+(defktn rassoc (item list &aux (tx (tp8 item)))
+  (unless (mapc (lambda (x) (check-type x list)
+		  (when x
+		    (let* ((k (cdr x))(k (if key (funcall key k) k)))
+		      (when (cond (test (funcall test item k)) (test-not (not (funcall test-not item k))) ((eql-with-tx item k tx)))
+			(return-from rassoc x))))) list)))
+
+(defnfn intersection (l1 l2)
+  (mapcan (lambda (x) 
+	    (when (member (if key (funcall key x) x) l2 :test test :test-not test-not :key key)
+	      (cons x nil))) l1))
+
+(defnfn union (l1 l2 &aux rp)
+  (prog1 (or (mapcan (lambda (x) 
+		       (unless (member (if key (funcall key x) x) l2 :test test :test-not test-not :key key)
+			 (setq rp (cons x nil)))) l1) l2)
+    (when rp (rplacd rp l2))))
+
+
+(defnfn set-difference (l1 l2)
+  (mapcan (lambda (x) 
+	    (unless (member (if key (funcall key x) x) l2 :test test :test-not test-not :key key)
+	      (cons x nil))) l1))
+
+(defnfn set-exclusive-or (l1 l2 &aux rp (rr (copy-list l2)))
+  (prog1 (or (mapcan (lambda (x &aux (k (if key (funcall key x) x))) 
+		       (if (member k l2 :test test :test-not test-not :key key)
+			   (unless (setq rr (delete k rr :test test :test-not test-not :key key)))
+			 (setq rp (cons x nil)))) l1) rr)
+    (when rp (rplacd rp rr))))
+
+     
+(defnfn nintersection (l1 l2 &aux r rp)
+  (mapl (lambda (x &aux (k (car x))) 
+	  (when (member (if key (funcall key k) k) l2 :test test :test-not test-not :key key)
+	    (if rp (rplacd rp x) (setq r x))(setq rp x))) l1)
+  (when rp (rplacd rp nil))
+  r)
+
+(defnfn nunion (l1 l2 &aux r rp)
+  (mapl (lambda (x &aux (k (car x))) 
+	  (unless (member (if key (funcall key k) k) l2 :test test :test-not test-not :key key)
+	    (if rp (rplacd rp x) (setq r x))(setq rp x))) l1)
+  (when rp (rplacd rp l2))
+  (or r l2))
+
+(defnfn nset-difference (l1 l2 &aux r rp)
+  (mapl (lambda (x &aux (k (car x))) 
+	  (unless (member (if key (funcall key k) k) l2 :test test :test-not test-not :key key)
+	    (if rp (rplacd rp x) (setq r x))(setq rp x))) l1)
+  (when rp (rplacd rp nil))
+  r)
+
+
+(defnfn nset-exclusive-or (l1 l2 &aux r rp (rr (copy-list l2)))
+  (mapl (lambda (x &aux (k (car x))(k (if key (funcall key k) k))) 
+	    (if (member k l2 :test test :test-not test-not :key key)
+		(unless (setq rr (delete k rr :test test :test-not test-not :key key)))
+	      (progn (if rp (rplacd rp x) (setq r x))(setq rp x)))) l1)
+  (when rp (rplacd rp rr))
+  (or r rr))
+  
+
+(defnfn subsetp (l1 l2)
+  (mapc (lambda (x) 
+	  (unless (member (if key (funcall key x) x) l2 :test test :test-not test-not :key key)
+	    (return-from subsetp nil))) l1) t)
+
 
 (defun endp (x)
   (declare (optimize (safety 2)))
@@ -196,14 +389,14 @@
 	((atom w) (when rp (rplacd rp nil) r)))))
 
 (defun ldiff (l tl &aux (test #'eql))
-  (declare (optimize (safety 2)))
+  (declare (optimize (safety 2)) (ignorable test))
   (check-type l list)
   (do (r rp (tc (bump-test (comp-test test nil) tl)) (l l (cdr l))) 
       ((cond ((do-test test tc l tl)) ((atom l) (when rp (rplacd rp l)))) r)
       (let ((tmp (cons (car l) nil))) (collect r rp tmp))))
 
 (defun tailp (tl l &aux (test #'eql))
-  (declare (optimize (safety 2)))
+  (declare (optimize (safety 2)) (ignorable test))
   (check-type l list)
   (do (r (tc (bump-test (comp-test test nil) tl)) (l l (cdr l))) 
       ((cond ((setq r (do-test test tc l tl))) ((atom l))) r)))
@@ -235,11 +428,11 @@
   (cons (cons key datum) alist))
 
 (defun pairlis (k d &optional a)
-  (declare (optimize (safety 2)))
+  (declare (optimize (safety 1)))
   (check-type k proper-list)
   (check-type d proper-list)
-  (do ((k k (cdr k)) (d d (cdr d)) (a a (acons (car k) (car d) a)))
-      ((or (endp k) (endp d)) a)))
+  (mapc (lambda (x y) (setq a (acons x y a))) k d)
+  a)
 
 (defun copy-list (l)
   (declare (optimize (safety 2)))
@@ -248,25 +441,45 @@
       (let ((tmp (cons (car l) nil))) (collect r rp tmp))))
 
 (defun copy-alist (l)
-  (declare (optimize (safety 2)))
+  (declare (optimize (safety 1)))
   (check-type l proper-list)
-  (do (r rp (l l (cdr l))) ((endp l) r)
-      (let ((tmp (cons (let ((e (car l))) (cond ((consp e) (cons (car e) (cdr e))) (e))) nil))) 
-	(collect r rp tmp))))
+  (maplist (lambda (x &aux (e (car x))) (if (consp e) (cons (car e) (cdr e)) e)) l))
 
-(defun nconc (&rest l)
-  (declare (optimize (safety 2)) (:dynamic-extent l))
-  (do (r rp (l l (cdr l)))
-      ((endp l) r)
-      (let ((it (car l)))
-	(if rp (rplacd rp it) (setq r it))
-	(when (and (cdr l) (consp it)) (setq rp (last it))))))
 
-(defun nreconc (list tail)
-  (declare (optimize (safety 2)))
+;; (defun copy-alist (l)
+;;   (declare (optimize (safety 2)))
+;;   (check-type l proper-list)
+;;   (do (r rp (l l (cdr l))) ((endp l) r)
+;;       (let ((tmp (cons (let ((e (car l))) (cond ((consp e) (cons (car e) (cdr e))) (e))) nil))) 
+;; 	(collect r rp tmp))))
+
+(defun nconc (&rest l &aux r rp)
+  (declare (:dynamic-extent l))
+  (mapl (lambda (l &aux (it (car l)))
+	  (if rp (rplacd rp it) (setq r it))
+	  (when (and (cdr l) (consp it)) (setq rp (last it)))) l)
+  r)
+	
+
+;; (defun nconc (&rest l)
+;;   (declare (optimize (safety 2)) (:dynamic-extent l))
+;;   (do (r rp (l l (cdr l)))
+;;       ((endp l) r)
+;;       (let ((it (car l)))
+;; 	(if rp (rplacd rp it) (setq r it))
+;; 	(when (and (cdr l) (consp it)) (setq rp (last it))))))
+
+(defun nreconc (list tail &aux r)
+  (declare (optimize (safety 1)))
   (check-type list proper-list)
-  (do (cdp (p tail)(pp list)) ((endp pp) p)
-      (setq cdp (cdr pp) p (rplacd pp p) pp cdp)))
+  (mapl (lambda (x) (when r (setq tail (rplacd r tail))) (setq r x)) list)
+  (if r (rplacd r tail) tail))
+
+;; (defun nreconc (list tail)
+;;   (declare (optimize (safety 2)))
+;;   (check-type list proper-list)
+;;   (do (cdp (p tail)(pp list)) ((endp pp) p)
+;;       (setq cdp (cdr pp) p (rplacd pp p) pp cdp)))
 
 (defun nth (n x)
   (declare (optimize (safety 2)))
@@ -292,7 +505,7 @@
 
 (defun copy-tree (tr)
   (declare (optimize (safety 2)))
-  (do (st cs a (g (load-time-value (gensym)))) (nil)
+  (do (st cs a (g (sgen))) (nil)
       (declare (:dynamic-extent st cs))
       (cond ((atom tr)
 	     (do nil ((or (not cs) (eq g (car cs))))
@@ -301,43 +514,13 @@
 	     (setf (car cs) tr tr (cdar st)))
 	    ((setq st (cons tr st) cs (cons g cs) tr (car tr))))))
 
-(deflist member ((item) list t t)
-  (do ((list list (cdr list)))
-      ((endp list))
-      (when (do-test test test-comp item (do-key key key-comp (car list)))
-	(return list))))
-
-(deflist adjoin ((oitem) olist nil t)
-  (do ((list olist (cdr list))(item (do-key key key-comp oitem)))
-      ((endp list) (cons oitem olist))
-      (when (do-test test test-comp item (do-key key key-comp (car list)))
-	(return olist))))
-
-(deflist assoc ((item) list t t)
-  (do ((list list (cdr list))) 
-      ((endp list))
-      (let ((c (car list)))
-	(check-type c list)
-	(when c
-	  (when (do-test test test-comp item (do-key key key-comp (car c)))
-	    (return c))))))
-
-(deflist rassoc ((item) list t t)
-  (do ((list list (cdr list))) 
-      ((endp list))
-      (let ((c (car list)))
-	(check-type c list)
-	(when c
-	  (when (do-test test test-comp item (do-key key key-comp (cdr c)))
-	    (return c))))))
-
 (defun tree-equal (tr1 tr2 &key test test-not)
   (declare (optimize (safety 2)))
   (and test test-not (error "both test and test not supplied"))
   (let* ((test (or test test-not #'eql))
 	 (test (if (functionp test) test (funcallable-symbol-function test)))
 	 (test-comp (comp-test test test-not)))
-    (do (st1 cs1 st2 (g (load-time-value (gensym)))) (nil)
+    (do (st1 cs1 st2 (g (sgen))) (nil)
 	(declare (:dynamic-extent st1 cs1 st2))
 	(cond ((and (atom tr1) (consp tr2)) (return nil))
 	      ((and (consp tr1) (atom tr2)) (return nil))
@@ -351,7 +534,7 @@
 		     st2 (cons tr2 st2) tr2 (car tr2)))))))
 
 (deflist subst ((n o) tr t nil)
-  (do (st cs a c rep (g (load-time-value (gensym)))) (nil)
+  (do (st cs a c rep (g (sgen))) (nil)
       (declare (:dynamic-extent st cs))
       (setq rep (do-test test test-comp o (do-key key key-comp tr)))
       (cond ((or rep (atom tr))
@@ -362,7 +545,7 @@
 	    ((setq st (cons tr st) cs (cons g cs) tr (car tr))))))
 
 (deflist nsubst ((n o) tr t nil)
-  (do (st cs rep (g (load-time-value (gensym)))) (nil)
+  (do (st cs rep (g (sgen))) (nil)
       (declare (:dynamic-extent st cs))
       (setq rep (do-test test test-comp o (do-key key key-comp tr)))
       (cond ((or rep (atom tr))
@@ -374,7 +557,7 @@
 
 (defllist sublis (al tr nil)
   (or (unless al tr)
-      (do (st cs a c rep (g (load-time-value (gensym)))) (nil)
+      (do (st cs a c rep (g (sgen))) (nil)
 	(declare (:dynamic-extent st cs))
 	(setq rep (assoc (do-key key key-comp tr) al :test test :test-not test-not))
 	(cond ((or rep (atom tr))
@@ -386,7 +569,7 @@
   
 (defllist nsublis (al tr nil)
   (or (unless al tr)
-      (do (st cs rep (g (load-time-value (gensym)))) (nil)
+      (do (st cs rep (g (sgen))) (nil)
 	(declare (:dynamic-extent st cs))
 	(setq rep (assoc (do-key key key-comp tr) al :test test :test-not test-not))
 	(cond ((or rep (atom tr))
@@ -396,136 +579,63 @@
 	       (if cs (setf (car cs) tr tr (cdar st)) (return tr)))
 	      ((setq st (cons tr st) cs (cons g cs) tr (car tr)))))))
 
-(defllist intersection (l1 l2 t)
-  (do (r (l1 l1 (cdr l1)))
-      ((endp l1) r)
-      (let ((oitem (car l1)))
-	(when (member (do-key key key-comp oitem) l2 :test test :test-not test-not :key key)
-	  (push oitem r)))))
-
-(defllist nintersection (l1 l2 t)
-  (do (r rp (l1 l1 (cdr l1)))
-      ((endp l1) (when rp (rplacd rp nil)) r)
-      (when (member (do-key key key-comp (car l1)) l2 :test test :test-not test-not :key key)
-	(collect r rp l1))))
-
-(defllist union (l1 l2 t)
-  (do ((r l2) (l1 l1 (cdr l1)))
-      ((endp l1) r)
-      (let* ((oitem (car l1)))
-	(unless (member (do-key key key-comp oitem) l2 :test test :test-not test-not :key key)
-	  (push oitem r)))))
-
-(defllist nunion (l1 l2 t)
-  (do (r rp (l1 l1 (cdr l1)))
-      ((endp l1) (when rp (rplacd rp l2)) (or r l2))
-      (unless (member (do-key key key-comp (car l1)) l2 :test test :test-not test-not :key key)
-	(collect r rp l1))))
-
-
-(defllist set-difference (l1 l2 t)
-  (do (r (l1 l1 (cdr l1)))
-      ((endp l1) r)
-      (let* ((oitem (car l1)))
-	(unless (member (do-key key key-comp oitem) l2 :test test :test-not test-not :key key)
-	  (push oitem r)))))
-
-(defllist nset-difference (l1 l2 t)
-  (do (r rp (l1 l1 (cdr l1)))
-      ((endp l1) (when rp (rplacd rp nil)) r)
-      (unless (member (do-key key key-comp (car l1)) l2 :test test :test-not test-not :key key)
-	(collect r rp l1))))
-
-(defllist set-exclusive-or (l1 l2 t)
-  (do (r (rr (copy-list l2)) (l1 l1 (cdr l1)))
-      ((endp l1) (nconc r rr))
-      (do (p (oitem (car l1))(c2 l2 (cdr c2)))
-	    ((not (setq c2 (member (do-key key key-comp oitem) c2 :test test :test-not test-not :key key)))
-	     (unless p (push oitem r)))
-	    (do ((xp nil (or xp f)) f (x rr (cdr x))) ((not x) (setq rr f p t));FIXME delete type precedence
-		(if (eq (car x) (car c2)) (when xp (setq xp (rplacd xp (cdr x)))) (setq f (or f x) xp (cdr xp)))))))
-
-(defllist nset-exclusive-or (l1 l2 t)
-  (do (r rp (rr (copy-list l2)) (l1 l1 (cdr l1)))
-      ((endp l1) (when rp (rplacd rp rr)) (or r rr))
-      (do (p (c2 l2 (cdr c2)))
-	    ((not (setq c2 (member (do-key key key-comp (car l1)) c2 :test test :test-not test-not :key key)))
-	     (unless p (collect r rp l1)))
-	    (do ((xp nil (or xp f)) f (x rr (cdr x))) ((not x) (setq rr f p t));FIXME delete type precedence
-		(if (eq (car x) (car c2)) (when xp (setq xp (rplacd xp (cdr x)))) (setq f (or f x) xp (cdr xp)))))))
-
-(defllist subsetp (l1 l2 t)
-  (do ((l1 l1 (cdr l1)))
-      ((endp l1) t)
-      (unless (member (do-key key key-comp (car l1)) l2 :test test :test-not test-not :key key)
-	(return nil))))
-
-
-(defun mapl (f l1 &rest l)
-  (declare (optimize (safety 2))(:dynamic-extent l))
-  (check-type l1 proper-list)
-  (do ((r l1) (l1 l1 (cdr l1)) (l l (mapl (lambda (x) (setf (car x) (cdar x))) l)))
-      ((or (endp l1) (member-if 'endp l)) r)
-      (apply f l1 l)))
-
-(defun mapcar (f l1 &rest l)
-  (declare (optimize (safety 2))(:dynamic-extent l))
-  (check-type l1 proper-list)
-  (do (r rp (vals (make-list (list-length l))))
-      ((or (endp l1) (member-if 'endp l)) r)
-      (declare (:dynamic-extent vals))
-      (do ((v vals (cdr v))(l l (cdr l))) ((endp l)) (setf (car v) (pop (car l))))
-      (let ((tmp (cons (apply f (pop l1) vals) nil))) 
-	(collect r rp tmp))))
-
-(defun maplist (f l1 &rest l)
-  (declare (optimize (safety 2))(:dynamic-extent l))
-  (check-type l1 proper-list)
-  (do (r rp (l1 l1 (cdr l1)) (l l (mapl (lambda (x) (setf (car x) (cdar x))) l)))
-      ((or (endp l1) (member-if 'endp l)) r)
-      (let ((tmp (cons (apply f l1 l) nil))) 
-	(collect r rp tmp))))
-
-(defun mapc (f l1 &rest l)
-  (declare (optimize (safety 2))(:dynamic-extent l))
-  (check-type l1 proper-list)
-  (do ((r l1) (vals (make-list (list-length l))))
-      ((or (endp l1) (member-if 'endp l)) r)
-      (declare (:dynamic-extent vals))
-      (do ((v vals (cdr v))(l l (cdr l))) ((endp l)) (setf (car v) (pop (car l))))
-      (apply f (pop l1) vals)))
-
-(defun mapcan (f l1 &rest l)
-  (declare (optimize (safety 2))(:dynamic-extent l))
-  (check-type l1 proper-list)
-  (do (r rp (vals (make-list (list-length l))))
-      ((or (endp l1) (member-if 'endp l)) r)
-      (declare (:dynamic-extent vals))
-      (do ((v vals (cdr v))(l l (cdr l))) ((endp l)) (setf (car v) (pop (car l))))
-      (let ((tmp (apply f (pop l1) vals)))
-	(if rp (rplacd rp tmp) (setq r tmp))
-	(when (consp tmp) (setq rp (last tmp))))))
-
-
-(defun mapcon (f l1 &rest l)
-  (declare (optimize (safety 2))(:dynamic-extent l))
-  (check-type l1 proper-list)
-  (do (r rp (l1 l1 (cdr l1)) (l l (mapl (lambda (x) (setf (car x) (cdar x))) l)))
-      ((or (endp l1) (member-if 'endp l)) r)
-      (let ((tmp (apply f l1 l)))
-	(if rp (rplacd rp tmp) (setq r tmp))
-	(when (consp tmp) (setq rp (last tmp))))))
-
-
-(defun append (&rest l)
-  (declare (optimize (safety 2))(:dynamic-extent l))
-  (do (r rp (l l (cdr l))) ((endp (cdr l)) (cond (rp (rplacd rp (car l)) r) ((car l))))
-      (do ((c (car l) (cdr c))) ((endp c))
-	  (let ((tmp (cons (car c) nil))) (collect r rp tmp)))))
+(defun append (&rest l &aux r rp)
+  (declare (:dynamic-extent l))
+  (mapl (lambda (x &aux (y (car x)))
+	  (declare (optimize (safety 2)))
+	  (if (cdr x)
+	      (mapc (lambda (x) (collect r rp (cons x nil))) y)
+	    (collect r rp y))) l) r)
 
 (defun revappend (list tail)
-  (declare (optimize (safety 2)))
+  (declare (optimize (safety 1)))
   (check-type list proper-list)
-  (do (cdp (p tail)(pp list)) ((endp pp) p)
-      (setq cdp (cdr pp) p (cons (car pp) p) pp cdp)))
+  (mapc (lambda (x) (setq tail (cons x tail))) list)
+  tail)
 
+;; (defun revappend (list tail)
+;;   (declare (optimize (safety 2)))
+;;   (check-type list proper-list)
+;;   (do (cdp (p tail)(pp list)) ((endp pp) p)
+;;       (setq cdp (cdr pp) p (cons (car pp) p) pp cdp)))
+
+(defun not (x)
+  (if x nil t))
+
+(defun null (x)
+  (if x nil t))
+
+(defun get-properties (p i &aux s)
+  (declare (optimize (safety 1)));FIXME, safety 2 and no check-type loses signature info
+  (check-type p proper-list)
+  (check-type i proper-list)
+  (cond ((endp p) (values nil nil nil))
+	((member (setq s (car p)) i :test 'eq) (values s (cadr p) p))
+	((endp (setq s (cdr p))) (error "Bad plist"))
+	(t (get-properties (cdr s) i))))
+
+(defun rplaca (x y)
+  (declare (optimize (safety 1)))
+  (check-type x cons)
+  (c-set-cons-car x y)
+  x)
+
+(defun rplacd (x y)
+  (declare (optimize (safety 1)))
+  (check-type x cons)
+  (c-set-cons-cdr x y)
+  x)
+
+;(defun listp (x) (typep x 'list));(typecase x (list t)))
+(defun consp (x) (when x (listp x)))
+(defun atom (x) (not (consp x)))
+
+(defun getf (l i &optional d &aux s)
+  (declare (optimize (safety 1)))
+  (check-type l proper-list)
+  (cond ((endp l) d) 
+	((eq (car l) i) (cadr l)) 
+	((endp (setq s (cdr l))) (error "Bad plist"))
+	((getf (cdr s) i d))))
+
+(defun identity (x) x)

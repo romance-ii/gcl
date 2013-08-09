@@ -41,9 +41,9 @@ system: $(PORTDIR)/$(FLISP)
 	$(MAKE) -C $(PORTDIR) final
 	touch $@
 
-ASRC:=$(shell ls -1 o/*.c o/*.d o/*.h h/*.h lsp/*.lsp cmpnew/*.lsp mod/*.lsp pcl/*sp clcs/*sp xgcl-2/*p)
+ASRC:=$(shell ls -1 o/*.c lsp/*.lsp cmpnew/*.lsp mod/*.lsp pcl/*sp clcs/*sp xgcl-2/*p) #o/*.d o/*.h h/*.h
 TAGS: $(ASRC)
-	etags $^
+	etags --regex='/\#.`(defun[ \n\t]+\([^ \n\t]+\)/' $^
 
 xgcl: $(PORTDIR)/saved_xgcl
 
@@ -72,7 +72,7 @@ $(PORTDIR)/saved_pre_gcl: $(HDIR)cmpinclude.h
 	(cd $(BINDIR); $(MAKE) all)
 	$(MAKE) mpfiles
 	rm -f o/cmpinclude.h ; cp h/cmpinclude.h o
-	(cd $(ODIR); rm -f boot.h; touch boot.h; $(MAKE) all)
+	(cd $(ODIR); $(MAKE) all)
 	$(MAKE) $<
 	rm -f o/cmpinclude.h ; cp h/cmpinclude.h o
 #	(cd $(ODIR); $(MAKE) all)
@@ -318,7 +318,7 @@ gclclean:
 	(cd info ; $(MAKE) clean)
 	find binutils -name "*.o" -exec rm {} \;
 	rm -f foo.tcl config.log makedefs makedefsafter config.cache config.status makedefc
-	rm -f h/config.h h/gclincl.h h/cmpinclude.h h/gmp.h
+	rm -f h/config.h h/gclincl.h h/cmpinclude.h
 	rm -f xbin/gcl foo foo.c bin/gclm.bat gmp_all
 	rm -f h/*-linux.defs h/bfd.h h/bfdlink.h h/ansidecl.h h/symcat.h
 	rm -f windows/gcl.iss bin/gcl.bat windows/gcl.ansi.iss windows/install.ansi.lsp \
@@ -352,11 +352,11 @@ $(HDIR)new_decl.h:
 
 $(HDIR)cmpinclude.h: $(CMPINCLUDE_FILES) $(HDIR)config.h
 	cat $(HDIR)config.h | sed -e "1,/Begin for cmpincl/d" \
-		-e "/End for cmpinclude/,50000d" > tmpx
-	echo -e '#include "h/config.h"\n#ifdef SGC\n"#define SGC"\n#else\n"#undef SGC"\n#endif' | cpp 2>/dev/null| grep -v '^ *$$' | tail -1l | tr -d '"' >>tmpx
-	cat $(CMPINCLUDE_FILES) >> tmpx
-	cpp -P -dD tmpx | grep -v "#define *__STDC__ " | grep -v "#define *__STDC_HOSTED__ " | grep -v "#define  *__GNUC_PATCHLEVEL__ " | grep -v "#define  *__VERSION__ ">tmpx1 && mv tmpx1 tmpx
-	./xbin/move-if-changed mv tmpx h/cmpinclude.h
+		-e "/End for cmpinclude/,50000d" > tmpx.c
+	echo '#include "h/config.h"\n#ifdef SGC\n"#define SGC"\n#else\n"#undef SGC"\n#endif' | $(CPP) 2>/dev/null| grep -v '^ *$$' | tail -1l | tr -d '"' >>tmpx.c
+	cat $(CMPINCLUDE_FILES) >> tmpx.c
+	$(CPP) -P -dD tmpx.c | grep -v "#define *__STDC_" | grep -v "#define  *__GNUC_PATCHLEVEL__ " | grep -v "#define  *__VERSION__ ">tmpx1 && mv tmpx1 tmpx.c
+	./xbin/move-if-changed mv tmpx.c h/cmpinclude.h
 	./xbin/move-if-changed cp h/cmpinclude.h o/cmpinclude.h
 
 go:

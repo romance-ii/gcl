@@ -28,13 +28,13 @@
 ;; If you are working in another package you should (import 'si::arglist)
 ;; to avoid typing the si::
 
-(in-package 'lisp)
+;; (in-package 'lisp)
 
-(export '(trace untrace))
-(export 'step)
+;; (export '(trace untrace))
+;; (export 'step)
 
 
-(in-package 'system)
+(in-package :system)
 
 ;;(proclaim '(optimize (safety 2) (space 3)))
 
@@ -172,7 +172,7 @@
      (when (null (fboundp fname))
        (format *trace-output* "The function ~S is not defined.~%" fname)
        (return-from trace-one nil))
-     (when (special-form-p fname)
+     (when (special-operator-p fname)
        (format *trace-output* "~S is a special form.~%" fname)
        (return-from trace-one nil))
      (when (macro-function fname)
@@ -199,7 +199,7 @@
   result)
 	  
 (defun trace-call (temp-name args cond entrycond entry exitcond exit
-			 &aux (*trace-level* *trace-level*) vals indent)
+			 &aux (*trace-level* *trace-level*) (*print-circle* t) vals indent)
   (when (= *trace-level* 0)
 	(reset-trace-declarations (all-trace-declarations)))
   (cond

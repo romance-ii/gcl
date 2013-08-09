@@ -5,60 +5,25 @@ Copyright William Schelter. All rights reserved. */
 #error Need either BFD or SPECIAL_RSYM
 #endif
 
-#ifdef SPECIAL_RSYM
-
-int node_compare();
-
-
-struct node *
-find_sym_ptable(name)
-  char *name;
-  {struct node joe,*answ;
-   joe.string=name;
-   answ =  (struct node *)  bsearch((char *)(&joe),(char*) (c_table.ptable),
-			 c_table.length,
-			 sizeof(struct node), node_compare);
-
-   return answ;
- }
-       
-
-#else
-
-static MY_BFD_BOOLEAN
-bfd_hash_transfer(struct bfd_link_hash_entry *h,void *v) {
-  
-  if (h->type==bfd_link_hash_defined)
-    sethash(make_simple_string(h->root.string),
-	    sSAlink_hash_tableA->s.s_dbind,
-	    make_fixnum(h->u.def.value+h->u.def.section->vma));
-
-  return MY_BFD_TRUE;
-  
-}  
-
-#ifdef GCL_GPROF
-extern void _mcount();
-/* int */
-/* mcount_wrapper(unsigned long u1,unsigned long u2) { */
-/*   return _mcount(u1,u2); */
-/* } */
-#endif
+#ifndef SPECIAL_RSYM
 
 /* Replace this with gcl's own hash structure at some point */
 static int
 build_symbol_table_bfd(void) {
 
   int u,v;
+  unsigned long pa;
   asymbol **q;
-  
+
   bfd_init();
   if (!(bself=bfd_openr(kcl_self,0)))
     FEerror("Cannot open self\n",0);
   if (!bfd_check_format(bself,bfd_object))
     FEerror("I'm not an object",0);
+/*    if (link_info.hash) */
+/*      bfd_link_hash_table_free(bself,link_info.hash); */
 #ifdef HAVE_OUTPUT_BFD
-  link_info.output_bfd = bfd_openw("/dev/null", bfd_get_target(bself));
+    link_info.output_bfd = bfd_openw("/dev/null", bfd_get_target(bself));
 #endif
   if (!(link_info.hash = bfd_link_hash_table_create (bself)))
     FEerror("Cannot make hash table",0);
@@ -68,7 +33,7 @@ build_symbol_table_bfd(void) {
     FEerror("Cannot get self's symtab upper bound",0);
 
 #ifdef HAVE_ALLOCA
-  q=(asymbol **)ZALLOCA(u);
+  q=(asymbol **)alloca(u);
 #else
   q=(asymbol **)malloc(u);
 #endif
@@ -79,7 +44,7 @@ build_symbol_table_bfd(void) {
     char *c=NULL;
     struct bfd_link_hash_entry *h;
 
-    if (!*q[u]->name || !q[u]->section)
+    if (!*q[u]->name)
       continue;
 
     if (strncmp(q[u]->section->name,"*UND*",5) && !(q[u]->flags & BSF_WEAK))
@@ -98,9 +63,16 @@ build_symbol_table_bfd(void) {
     if (h->type!=bfd_link_hash_defined) {
       if (!q[u]->section)
 	FEerror("Symbol ~S is missing section",1,make_simple_string(q[u]->name));
+      if (!my_plt(q[u]->name,&pa)) {
+/* 	 printf("my_plt %s %p\n",q[u]->name,(void *)pa);  */
+ 	if (q[u]->value && q[u]->value!=pa)
+ 	  FEerror("plt address mismatch", 0);
+ 	else
+ 	  q[u]->value=pa;
+      }
       if (q[u]->value) {
 	h->type=bfd_link_hash_defined;
-	h->u.def.value=q[u]->value+((q[u]->flags & BSF_WEAK) ? -q[u]->section->vma : q[u]->section->vma);
+	h->u.def.value=q[u]->value+q[u]->section->vma;
 	h->u.def.section=q[u]->section;
       }
     }
@@ -110,43 +82,6 @@ build_symbol_table_bfd(void) {
       c=NULL;
     }
   }
-
-  {
-    
-    extern object sLequal;
-    object *ovsb=vs_base,*ovst=vs_top;
-    
-    vs_base=vs_top;
-    vs_push(sKtest);
-    vs_push(sLequal);
-    Lmake_hash_table();
-    sSAlink_hash_tableA->s.s_dbind=vs_base[0];
-    vs_top=ovst;
-    vs_base=ovsb;
-
-    bfd_link_hash_traverse(link_info.hash,bfd_hash_transfer,NULL);
-
-#ifdef GCL_GPROF
-    sethash(make_simple_string("_mcount"),
-	    sSAlink_hash_tableA->s.s_dbind,
-	    make_fixnum((fixnum)_mcount));
-    sethash(make_simple_string("mcount"),
-	    sSAlink_hash_tableA->s.s_dbind,
-	    make_fixnum((fixnum)_mcount));
-
-    if ((fixnum)_mcount<DBEGIN || (fixnum)_mcount>=(DBEGIN+MAXPAGE*PAGESIZE))
-      fprintf(stderr,"Warning, symbol address for mcount off core\n");
-#endif
-
-    bfd_close(bself);
-    bself=NULL;
-    link_info.hash=NULL;
-
-  }
-
-
-
-
 
 #ifndef HAVE_ALLOCA
   free(q);
@@ -160,57 +95,58 @@ build_symbol_table_bfd(void) {
 
 LFD(build_symbol_table)(void) { 
 
-
   printf("Building symbol table for %s ..\n",kcl_self);fflush(stdout);
 
 #ifdef SPECIAL_RSYM
-  {
 
-    char tmpfile1[80],command[300];
-
-    snprintf(tmpfile1,sizeof(tmpfile1),"rsym%d",(int)getpid());
-#ifndef STAND
-    coerce_to_filename(symbol_value(sSAsystem_directoryA),
-		       system_directory);
+#ifndef USE_DLOPEN
+  load_self_symbols();
 #endif
-#ifndef RSYM_COMMAND
-    snprintf(command,sizeof(command),"%s/rsym %s %s",system_directory,kcl_self,tmpfile1);
+
 #else
-    RSYM_COMMAND(command,system_directory,kcl_self,tmpfile1);
-#endif
-    if (system(command) != 0)
-#ifdef STAND
-      FEerror("The rsym command %s failed.",1,command);
-#else
-    FEerror("The rsym command ~a failed.",1,
-	    make_simple_string(command));
-#endif
-    read_special_symbols(tmpfile1);
-    unlink(tmpfile1);
-    qsort((char*)(c_table.ptable),(int)(c_table.length),sizeof(struct node),node_compare);
-
-/*     { */
-/*       struct node *p,*pe; */
-/*       for (p=*c_table.ptable,pe=p+c_table.length;p<pe;p++) { */
-/* 	unsigned long pa; */
-/* 	if (!my_plt(p->string,&pa)) { */
-/* /\* 	  printf("my_plt %s %p %p\n",p->string,(void *)pa,(void *)p->address); *\/ */
-/* 	  if (p->address && p->address!=pa) */
-/* 	    FEerror("plt address mismatch",0); */
-/* 	  else */
-/* 	    p->address=pa; */
-/* 	} */
-/*       } */
-/*     } */
-
-  }
-#else /* special_rsym */
 
   build_symbol_table_bfd();
 
 #endif
 
 }
+
+extern int mcount();
+extern int _mcount();
+extern int __divdi3();
+extern int __moddi3();
+extern int __udivdi3();
+extern int __umoddi3();
+extern void sincos(double,double *,double *);
+extern int __divsi3();
+extern int __modsi3();
+extern int __udivsi3();
+extern int __umodsi3();
+extern int $$divI();
+extern int $$divU();
+extern int $$remI();
+extern int $$remU();
+extern int __divq();
+extern int __divqu();
+extern int __remq();
+extern int __remqu();
+
+#ifndef DARWIN
+#ifndef _WIN32
+int
+use_symbols(double d,...) {
+
+  sincos(d,&d,&d);
+
+#ifdef GCL_GPROF
+  _mcount();
+#endif
+  
+  return (int)d;
+
+}
+#endif
+#endif
 
 void
 gcl_init_sfasl() {

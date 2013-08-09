@@ -1,33 +1,41 @@
-;(si::use-fast-links nil)
-;(setq compiler::*space* 3)
-
-#+pre-gcl(progn
-	   (declaim (optimize (safety 3)))
-	   (setf (symbol-plist 'union) nil (symbol-plist 'set-difference) nil))
-
-(dolist (l '(c listlib #-pre-gcl cp predlib arraylib seq seqlib bnum))
-  (time (load (compile-file
-	       (concatenate 'string "../lsp/gcl_" (string-downcase (string l)) ".lsp")
-	       :c-file t :h-file t :data-file t :system-p t))))
-
-(dolist (l '(cmptype cmpeval cmpvar cmpwt cmpif cmplet cmptag cmpinline cmpenv cmplam cmptop
-		     cmpbind cmpblock cmpcall cmpcatch cmpflet cmpfun  cmplabel cmploc cmpmap 
-		     cmpmulti cmpspecial cmputil  cmpvs cmpmain))
-  (time (load (compile-file
-	       (concatenate 'string "../cmpnew/gcl_" (string-downcase (string l)) ".lsp")
-	       :c-file t :h-file t :data-file t :system-p t))))
-
-(with-open-file (s "../lsp/gcl_recompile.lsp" :direction :output))
-(dolist (l '(recompile callhash assert defmacro defstruct describe evalmacros sc
-		       iolib mislib module numlib mnum packlib setf top trace sloop debug info serror))
-  (time (compile-file
-	 (concatenate 'string "../lsp/gcl_" (string-downcase (string l)) ".lsp")
-	 :c-file t :h-file t :data-file t :system-p t)))
+(in-package :compiler)(cdebug)
 
 #+pre-gcl
 (progn
-  (declaim (optimize (safety 2)))
-  (dolist (l '(cp))
-    (time (load (compile-file
-		 (concatenate 'string "../lsp/gcl_" (string-downcase (string l)) ".lsp")
-		 :c-file t :h-file t :data-file t :system-p t)))))
+  (declaim (optimize (safety 3)))
+  (unless (fboundp 'logandc2) (defun logandc2 (x y) (boole boole-andc2 x y)))
+  (unless (fboundp 'lognot) (defun lognot (x) (boole boole-c1 x 0)))
+  (defun mc nil (si::make-anonymous-closure)))
+
+(mapc 'compile (nconc #-pre-gcl '(mapcar mapc mapl maplist)
+		      'si::(listp typep ibb ib <= coerce < > >= + - set-array concatenate mta mtv eql-is-eq)
+		      '(info-p info-ref info-type info-flags info-ch info-ref-ccb info-ref-clb c1constant-value-object
+			     var-p var-name var-kind var-ref var-ref-ccb var-loc var-dt var-type var-mt var-tag var-store
+			     c-array-rank c-array-dim c-array-elttype c-array-eltsize c-array-self c-array-hasfillp
+			     array-dimension array-row-major-index row-major-aref si::row-major-aset aref si::aset 
+			     array-has-fill-pointer-p length)))
+(setf (symbol-function 'array-rank) (symbol-function 'c-array-rank)
+      (symbol-function 'array-total-size) (symbol-function 'c-array-dim))
+
+(in-package :user)
+
+(defun doitf (l dir ld? cmpl?)
+  (time (funcall ld? (funcall cmpl? (concatenate 'string "../" dir "/gcl_" (string-downcase (string l)) 
+						 (if (eq cmpl? 'compile-file) ".lsp" ""))))))
+
+(defun doit (ld? cmpl?)
+
+  (dolist (l '(s sf c listlib predlib type typep typecase arraylib seq seqlib bnum fle dl rm nr lr sym hash sharp))
+    (doitf l "lsp" ld? cmpl?))
+  
+  (dolist (l '(cmptype cmpeval cmpvar cmpwt cmpif cmplet cmptag cmpinline cmpenv cmplam cmptop
+		       cmpbind cmpblock cmpcall cmpcatch cmpflet cmpfun cmplabel cmploc cmpmap 
+		       cmpmulti cmpspecial cmputil cmpvs cmpmain))
+    (doitf l "cmpnew" ld? cmpl?))
+  
+  (with-open-file (s "../lsp/gcl_recompile.lsp" :direction :output))
+  (dolist (l '(recompile callhash assert defmacro defstruct describe evalmacros sc
+			 iolib mislib module numlib packlib setf top trace sloop debug info serror mnum))
+    (doitf l "lsp" 'identity cmpl?)))
+
+(doit (if (boundp 'noload) 'identity 'load) 'compile-file)

@@ -228,9 +228,9 @@ mark_cons(object x) {
   } else
     mark_object(x->c.c_car);
  MARK_CDR:  
-  if (NULL_OR_ON_C_STACK(x->c.c_cdr))
-    return;
   x = Scdr(x);
+  if (NULL_OR_ON_C_STACK(x))
+    return;
   if (consp(x)) {
     if (is_marked_or_free(x))
       return;
@@ -300,8 +300,10 @@ mark_object(object x) {
     mark_object(x->s.s_plist);
     mark_object(x->s.s_gfdef);
     mark_object(x->s.s_dbind);
-    if (x->s.s_hpack!=Cnil && x->s.s_hpack->p.p_name==Cnil)
+    if (x->s.s_hpack!=Cnil && x->s.s_hpack->p.p_name==Cnil) {
       x->s.s_hpack=Cnil;
+      x->s.tt=0;
+    }
 /*       mark_object(x->s.s_hpack); */
     if (x->s.s_self == NULL)
       break;
@@ -347,18 +349,18 @@ mark_object(object x) {
     if (x->ht.ht_self == NULL)
       break;
     for (i = 0, j = x->ht.ht_size;  i < j;  i++) {
-      mark_object(x->ht.ht_self[i].hte_key);
-      mark_object(x->ht.ht_self[i].hte_value);
+      mark_object(x->ht.ht_self[i].c_cdr);
+      mark_object(x->ht.ht_self[i].c_car);
     }
     if ((short)what_to_collect >= (short)t_contiguous) {
       if (inheap(x->ht.ht_self)) {
 	if (what_to_collect == t_contiguous)
 	  mark_contblock((char *)(x->ht.ht_self),
-			 j * sizeof(struct htent));
+			 j * sizeof(struct cons));
       } else
 	x->ht.ht_self =
 	  copy_relblock((char *)(x->ht.ht_self),
-			j * sizeof(struct htent));
+			j * sizeof(struct cons));
     }
     break;
     
@@ -384,7 +386,7 @@ mark_object(object x) {
       goto CASE_GENERAL;
     
   CASE_SPECIAL:
-    cp = x->fixa.fixa_self;
+    cp = x->a.a_self;
     if (cp == NULL)
       break;
     /* set j to the size in char of the body of the array */
@@ -397,7 +399,7 @@ mark_object(object x) {
        rb_pointer1 +=  (sizeof(double) - tem); \
      }}
     case aet_lf:
-      j= sizeof(longfloat)*x->lfa.lfa_dim;
+      j= sizeof(longfloat)*x->a.a_dim;
       if (((int)what_to_collect >= (int)t_contiguous) &&
 	  !(inheap(cp))) ROUND_RB_POINTERS_DOUBLE;
       break;
@@ -417,7 +419,7 @@ mark_object(object x) {
       j=sizeof(int)*x->a.a_dim;
       break;
     default:
-      j=sizeof(fixnum)*x->fixa.fixa_dim;}
+      j=sizeof(fixnum)*x->a.a_dim;}
     
     goto COPY;
     
@@ -615,7 +617,7 @@ mark_object(object x) {
   case t_random:
     if ((int)what_to_collect >= (int)t_contiguous) {
       MARK_MP(x->rnd.rnd_state._mp_seed);
-#if __GNU_MP_VERSION < 4 || __GNU_MP_VERSION_MINOR < 2
+#if __GNU_MP_VERSION < 4 || (__GNU_MP_VERSION  == 4 && __GNU_MP_VERSION_MINOR < 2)
       if (x->rnd.rnd_state._mp_algdata._mp_lc) {
 	MARK_MP(x->rnd.rnd_state._mp_algdata._mp_lc->_mp_a);
 	if (!x->rnd.rnd_state._mp_algdata._mp_lc->_mp_m2exp) MARK_MP(x->rnd.rnd_state._mp_algdata._mp_lc->_mp_m);
@@ -654,26 +656,33 @@ mark_object(object x) {
     mark_object(x->pn.pn_version);
     break;
     
-  case t_closure:
-    { int i ;
-    if (what_to_collect == t_contiguous)
-      mark_contblock(x->cc.cc_turbo,x->cc.cc_envdim);
-    for (i= 0 ; i < x->cc.cc_envdim ; i++) {
-      mark_object(x->cc.cc_turbo[i]);}}
-    
-  case t_cfun:
-  case t_sfun:
-  case t_vfun:
-  case t_afun:
-  case t_gfun:	
-    mark_object(x->cf.cf_name);
-    mark_object(x->cf.cf_data);
+  /* case t_cfun: */
+  /*   mark_object(x->cf.cf_name); */
+  /*   mark_object(x->cf.cf_call); */
+  /*   mark_object(x->cf.cf_data); */
+  /*   break; */
+
+  case t_function:	
+    mark_object(x->fun.fun_data);
+    mark_object(x->fun.fun_plist);
+    if (x->fun.fun_env != def_env && x->fun.fun_env != src_env) {
+      mark_object(x->fun.fun_env[0]);
+      if (what_to_collect >= t_contiguous) {
+	object *p=x->fun.fun_env-1;
+	ufixnum n=*(ufixnum *)p;
+	p=copy_relblock((char *)p,n*sizeof(object));
+	x->fun.fun_env=p+1;
+      }
+    }
     break;
 
-  case t_ifun:
-    mark_object(x->ifn.ifn_self);
-    break;
-    
+
+  /* case t_ifun: */
+  /*   mark_object(x->ifn.ifn_name); */
+  /*   mark_object(x->ifn.ifn_call); */
+  /*   mark_object(x->ifn.ifn_self); */
+  /*   break; */
+
   case t_cfdata:
     
     mark_object(x->cfd.cfd_dlist);
@@ -689,18 +698,6 @@ mark_object(object x) {
 	break;
       mark_contblock(x->cfd.cfd_start, x->cfd.cfd_size);}
     break;
-  case t_cclosure:
-    mark_object(x->cc.cc_name);
-    mark_object(x->cc.cc_env);
-    mark_object(x->cc.cc_data);
-    if (x->cc.cc_turbo!=NULL) mark_object(*(x->cc.cc_turbo-1));
-    if (what_to_collect == t_contiguous) {
-      if (x->cc.cc_turbo != NULL)
-	mark_contblock((char *)(x->cc.cc_turbo-1),
-		       (1+fix(*(x->cc.cc_turbo-1)))*sizeof(object));
-    }
-    break;
-    
   case t_spice:
     break;
   default:
@@ -1198,15 +1195,15 @@ GBC(enum type t) {
     i = rb_pointer - rb_start;
 #endif    
 
-    if (nrbpage > (real_maxpage-page(heap_end)
-		   -holepage-real_maxpage/32)/2) {
-      if (i > nrbpage*PAGESIZE)
-	error("Can't allocate.  Good-bye!.");
-      else
-	nrbpage =
-	  (real_maxpage-page(heap_end)
-	   -holepage-real_maxpage/32)/2;
-    }
+    /* if (nrbpage > (real_maxpage-page(heap_end) */
+    /* 		   -holepage-real_maxpage/32)/2) { */
+    /*   if (i > nrbpage*PAGESIZE) */
+    /* 	error("Can't allocate.  Good-bye!."); */
+    /*   else */
+    /* 	nrbpage = */
+    /* 	  (real_maxpage-page(heap_end) */
+    /* 	   -holepage-real_maxpage/32)/2; */
+    /* } */
     
 /*     if (saving_system) */
 /*       rb_start = heap_end+PAGESIZE; */
@@ -1490,7 +1487,10 @@ FFN(siLheap_report)(void) {
   vs_push(make_fixnum((CSTACK_DIRECTION+1)>>1));
   vs_push(make_fixnum(CSTACK_ALIGNMENT));
   vs_push(make_fixnum(CSSIZE));
-#if defined(IM_FIX_BASE) && defined(IM_FIX_LIM)
+#if defined(LOW_IM_FIX)
+  vs_push(make_fixnum(-(LOW_IM_FIX>>1)));
+  vs_push(make_fixnum(LOW_IM_FIX));
+#elif defined(IM_FIX_BASE) && defined(IM_FIX_LIM)
   vs_push(make_fixnum(IM_FIX_BASE));
   vs_push(make_fixnum(IM_FIX_LIM));
 #else  
@@ -1501,14 +1501,11 @@ FFN(siLheap_report)(void) {
 }  
 
 
-DEFUN_NEW("ROOM-REPORT",object,fSroom_report,SI
-	  ,0,0,NONE,OO,OO,OO,OO,(void),"") {
-/* static void */
-/* FFN(siLroom_report)(void) { */
+DEFUN("ROOM-REPORT",object,fSroom_report,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
 
   int i;
   object x;
-  
+
   /*
     GBC(t_contiguous);
   */
@@ -1601,8 +1598,7 @@ mark_contblock(void *p, fixnum s) {
     set_mark_bit(x);
 }
 
-DEFUN_NEW("GBC",object,fLgbc,LISP
-       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
+DEFUN("GBC",object,fSgbc,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"")
 
 {
   /* 1 args */

@@ -97,7 +97,7 @@ work during bootstrapping.
 ;;;
 (eval-when (load eval)
 
-(defun redirect-early-function-internal (real early)
+(defun redirect-early-function-internal (real early);(print (list  'baz real early))
   (setf (gdefinition real)
 	(set-function-name
 	 (lambda (&rest args)
@@ -111,6 +111,7 @@ work during bootstrapping.
 
 )
 
+(setf (symbol-function 'real-documentation) (symbol-function 'documentation))
 
 ;;;
 ;;; *generic-function-fixups* is used by fix-early-generic-functions to
@@ -122,6 +123,10 @@ work during bootstrapping.
 	((generic-function method)		        ;lambda-list
 	 (standard-generic-function method)	        ;specializers
 	 real-add-method))			        ;method-function
+      (documentation
+       ((slotd &optional doc-type)
+	(t t)
+	real-documentation))
       (remove-method
 	((generic-function method)
 	 (standard-generic-function method)
@@ -1518,7 +1523,8 @@ work during bootstrapping.
 	     (fin-lambda-fn (&rest args)
 	       (declare (ignore args))
 	       (error "The function of the funcallable-instance ~S~
-                       has not been set" fin)))))
+                       has not been set" fin)
+	       (values-list (make-dummy-list))))))
     (setf (gdefinition spec) fin)
     (bootstrap-set-slot 'standard-generic-function fin 'name spec)
     (bootstrap-set-slot 'standard-generic-function fin 'source (load-truename))
@@ -1655,6 +1661,7 @@ work during bootstrapping.
 	(values (arg-info-applyp arg-info)
 		metatypes
 		arg-info))
+;      (print (list 'baz gf (early-gf-p gf) arg-info (arg-info-applyp arg-info)))
     (values (length metatypes) applyp metatypes
 	    (count-if (lambda (x) (neq x t)) metatypes)
 	    arg-info)))
@@ -2123,7 +2130,7 @@ work during bootstrapping.
 			(if (and y (eq (cadr y) (variable-lexical-p nf env))) (walker::macroexpand-all (caddr y) env) nf))))
 	     (if (eq nf (cadr form)) form
 	       `(,(car form) ,nf ,@(cddr form)))))
-	  ((and (not (eq (car form) 'symbol-macrolet)) (eq 'lisp::macro (cadar (assoc (car form) env :key 'car))))
+	  ((and (not (eq (car form) 'symbol-macrolet)) (eq 'si::macro (cadar (assoc (car form) env :key 'car))))
 	   (let ((kind (car form)))
 	     (labels ((scan-setf (tail)
 				 (when tail

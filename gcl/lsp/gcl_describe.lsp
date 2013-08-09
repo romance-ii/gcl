@@ -23,15 +23,12 @@
 ;;;;                           DESCRIBE and INSPECT
 
 
-(in-package 'lisp)
+;; (in-package 'lisp)
 
-(export '(describe inspect))
-
-
-(in-package 'system)
+;; (export '(describe inspect))
 
 
-;(proclaim '(optimize (safety 2) (space 3)))
+(in-package :system)
 
 
 (defvar *inspect-level* 0)
@@ -358,7 +355,7 @@
                (find-package "SYSTEM")
                *package*)))
 
-    (cond ((special-form-p symbol)
+    (cond ((special-operator-p symbol)
            (doc1 (or (documentation symbol 'function) "")
                  (if (macro-function symbol)
                      "[Special form and Macro]"
@@ -441,15 +438,11 @@
                  (format t "~&No documentation for ~:@(~S~)." symbol))
              (values))))
 
-(defun apropos-doc (string &optional (package 'lisp) &aux (f nil))
+(defun apropos-doc (string &optional (package 'lisp) &aux f (package (or package (list-all-packages))))
   (setq string (string string))
-  (if package
-      (do-symbols (symbol package)
-        (when (substringp string (string symbol))
-          (setq f (or (print-doc symbol t) f))))
-      (do-all-symbols (symbol)
-        (when (substringp string (string symbol))
-          (setq f (or (print-doc symbol t) f)))))
+  (do-symbols (symbol package) ;FIXME?  do-symbols takes package list
+	      (when (search string (string symbol))
+		(setq f (or (print-doc symbol t) f))))
   (if f
       (format t "~&-----------------------------------------------------------------------------")
       (format t "~&No documentation for ~S in ~:[any~;~A~] package."

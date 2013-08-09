@@ -21,29 +21,6 @@ DPP	= ../bin/dpp$(EXE)
 
 DECL := $(HDIR)/new_decl.h
 
-# AUX_INFO=-aux-info $*.X
-%.o: %.c $(DECL)
-	$(CC) -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO) 
-
-%.c: %.d $(DPP)
-	$(DPP) $*
-
-%.o: %.d $(DECL)
-	$(DPP) $*
-	$(CC) -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO)
-	rm $*.c
-
-CPP=
-%.ini: %.c grab_defs #plt.h
-	[ -e $(DECL) ] || touch $(DECL)
-	$(CC) -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c | sed -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
-
-%.ini: %.d $(DPP) grab_defs
-	[ -e $(DECL) ] || touch $(DECL)
-	$(DPP) $*
-	$(CC) -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c | sed -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
-	rm $*.c
-
 X11_INCLUDE=${TK_XINCLUDES} ${HAVE_X11}
 #CFLAGS	=  -I../gcl-tk -I$(HDIR) $(ODIR_DEBUG) 
 
@@ -63,7 +40,7 @@ HFILES	= $(HDIR)/include.h $(CMPINCLUDE_FILES) $(OTHERS)
 MPFILES= 
 
 OBJS	= $(OD)typespec.o $(OD)alloc.o $(OD)gbc.o \
-	$(OD)bitop.o $(OD)main.o $(OD)eval.o \
+	$(OD)bitop.o $(OD)boot.o $(OD)main.o $(OD)eval.o \
 	$(OD)macros.o $(OD)lex.o $(OD)bds.o \
 	$(OD)frame.o $(OD)predicate.o $(OD)reference.o \
 	$(OD)assignment.o $(OD)bind.o $(OD)let.o \
@@ -88,22 +65,55 @@ OBJS	= $(OD)typespec.o $(OD)alloc.o $(OD)gbc.o \
 	$(OD)init_pari.o $(OD)nsocket.o $(NEW_INIT) $(MPFILES) $(SFASL) $(EXTRAS) \
 	$(RL_OBJS)
 
-INI_FILES=$(patsubst %.o,%.ini,${OBJS})
+INI_FILES=$(patsubst %.o,%.ini,${OBJS} boot.o)
+INI_FILES:=$(filter-out boot.ini,$(INI_FILES))
 
 OBJECTS:=$(OBJS) $(LIBFILES) new_init.o  $(GCLIB) $(LAST_FILE)  $(FIRST_FILE) 
 
 all:  $(OBJECTS) #plt.o
+
+# AUX_INFO=-aux-info $*.X
+boot.o: boot.c $(DECL) boot.h
+	$(CC) -c $(CFLAGS) $(DEFS) -fPIC $*.c $(AUX_INFO) 
+
+%.o: %.c $(DECL)
+	$(CC) -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO) 
+
+%.c: %.d $(DPP)
+	$(DPP) $*
+
+%.o: %.d $(DECL)
+	$(DPP) $*
+	$(CC) -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO)
+	rm $*.c
+
+CPP=
+
+boot.ini: boot.c grab_defs
+	[ -e $(DECL) ] || touch $(DECL)
+	$(CC) -DNO_DEFUN -DNO_BOOT_H $(CFLAGS) $(DEFS) -E $*.c | sed -e 's,^.* DEFUNB,DEFUNB,g' -e 's/DEF,//g' -e 's:\"[ ]*):\"):g' | ./grab_defs > $@
+
+boot.h: boot.ini
+	echo '#include "make-init.h"' > $@
+	echo 'void gcl_init_boot(void){' >> $@
+	cat $< >> $@
+	echo '}' >> $@
+
+%.ini: %.c grab_defs #plt.h
+	[ -e $(DECL) ] || touch $(DECL)
+	$(CC) -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c | sed -e 's,^.* DEFUNB,DEFUNB,g' -e 's/DEF,//g' -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
+
+%.ini: %.d $(DPP) grab_defs
+	[ -e $(DECL) ] || touch $(DECL)
+	$(DPP) $*
+	$(CC) -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c | sed -e 's,^.* DEFUNB,DEFUNB,g' -e 's/DEF,//g' | sed -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
+	rm $*.c
 
 go:
 	$(MAKE) "CFLAGS=${CFLAGS} -pg"
 
 $(DPP):	../bin/dpp.c
 	${CC} ${DEFS} -o $@ $<
-
-boot.h:
-	touch $@
-
-list.c: boot.h
 
 new-init: 
 	$(MAKE) new_init.c decls1
@@ -121,13 +131,13 @@ endif
 
 decls1: $(INI_FILES)
 	echo '#include "make-decl.h"' > foo.c
-	cat ${INI_FILES} >> foo.c
+	cat ${INI_FILES} |sed 's,DEFBFUN,DEFUN,g' >> foo.c
 	${CC} -E -I${HDIR} foo.c | sed -n -e '/#/d' -e '/DO_/d' -e '/[a-zA-Z;]/p' > tmpx
 	../xbin/move-if-changed mv tmpx ${HDIR}/new_decl.h
 
 $(DECL): $(HDIR)/make-decl.h $(INI_FILES)
 	echo '#include "make-decl.h"' > foo.c
-	cat ${INI_FILES} >> foo.c
+	cat ${INI_FILES} |sed 's,DEFBFUN,DEFUN,g' >> foo.c
 	${CC} -E -I${HDIR} foo.c | sed -n -e '/#/d' -e '/DO_/d' -e '/[a-zA-Z;]/p' > tmpini
 	../xbin/move-if-changed mv tmpini $@
 	rm -f foo.c tmpini
@@ -177,10 +187,10 @@ plt.h: plttest.o pltd.h
 			sort | \
 			grep -v 'restFP' | grep -v 'saveFP'  | \
 			grep -v _gp_disp | \
-			$(AWK) '{A[++k]=$$0} END {for (i=1;i<=k;i++) \
+			$(AWK) '{gsub("\\$$.*","");A[++k]=$$0} END {for (i=1;i<=k;i++) \
 				printf("MY_PLT(%s)%s\n",A[i],i==k ? "" : ",");}' >$@
-	rm $@
-	touch $@
+#	rm $@
+#	touch $@
 	echo Plt table:
 	cat $@
 

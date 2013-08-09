@@ -65,9 +65,9 @@ do {static struct sigaction action; \
 #ifdef HAVE_LIBBFD
 #define SEPARATE_SFASL_FILE "sfaslbfd.c"
 #else
-#if !defined(__i386__) && !defined(__sparc__)
-#error Can only do non-bfd relocs for i386 and sparc
-#endif
+/* #if !defined(__i386__) && !defined(__sparc__) */
+/* #error Can only do non-bfd relocs for i386 and sparc */
+/* #endif */
 #define SPECIAL_RSYM "rsym_elf.c"
 #define SEPARATE_SFASL_FILE "sfaslelf.c"
 #endif

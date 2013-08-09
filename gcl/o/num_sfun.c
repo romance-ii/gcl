@@ -717,8 +717,7 @@ powm_fff(fixnum a,fixnum i,fixnum m) {
 }
 
 
-DEFUNO_NEW("POWM",object,fSpowm,SI,
-	   3,3,NONE,OO,OO,OO,OO,void,siLpowm,(object a,object i,object m),"") {
+DEFUN("POWM",object,fSpowm,SI,3,3,NONE,OO,OO,OO,OO,(object a,object i,object m),"") {
 
   check_type_integer(&a);
   check_type_integer(&i);
@@ -728,7 +727,7 @@ DEFUNO_NEW("POWM",object,fSpowm,SI,
 }
 
 
-DEFUN_NEW("ISNAN",object,fSisnan,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("ISNAN",object,fSisnan,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
   switch (type_of(x)) {
   case t_longfloat:
@@ -747,7 +746,7 @@ DEFUN_NEW("ISNAN",object,fSisnan,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 }
 
 
-DEFUN_NEW("ISINF",object,fSisinf,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+DEFUN("ISINF",object,fSisinf,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
   switch (type_of(x)) {
   case t_longfloat:

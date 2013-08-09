@@ -23,39 +23,39 @@
 ;;;;        The IO library.
 
 
-(in-package 'lisp)
+;; (in-package 'lisp)
 
-(export '(with-open-stream with-input-from-string with-output-to-string))
-(export '(read-from-string))
-(export '(write-to-string prin1-to-string princ-to-string))
-(export 'file-string-length)
-(export 'with-open-file)
-(export '(y-or-n-p yes-or-no-p))
-(export 'dribble)
-(export 'with-standard-io-syntax)
-(export 'logical-pathname-translations)
-(export 'load-logical-pathname-translations)
-(export 'formatter)
-(export 'pprint-dispatch)
-(export 'set-pprint-dispatch)
-(export 'copy-pprint-dispatch)
-(export 'ensure-directories-exist) ; from ECLS
-(export 'print-unreadable-object) ; from ECLS
-(export 'with-compilation-unit)
-(export '(concatenated-stream-streams 
-	  broadcast-stream-streams 
-	  two-way-stream-input-stream
-	  echo-stream-input-stream
-	  two-way-stream-output-stream
-	  echo-stream-output-stream
-	  synonym-stream-symbol
-	  read-byte
-	  write-byte
-	  read-sequence
-	  write-sequence
-	  open))
+;; (export '(with-open-stream with-input-from-string with-output-to-string parse-integer))
+;; (export '(read-from-string))
+;; (export '(write-to-string prin1-to-string princ-to-string))
+;; (export 'file-string-length)
+;; (export 'with-open-file)
+;; (export '(y-or-n-p yes-or-no-p))
+;; (export 'dribble)
+;; (export 'with-standard-io-syntax)
+;; (export 'logical-pathname-translations)
+;; (export 'load-logical-pathname-translations)
+;; (export 'formatter)
+;; (export 'pprint-dispatch)
+;; (export 'set-pprint-dispatch)
+;; (export 'copy-pprint-dispatch)
+;; (export 'ensure-directories-exist) ; from ECLS
+;; (export 'print-unreadable-object) ; from ECLS
+;; (export 'with-compilation-unit)
+;; (export '(concatenated-stream-streams 
+;; 	  broadcast-stream-streams 
+;; 	  two-way-stream-input-stream
+;; 	  echo-stream-input-stream
+;; 	  two-way-stream-output-stream
+;; 	  echo-stream-output-stream
+;; 	  synonym-stream-symbol
+;; 	  read-byte
+;; 	  write-byte
+;; 	  read-sequence
+;; 	  write-sequence
+;; 	  open))
 
-(in-package 'system)
+(in-package :system)
 
 (defun concatenated-stream-streams (stream)
   (declare (optimize (safety 2)))
@@ -85,7 +85,6 @@
   (declare (optimize (safety 2)))
   (check-type stream synonym-stream)
   (stream-object0 stream))
-;(proclaim '(optimize (safety 2) (space 3)))
 
 (defun maybe-clear-input (&optional (x *standard-input*))
   (cond ((not (typep x 'stream)) nil)
@@ -103,7 +102,7 @@
 
 
 (defmacro with-open-stream ((var stream) . body)
-  (declare (optimize (safety 2)))
+;  (declare (optimize (safety 2)))
   (multiple-value-bind 
    (ds b)
    (find-declarations body)
@@ -117,7 +116,7 @@
 
 
 (defmacro with-input-from-string ((var string &key index start end) . body)
-  (declare (optimize (safety 2)))
+;  (declare (optimize (safety 2)))
   (multiple-value-bind 
    (ds b)
    (find-declarations body)
@@ -131,7 +130,7 @@
 
 
 (defmacro with-output-to-string ((var &optional string &key element-type) . body)
-  (declare (optimize (safety 2)))
+;  (declare (optimize (safety 2)))
   (multiple-value-bind 
    (ds b)
    (find-declarations body)
@@ -157,6 +156,26 @@
         (values (read stream eof-error-p eof-value)
                 (si:get-string-input-stream-index stream)))))
 
+
+(defun write (x &key stream 
+		(array            *print-array*)
+		(base             *print-base*)
+		(case             *print-case*)
+		(circle           *print-circle*)
+		(escape           *print-escape*)
+		(gensym           *print-gensym*)
+		(length           *print-length*)
+		(level            *print-level*)
+		(lines            *print-lines*)
+		(miser-width      *print-miser-width*)
+		(pprint-dispatch  *print-pprint-dispatch*)
+		(pretty           *print-pretty*)
+		(radix            *print-radix*)
+		(readably         *print-readably*)
+		(right-margin     *print-right-margin*))
+  (write-int x stream array base case circle escape gensym
+	     length level lines miser-width pprint-dispatch
+	     pretty radix readably right-margin))
 
 (defun write-to-string (object &rest rest &key
 			    ( escape nil escape-supplied-p )
@@ -232,12 +251,18 @@
 	   (length (let ((*print-escape* nil)) (write-to-string object)))))))
 
 (defmacro with-temp-file ((s pn) (tmp ext) &rest body) 
-  `(let* ((,s (temp-stream ,tmp ,ext)) 
-	  (,pn (stream-object1 ,s))) 
-     (unwind-protect (progn ,@body) (progn (close ,s) (delete-file ,s)))))
+  (multiple-value-bind
+   (doc decls ctps body)
+   (parse-body-header body)
+   (declare (ignore doc))
+   `(let* ((,s (temp-stream ,tmp ,ext)) 
+	   (,pn (stream-object1 ,s))) 
+      ,@decls
+      ,@ctps
+      (unwind-protect (progn ,@body) (progn (close ,s) (delete-file ,s))))))
 
 (defmacro with-open-file ((stream . filespec) . body)
-  (declare (optimize (safety 2)))
+;  (declare (optimize (safety 2)))
   (multiple-value-bind 
    (ds b)
    (find-declarations body)
@@ -444,8 +469,7 @@
     (setq si:*pathname-logical*
 	  (si:set-pathname-lookup k si:*pathname-logical* t))
     (setq si:*pathname-logical*
-          (si:set-pathname-lookup k si:*pathname-logical* 
-          (si::map-pathname-translations k value)))
+          (si:set-pathname-lookup k si:*pathname-logical* (si::map-pathname-translations k value)))
     (cdr (si:pathname-lookup k si:*pathname-logical*))))
 
 (defsetf logical-pathname-translations si::set-logical-pathname-translations)
@@ -481,8 +505,7 @@
 (defsetf device-pathname-searchlist set-device-pathname-searchlist)
 
 (defun load-logical-pathname-translations (host)
-  (if (endp (cdr (si:pathname-lookup (string-downcase host)
-				     si:*pathname-logical*)))
+  (if (endp (cdr (si:pathname-lookup (string-downcase host) si:*pathname-logical*)))
   (let (n p) (block nil
     (setq n (concatenate 'string host "-translations"))
     (setq p (make-pathname :name n :type "lisp" :directory :current))
@@ -535,36 +558,39 @@
 	 (apply 'format t ,control-string arguments)
 	 *format-unused-args*))))
 
+(defun stream-external-format (s)
+  (declare (optimize (safety 1)))
+  (check-type s stream)
+  :default)
+
 ;;; copied from ECL under LGPL by Michael Koehne
 ;;;    with-standard-io-syntax
 
+
 (defmacro with-standard-io-syntax (&body body)
-  "Syntax: ({forms}*)
-The forms of the body are executed in a print environment that corresponds to
-the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
-*package* is \"CL-USER\", etc."
   (declare (optimize (safety 2)))
-  `(let*((*package* (find-package :cl-user))
-	 (*print-array* t) ;; print-array -> core dampft
-	 (*print-base* 10)
-	 (*print-case* :upcase)
-	 (*print-circle* nil)
-	 (*print-escape* t)
-	 (*print-gensym* t)
-	 (*print-length* nil)
-	 (*print-level* nil)
-	 (*print-lines* nil)
-	 (*print-miser-width* nil)
-	 (*print-pretty* nil)
-	 (*print-radix* nil)
-	 (*print-readably* t)
-	 (*print-right-margin* nil)
-	 (*read-base* 10)
-	 (*read-default-float-format* 'single-float)
-	 (*read-eval* t)
-	 (*read-suppress* nil)
-	 (*readtable* (copy-readtable (si::standard-readtable))))
-    ,@body))
+  `(let* ((*package* (find-package :cl-user))
+	  (*print-array* t)
+	  (*print-base* 10)
+	  (*print-case* :upcase)
+	  (*print-circle* nil)
+	  (*print-escape* t)
+	  (*print-gensym* t)
+	  (*print-length* nil)
+	  (*print-level* nil)
+	  (*print-lines* nil)
+	  (*print-miser-width* nil)
+	  (*print-pprint-dispatch* *print-pprint-dispatch*);FIXME
+	  (*print-pretty* nil)
+	  (*print-radix* nil)
+	  (*print-readably* t)
+	  (*print-right-margin* nil)
+	  (*read-base* 10)
+	  (*read-default-float-format* 'single-float)
+	  (*read-eval* t)
+	  (*read-suppress* nil)
+	  (*readtable* (copy-readtable (si::standard-readtable))));FIXME copy?
+     ,@body))
 
 (defmacro print-unreadable-object
 	  ((object stream &key type identity) &body body)
@@ -612,6 +638,11 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
 	 (tp (if (consp tp) (cadr tp) char-length))
 	 (nc (ceiling tp char-length)))
     nc))
+
+(defun parse-integer (s &key start end (radix 10) junk-allowed)
+  (declare (optimize (safety 1)))
+  (parse-integer-int s start end radix junk-allowed))
+
 
 (defun write-byte (j s)
   (declare (optimize (safety 2)))
@@ -690,32 +721,24 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
   (cond ((member tp '(unsigned-byte signed-byte)) tp)
 	((or (member tp '(character :default)) (si::subtypep1 tp 'character)) 'character)
 	((si::subtypep1 tp 'integer) 
-	 (let* ((tp (si::normalize-type tp))
-		(tp (if (eq (car tp) 'integer) `(or ,tp) tp))
-		(min (reduce (lambda (&rest xy) 
-			       (when xy 
-				 (let ((x (car xy)) (y (cadr xy)))
-				   (if (or (eq x '*) (eq y '*)) '* (min x y)))))
-			     (cdr tp) 
-			     :key (lambda (x) (let ((x (cadr x))) (if (consp x) (1+ (car x)) x)))))
-		(max (reduce (lambda (&rest xy) 
-			       (when xy 
-				 (let ((x (car xy)) (y (cadr xy)))
-				   (if (or (eq x '*) (eq y '*)) '* (max x y)))))
-			     (cdr tp) 
-			     :key (lambda (x) (let ((x (caddr x))) (if (consp x) (1- (car x)) x)))))
+	 (let* ((ntp (car (expand-ranges (cmp-norm-tp tp))))
+		(min (cadr ntp))(max (caddr ntp))
 		(s (if (or (eq min '*) (< min 0)) 'signed-byte 'unsigned-byte))
 		(lim (unless (or (eq min '*) (eq max '*)) (max (integer-length min) (integer-length max))))
 		(lim (if (and lim (eq s 'signed-byte)) (1+ lim) lim)))
 	   (if lim `(,s ,lim) s)))
 	((check-type tp (member character integer)))))
 
-(defun open (f &rest args)
-  (declare (optimize (safety 2)))
-  (let ((args (let ((et (cadr (member :element-type args))))
-		(if et `(:element-type ,(restrict-stream-element-type et) ,@args)
-		  args))))
-    (values (apply 'open1 f args))))
+(defun open (f &key (direction :input)
+	       (element-type 'character etp)
+	       (if-exists nil iesp)
+	       (if-does-not-exist nil idnesp)
+	       (external-format :default))
 
+  (declare (optimize (safety 2)))
+  
+  (when etp (setq element-type (restrict-stream-element-type element-type)))
+  (open-int f direction element-type if-exists iesp if-does-not-exist idnesp external-format))
 (defun load (f &rest args)
   (values (apply 'load1 f args)))
+

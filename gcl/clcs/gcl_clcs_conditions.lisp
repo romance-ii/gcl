@@ -1,7 +1,8 @@
 ;;; -*- Mode: Lisp; Syntax: Common-Lisp; Package: "CONDITIONS"; Base: 10 -*-
 
-(in-package "CONDITIONS" :USE '("LISP" #+(and clos (not pcl)) "CLOS" #+pcl "PCL"))
+;(in-package "CONDITIONS" :USE '(:cl #+(and clos (not pcl)) "CLOS" #+pcl "PCL"))
 
+(in-package :conditions)
 
 (eval-when (compile load eval)
 	   (when (fboundp 'remove-clcs-symbols)

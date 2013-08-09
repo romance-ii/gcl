@@ -593,7 +593,6 @@ IconPositionHint IconMaskHint WindowGroupHint))
 )( fixnum "XPointInRegion"))
 
 
-
 (defentry XRectInRegion(
 
     fixnum		;; r 

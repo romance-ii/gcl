@@ -25,24 +25,14 @@
 ;;;;  Revised on July 11, by Carl Hoffman.
 
 
-(in-package "LISP")
-;(export 'lisp)
-(export '(+ ++ +++ - * ** *** / // ///))
-(export '(break warn))
-(export '*break-on-warnings*)
-(export '*break-enable*)
+(in-package :system)
 
-(in-package 'system)
+(export '(loc *debug-print-level* *break-readtable* *break-enable* vs ihs-vs ihs-fun frs-vs frs-bds frs-ihs bds-var bds-val super-go))
 
-(export '*break-readtable*)
-(export '(loc *debug-print-level*))
-
-(export '(vs ihs-vs ihs-fun frs-vs frs-bds frs-ihs bds-var bds-val super-go))
-
-(eval-when (compile) ;(proclaim '(optimize (safety 2) (space 3))
-		;	       )
-	   (defvar *command-args* nil)
-	   )
+;FIXME ?
+(eval-when 
+ (compile)
+ (defvar *command-args* nil))
 
 (defvar +)
 (defvar ++)
@@ -102,8 +92,6 @@
     (setq *package* z)
     (format t "Emergency reset complete~%")))
 
-(defconstant +coerce-list+ '(list vector string array character short-float long-float float complex function null cons))
-
 (defun show-lib-syms nil
   (when (find-package "LIB")
     (do-external-symbols 
@@ -112,6 +100,17 @@
      (do-external-symbols 
       (s p)
       (print (list s (symbol-value s) (when (fboundp s) (symbol-function s))))))))
+
+(defun coerce-to-package (p)
+  (cond ((packagep p) p)
+	((find-package p))
+	(t 
+	 (cerror "Input new package" 'package-error
+		 :package p 
+		 :format-control "~a is not a package"
+		 :format-arguments (list p)) 
+	 (coerce-to-package (eval (read))))))
+;(declaim (inline coerce-to-package))
 
 (defun reset-lib-syms nil
   (when (find-package "LIB")
@@ -228,7 +227,7 @@
 	    (when (boundp '*system-banner*)
 	      (format t "~a~%" *system-banner*))
 	    (format t "Temporary directory for compiler files set to ~a~%" *tmp-dir*)))
-   (setq *ihs-top* 1)
+   (setq *ihs-top* (ihs-top))
 ;   (in-package 'system::user) ;(incf system::*ihs-top* 2)
    (setq *package* (user-package))
    (top-level1))
@@ -343,17 +342,17 @@
 (defvar *debug-print-level* 3)
 
 ;;FIXME elim
-(defun warn (format-string &rest args)
-  (let ((*print-level* 4)
-        (*print-length* 4)
-        (*print-case* :upcase))
-    (cond (*break-on-warnings*
-           (apply #'break format-string args))
-          (t (format *error-output* "~&Warning: ")
-             (let ((*indent-formatted-output* t))
-               (apply #'format *error-output* format-string args))
-	     (terpri *error-output*)
-             nil))))
+;; (defun warn (format-string &rest args)
+;;   (let ((*print-level* 4)
+;;         (*print-length* 4)
+;;         (*print-case* :upcase))
+;;     (cond (*break-on-warnings*
+;;            (apply #'break format-string args))
+;;           (t (format *error-output* "~&Warning: ")
+;;              (let ((*indent-formatted-output* t))
+;;                (apply #'format *error-output* format-string args))
+;; 	     (terpri *error-output*)
+;;              nil))))
 
 ;; (defun universal-error-handler
 ;;   (error-name correctable function-name
@@ -521,8 +520,7 @@
           ((or (> fi *frs-top*) (> (frs-bds fi) bi)))
         (print-frs fi)
         (incf fi))
-      (format *debug-io* "~&BDS[~d]: ~s = ~s"
-              bi (bds-var bi) (bds-val bi)))))
+      (format *debug-io* "~&BDS[~d]: ~s = ~s" bi (bds-var bi) (let ((x (bds-val bi))) (if (zerop x) "unbound" (nani x)))))))
 
 (defun simple-backtrace ()
   (princ "Backtrace: " *debug-io*)
@@ -545,13 +543,13 @@
       (print-frs j)
       (incf j))))
 
-(defun print-ihs (i &aux (*print-level* 2) (*print-length* 4))
+(defun print-ihs (i &aux (*print-level* 2) (*print-length* 4));FIXME
   (format t "~&~:[  ~;@ ~]IHS[~d]: ~s ---> VS[~d]"
           (= i *current-ihs*)
           i
           (let ((fun (ihs-fun i)))
             (cond ((or (symbolp fun) (compiled-function-p fun)) fun)
-		  ((when (interpreted-function-p fun) (setq fun (interpreted-function-lambda fun)) nil))
+;		  ((when (interpreted-function-p fun) (setq fun (interpreted-function-lambda fun)) nil))
                   ((consp fun)
                    (case (car fun)
                      (lambda fun)
@@ -560,7 +558,7 @@
                      (lambda-block-closure (cddddr fun))
                      (t (cond
 			 ((and (symbolp (car fun))
-			       (or (special-form-p(car fun))
+			       (or (special-operator-p (car fun))
 				   (fboundp (car fun))))
 			  (car fun))
 			 (t '(:zombi))))))
@@ -607,7 +605,13 @@
 (defun ihs-fname (ihs-index)
   (let ((fun (ihs-fun ihs-index)))
     (cond ((symbolp fun) fun)
-	  ((when (interpreted-function-p fun) (setq fun (interpreted-function-lambda fun)) nil))
+	  ((when (compiled-function-p fun) (compiled-function-name fun)));FIXME
+	  ((functionp fun) (sixth (c-function-plist fun)));(name fun)
+	   ;; (multiple-value-bind ;FIXME faster
+	   ;;  (x y fun) 
+	   ;;  (function-lambda-expression fun)
+	   ;;  (declare (ignore x y))
+	   ;;  fun))
           ((consp fun)
            (case (car fun)
              (lambda 'lambda)
@@ -615,13 +619,11 @@
              (lambda-block-closure (cadr (cdddr fun)))
              (lambda-closure 'lambda-closure)
              (t (if (and (symbolp (car fun))
-			 (or (special-form-p (car fun))
+			 (or (special-operator-p (car fun))
 			     (fboundp (car fun))))
 		    (car fun) :zombi)
 		    )))
-          ((compiled-function-p fun)
-           (compiled-function-name fun))
-          (t :zombi))))
+          (:zombi))))
 
 (defun ihs-not-interpreted-env (ihs-index)
   (let ((fun (ihs-fun ihs-index)))
@@ -842,6 +844,28 @@ First directory is checked for first name and all extensions etc."
 (defun set-dir (sym flag)
    (let ((tem (or (si::get-command-arg flag) (and (boundp sym) (symbol-value sym)))))
       (if tem (set sym (si::coerce-slash-terminated tem)))))
+
+(defun get-temp-dir ()
+  (dolist (x `(,@(mapcar 'si::getenv '("TMPDIR" "TMP" "TEMP")) "/tmp" ""))
+    (when x
+      (let* ((x (pathname x))
+	     (x (if (pathname-name x) x 
+		  (merge-pathnames
+		   (make-pathname :directory (butlast (pathname-directory x)) 
+				  :name (car (last (pathname-directory x))))
+		   x))))
+	(when (stat x) 
+	  (return-from 
+	   get-temp-dir 
+	   (namestring 
+	    (make-pathname 
+	     :device (pathname-device x)
+	     :directory (when (or (pathname-directory x) (pathname-name x))
+			  (append (pathname-directory x) (list (pathname-name x))))))))))))
+
+(defvar si::*lib-directory* (namestring (make-pathname :directory (list :parent))))
+
+(defvar *tmp-dir*)
 
 (defun set-up-top-level ( &aux (i (argc)) tem)
   (declare (fixnum i))

@@ -2192,7 +2192,6 @@
 )( void "XKillClient"))
 
 
-
 (defentry XLookupColor(
 
     fixnum		;; display 

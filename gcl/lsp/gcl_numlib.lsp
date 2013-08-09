@@ -23,28 +23,33 @@
 ;;;;                           number routines
 
 
-(in-package 'lisp)
-(export
- '(isqrt abs phase signum cis asin acos sinh cosh tanh
-   asinh acosh atanh
-   rational rationalize
-   ffloor fround ftruncate fceiling
-   lognand lognor logandc1 logandc2 logorc1 logorc2
-   lognot logtest
-   byte byte-size byte-position
-   ldb ldb-test mask-field dpb deposit-field
-   ))
+;; (in-package 'lisp)
+;; (export
+;;  '(isqrt abs phase signum cis asin acos sinh cosh tanh
+;;    asinh acosh atanh
+;;    rational rationalize
+;;    ffloor fround ftruncate fceiling
+;;    lognand lognor logandc1 logandc2 logorc1 logorc2
+;;    lognot logtest
+;;    byte byte-size byte-position
+;;    ldb ldb-test mask-field dpb deposit-field
+;;    ))
 
 
-(in-package 'system)
+(in-package :system)
 
 
-;(eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))
-;(eval-when (compile) (proclaim '(optimize (safety 2))))
-
+(defun rational (x)
+  (etypecase x
+    (float	  
+      (multiple-value-bind
+       (i e s) (integer-decode-float x)
+       (let ((x (if (>= e 0) (ash i e) (/ i (ash 1 (- e))))))
+	 (if (>= s 0) x (- x)))))
+    (rational x)))
+(setf (symbol-function 'rationalize) (symbol-function 'rational))
 
 (defconstant imag-one #C(0 1))
-
 
 (defun isqrt (i)
        (unless (and (integerp i) (>= i 0))
@@ -61,7 +66,20 @@
                     (setq x (floor (+ x y) 2))))))
 
 
-(defun logandc2 (x y) (boole boole-andc2 x y))
+;(defun logandc2 (x y) (boole boole-andc2 x y))
+
+;; (defstruct byte
+;;   (position 0 :type (integer 0))
+;;   (size     0 :type (integer 0)))
+
+;; (defun byte (size position)
+;;   (declare (optimize (safety 1)))
+;;   (check-type size (integer 0))
+;;   (check-type position (integer 0))
+;;   (make-byte :size size :position position))
+
+(defun byte (size position)
+  (cons size position))
 (defun byte-position (bytespec)
   (check-type bytespec cons)
   (cdr bytespec))
@@ -86,9 +104,21 @@
   (if (= 0 x) 0.0
        (atan (imagpart x) (realpart x))))
 
+;; (defun signum (x)
+;;   (declare (optimize (safety 1)))
+;;   (check-type x number)
+;;   (typecase
+;;    x
+;;    (rational (cond ((zerop x) x) ((plusp x) 1) (-1)))
+;;    (real     (cond ((zerop x) x) ((plusp x) (float 1 x)) ((float -1 x))))
+;;    (otherwise (cond ((zerop x) x) ((/ x (abs x)))))))
+
 (defun signum (x) (if (zerop x) x (/ x (abs x))))
 
-(defun cis (x) (exp (* #c(0 1) x)))
+(defun cis (x) 
+  (declare (optimize (safety 1)))
+  (check-type x real)
+  (exp (* #c(0 1) (float x))))
 
 ;; (defmacro asincos (x f)
 ;;   (let* ((rad (list 'sqrt (list '- 1d0 (list '* x x))))
@@ -174,17 +204,7 @@
 ;; 	   y)))
 
 
-(defun rational (x)
-  (etypecase x
-    (float	  
-      (multiple-value-bind
-       (i e s) (integer-decode-float x)
-       (let ((x (if (>= e 0) (ash i e) (/ i (ash 1 (- e))))))
-	 (if (>= s 0) x (- x)))))
-    (rational x)))
 
-
-(setf (symbol-function 'rationalize) (symbol-function 'rational))
 
 ;; although the following is correct code in that it approximates the
 ;; x to within eps, it does not preserve (eql (float (rationalize x) x) x)
@@ -236,18 +256,18 @@
     (values (float i (if (floatp x) x 1.0)) r)))
 
 
-(defun lognand (x y) (boole boole-nand x y))
-(defun lognor (x y) (boole boole-nor x y))
-(defun logandc1 (x y) (boole boole-andc1 x y))
-(defun logorc1 (x y) (boole boole-orc1 x y))
-(defun logorc2 (x y) (boole boole-orc2 x y))
+;(defun lognand (x y) (boole boole-nand x y))
+;(defun lognor (x y) (boole boole-nor x y))
+;(defun logandc1 (x y) (boole boole-andc1 x y))
+;(defun logorc1 (x y) (boole boole-orc1 x y))
+;(defun logorc2 (x y) (boole boole-orc2 x y))
 
-(defun lognot (x) (logxor -1 x))
-(defun logtest (x y) (not (zerop (logand x y))))
-
-
-(defun byte (size position)
-  (cons size position))
+;(defun lognot (x) (logxor -1 x))
+(defun logtest (x y) 
+  (declare (optimize (safety 1)))
+  (check-type x integer)
+  (check-type y integer)
+  (not (zerop (logand x y))))
 
 
 

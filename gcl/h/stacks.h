@@ -16,7 +16,7 @@ EXTER struct bds_bd bind_stack[BDSSIZE + (STACK_OVER +1)* BDSGETA];
 
      
 #ifndef IHSSIZE
-#define	IHSSIZE		4*1024
+#define	IHSSIZE		8*1024
 #endif
 #define	IHSGETA		96
 EXTER struct invocation_history ihs_stack[IHSSIZE + (STACK_OVER +1) * IHSGETA];     

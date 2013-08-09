@@ -1,11 +1,11 @@
-(in-package 'lisp)
-(export '(pprint-linear
-	  pprint-fill
-	  pprint-tabular
-	  pprint-logical-block
-	  pprint-pop pprint-indent pprint-newline pprint-tab 
-	  pprint-exit-if-list-exhausted))
-(in-package 'si)
+;; (in-package 'lisp)
+;; (export '(pprint-linear
+;; 	  pprint-fill
+;; 	  pprint-tabular
+;; 	  pprint-logical-block
+;; 	  pprint-pop pprint-indent pprint-newline pprint-tab 
+;; 	  pprint-exit-if-list-exhausted))
+(in-package :si)
 
 ;placeholder
 (defun pprint-tab (&rest r) nil)

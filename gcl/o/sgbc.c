@@ -197,8 +197,10 @@ sgc_mark_object1(object x) {
     sgc_mark_cons(x->s.s_plist);});
     sgc_mark_object(x->s.s_gfdef);
     sgc_mark_object(x->s.s_dbind);
-    if (x->s.s_hpack!=Cnil && x->s.s_hpack->p.p_name==Cnil)
+    if (x->s.s_hpack!=Cnil && x->s.s_hpack->p.p_name==Cnil) {
       x->s.s_hpack=Cnil;
+      x->s.tt=0;
+    }
 /*       sgc_mark_object(x->s.s_hpack); */
     if (x->s.s_self == NULL)
       break;
@@ -246,19 +248,19 @@ sgc_mark_object1(object x) {
       break;
     for (i = 0, j = x->ht.ht_size;  i < j;  i++) {
       if (ON_WRITABLE_PAGE(&x->ht.ht_self[i])) {
-	sgc_mark_object(x->ht.ht_self[i].hte_key);
-	sgc_mark_object(x->ht.ht_self[i].hte_value);
+	sgc_mark_object(x->ht.ht_self[i].c_cdr);
+	sgc_mark_object(x->ht.ht_self[i].c_car);
       }
     }
     if ((short)what_to_collect >= (short)t_contiguous) {
       if (inheap(x->ht.ht_self)) {
 	if (what_to_collect == t_contiguous)
 	  mark_contblock((char *)(x->ht.ht_self),
-			 j * sizeof(struct htent));
+			 j * sizeof(struct cons));
       } else if(SGC_RELBLOCK_P(x->ht.ht_self))
 	x->ht.ht_self =
 	  copy_relblock((char *)(x->ht.ht_self),
-			j * sizeof(struct htent));
+			j * sizeof(struct cons));
     }
     break;
     
@@ -284,14 +286,14 @@ sgc_mark_object1(object x) {
       goto CASE_GENERAL;
     
   CASE_SPECIAL:
-    cp = x->fixa.fixa_self;
+    cp = x->a.a_self;
     if (cp == NULL)
       break;
     /* set j to the size in char of the body of the array */
     
     switch((enum aelttype)x->a.a_elttype){
     case aet_lf:
-      j= sizeof(longfloat)*x->lfa.lfa_dim;
+      j= sizeof(longfloat)*x->a.a_dim;
       if (((int)what_to_collect >= (int)t_contiguous) &&
 	  !(inheap(cp)) && SGC_RELBLOCK_P(x->a.a_self))
 	ROUND_RB_POINTERS_DOUBLE;
@@ -312,7 +314,7 @@ sgc_mark_object1(object x) {
       j=sizeof(int)*x->a.a_dim;
       break;
     default:
-      j=sizeof(fixnum)*x->fixa.fixa_dim;}
+      j=sizeof(fixnum)*x->a.a_dim;}
     
     goto COPY;
     
@@ -545,7 +547,7 @@ sgc_mark_object1(object x) {
   case t_random:
     if ((int)what_to_collect >= (int)t_contiguous) {
       SGC_MARK_MP(x->rnd.rnd_state._mp_seed);
-#if __GNU_MP_VERSION < 4 || __GNU_MP_VERSION_MINOR < 2
+#if __GNU_MP_VERSION < 4 || (__GNU_MP_VERSION == 4 && __GNU_MP_VERSION_MINOR < 2)
       if (x->rnd.rnd_state._mp_algdata._mp_lc) {
 	SGC_MARK_MP(x->rnd.rnd_state._mp_algdata._mp_lc->_mp_a);
 	if (!x->rnd.rnd_state._mp_algdata._mp_lc->_mp_m2exp) SGC_MARK_MP(x->rnd.rnd_state._mp_algdata._mp_lc->_mp_m);
@@ -582,28 +584,34 @@ sgc_mark_object1(object x) {
     sgc_mark_object(x->pn.pn_version);
     break;
     
-  case t_closure:
-    { 
-      int i ;
-      if (what_to_collect == t_contiguous)
-	mark_contblock(x->cc.cc_turbo,x->cc.cc_envdim);
-      for (i= 0 ; i < x->cc.cc_envdim ; i++) 
-	sgc_mark_object(x->cc.cc_turbo[i]);
+  /* case t_cfun: */
+  /*   sgc_mark_object(x->cf.cf_name); */
+  /*   sgc_mark_object(x->cf.cf_data); */
+  /*   sgc_mark_object(x->cf.cf_call); */
+  /*   break; */
+    
+  case t_function:	
+    sgc_mark_object(x->fun.fun_data);
+    sgc_mark_object(x->fun.fun_plist);
+    if (x->fun.fun_env != def_env && x->fun.fun_env != src_env) {
+      sgc_mark_object(x->fun.fun_env[0]);
+      if (what_to_collect >= t_contiguous) {
+	object *p=x->fun.fun_env-1;
+	if(SGC_RELBLOCK_P(p)) {
+	  ufixnum n=*(ufixnum *)p;
+	  p=copy_relblock((char *)p,n);
+	  x->fun.fun_env=p+1;
+	}
+      }
     }
-    
-  case t_cfun:
-  case t_sfun:
-  case t_vfun:
-  case t_afun:
-  case t_gfun:
-    sgc_mark_object(x->cf.cf_name);
-    sgc_mark_object(x->cf.cf_data);
-    break;
-    
-  case t_ifun:
-    sgc_mark_object(x->ifn.ifn_self);
     break;
 
+  /* case t_ifun: */
+  /*   sgc_mark_object(x->ifn.ifn_name); */
+  /*   sgc_mark_object(x->ifn.ifn_self); */
+  /*   sgc_mark_object(x->ifn.ifn_call); */
+  /*   break; */
+    
   case t_cfdata:
     
     sgc_mark_object(x->cfd.cfd_dlist);
@@ -621,18 +629,6 @@ sgc_mark_object1(object x) {
       mark_contblock(x->cfd.cfd_start, x->cfd.cfd_size);
     }
     break;
-  case t_cclosure:
-    sgc_mark_object(x->cc.cc_name);
-    sgc_mark_object(x->cc.cc_env);
-    sgc_mark_object(x->cc.cc_data);
-    if (x->cc.cc_turbo!=NULL) sgc_mark_object(*(x->cc.cc_turbo-1));
-    if (what_to_collect == t_contiguous) {
-      if (x->cc.cc_turbo != NULL)
-	mark_contblock((char *)(x->cc.cc_turbo-1),
-		       (1+fix(*(x->cc.cc_turbo-1)))*sizeof(object));
-    }
-    break;
-    
   case t_spice:
     break;
     
@@ -1102,7 +1098,7 @@ typedef enum {memprotect_none,memprotect_cannot_protect,memprotect_sigaction,
 	      memprotect_bad_return,memprotect_no_signal,
 	      memprotect_multiple_invocations,memprotect_no_restart,
 	      memprotect_bad_fault_address,memprotect_success} memprotect_enum;
-static memprotect_enum memprotect_result;
+static volatile memprotect_enum memprotect_result;
 static int memprotect_handler_invocations,memprotect_print_enable;
 static void *memprotect_test_address;
 
@@ -1201,7 +1197,7 @@ memprotect_test(void) {
   }
   memprotect_result=memprotect_success;
   sigaction(SIGSEGV,&sao,NULL);
-    sigaction(SIGBUS,&saob,NULL);
+  sigaction(SIGBUS,&saob,NULL);
   return 0;
 
 }
@@ -1300,7 +1296,7 @@ sgc_start(void) {
       bzero(free_map,npages*sizeof(short));
       f = tm->tm_free;
       count=0;
-      while (f!=0) {
+      while (f!=OBJNULL) {
 	j=page(f);
 	if (j>=MAXPAGE)
 	  error("Address in tm freelist out of range");
@@ -1508,7 +1504,7 @@ sgc_start(void) {
       int count=0;
       x=y=0;
       
-      while (f!=0) {
+      while (f!=OBJNULL) {
 	next=OBJ_LINK(f);
 #ifdef SDEBUG	     
 	if (!is_free(f))
@@ -1586,7 +1582,7 @@ sgc_quit(void) {
       if ((np=tm->tm_sgc)) {
 	object f,y;
 	f=tm->tm_free;
-	if (f==0) 
+	if (f==OBJNULL) 
 	  tm->tm_free=tm->tm_alt_free;
 	else {
 	  /* tack the alt_free onto the end of free */

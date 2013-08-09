@@ -1,5 +1,5 @@
 ;; -*-Lisp-*-
-(in-package 'si)
+(in-package :si)
 
 ;; by William F. Schelter
 

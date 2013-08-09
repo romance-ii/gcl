@@ -112,14 +112,14 @@
 #-new-kcl-wrapper
 (progn
 
-(eval-when (compile load eval)
-	   (deftype std-instance nil `(or structure (and standard-object (not funcallable-standard-object)))))
+;(eval-when (compile load eval)
+;	   (deftype std-instance nil `(or structure (and standard-object (not funcallable-standard-object)))))
 ;(si::putprop 'std-instance '(lambda nil `(or structure (and standard-object (not (funcallable-standard-object))))) 'si::deftype-definition)
 
 #-cmu17
 (defstruct (std-instance (:predicate std-instance-p)
 			 (:conc-name %std-instance-)
-			 (:constructor %%allocate-instance--class ())
+			 (:constructor nil);(:constructor %%allocate-instance--class ())
 			 (:print-function print-std-instance))
   (wrapper nil)
   (slots nil))
@@ -137,8 +137,7 @@
 
 #+new-kcl-wrapper
 (progn
-(defvar *init-vector* (make-array 40 :fill-pointer 1 :adjustable t 
-				  :initial-element nil))
+(defvar *init-vector* (make-array 40 :fill-pointer 1 :adjustable t  :initial-element nil))
 
 (defun get-init-list (i)
   (declare (fixnum i)(special *slot-unbound*))
@@ -163,22 +162,46 @@
 (defmacro std-instance-slots   (x) `(%std-instance-slots ,x))
 
 (defmacro get-wrapper (inst)
-  `(cond ((std-instance-p ,inst) (std-instance-wrapper ,inst))
-	 ((fsc-instance-p ,inst) (fsc-instance-wrapper ,inst))
-	 (t (error "What kind of instance is this?"))))
+  `(etypecase 
+    ,inst
+    (std-instance (std-instance-wrapper ,inst))
+    (standard-generic-function (fsc-instance-wrapper ,inst))))
 
 (defmacro get-instance-wrapper-or-nil (inst)
-  `(cond ((std-instance-p ,inst) (std-instance-wrapper ,inst))
-	 ((fsc-instance-p ,inst) (fsc-instance-wrapper ,inst))))
+  `(typecase 
+    ,inst
+    (std-instance (std-instance-wrapper ,inst))
+    (standard-generic-function (fsc-instance-wrapper ,inst))))
 
 (defmacro get-slots (inst)
-  `(cond ((std-instance-p ,inst) (std-instance-slots ,inst))
-	 ((fsc-instance-p ,inst) (fsc-instance-slots ,inst))
-	 (t (error "What kind of instance is this?"))))
+  `(etypecase 
+    ,inst
+    (std-instance (std-instance-slots ,inst))
+    (standard-generic-function (fsc-instance-slots ,inst))))
 
 (defmacro get-slots-or-nil (inst)
-  `(cond ((std-instance-p ,inst) (std-instance-slots ,inst))
-	 ((fsc-instance-p ,inst) (fsc-instance-slots ,inst))))
+  `(typecase 
+    ,inst
+    (std-instance (std-instance-slots ,inst))
+    (standard-generic-function (fsc-instance-slots ,inst))))
+
+;; (defmacro get-wrapper (inst)
+;;   `(cond ((std-instance-p ,inst) (std-instance-wrapper ,inst))
+;; 	 ((fsc-instance-p ,inst) (fsc-instance-wrapper ,inst))
+;; 	 (t (error "What kind of instance is this?"))))
+
+;; (defmacro get-instance-wrapper-or-nil (inst)
+;;   `(cond ((std-instance-p ,inst) (std-instance-wrapper ,inst))
+;; 	 ((fsc-instance-p ,inst) (fsc-instance-wrapper ,inst))))
+
+;; (defmacro get-slots (inst)
+;;   `(cond ((std-instance-p ,inst) (std-instance-slots ,inst))
+;; 	 ((fsc-instance-p ,inst) (fsc-instance-slots ,inst))
+;; 	 (t (error "What kind of instance is this?"))))
+
+;; (defmacro get-slots-or-nil (inst)
+;;   `(cond ((std-instance-p ,inst) (std-instance-slots ,inst))
+;; 	 ((fsc-instance-p ,inst) (fsc-instance-slots ,inst))))
 
 (defun print-std-instance (instance stream depth) ;A temporary definition used
   (declare (ignore depth))		          ;for debugging the bootstrap
@@ -382,14 +405,23 @@
 
 #-cmu17
 (defmacro wrapper-of-macro (x)
-  `(cond ((std-instance-p ,x)
-	  (std-instance-wrapper ,x))
-         ((fsc-instance-p ,x)
-	  (fsc-instance-wrapper ,x))	      
-         (t
-	  (#+new-kcl-wrapper built-in-wrapper-of
-	   #-new-kcl-wrapper built-in-or-structure-wrapper
-	   ,x))))
+  `(typecase
+    ,x
+    (std-instance (std-instance-wrapper ,x))
+    (standard-generic-function (fsc-instance-wrapper ,x))
+    (structure (wrapper-for-structure ,x))
+    (symbol (if ,x *the-wrapper-of-symbol* *the-wrapper-of-null*))
+    (otherwise (built-in-wrapper-of ,x))))
+
+;; (defmacro wrapper-of-macro (x)
+;;   `(cond ((std-instance-p ,x)
+;; 	  (std-instance-wrapper ,x))
+;;          ((fsc-instance-p ,x)
+;; 	  (fsc-instance-wrapper ,x))	      
+;;          (t
+;; 	  (#+new-kcl-wrapper built-in-wrapper-of
+;; 	   #-new-kcl-wrapper built-in-or-structure-wrapper
+;; 	   ,x))))
 
 #+cmu17
 (defmacro wrapper-of-macro (x)
@@ -399,13 +431,13 @@
 
 ;Functions on arbitrary objects
 
-(defvar *structure-table* (make-hash-table :test 'eq))
+;(defvar *structure-table* (make-hash-table :test 'eq))
 
 (defun declare-structure (name included-name slot-description-list)
   (setf (gethash name *structure-table*)
 	(cons included-name slot-description-list)))
 
-(unless (fboundp 'structure-functions-exist-p)
+#-gcl(unless (fboundp 'structure-functions-exist-p)
   (setf (symbol-function 'structure-functions-exist-p) 
 	#'(lambda () nil)))
 
@@ -435,7 +467,7 @@
 ;Functions on symbols naming structures
 
 ; Excludes structures types created with the :type option
-(defun structure-type-p (symbol)
+#-gcl(defun structure-type-p (symbol)
   (not (null (gethash symbol *structure-table*))))
 
 (defun structure-type-included-type-name (symbol)

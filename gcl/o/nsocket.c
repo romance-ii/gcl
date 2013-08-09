@@ -204,7 +204,7 @@ CreateSocket(int port, char *host, int server, char *myaddr, int myport, int asy
                                  * attempt to do an async connect. Otherwise
                                  * do a synchronous connect or bind. */
 {
-    int status, sock, asyncConnect, curState, origState;
+    int status, sock/* , asyncConnect */, curState, origState;
     struct sockaddr_in sockaddr;	/* socket address */
     struct sockaddr_in mysockaddr;	/* Socket address for client */
 
@@ -230,7 +230,7 @@ CreateSocket(int port, char *host, int server, char *myaddr, int myport, int asy
 
     fcntl(sock, F_SETFD, FD_CLOEXEC);
     
-    asyncConnect = 0;
+    /* asyncConnect = 0; */
     status = 0;
     if (server) {
 
@@ -285,7 +285,7 @@ CreateSocket(int port, char *host, int server, char *myaddr, int myport, int asy
                     sizeof(sockaddr));
             if (status < 0) {
                 if (errno == EINPROGRESS) {
-                    asyncConnect = 1;
+                    /* asyncConnect = 1; */
                     status = 0;
                 }
             }
@@ -330,7 +330,7 @@ doConnect(host,port)
 
 #define SOCKET_FD(strm) ((strm)->sm.sm_fp ? fileno((strm)->sm.sm_fp) : -1)
 
-DEFUN_NEW("GETPEERNAME",object,fSgetpeername,SI,1,1,NONE,OO,OO,OO,OO,(object sock),
+DEFUN("GETPEERNAME",object,fSgetpeername,SI,1,1,NONE,OO,OO,OO,OO,(object sock),
  "Return a list of three elements: the address, the hostname and the port for the other end of the socket.  If hostname is not available it will be equal to the address.  Invalid on server sockets. Return NIL on failure.")
 {
  struct sockaddr_in peername;
@@ -358,7 +358,7 @@ DEFUN_NEW("GETPEERNAME",object,fSgetpeername,SI,1,1,NONE,OO,OO,OO,OO,(object soc
 }
 	    
 
-DEFUN_NEW("GETSOCKNAME",object,fSgetsockname,SI,1,1,NONE,OO,OO,OO,OO,(object sock),
+DEFUN("GETSOCKNAME",object,fSgetsockname,SI,1,1,NONE,OO,OO,OO,OO,(object sock),
  "Return a list of three elements: the address, the hostname and the port for the socket.  If hostname is not available it will be equal to the address. Return NIL on failure. ")
 { struct sockaddr_in sockname;
  unsigned size = sizeof(struct sockaddr_in);
@@ -394,7 +394,7 @@ DEFUN_NEW("GETSOCKNAME",object,fSgetsockname,SI,1,1,NONE,OO,OO,OO,OO,(object soc
      the channel is setto blocking or nonblocking mode. 
 */  
 
-DEFUN_NEW("SET-BLOCKING",object,fSset_blocking,SI,2,2,NONE,OO,OO,OO,OO,(object sock,object setBlocking),
+DEFUN("SET-BLOCKING",object,fSset_blocking,SI,2,2,NONE,OO,OO,OO,OO,(object sock,object setBlocking),
       "Set blocking on if MODE is T otherwise off.  Return 0 if succeeds. Otherwise the error number.")
 {
       int setting;
@@ -661,8 +661,8 @@ getCharGclSocket(object strm, object block)
 	else
 	  {
 	    SOCKET_STREAM_FD(strm)=-1;
-	   return EOF;
-	  /* FEerror("select said there was stuff there but there was not",0); */
+	    return EOF;
+	    /* FEerror("select said there was stuff there but there was not",0); */
 	  }
 	}
       /* probably a signal interrupted us.. */

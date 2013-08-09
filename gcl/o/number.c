@@ -61,7 +61,7 @@ object small_fixnum ( int i ) {
 struct {int min,max;} bigger_fixnums;
 
 struct fixnum_struct *bigger_fixnum_table;
-DEFUN_NEW("ALLOCATE-BIGGER-FIXNUM-RANGE",object,fSallocate_bigger_fixnum_range,
+DEFUN("ALLOCATE-BIGGER-FIXNUM-RANGE",object,fSallocate_bigger_fixnum_range,
       SI,2,2,NONE,OI,IO,OO,OO,(fixnum min,fixnum max),"") 
 { int j; 
   if (min <= max); else {FEerror("Need Min < Max",0);}
@@ -229,6 +229,11 @@ make_complex(object r, object i)
 	  break;
 	}			
 	c = alloc_object(t_complex);
+	{enum type tp=type_of(r);
+	  c->cmp.tt= tp==t_longfloat ? 3 : 
+	    (tp==t_shortfloat ? 2 : 
+	     (tp==t_ratio || type_of(i)==t_ratio ?  1 : 0));
+	}
 	c->cmp.cmp_real = r;
 	c->cmp.cmp_imag = i;
 	vs_reset;
