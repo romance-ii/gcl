@@ -123,7 +123,7 @@ do {char *x=sbrk(0); \
   if (core_end != x) \
    { ROUND_UP_SBRK(x); x=sbrk(0);\
      while (core_end < x) \
-       { type_map[page(core_end)]= t_other; \
+       {  \
 	 core_end = core_end + PAGESIZE;} \
      if (core_end !=x) error("Someone allocated my memory");}} while (0)
  

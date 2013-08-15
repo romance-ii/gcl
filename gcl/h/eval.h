@@ -89,21 +89,10 @@ struct bind_temp {
 }
 
 
-#define MMcall(x)  \
-	ihs_check;  \
-	ihs_push(x);  \
-	(*(x)->cf.cf_self)();  \
-	ihs_pop()
-
-#define MMccall(x, env_top)  \
-	ihs_check;  \
-	ihs_push(x);  \
-	(*(x)->cc.cc_self)(env_top);  \
-	ihs_pop()
-
+#define MMcall(x) ({extern int Rset;int rset=Rset;if (!rset) {ihs_check;ihs_push(x);}(*(x)->cf.cf_self)();if (!rset) ihs_pop();})
+#define MMccall(x,env_top) ({extern int Rset;int rset=Rset;if (!rset) {ihs_check;ihs_push(x);}(*(x)->cc.cc_self)(env_top);if (!rset) ihs_pop();})
 
 #define MMcons(a,d)	make_cons((a),(d))
-
 
 #define MMcar(x)	(x)->c.c_car
 #define MMcdr(x)	(x)->c.c_cdr

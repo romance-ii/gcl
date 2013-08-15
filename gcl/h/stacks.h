@@ -1,6 +1,3 @@
-#ifndef MAXPAGE
-#define MAXPAGE (128 * 1024)
-#endif
 #ifndef VSSIZE
 #define VSSIZE 256*1024
 #endif

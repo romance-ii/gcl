@@ -138,7 +138,7 @@ char *sdebug;
          {int ll;   \
 	   if ((ll=(int)(sbrk(0) - core_end))  < PAGESIZE) \
            {sbrk(PAGESIZE - ll); \
-            type_map[page(core_end)] = t_other; \
+            \
             core_end = sbrk(0); }\
           else  \
         error("Someone allocated my memory!");} \

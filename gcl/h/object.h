@@ -20,11 +20,11 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 /*
- object.h
+	object.h
 */
 
 /*
- Some system constants.
+	Some system constants.
 */
 
 #define TRUE   1   /*  boolean true value  */
@@ -62,41 +62,34 @@ typedef unsigned char   uqfixnum;
 
 #if SIZEOF_LONG < 8
 #define SPAD object pad
-#define LM31BITS 1
 #else
 #define SPAD
-#define LM31BITS 33/*FIXME*/
 #endif
 
-#ifndef WORDS_BIGENDIAN
-
-#define FIRSTWORD ufixnum e:1,m:1,f:1,s:1,tt:4,t:5,st:3,w:LM16BITS
-#define FSTPWORD  ufixnum emfs:4,         tp:9,    st:3,w:LM16BITS
-#define MARKWORD  ufixnum e:1,mf:2,   s:1,tt:4,t:5,x:LM13BITS
-#define SGCMWORD  ufixnum e:1,mfs:3,      tt:4,t:5,x:LM13BITS
-#define TYPEWORD  ufixnum emf:3,      s:1,tt:4,t:5,x:LM13BITS
-#define FUNWORD   ufixnum e:1,m:1,f:1,s:1,tt:4,t:5,fun_minarg:6,fun_maxarg:6,fun_neval:5,fun_vv:1,y:LM31BITS
-
-#else
-
-#define FIRSTWORD ufixnum w:LM16BITS,st:3,t:5,tt:4,s:1,f:1,m:1,e:1
-#define FSTPWORD  ufixnum w:LM16BITS,st:3,tp:9,    emfs:4
-#define MARKWORD  ufixnum x:LM13BITS,      t:5,tt:4,s:1,mf:2,   e:1
-#define SGCMWORD  ufixnum x:LM13BITS,      t:5,tt:4,mfs:3,      e:1
-#define TYPEWORD  ufixnum x:LM13BITS,      t:5,tt:4,s:1,emf:3
-#define FUNWORD   ufixnum y:LM31BITS,fun_vv:1,fun_neval:5,fun_maxarg:6,fun_minarg:6,t:5,tt:4,s:1,f:1,m:1,e:1
-
-#endif
+#define	TRUE		1	/*  boolean true value  */
+#define	FALSE		0	/*  boolean false value  */
 
 #define NOT_OBJECT_ALIGNED(a_) ({union lispunion _t={.vw=(void *)(a_)};_t.td.emf;})
 #define ROUNDUP(x_,y_) (((unsigned long)(x_)+(y_ -1)) & ~(y_ -1))
 #define ROUNDDN(x_,y_) (((unsigned long)(x_)) & ~(y_ -1))
 
 #ifndef PAGEWIDTH
-#define PAGEWIDTH 11
+#define	PAGEWIDTH	11	/*  page width  */
 #endif
 #undef PAGESIZE
-#define PAGESIZE (1 << PAGEWIDTH) /*  page size in bytes  */
+#define	PAGESIZE	(1L << PAGEWIDTH)	/*  page size in bytes  */
+
+
+#define	CHCODELIM	256	/*  character code limit  */
+				/*  ASCII character set  */
+#define	CHFONTLIM	1	/*  character font limit  */
+#define	CHBITSLIM	1	/*  character bits limit  */
+#define	CHCODEFLEN	8	/*  character code field length  */
+#define	CHFONTFLEN	0	/*  character font field length  */
+#define	CHBITSFLEN      0	/*  character bits field length  */
+
+#define	PHTABSIZE	512	/*  number of entries  */
+				/*  in the package hash table  */
 
 
 #define CHCODELIM  256            /*  character code limit  */
@@ -121,7 +114,7 @@ typedef float  shortfloat;
 typedef double longfloat;
 
 #ifndef plong
-#define plong int
+#define plong long
 #endif
 
 #define SIGNED_CHAR(x) (((char ) -1) < (char )0 ? (char) x \
@@ -183,7 +176,7 @@ struct fixnum_struct {
 #define       fix_imm_fixnum(a_)        ((fixnum)a_)
 #define      mark_imm_fixnum(a_)        ((a_)=((object)((fixnum)(a_)+(LOW_IM_FIX<<1))))
 #define    unmark_imm_fixnum(a_)        ((a_)=((object)((fixnum)(a_)-(LOW_IM_FIX<<1))))
-#define        is_imm_fixnum(a_)        ((fixnum)(a_)<DBEGIN)
+#define        is_imm_fixnum(a_)        ((fixnum)(a_)<data_start)
 #define is_unmrkd_imm_fixnum(a_)        ((fixnum)(a_)<LOW_IM_FIX)
 #define is_marked_imm_fixnum(a_)        (is_imm_fixnum(a_)*!is_unmrkd_imm_fixnum(a_))
 #define           is_imm_fix(a_)        INT_IN_BITS(a_,LOW_SHFT-1)
@@ -223,17 +216,34 @@ struct fixnum_struct {
 #define mark(a_)                 if (is_imm_fixnum(Zcdr(a_))) mark_imm_fixnum(Zcdr(a_)); else (a_)->d.m=1
 #define unmark(a_)               if (is_imm_fixnum(Zcdr(a_))) unmark_imm_fixnum(Zcdr(a_)); else (a_)->d.m=0
 #define is_free(a_)              (!is_imm_fixnum(a_) && !is_imm_fixnum(Zcdr(a_)) && (a_)->d.f)
-#define make_free(a_)            {*(fixnum *)(a_)&=TYPE_BITS;(a_)->d.f=1;}
+#define make_free(a_)            ({(a_)->fw=0;(a_)->d.f=1;})/*set_type_of(a_,t_other)*/
 #define make_unfree(a_)          {(a_)->d.f=0;}
 
-#define valid_cdr(a_)              (!(a_)->d.e || is_imm_fixnum(Zcdr(a_)))
+#define valid_cdr(a_)            (!(a_)->d.e || is_imm_fixnum(Zcdr(a_)))
+
+
+#define type_of(x)       ({register object _z=(object)(x);\
+                           (is_imm_fixnum(_z) ? t_fixnum : \
+			    (valid_cdr(_z) ?  (_z==Cnil ? t_symbol : t_cons)  : _z->d.t));})
+  
+#define set_type_of(x,y) ({object _x=(object)(x);enum type _y=(y);_x->d.f=0;if (_y!=t_cons) {_x->d.e=1;_x->d.t=_y;}})
+
+
+#define consp(x)         ({register object _z=(object)(x);\
+                           (_z!=Cnil && !is_imm_fixnum(_z) && valid_cdr(_z));})
+#define listp(x)         ({register object _z=(object)(x);\
+                           (!is_imm_fixnum(_z) && valid_cdr(_z));})
+#define atom(x)          ({register object _z=(object)(x);\
+                           (_z==Cnil || is_imm_fixnum(_z) || !valid_cdr(_z));})
+
+/* #define eql_is_eq(a_)    (is_imm_fixnum(a_) || ({enum type _tp=type_of(a_); _tp == t_cons || _tp > t_complex;})) */
+/* #define equal_is_eq(a_)  (is_imm_fixnum(a_) || type_of(a_)>t_bitvector) */
+
+
 
 struct shortfloat_struct {
-
-  FIRSTWORD;
-
-  shortfloat SFVAL; /*  shortfloat value  */
-
+			FIRSTWORD;
+	shortfloat	SFVAL;	/*  shortfloat value  */
 };
 #define Msf(obje) (obje)->SF.SFVAL
 #define sf(x) Msf(x)
@@ -362,11 +372,7 @@ struct symbol {
 
 };
 
-/* EXTER char CnilCt[3*sizeof(struct symbol)] OBJ_ALIGN; */
-
-/* #define Cnil   ((object)(CnilCt)) */
-/* #define Ct     ((object)((char *)Cnil+sizeof(struct symbol))) */
-/* #define Dotnil ((object)((char *)Ct+sizeof(struct symbol))) */
+#define NOT_OBJECT_ALIGNED(a_) ({union lispunion _t={.vw=(void *)(a_)};_t.td.emf;})
 
 EXTER union lispunion Cnil_body OBJ_ALIGN;
 EXTER union lispunion Ct_body OBJ_ALIGN;
@@ -901,12 +907,6 @@ union lispunion {
 
 };
 
-/* EXTER union lispunion character_table1[256+128] OBJ_ALIGN; /\*FIXME, sync with char code constants above.*\/ */
-/* #define character_table (character_table1+128) */
-/* #define code_char(c)    (object)(character_table+((unsigned char)(c))) */
-/* #define char_code(obje) (obje)->ch.ch_code */
-/* #define char_font(obje) (obje)->ch.ch_font */
-/* #define char_bits(obje) (obje)->ch.ch_bits */
 
 #define address_int ufixnum
 
@@ -929,15 +929,7 @@ struct freelist {
 #define SET_LINK(x,val) F_LINK(x) = (address_int) (val)
 #define OBJ_LINK(x) ((object) INT_TO_ADDRESS(F_LINK(x)))
 
-/*
- Type_of.
-*/
-#define type_of(x)       ({register object _z=(object)(x);\
-                           _z==Cnil ? t_symbol : \
-                           (is_imm_fixnum(_z) ? t_fixnum : \
-                           (valid_cdr(_z) ?  t_cons  : _z->d.t));})
-#define set_type_of(x,y) ({object _x=(object)(x);enum type _y=(y);(_x)->fw&=TYPE_BITS;\
-                           if (_y!=t_cons) {_x->d.e=1;_x->d.t=_y;}})
+#define	FREE	(-1)		/*  free object  */
 
 /*
 
@@ -1004,8 +996,8 @@ struct typemanager {
   object     tm_free;           /*  free list  */
                                 /*  Note that it is of type object.  */
   fixnum     tm_nfree;          /*  number of free elements  */
-  fixnum     tm_nused;          /*  number of elements used  */
   fixnum     tm_npage;          /*  number of pages  */
+  fixnum     tm_alt_npage;      /*  Alternate number of pages  */
   fixnum     tm_maxpage;        /*  maximum number of pages  */
   char      *tm_name;           /*  type name  */
   int        tm_gbccount;       /*  GBC count  */
@@ -1049,16 +1041,7 @@ EXTER struct contblock *cb_pointer; /*  contblock pointer  */
 /* SGC cont pages: After SGC_start, old_cb_pointer will be a linked
    list of free blocks on non-SGC pages, and cb_pointer will be
    likewise for SGC pages.  CM 20030827*/
-EXTER struct contblock *old_cb_pointer; /*  old contblock pointer when in SGC  */
-
-/* SGC cont pages: FIXME -- at some point, enable runtime disabling of
-   SGC cont pages.  Right now, the tm_sgc variable for type contiguous
-   will govern only the possible attempt to get new pages for SGC.
-   Contiguous pages normally allocated when SGC is on will always be
-   marked with SGC_PAGE_FLAG, as the current GBC algorithm always uses
-   sgc_contblock_sweep_phase in this case. */
-/* #define SGC_CONT_ENABLED (sgc_enabled && tm_table[t_contiguous].tm_sgc) */
-#define SGC_CONT_ENABLED (sgc_enabled)
+EXTER struct contblock *old_cb_pointer;	/*  old contblock pointer when in SGC  */
 
 /*
  Variables for memory management.
@@ -1075,16 +1058,20 @@ EXTER fixnum holepage;   /*  hole pages  */
 #define rbgbccount tm_table[t_relocatable].tm_gbccount
   
 
-EXTER char *rb_start;   /*  relblock start  */
-EXTER char *rb_end;     /*  relblock end  */
-EXTER char *rb_limit;   /*  relblock limit  */
-EXTER char *rb_pointer; /*  relblock pointer  */
-EXTER char *rb_start1;  /*  relblock start in copy space  */
-EXTER char *rb_pointer1;/*  relblock pointer in copy space  */
+#ifdef SGC
+EXTER char *old_rb_start;			/*  read-only relblock start  */
+#endif
+EXTER char *rb_start;			/*  relblock start  */
+EXTER char *rb_end;			/*  relblock end  */
+EXTER char *rb_limit;			/*  relblock limit  */
+EXTER char *rb_pointer;		/*  relblock pointer  */
+EXTER char *rb_start1;		/*  relblock start in copy space  */
+EXTER char *rb_pointer1;		/*  relblock pointer in copy space  */
 
-EXTER char *heap_end;   /*  heap end  */
-EXTER char *core_end;   /*  core end  */
-EXTER char *tmp_alloc;
+EXTER char *heap_end;			/*  heap end  */
+EXTER char *core_end;			/*  core end  */
+EXTER 
+char *tmp_alloc;
 
 /* make f allocate enough extra, so that we can round
    up, the address given to an even multiple.   Special
@@ -1100,12 +1087,19 @@ EXTER char *tmp_alloc;
   (ALLOC_ALIGNED(f,(n)*sizeof(type),sizeof(type)))
 
 
-#define INIT_HOLEDIV (5*HOLEDIV/6)
-#define INIT_NRBDIV (INIT_HOLEDIV*3)
-#define RB_GETDIV 100
+/* FIXME  Make all other page constants scale similarly by default. */
+/* #ifndef HOLEPAGE */
+/* #define	HOLEPAGE	(MAXPAGE/10) */
+/* #endif */
 
-#define CORE_PAGES (((ufixnum)core_end-DBEGIN)>>PAGEWIDTH)
-#define RB_GETA    (CORE_PAGES/RB_GETDIV)
+
+/* /\* #define	INIT_HOLEPAGE	150 *\/ */
+/* /\* #define	INIT_NRBPAGE	50 *\/ */
+/* /\* #define	RB_GETA		512 *\/ */
+
+/* #define	INIT_HOLEPAGE	(6*HOLEPAGE/5) */
+/* #define	INIT_NRBPAGE	(INIT_HOLEPAGE/30) */
+#define	RB_GETA		PAGESIZE
 
 
 #ifdef AV
@@ -1128,11 +1122,26 @@ EXTER char *tmp_alloc;
 /* #endif */
 
 
-#define isUpper(xxx) (((xxx)&0200) == 0 && isupper((int)xxx))
-#define isLower(xxx) (((xxx)&0200) == 0 && islower((int)xxx))
-#define isDigit(xxx) (((xxx)&0200) == 0 && isdigit((int)xxx))
-enum ftype {f_object,f_fixnum,f_integer};
-EXTER char *alloca_val;
+#define	isUpper(xxx)	(((xxx)&0200) == 0 && isupper((int)xxx))
+#define	isLower(xxx)	(((xxx)&0200) == 0 && islower((int)xxx))
+#define	isDigit(xxx)	(((xxx)&0200) == 0 && isdigit((int)xxx))
+enum ftype {f_object,f_fixnum};
+EXTER 
+char *alloca_val;
+/*          ...xx|xx|xxxx|xxxx|   
+		     ret  Narg     */
+
+/*    a9a8a7a6a5a4a3a4a3a2a1a0rrrrnnnnnnnn
+         ai=argtype(i)         ret   nargs
+ */
+#define SFUN_NARGS(x) (x & 0xff) /* 8 bits */
+#define RESTYPE(x) (x<<8)   /* 3 bits */
+   /* set if the VFUN_NARGS = m ; has been set correctly */
+#define VFUN_NARG_BIT (1 <<11) 
+#define ARGTYPE(i,x) ((x) <<(12+(i*2)))
+#define ARGTYPE1(x)  (1 | ARGTYPE(0,x))
+#define ARGTYPE2(x,y) (2 | ARGTYPE(0,x)  | ARGTYPE(1,y))
+#define ARGTYPE3(x,y,z) (3 | ARGTYPE(0,x) | ARGTYPE(1,y) | ARGTYPE(2,z))
 
 object make_si_sfun();
 EXTER object MVloc[10];
@@ -1409,7 +1418,7 @@ extern void *stack_alloc_start,*stack_alloc_end;
    _x;})
                                         
 
-#define make_cons(a_,b_) ({register struct typemanager *_tm=tm_table+(int)t_cons;register object _x;if (!stack_alloc_start && _tm->tm_free!=OBJNULL) {_x=_tm->tm_free;_tm->tm_free=OBJ_LINK(_x);_tm->tm_nfree--;_tm->tm_nused++;_x->c.c_car=(a_);_x->c.c_cdr=(b_);} else _x=make_cons1(a_,b_);_x;})
+/* #define make_cons(a_,b_) ({register struct typemanager *_tm=tm_table+(int)t_cons;register object _x;if (!stack_alloc_start && _tm->tm_free!=OBJNULL) {_x=_tm->tm_free;_tm->tm_free=OBJ_LINK(_x);_tm->tm_nfree--;_tm->tm_nused++;_x->c.c_car=(a_);_x->c.c_cdr=(b_);} else _x=make_cons1(a_,b_);_x;}) */
 
 EXTER object null_string;
 #define FEerror(a_,b_...)   Icall_error_handler(sLerror,null_string,\

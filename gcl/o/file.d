@@ -371,9 +371,6 @@ setup_stream_buffer(x)
      object x;
 {char *buf=alloc_contblock(BUFSIZ);
   	x->sm.sm_buffer = buf;
-#ifdef SGC
-	perm_writable(buf,BUFSIZ);
-#endif
 	setbuf(x->sm.sm_fp, buf);
 }	
 

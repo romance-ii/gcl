@@ -339,7 +339,8 @@ clean: gclclean
 	-cd binutils/bfd && $(MAKE) distclean
 	-cd binutils/libiberty && $(MAKE) distclean
 
-CMPINCLUDE_FILES=$(HDIR)cmpincl1.h $(HDIR)gclincl.h $(HDIR)compbas.h $(HDIR)enum.h $(HDIR)mgmp.h $(HDIR)object.h $(HDIR)vs.h \
+CMPINCLUDE_FILES=$(HDIR)cmpincl1.h $(HDIR)gclincl.h $(HDIR)compbas.h $(HDIR)enum.h $(HDIR)mgmp.h \
+	$(HDIR)bits.h $(HDIR)object.h $(HDIR)vs.h \
 	$(HDIR)bds.h $(HDIR)frame.h \
 	$(HDIR)lex.h $(HDIR)eval.h    $(HDIR)funlink.h \
 	$(HDIR)att_ext.h $(HDIR)new_decl.h $(HDIR)compbas2.h \
@@ -355,7 +356,7 @@ $(HDIR)cmpinclude.h: $(CMPINCLUDE_FILES) $(HDIR)config.h
 		-e "/End for cmpinclude/,50000d" > tmpx.c
 	echo '#include "h/config.h"\n#ifdef SGC\n"#define SGC"\n#else\n"#undef SGC"\n#endif' | $(CPP) 2>/dev/null| grep -v '^ *$$' | tail -1l | tr -d '"' >>tmpx.c
 	cat $(CMPINCLUDE_FILES) >> tmpx.c
-	$(CPP) -P -dD tmpx.c | grep -v "#define *__STDC_" | grep -v "#define  *__GNUC_PATCHLEVEL__ " | grep -v "#define  *__VERSION__ ">tmpx1 && mv tmpx1 tmpx.c
+	$(CPP) -Ih -P -dD tmpx.c | grep -v "#define *__STDC_" | grep -v "#define  *__GNUC_PATCHLEVEL__ " | grep -v "#define  *__VERSION__ ">tmpx1 && mv tmpx1 tmpx.c
 	./xbin/move-if-changed mv tmpx.c h/cmpinclude.h
 	./xbin/move-if-changed cp h/cmpinclude.h o/cmpinclude.h
 

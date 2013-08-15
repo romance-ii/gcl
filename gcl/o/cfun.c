@@ -66,15 +66,15 @@ make_cfun(void (*self)(), object name, object data, char *start, int size) {
 DEFUN("CFDL",object,fScfdl,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
 
   struct typemanager *tm=tm_of(t_cfdata);
-  extern long maxpage;
-  unsigned long i;
   int j;
   object x;
   void *p;
-  for (i=0;i<maxpage;i++) {
-    if (tm!=tm_of(type_map[i]))
+  struct pageinfo *v;
+
+  for (v=cell_list_head;v;v=v->next) {
+    if (tm!=tm_of(v->type))
       continue;
-    for (p=pagetochar(i),j=tm->tm_nppage;j>0;--j,p+=tm->tm_size) {
+    for (p=pagetochar(page(v)),j=tm->tm_nppage;j>0;--j,p+=tm->tm_size) {
       x=(object)p;
       if (type_of(x)!=t_cfdata || is_marked_or_free(x))
 	continue;

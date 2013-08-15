@@ -38,13 +38,13 @@ extern char etext;
 
 
 
-#define SET_REAL_MAXPAGE do { struct rlimit data_rlimit; \
-				extern char etext; \
-			     real_maxpage = MAXPAGE ; \
-     	getrlimit(RLIMIT_DATA, &data_rlimit); \
-	real_maxpage = ((unsigned long)&etext/PAGESIZE + data_rlimit.rlim_cur/PAGESIZE); \
-	if (real_maxpage > MAXPAGE) \
-		real_maxpage = MAXPAGE ; } while(0)
+/* #define SET_REAL_MAXPAGE do { struct rlimit data_rlimit; \ */
+/* 				extern char etext; \ */
+/* 			     real_maxpage = MAXPAGE ; \ */
+/*      	getrlimit(RLIMIT_DATA, &data_rlimit); \ */
+/* 	real_maxpage = ((unsigned int)&etext/PAGESIZE + data_rlimit.rlim_cur/PAGESIZE); \ */
+/* 	if (real_maxpage > MAXPAGE) \ */
+/* 		real_maxpage = MAXPAGE ; } while(0) */
      
 #define ROUND_UP_SBRK(x)  \
        do {long i; \
@@ -56,7 +56,7 @@ do {char *x=sbrk(0); \
   if (core_end != x) \
    { ROUND_UP_SBRK(x); x=sbrk(0);\
      while (core_end < x) \
-       { type_map[page(core_end)]= t_other; \
+       { \
 	 core_end = core_end + PAGESIZE;} \
      if (core_end !=x) error("Someone allocated my memory");}} while (0)
  
@@ -65,10 +65,9 @@ do {char *x=sbrk(0); \
      	heap_end = sbrk(0); ROUND_UP_SBRK(heap_end);\
 	heap_end = core_end = sbrk(0);
 
-#define MAXCORE ((char *)((unsigned long)DBEGIN+(unsigned long)(MAXPAGE-1)*PAGESIZE))
 #define IF_ALLOCATE_ERR \
         FIX_RANDOM_SBRK; \
-	if (core_end+PAGESIZE*(n - m)>MAXCORE || core_end != sbrk(PAGESIZE*(n - m)))
+	if (core_end != sbrk(PAGESIZE*(n - m)))
 
 #define SYM_EXTERNAL_P(sym) ((sym)->n_type & N_EXT)
      
@@ -89,9 +88,7 @@ do {char *x=sbrk(0); \
    and get a stream connection with it */
 #define RUN_PROCESS
 
-#ifndef HAVE_XDR /*FIXME configure*/
-#define HAVE_XDR
-#endif
+/* #define HAVE_XDR */
 
 #define WANT_VALLOC  
 

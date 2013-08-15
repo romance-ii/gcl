@@ -36,91 +36,98 @@ void install_segmentation_catcher(void);
 #define IN_MAIN
 
 #ifdef KCLOVM
-#  include <ovm/ovm.h>
+#include <ovm/ovm.h>
 void change_contexts();
 int ovm_process_created; 
 void initialize_process();
 #endif
 
 #include "include.h"
-
 #ifdef UNIX
-#  include <signal.h>
+#include <signal.h>
 #endif
-
 #include "page.h"
 
+bool saving_system ;
+
 #ifdef BSD
-#  include <sys/time.h>
-#  ifndef SGI
-#    include <sys/resource.h>
-#  endif
+#include <sys/time.h>
+#ifndef SGI
+#include <sys/resource.h>
+#endif
+#endif
+
+#ifdef AOSVS
+
 #endif
 
 #ifdef _WIN32
-
-#ifdef WITH_WINMAIN
-#  include <windows.h>
-#endif
-
-extern void init_shared_memory (void);
-int is_shared_memory_initialised = FALSE;
-
-#  include <fcntl.h>
-
-#endif
-
-#ifdef HAVE_TK
-
-#  include <tcl.h>
-#  include <tk.h>
-Tcl_Interp *tcl_interpreter;
-
+#include <fcntl.h>
 #endif
 
 #define LISP_IMPLEMENTATION_VERSION "April 1994"
+
+char system_directory[PATH_MAX];
 
 #define EXTRA_BUFSIZE 8
 char stdin_buf[BUFSIZ + EXTRA_BUFSIZE];
 char stdout_buf[BUFSIZ + EXTRA_BUFSIZE];
 
-/* char *system_directory   = NULL; */
-int page_multiple        = 1;
+int debug;			/* debug switch */
+int initflag = FALSE;		/* initialized flag */
+int raw_image = FALSE;		/* raw or saved image */
 
-int    debug             = FALSE;		/* debug switch */
-int    initflag          = FALSE;		/* initialized flag */
-int    raw_image         = FALSE;		/* raw or saved image */
-
-int    stack_multiple    = 1;
-
-extern bool saving_system;
-extern long real_maxpage;
-extern int sgc_enabled;
-
-
+long real_maxpage;
 object sSAlisp_maxpagesA;
-object siClisp_pagesize;
-object sStop_level;
-object sSAmultiply_stacksA;
 
+object siClisp_pagesize;
+
+object sStop_level;
+
+
+object sSAmultiply_stacksA;
+int stack_multiple=1;
 static object stack_space;
 
-/*FIXME: all ports should be able t use the default sigstack now --
-  some h/ implementations are broken.*/
-#ifndef SIG_STACK_SIZE
-#  define SIG_STACK_SIZE 1000
+#ifdef _WIN32
+unsigned int _dbegin = 0x10100000;
 #endif
+
+fixnum cssize;
+
+#ifdef SGC
+int sgc_enabled;
+#endif
+void install_segmentation_catcher(void);
+
+#ifndef SIG_STACK_SIZE
+#define SIG_STACK_SIZE 1000
+#endif
+#ifndef SETUP_SIG_STACK
+#if defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC)
+        struct sigstack estack;
+#endif
+#endif
+
+int cstack_dir=0;
+
+static int
+get_cstack_dir(VOL fixnum j) {
+  static fixnum n;
+  fixnum q=n;
+  n=1-n;
+  return q ? ((fixnum)&j<j ? -1 : 1) : get_cstack_dir((fixnum)&j);
+}
 
 void
 wipe_stack(VOL void *l) {
 
-#if CSTACK_DIRECTION == -1
-   if (l>(void *)&l) bzero((void *)&l,l-(void *)&l);
-#else
-  l+=sizeof(l);
-  if ((void *)&l>l) bzero((void *)l,(void *)&l-l);
-#endif
-
+  if (cstack_dir==-1) {
+    if (l>(void *)&l) bzero((void *)&l,l-(void *)&l);
+  } else {
+     l+=sizeof(l);
+     if ((void *)&l>l) bzero((void *)l,(void *)&l-l);
+   }
 }
 
 void
@@ -132,9 +139,108 @@ clear_c_stack(VOL unsigned n) {
 
 }
 
-unsigned long cssize      = 0;
+fixnum log_maxpage_bound=sizeof(fixnum)*8-1;
 
-int pre_gcl=0;
+inline int
+mbrk(void *v) {
+  ufixnum uv=(ufixnum)v,uc=(ufixnum)sbrk(0),ux,um;
+  fixnum m=((1UL<<(sizeof(fixnum)*8-1))-1);
+
+#ifdef MAX_BRK /*GNU Hurd fragmentation bug*/
+  if ((ufixnum)v>MAX_BRK) return -1;
+#endif
+
+  if (uv<uc) {
+    um=uv;
+    ux=uc;
+  } else {
+    um=uc;
+    ux=uv;
+  }
+  if (((fixnum)(ux-um))<0)
+    return mbrk((void *)uc+(uv<uc ? -m : m)) || mbrk(v);
+  return uc==(ufixnum)sbrk(uv-uc) ? 0 : -1;
+}
+    
+int
+update_real_maxpage(void) {
+
+  ufixnum i,j;
+  void *end,*cur;
+#ifdef __MINGW32__
+  static fixnum n;
+
+  if (!n) {
+    init_shared_memory();
+    n=1;
+  }
+#endif
+
+  massert(cur=sbrk(0));
+  for (i=0,j=(1L<<log_maxpage_bound);j>PAGESIZE;j>>=1)
+    if ((end=data_start+i+j-PAGESIZE)>cur)
+      if (!mbrk(end)) {
+	real_maxpage=page(end);
+	i+=j;
+      }
+  massert(!mbrk(cur));
+
+#ifdef HAVE_SYSCONF_PHYS_PAGES
+  phys_pages=sysconf(_SC_PHYS_PAGES);
+#ifdef BRK_DOES_NOT_GUARANTEE_ALLOCATION
+  if (phys_pages>0 && real_maxpage>phys_pages+first_data_page) real_maxpage=phys_pages+first_data_page;
+#endif
+#endif
+
+  available_pages=real_maxpage-first_data_page;
+  for (i=t_start;i<t_other;i++)
+    available_pages-=tm_table[i].tm_type==t_relocatable ? 2*tm_table[i].tm_maxpage : tm_table[i].tm_maxpage;
+  resv_pages=40<available_pages ? 40 : available_pages;
+  available_pages-=resv_pages;
+    
+
+  return 0;
+
+}
+
+static int
+minimize_image(void) {
+
+#ifdef SGC
+  int in_sgc=sgc_enabled;
+#else
+  int in_sgc=0;
+#endif
+  extern long new_holepage;
+  fixnum old_holepage=new_holepage,i;
+  void *new;
+  
+  if (in_sgc) sgc_quit();
+  holepage=new_holepage=1;
+  GBC(t_contiguous);
+  if (in_sgc) sgc_start();
+  new = (void *)(((((ufixnum)rb_pointer)+ PAGESIZE-1)/PAGESIZE)*PAGESIZE);
+  core_end = new;
+  rb_end=rb_limit=new;
+  set_tm_maxpage(tm_table+t_relocatable,(nrbpage=((char *)new-REAL_RB_START)/PAGESIZE));
+  new_holepage=old_holepage;
+  
+#ifdef GCL_GPROF
+  gprof_cleanup();
+#endif
+  
+#if defined(BSD) || defined(ATT)  
+  brk(core_end);
+#endif
+  
+  cbgbccount = tm_table[t_contiguous].tm_adjgbccnt = tm_table[t_contiguous].tm_opt_maxpage = 0;
+  rbgbccount = tm_table[t_relocatable].tm_adjgbccnt = tm_table[t_relocatable].tm_opt_maxpage = 0;
+  for (i = 0;  i < (int)t_end;  i++)
+    tm_table[i].tm_gbccount = tm_table[i].tm_adjgbccnt = tm_table[i].tm_opt_maxpage = 0;
+  
+  return 0;
+  
+}
 
 void
 init_boot(void) {
@@ -152,9 +258,29 @@ init_boot(void) {
 
 }
 
+DEFUN("SET-LOG-MAXPAGE-BOUND",fixnum,fSset_log_maxpage_bound,SI,1,1,NONE,II,OO,OO,OO,(fixnum l),"") {
+
+  void *end,*dend;
+  fixnum def=sizeof(fixnum)*8-1;
+
+  l=l<def ? l : def;
+  end=data_start+(1L<<l)-PAGESIZE;
+  GBC(t_contiguous);
+  dend=heap_end+PAGESIZE+(((rb_pointer-REAL_RB_START)+PAGESIZE-1)&(-PAGESIZE));
+  if (end >= dend) {
+    minimize_image();
+    log_maxpage_bound=l;
+    update_real_maxpage();
+  }
+
+  return log_maxpage_bound;
+
+}
+
+int pre_gcl=0;
+
 int
-gcl_main(int argc, char **argv, char **envp)
-{
+main(int argc, char **argv, char **envp) {
 
 #if defined ( BSD ) && defined ( RLIMIT_STACK )
     struct rlimit rl;
@@ -179,10 +305,17 @@ gcl_main(int argc, char **argv, char **envp)
     *argv=kcl_self;
 
 #ifdef CAN_UNRANDOMIZE_SBRK
-/* #include <stdio.h> */
-/* #include <stdlib.h> */
+#include <stdio.h>
+#include <stdlib.h>
 #include "unrandomize.h"
 #endif
+
+#ifdef LD_BIND_NOW
+#include <stdio.h>
+#include <stdlib.h>
+#include "ld_bind_now.h"
+#endif
+
 
 #if defined(DARWIN)
 	{
@@ -329,8 +462,10 @@ gcl_main(int argc, char **argv, char **envp)
 
 #ifdef AV
     
-    cs_limit = (void *)CSTACK_ADDRESS + CSTACK_DIRECTION * cssize + 1;
+    cs_limit = (void *)CSTACK_ADDRESS + cstack_dir * cssize + 1;
 #endif
+
+    cstack_dir=get_cstack_dir(0);
 
 
 #ifdef SETUP_SIG_STACK
@@ -362,307 +497,126 @@ gcl_main(int argc, char **argv, char **envp)
 	  error("Cannot setup gprof_cleanup on exit");
 #endif
 
-    if (initflag) {
-        if (saving_system) {
-            saving_system = FALSE;
-            terminal_io->sm.sm_object0->sm.sm_fp = stdin;
-            terminal_io->sm.sm_object1->sm.sm_fp = stdout;
-            gcl_init_big1();
+	if (initflag) {
+
+#ifdef _WIN32
+	  detect_wine();
+#endif
+	  
+	  if (saving_system) {
+	    
+	    saving_system = FALSE;
+	    terminal_io->sm.sm_object0->sm.sm_fp = stdin;
+	    terminal_io->sm.sm_object1->sm.sm_fp = stdout;
+	    gcl_init_big1();
 #ifdef INIT_CORE_END
-            INIT_CORE_END
+	    INIT_CORE_END;
 #endif			  
-            alloc_page(-(holepage + nrbpage));
-
-        }
-
-        initflag = FALSE;
-        GBC_enable = TRUE;
-        vs_base = vs_top;
-        ihs_push(Cnil);
-        lex_new();
-        vs_base = vs_top;
-
-	if (pre_gcl) init_boot();
-
-        interrupt_enable = TRUE;
-        install_default_signals();
-
-        sSAlisp_maxpagesA->s.s_dbind = make_fixnum(real_maxpage);
-        initflag = TRUE;
+	    alloc_page(-(holepage + nrbpage));
+	  }
+	  
+	  initflag = FALSE;
+	  GBC_enable = TRUE;
+	  vs_base = vs_top;
+	  ihs_push(Cnil);
+	  lex_new();
+	  vs_base = vs_top;
+	  
+	  if (pre_gcl) init_boot();
+	  
+	  interrupt_enable = TRUE;
+	  install_default_signals();
+	  
+	  sSAlisp_maxpagesA->s.s_dbind = make_fixnum(real_maxpage);
+	  initflag = TRUE;
 #ifdef KCLOVM
-        ovm_user_context_change = change_contexts;
-        ovm_user_context_initialize = initialize_process;
-
-        v_init_processes();
-        ovm_process_created = 1;
+	  ovm_user_context_change = change_contexts;
+	  ovm_user_context_initialize = initialize_process;
+	  
+	  v_init_processes();
+	  ovm_process_created = 1;
 #endif
 #ifdef HAVE_READLINE
-        gcl_init_readline_function();
+	  gcl_init_readline_function();
 #endif
-	reinit_gmp();
-#ifdef HAVE_TK
-#  ifdef _WIN32
-	Tcl_FindExecutable ( argv[0] );
-	tcl_interpreter = Tcl_CreateInterp();
-#  else
-	tcl_interpreter = Tcl_CreateInterp();
-	if ( Tcl_AppInit ( tcl_interpreter ) != TCL_OK ) {
-	  fprintf(stderr, "Tcl_AppInit failed: %s\n", interp->result);
-	}
-#  endif
-#endif
-
-    again:
-
-#ifdef HAVE_TK
-        if ( Tk_GetNumMainWindows() > 0 ) {
-            Tcl_DoOneEvent(0);
-        }
-#endif
-
-        super_funcall(sStop_level);
-        if (type_of(sSAmultiply_stacksA->s.s_dbind)==t_fixnum) {
-            multiply_stacks(fix(sSAmultiply_stacksA->s.s_dbind));
-            goto  again;
-        }
-        
+	again:
+	  super_funcall(sStop_level);
+	  if (type_of(sSAmultiply_stacksA->s.s_dbind)==t_fixnum) {
+	    multiply_stacks(fix(sSAmultiply_stacksA->s.s_dbind));
+	    goto  again;
+	  }
+          
 #ifdef USE_DLOPEN
- 	unlink_loaded_files();
+	  unlink_loaded_files();
 #endif			
-
-        exit(0);
-    }
-
-    printf("GCL (GNU Common Lisp)  %s  %d pages\n",
-            LISP_IMPLEMENTATION_VERSION,
-            MAXPAGE);
-    fflush(stdout);
-
-    def_env1[0]=(object)1;/*FIXME better place*/
-    def_env1[1]=Cnil;
-    def_env=def_env1+1;
-
-    src_env1[0]=(object)1;/*FIXME better place*/
-    src_env1[1]=Cnil;
-    src_env=src_env1+1;
-
-    initlisp();
-
-    vs_base = vs_top;
-    ihs_push(Cnil);
-    lex_new();
-
-    GBC_enable = TRUE;
-
-    CMPtemp = CMPtemp1 = CMPtemp2 = CMPtemp3 = OBJNULL;
-
-/*     parse_plt(); */
-    gcl_init_init();
-
-    sLApackageA->s.s_dbind = user_package;
-
-    lex_new();
-    vs_base = vs_top;
-    initflag = TRUE;
-
-    interrupt_enable = TRUE;
-
-    raw_image=TRUE;
- 
-    super_funcall(sStop_level);
-
-    return 0;
-
-}
-
-#ifdef WITH_WINMAIN
-
-#  define MAX_CONSOLE_LINES 500
-
-void SetupConsole ( void )
-{
-    /* allocate a console for this app */
-    AllocConsole ();
-
-    /* Set the console up */
-    {
-        HANDLE hStdOut = GetStdHandle ( STD_OUTPUT_HANDLE );
-        int    fdOut   = _open_osfhandle ( hStdOut, _O_TEXT );
-        
-        HANDLE hStdIn  = GetStdHandle ( STD_INPUT_HANDLE );
-        int    fdIn    = _open_osfhandle ( hStdIn,  _O_TEXT );
-
-        HANDLE hStdErr = GetStdHandle ( STD_ERROR_HANDLE );
-        int    fdErr   = _open_osfhandle ( hStdErr, _O_TEXT );
-
-        CONSOLE_SCREEN_BUFFER_INFO coninfo;
-        FILE *fp;
-
-        /* set the screen buffer to be big enough to let us scroll text */
-        GetConsoleScreenBufferInfo ( hStdOut, &coninfo );
-        coninfo.dwSize.Y = MAX_CONSOLE_LINES;
-        SetConsoleScreenBufferSize ( hStdOut, coninfo.dwSize);
-
-        /* redirect unbuffered std i/o to the console */
-        fp = _fdopen ( fdOut, "w" );
-        *stdout = *fp;
-        setvbuf ( stdout, NULL, _IONBF, 0 );
-
-        fp = _fdopen ( fdIn, "r" );
-        *stdin = *fp;
-        setvbuf ( stdin, NULL, _IONBF, 0 );
-
-        fp = _fdopen ( fdErr, "w" );
-        *stderr = *fp;
-        setvbuf ( stderr, NULL, _IONBF, 0 );
-    }
-}
-
-
-/* Borrowed from TK 8.4.2 */
-
-static void
-setargv ( int *argcPtr, char ***argvPtr )
-{
-    char *p, *arg, *argSpace;
-    char **argv;
-    int argc, size, inquote, copy, slashes;
-    LPTSTR cmdLine = GetCommandLine ();
-    
-    /*
-     * Precompute an overly pessimistic guess at the number of arguments
-     * in the command line by counting non-space spans.
-     */
-
-    size = 2;
-    for (p = cmdLine; *p != '\0'; p++) {
-	if ((*p == ' ') || (*p == '\t')) {	/* INTL: ISO space. */
-	    size++;
-	    while ((*p == ' ') || (*p == '\t')) { /* INTL: ISO space. */
-		p++;
-	    }
-	    if (*p == '\0') {
-		break;
-	    }
+	  exit(0);
 	}
-    }
-    argSpace = (char *) malloc ( (unsigned) (size * sizeof (char *) + strlen ( cmdLine ) + 1 ) );
-    argv = (char **) argSpace;
-    argSpace += size * sizeof(char *);
-    size--;
+	
+	printf("GCL (GNU Common Lisp)  %s  %ld pages\n",
+	       LISP_IMPLEMENTATION_VERSION,
+	       real_maxpage);
+	fflush(stdout);
 
-    p = cmdLine;
-    for (argc = 0; argc < size; argc++) {
-	argv[argc] = arg = argSpace;
-	while ((*p == ' ') || (*p == '\t')) {	/* INTL: ISO space. */
-	    p++;
-	}
-	if (*p == '\0') {
-	    break;
-	}
+	def_env1[0]=(object)1;/*FIXME better place*/
+	def_env1[1]=Cnil;
+	def_env=def_env1+1;
+	
+	src_env1[0]=(object)1;/*FIXME better place*/
+	src_env1[1]=Cnil;
+	src_env=src_env1+1;
+	
+	initlisp();
+#ifdef _WIN32
+	detect_wine();
+#endif
 
-	inquote = 0;
-	slashes = 0;
-	while (1) {
-	    copy = 1;
-	    while (*p == '\\') {
-		slashes++;
-		p++;
-	    }
-	    if (*p == '"') {
-		if ((slashes & 1) == 0) {
-		    copy = 0;
-		    if ((inquote) && (p[1] == '"')) {
-			p++;
-			copy = 1;
-		    } else {
-			inquote = !inquote;
-		    }
-                }
-                slashes >>= 1;
-            }
+	vs_base = vs_top;
+	ihs_push(Cnil);
+	lex_new();
 
-            while (slashes) {
-		*arg = '\\';
-		arg++;
-		slashes--;
-	    }
+	GBC_enable = TRUE;
 
-	    if ((*p == '\0')
-		    || (!inquote && ((*p == ' ') || (*p == '\t')))) { /* INTL: ISO space. */
-		break;
-	    }
-	    if (copy != 0) {
-		*arg = *p;
-		arg++;
-	    }
-	    p++;
-        }
-	*arg = '\0';
-	argSpace = arg + 1;
-    }
-    argv[argc] = NULL;
+	CMPtemp = CMPtemp1 = CMPtemp2 = CMPtemp3 = OBJNULL;
 
-    *argcPtr = argc;
-    *argvPtr = argv;
+#ifdef HAVE_LIBBFD
+	parse_plt();
+#endif
+	gcl_init_init();
+
+	sLApackageA->s.s_dbind = user_package;
+
+	lex_new();
+	vs_base = vs_top;
+	initflag = TRUE;
+
+	interrupt_enable = TRUE;
+
+	raw_image=TRUE;
+
+	super_funcall(sStop_level);
+
+	return 0;
+
 }
-
-int APIENTRY
-WinMain ( HINSTANCE hInstance,
-	  HINSTANCE hPrevInstance,
-	  LPSTR lpszCmdLine,
-	  int nCmdShow )
-{
-    char **argv, **envp = NULL;
-    int argc;
-    int rv;
-    setargv ( &argc, &argv );
-    {
-        int index = 1;
-        int console = TRUE;
-        while ( argv[index] ) {
-	    if ( 0 == strcmp ( argv[index], "-noconsole" ) ) {
-	        console = FALSE;
-	    }
-	    index++;
-        }
-        if ( console ) {
-	  SetupConsole ();
-	} 
-    }
-    rv = gcl_main ( argc, argv, envp );
-    FreeConsole ();
-    return ( rv );
-}
-
-#else /* WITH_WINMAIN */
-
-int
-main(int argc, char **argv, char **envp)
-{
-  return gcl_main ( argc, argv, envp );
-}
- 
-#endif /* WITH_WINMAIN */
-
 
 /* catch certain signals */
 void install_segmentation_catcher(void)
 {
 #ifdef INSTALL_SEGMENTATION_CATCHER
-   INSTALL_SEGMENTATION_CATCHER;
+  INSTALL_SEGMENTATION_CATCHER;
 #else
-#  ifdef SIGSEGV
+#ifdef SIGSEGV
        (void) gcl_signal(SIGSEGV,segmentation_catcher);
-#  endif
+#endif
 #endif
 }
 
 int catch_fatal=1;
 void
-error(char *s) {
-  if (catch_fatal>0 && interrupt_enable ) {
-    catch_fatal = -1;
+error(char *s)
+{
+        if (catch_fatal>0 && interrupt_enable )
+            {catch_fatal = -1;
 #ifdef SGC
     if (sgc_enabled)
       sgc_quit();
@@ -687,7 +641,7 @@ error(char *s) {
 static void
 initlisp(void) {
 
-	fixnum j;
+        void *v=&v;
 	object a;
 
 	a=Cnil;
@@ -699,6 +653,30 @@ initlisp(void) {
 	  error("Ct is not properly aligned");
 
         gcl_init_alloc();
+
+	if (NULL_OR_ON_C_STACK(v) == 0
+#if defined(IM_FIX_BASE)
+             || NULL_OR_ON_C_STACK(IM_FIX_BASE) == 0
+             || NULL_OR_ON_C_STACK((IM_FIX_BASE|IM_FIX_LIM)) == 0
+#endif
+	    /* || NULL_OR_ON_C_STACK(vv) */
+	    || NULL_OR_ON_C_STACK(pagetoinfo(first_data_page))
+	    || NULL_OR_ON_C_STACK(core_end-1)) {
+	  /* check person has correct definition of above */
+	  fprintf(stderr,"%p %d "
+#if defined(IM_FIX_BASE)
+		  "%p %d %p %d "
+#endif
+		  "%p %d %p %d\n",
+		  v,NULL_OR_ON_C_STACK(v),
+#if defined(IM_FIX_BASE)
+		  (void *)IM_FIX_BASE,NULL_OR_ON_C_STACK(IM_FIX_BASE),
+		  (void *)(IM_FIX_BASE|IM_FIX_LIM),NULL_OR_ON_C_STACK(IM_FIX_BASE|IM_FIX_LIM),
+#endif
+		  pagetoinfo(first_data_page),NULL_OR_ON_C_STACK(pagetoinfo(first_data_page)),
+		  core_end-1,NULL_OR_ON_C_STACK(core_end-1));
+	  error("NULL_OR_ON_C_STACK macro invalid");
+	}
 
  	Cnil->c.c_cdr=Cnil;
  	Cnil->s.s_dbind = Cnil;
@@ -754,18 +732,6 @@ initlisp(void) {
 	init_boot();
 	NewInit();
 
-        if ( NULL_OR_ON_C_STACK(&j) == 0
-#if defined(IM_FIX_BASE)
-             || NULL_OR_ON_C_STACK(IM_FIX_BASE) == 0
-             || NULL_OR_ON_C_STACK((IM_FIX_BASE|IM_FIX_LIM)) == 0
-#endif
-             || NULL_OR_ON_C_STACK(Cnil) != 0
-             || (((unsigned long )core_end) !=0
-                  && NULL_OR_ON_C_STACK(core_end) != 0))
-	  { /* check person has correct definition of above */
-	    error("NULL_OR_ON_C_STACK macro invalid");
-	  }
-
 	dlopen("libboot",RTLD_LAZY|RTLD_GLOBAL);
 	gcl_init_typespec();
 	gcl_init_number();
@@ -778,7 +744,7 @@ initlisp(void) {
 	gcl_init_GBC();
 
 #if defined ( UNIX ) || defined ( __MINGW32__ )
-#  ifndef DGUX
+#ifndef DGUX
 	gcl_init_unixfasl();
 	gcl_init_unixsys();
 	gcl_init_unixsave();
@@ -878,24 +844,19 @@ ihs_overflow(void) {
 	FEerror("Invocation history stack overflow.", 0);
 }
 
-
 void
 segmentation_catcher(int i, long code, void *scp, char *addr) {
 #ifndef _WIN32
   void *faddr;
   faddr=GET_FAULT_ADDR(sig,code,scp,addr); 
 
-#if CSTACK_DIRECTION == -1
-  if (faddr < (void *)cs_limit && (void *)cs_limit-faddr <= PAGESIZE) /*FIXME, perhaps bound by nearest page here.*/
-#else
-  if (faddr > (void *)cs_limit && faddr-(void *)cs_limit <= PAGESIZE)
-#endif
+  if ((cstack_dir==-1 && faddr < (void *)cs_limit && (void *)cs_limit-faddr <= PAGESIZE) ||
+      (cstack_dir==1 && faddr > (void *)cs_limit && faddr-(void *)cs_limit <= PAGESIZE))
     FEerror("Control stack overflow.",0); /*FIXME -- provide getrlimit here.*/
   else 
     printf("Segmentation violation: c stack ok:signalling error");
 #endif
   error("Segmentation violation.");
-
 }
 
 DEFUN("BYE",object,fSbye,SI,0,1,NONE,OI,OO,OO,OO,(ufixnum exit_code,...),"") {
@@ -962,6 +923,7 @@ FFN(siLgetenv)(void) {
     vs_base[0] = make_simple_string(value);
 #ifdef FREE_GETENV_RESULT
     free(value);
+    
 #endif		
     }
   else
@@ -1026,23 +988,22 @@ LFD(siLreset_stack_limits)(void)
      cs_org2=GC_save_regs_in_stack();
  }
 #endif
-
-/*   reset_cstack_limit(i); */
+  /* reset_cstack_limit(i); */
   vs_base[0] = Cnil;
 }
 
 #define COPYSTACK(org,p,typ,lim,top,geta,size) \
- do{int leng,topl;      \
-  bcopy(org,p,leng=(stack_multiple*size*sizeof(typ))); \
-  topl= top - org; \
-  org=(typ *)p; top = org +topl;	    \
-  p=p+leng+(STACK_OVER+1)*geta*sizeof(typ); \
-  lim = ((typ *)p) - (STACK_OVER+1)*geta;   \
-  }while (0)
+  {unsigned long topl=top-org;\
+   bcopy(org,p,(lim-org)*sizeof(typ));\
+   org=p;\
+   top=org+topl;\
+   lim=org+stack_multiple*size;\
+   p=lim+(STACK_OVER+1)*geta;\
+   }
 
 static int
 multiply_stacks(int m) {  
-  char *p;
+  void *p;
   int vs,bd,frs,ihs;
   stack_multiple=stack_multiple*m;
 #define ELTSIZE(x) (((char *)((x)+1)) - ((char *) x))
@@ -1055,7 +1016,6 @@ multiply_stacks(int m) {
   array_allocself(stack_space,1,code_char(0));
   p=stack_space->st.st_self;
   COPYSTACK(vs_org,p,object,vs_limit,vs_top,VSGETA,VSSIZE);
-  vs_base=vs_org;
   COPYSTACK(bds_org,p,struct bds_bd,bds_limit,bds_top,BDSGETA,BDSSIZE);
   COPYSTACK(frs_org,p,struct frame,frs_limit,frs_top,FRSGETA,FRSSIZE);
   COPYSTACK(ihs_org,p,struct invocation_history,ihs_limit,ihs_top,
@@ -1095,16 +1055,15 @@ FFN(siLnani)(void) {
     vs_base[0] = (object)fixint(vs_base[0]);
     break;
   case t_bignum:
-    if (vs_base[0]->big.big_mpz_t._mp_size!=1)
-      FEerror("Integer too big",0);
-    /*FIXME 64*/
-    fprintf(stderr,"Warning, bignum in nani\n");
-    vs_base[0]=(object)*vs_base[0]->big.big_mpz_t._mp_d;
-    break;
+    if (mpz_fits_slong_p(MP(vs_base[0]))) {
+      MP_INT *u = MP(vs_base[0]);
+      vs_base[0]=(object)mpz_get_si(u);
+      break;
+    }
   default:
-    FEerror("Not an integer",0);
-    break;
-  }    
+    FEerror("Cannot coerce ~s to an address",1,vs_base[0]);
+  }
+
 }
 
 static void
@@ -1133,7 +1092,6 @@ DEFUN("LISP-IMPLEMENTATION-VERSION",object,fLlisp_implementation_version,LISP,0,
 
 static void
 FFN(siLsave_system)(void) {
-  int i;
   
 #ifdef HAVE_YP_UNBIND
   extern object truename(),namestring();
@@ -1151,25 +1109,18 @@ FFN(siLsave_system)(void) {
   DO_BEFORE_SAVE
 #endif	
     
-    sLAstandard_inputA->s.s_dbind=standard_io;
-    sLAstandard_outputA->s.s_dbind=standard_io;
-    sLAerror_outputA->s.s_dbind=standard_io;
+  saving_system = TRUE;
+  {
 
-    saving_system = TRUE;
-  GBC(t_contiguous);
-  
-#ifdef GCL_GPROF
-  gprof_cleanup();
-#endif
-    
-#if defined(BSD) || defined(ATT)  
-  brk(core_end);
-#endif
-  
-  cbgbccount = tm_table[t_contiguous].tm_adjgbccnt = tm_table[t_contiguous].tm_opt_maxpage = 0;
-  rbgbccount = tm_table[t_relocatable].tm_adjgbccnt = tm_table[t_relocatable].tm_opt_maxpage = 0;
-  for (i = 0;  i < (int)t_end;  i++)
-    tm_table[i].tm_gbccount = tm_table[i].tm_adjgbccnt = tm_table[i].tm_opt_maxpage = 0;
+    fixnum old_nrbpage=nrbpage;
+
+    minimize_image();
+
+    rb_limit=rb_end=REAL_RB_START+old_nrbpage*PAGESIZE;
+    set_tm_maxpage(tm_table+t_relocatable,nrbpage=old_nrbpage);
+
+  }
+
   Lsave();
   saving_system = FALSE;
   alloc_page(-(holepage+nrbpage));
@@ -1216,11 +1167,9 @@ init_main(void) {
 			 make_cons(make_keyword("KCL"), Cnil));
   ADD_FEATURE("AKCL");
   ADD_FEATURE("GCL");
-
 #ifdef BROKEN_O4_OPT
   ADD_FEATURE("BROKEN_O4_OPT");
 #endif
-
 #ifdef GMP
   ADD_FEATURE("GMP");
 #endif	 
@@ -1236,11 +1185,10 @@ init_main(void) {
   ADD_FEATURE("WINNT");
   ADD_FEATURE("WIN32");
 #endif
-  
+
 #ifdef IEEEFLOAT
   ADD_FEATURE("IEEE-FLOATING-POINT");
 #endif
-
 #ifdef SGC
   ADD_FEATURE("SGC");
 #endif	 
@@ -1250,27 +1198,14 @@ init_main(void) {
 #ifdef HOST_SYSTEM
   ADD_FEATURE(HOST_SYSTEM);
 #endif
-
 #ifdef  BSD
   ADD_FEATURE("BSD");
 #endif
   
-#ifndef WORDS_BIGENDIAN	 
+#if !defined(DOUBLE_BIGENDIAN)
   ADD_FEATURE("CLX-LITTLE-ENDIAN");
 #endif
   
-#ifndef NOSWITCH
-  ADD_FEATURE("SWITCH");
-#endif
-
-#ifndef NODYNEXT
-  ADD_FEATURE("DYNAMIC-EXTENT");
-#endif
-
-#ifndef NOINTDIV
-  ADD_FEATURE("INTDIV");
-#endif
-
 #ifndef PECULIAR_MACHINE
 #define BIGM    (int)((((unsigned int)(-1))/2))	 
   { 
@@ -1299,7 +1234,6 @@ init_main(void) {
 #endif
 #endif
   ADD_FEATURE("UNEXEC");
-
 #ifdef HAVE_XGCL
   ADD_FEATURE("XGCL");
 #endif
@@ -1308,16 +1242,8 @@ init_main(void) {
   ADD_FEATURE("GNU-LD");
 #endif
   
-#ifdef HAVE_JAPI_H
-  ADD_FEATURE("JAPI-PRIMITIVES");
-#endif	 
-
 #ifndef NO_C99
   ADD_FEATURE("C99");
-#endif	 
-
-#ifdef HAVE_TK
-  ADD_FEATURE("TK-PRIMITIVES");
 #endif	 
 
 #ifdef STATIC_LINKING
@@ -1335,3 +1261,7 @@ init_main(void) {
   /* make_si_function("WARN-VERSION",Lidentity); */
   
 }
+
+#ifdef SGC
+#include "writable.h"
+#endif

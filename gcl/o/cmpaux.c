@@ -460,7 +460,6 @@ char *
 object_to_string(object x) { 
 
   unsigned int leng;
-  long np; 
   char *res;
 
   if (type_of(x)!=t_string) FEwrong_type_argument(sLstring,x);
@@ -469,9 +468,7 @@ object_to_string(object x) {
   if (leng > 0 && leng < x->st.st_dim && x->st.st_self[leng]==0)
     return x->st.st_self;
 
-  np=page(x->st.st_self);
-  if (x->st.st_dim == leng && leng % sizeof(object) 
-      && np<MAXPAGE && (type_map[np]==t_relocatable || type_map[np]==t_contiguous)) {
+  if (x->st.st_dim == leng && leng % sizeof(object)) {
     x->st.st_self[leng] = 0;
     return x->st.st_self;
   }  
