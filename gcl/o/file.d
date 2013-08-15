@@ -1899,7 +1899,7 @@ BEGIN:
 
 void
 load(s)
-char *s;
+const char *s;
 {
 	object filename, strm, x;
 	vs_mark;

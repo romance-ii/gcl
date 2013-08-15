@@ -8,3 +8,5 @@
                         for (;v<ve;v+=CLEAR_CACHE_LINE_SIZE) \
                            asm __volatile__ ("dcbst 0,%0\n\tsync\n\ticbi 0,%0\n\tsync\n\tisync": : "r" (v) : "memory");\
                         } while(0)
+
+#define RELOC_H "elf32_ppc_reloc.h"

@@ -26,7 +26,7 @@
 #define	I386			/* ?? this is apparently not used anywhere */
 #define	IEEEFLOAT
 
-#undef HAVE_XDR
+/* #undef HAVE_XDR */
 
 #define USE_ATT_TIME
 

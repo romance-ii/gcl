@@ -105,3 +105,12 @@ label_got_symbols(void *v1,Shdr *sec1,Shdr *sece,Sym *sym1,Sym *syme,const char 
   return 0;
   
 }
+
+#define FIX_HIDDEN_SYMBOLS(st1_,a_,sym1_,sym_,syme_)				\
+  ({Sym *p;const char *n=(st1_)+(sym_)->st_name,*s=".pic.",*q;ul z=strlen(s);	\
+    if (ELF_ST_VISIBILITY((sym_)->st_other)==STV_HIDDEN) {		\
+      for (p=(sym1_);p<(syme_);p++)					\
+	if (!strncmp(s,(q=(st1_)+p->st_name),z) && !strcmp(n,q+z)) {	\
+	  (*(a_))->address=p->st_value;					\
+	  break;							\
+	}}})

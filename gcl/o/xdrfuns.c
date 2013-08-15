@@ -17,6 +17,10 @@ License for more details.
 
 #ifdef HAVE_XDR
 
+#ifdef DARWIN
+#undef __LP64__ /*Apple header declaration bug workaround for xdr_long*/
+#endif
+
 #ifdef AIX3
 #include <sys/select.h>
 #endif
@@ -46,14 +50,16 @@ DEFUN("XDR-WRITE",object,fSxdr_write,SI,2,2,NONE,OO,OO,OO,OO,(object str,object 
 
   switch (type_of(elt)) {
   case t_fixnum:
-    {fixnum f=fix(elt);
-    if(!xdr_long(xdrp,&f)) goto error;}
+    {
+      fixnum e=fix(elt);
+      if(xdr_long(xdrp,(long *)&e)) goto error;
+    }
     break;
   case t_longfloat:
-    if(!xdr_double(xdrp,&lf(elt))) goto error;
+    if(xdr_double(xdrp,&lf(elt))) goto error;
     break;
   case t_shortfloat:
-    if(!xdr_float(xdrp,&sf(elt))) goto error;
+    if(xdr_float(xdrp,&sf(elt))) goto error;
     break;
   case t_vector:
     
@@ -79,7 +85,7 @@ DEFUN("XDR-WRITE",object,fSxdr_write,SI,2,2,NONE,OO,OO,OO,OO,(object str,object 
       u_int tmp=elt->v.v_fillp;
       if (tmp!=elt->v.v_fillp)
 	goto error;
-      if(!xdr_array(xdrp,(void *)&elt->v.v_self,
+      if(xdr_array(xdrp,(void *)&elt->v.v_self,
 		    &tmp,
 		    elt->v.v_dim,
 		    aet_types[elt->v.v_elttype].size,
@@ -93,7 +99,7 @@ DEFUN("XDR-WRITE",object,fSxdr_write,SI,2,2,NONE,OO,OO,OO,OO,(object str,object 
   }
   return elt;
  error:
-  FEerror("bad xdr read",0);
+  FEerror("bad xdr write",0);
   return elt;
 }
 
@@ -105,16 +111,16 @@ DEFUN("XDR-READ",object,fSxdr_read,SI,2,2,NONE,OO,OO,OO,OO,(object str,object el
   switch (type_of(elt)) { 
   case t_fixnum:
     {fixnum l;
-    if(!xdr_long(xdrp,&l)) goto error;
+      if(xdr_long(xdrp,(long *)&l)) goto error;
     return make_fixnum(l);}
     break;
   case t_longfloat:
     {double x;
-    if(!xdr_double(xdrp,&x)) goto error;
+    if(xdr_double(xdrp,&x)) goto error;
     return make_longfloat(x);}
   case t_shortfloat:
     {float x;
-    if(!xdr_float(xdrp,&x)) goto error;
+    if(xdr_float(xdrp,&x)) goto error;
     return make_shortfloat(x);}
   case t_vector:
     switch(elt->v.v_elttype) {
@@ -140,7 +146,7 @@ DEFUN("XDR-READ",object,fSxdr_read,SI,2,2,NONE,OO,OO,OO,OO,(object str,object el
       u_int tmp=elt->v.v_fillp;
       if (tmp!=elt->v.v_fillp)
 	goto error;
-      if(!xdr_array(xdrp,(void *)&elt->v.v_self,
+      if(xdr_array(xdrp,(void *)&elt->v.v_self,
 		    &tmp,
 		    elt->v.v_dim,
 		    aet_types[elt->v.v_elttype].size,

@@ -63,7 +63,7 @@ struct rlimit { int i; } ;
 /* some regular bsd bells and whistles which aren't here */
 
 #undef HAVE_SIGVEC
-#undef HAVE_XDR
+/* #undef HAVE_XDR */
 #undef RUN_PROCESS
 
 

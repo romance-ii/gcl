@@ -123,7 +123,7 @@ fScheck_bounds_bounds(object x, int i)
     }
 }
 
-DEFUN("SVREF",object,fLsvref,LISP,2,2,ONE_VAL,OO,IO,OO,OO,(object x,fixnum i),"For array X and index I it returns (aref x i) ") {
+DEFUN("SVREF",object,fLsvref,LISP,2,2,ONE_VAL,OO,IO,OO,OO,(object x,ufixnum i),"For array X and index I it returns (aref x i) ") {
 
  if (type_of(x)==t_vector && (enum aelttype)x->v.v_elttype == aet_object) {
      if (x->v.v_dim > i)
@@ -438,8 +438,6 @@ fSmake_vector(object etp,fixnum n,object adjp,object fp,object displaced_to,fixn
 
 
 
-/* DEFUN("MAKE-VECTOR1",object,fSmake_vector1,SI,3,8,NONE,OI, */
-/* 	  IO,OO,OO,(fixnum n,fixnum elt_type,object staticp,...),"") {  */
 
 /*   fixnum nargs=INIT_NARGS(3); */
 /*   int displaced_index_offset=0; */

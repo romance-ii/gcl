@@ -629,7 +629,7 @@ char *s;
 #endif
 
 void
-gcl_init_or_load1(void (*fn)(void),char *file)
+gcl_init_or_load1(void (*fn)(void),const char *file)
 {int n=strlen(file);
  if (file[n-1]=='o')
    { object memory;
@@ -678,7 +678,18 @@ function.")
 object
 find_init_name1(char *s,unsigned len) {
 #ifdef _WIN32
-  FEerror("Not supported on Windows",0);
+
+  char *tmp;
+
+  if (len) {
+    tmp=alloca(len+1);
+    memcpy(tmp,s,len);
+    tmp[len]=0;
+  } else
+    tmp=s;
+
+  return find_init_string(tmp);
+
 #else    
   struct stat ss;
   char *tmp,*q;
@@ -702,7 +713,7 @@ find_init_name1(char *s,unsigned len) {
   if (strncmp(s,"init_",5))
     FEerror("Init name not found",0);
   return make_simple_string(s);
-#endif  
+#endif  /* _WIN32 */
 
 }
  

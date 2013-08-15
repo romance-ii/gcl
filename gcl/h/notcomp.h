@@ -249,12 +249,10 @@ EXTER struct printStruct *printStructBufp;
 */
 #ifndef NULL_OR_ON_C_STACK
 
-
-#ifdef USE_FAST_NULL_OR_ON_CSTACK_MACRO
-#define NULL_OR_ON_C_STACK(x) ((long)x <= DBEGIN)     
-#else
-#define NULL_OR_ON_C_STACK(x) (((unsigned long)x)<=DBEGIN || ((unsigned long)x) >= (unsigned long)(pagetochar(MAXPAGE)))
-#endif
+#define NULL_OR_ON_C_STACK(x) ({\
+      /* if ((void *)(x)<data_start && ((void *)(x)!=NULL) && ((object)(x))!=Cnil && ((object)(x))!=Ct) */ \
+      /* {pp(x);printf("%p %p\n",(void *)(x),data_start);}			*/ \
+      ((((void *)(x))<(void *)data_start || ((void *)(x))>=(void *)core_end));})
 
 #endif /* NULL_OR_ON_C_STACK */
 
@@ -310,6 +308,7 @@ PFN(stringp)
 PFN(string_symbolp)
 PFN(packagep)
 PFN(consp)
+PFN(listp)
 PFN(streamp)
 PFN(pathname_string_symbolp)
 PFN(pathname_string_symbol_streamp)
@@ -343,6 +342,7 @@ PFN(functionp)
 #define check_type_or_Pathname_string_symbol(a_)        TPE(a_,pathname_string_symbolp_fn,TSor_pathname_string_symbol)
 #define check_type_package(a_)                          TPE(a_,packagep_fn,sLpackage)
 #define check_type_cons(a_)                             TPE(a_,consp_fn,sLcons)
+#define check_type_list(a_)                             TPE(a_,listp_fn,sLlist)
 #define check_type_stream(a_)                           TPE(a_,streamp_fn,sLstream)
 #define check_type_array(a_)                            TPE(a_,arrayp_fn,sLarray)
 #define check_type_vector(a_)                           TPE(a_,vectorp_fn,sLvector)

@@ -350,7 +350,7 @@ setf(object place, object form)
 	    args=MMcons(MMcons(find_symbol(make_simple_string(s),p),MMcons(args->c.c_car,Cnil)),Cnil);
 
 	  }
-	}
+	} /*FIXME*/
 	  
 	if (fun == sLget) {
             object sym,val,key,deflt1;

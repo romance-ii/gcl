@@ -176,7 +176,7 @@ when they fix it
 #define SAFE_INC(u,amt) do{volatile unsigned int xTmp = u; xTmp += amt; u = (int) xTmp;}while(0)
 #define SAFE_DEC(u,amt) do{volatile unsigned int xTmp = u; xTmp -= amt; u = (int) xTmp;}while(0)
 
-#define HAVE_XDR
+/* #define HAVE_XDR */
 
 
 /* Begin for cmpinclude */

@@ -499,7 +499,7 @@ maybe_replace_big(object x)
   return make_bignum(MP(x));
 }
 
-/*FIXME 64*/
+
 object
 bignum2( int h,  int l)
 {
@@ -511,33 +511,34 @@ bignum2( int h,  int l)
 }
 
 void
-integer_quotient_remainder_1(object x, object y, object *qp, object *rp)
-{
-  *qp = new_bignum();
-  *rp = new_bignum();
+integer_quotient_remainder_1(object x, object y, object *qp, object *rp) {
+  
+  object q=qp ? new_bignum() : big_fixnum3;
+  object r=rp ? new_bignum() : big_fixnum4;
+
   /* we may need to coerce the fixnums to MP here, and
      we use the temporary storage of the rp/qp as inputs.
      since overlap is allowed in the mpz_tdiv_qr operation..
   */    
-  mpz_tdiv_qr(MP(*qp),MP(*rp),INTEGER_TO_MP(x,big_fixnum1),
-	      INTEGER_TO_MP(y,big_fixnum2));
-  *qp = normalize_big(*qp);
-  *rp = normalize_big(*rp);
+  mpz_tdiv_qr(MP(q),MP(r),INTEGER_TO_MP(x,big_fixnum1),INTEGER_TO_MP(y,big_fixnum2));
+  if (qp) *qp = normalize_big(q);
+  if (rp) *rp = normalize_big(r);
   return;
 }
 
 void
-integer_quotient_remainder_1_ui(object x, unsigned long y, object *qp, object *rp)
-{
-  *qp = new_bignum();
-  *rp = new_bignum();
+integer_quotient_remainder_1_ui(object x, unsigned long y, object *qp, object *rp) {
+  
+  object q=qp ? new_bignum() : big_fixnum3;
+  object r=rp ? new_bignum() : big_fixnum4;
+
   /* we may need to coerce the fixnums to MP here, and
      we use the temporary storage of the rp/qp as inputs.
      since overlap is allowed in the mpz_tdiv_qr operation..
   */    
-  mpz_tdiv_qr_ui(MP(*qp),MP(*rp),INTEGER_TO_MP(x,big_fixnum1),y);
-  *qp = normalize_big(*qp);
-  *rp = normalize_big(*rp);
+  mpz_tdiv_qr_ui(MP(q),MP(r),INTEGER_TO_MP(x,big_fixnum1),y);
+  if (qp) *qp = normalize_big(q);
+  if (rp) *rp = normalize_big(r);
   return;
 }
 
@@ -565,6 +566,7 @@ coerce_big_to_string(object x, int printbase) {
 void
 gcl_init_big(void)
 {
+  gcl_init_big1();
   big_gcprotect=alloc_object(t_bignum);
   MP_SELF(big_gcprotect)=0;
   MP_ALLOCATED(big_gcprotect)=0;
@@ -579,7 +581,6 @@ gcl_init_big(void)
   enter_mark_origin(&big_fixnum4);
   enter_mark_origin(&big_fixnum5);
   enter_mark_origin(&big_gcprotect);
-  gcl_init_big1();
 
 
 }

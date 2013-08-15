@@ -16,7 +16,7 @@ UNIX_SAVE_DEP = unexnt.c
 
 RSYM	     = rsym.exe
 SPECIAL_RSYM = rsym_nt.c
-SFASL	     = $(ODIR)/sfaslpecoff.o
+SFASL	     = $(ODIR)/sfasl.o
 FIRST_FILE   = $(ODIR)/firstfile.o
 LAST_FILE    = $(ODIR)/lastfile.o
 LIBFILES     = bcmp.o bzero.o bcopy.o

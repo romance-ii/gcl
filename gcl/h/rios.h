@@ -228,7 +228,7 @@ for the kernel.   See aix3_mprotect directory.
 #define HAVE_IOCTL
 #define HAVE_SIGACTION
   
-#define HAVE_XDR
+/* #define HAVE_XDR */
   
 #define SHARP_EQ_CONTEXT_SIZE 1024
 #undef VSSIZE

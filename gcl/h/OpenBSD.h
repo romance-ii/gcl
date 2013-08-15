@@ -22,7 +22,7 @@
 /* we don't need to worry about zeroing fp->_base, to prevent what??? */
 #define FCLOSE_SETBUF_OK 
 
-#undef HAVE_XDR
+/* #undef HAVE_XDR */
 
 #define USE_ATT_TIME
 

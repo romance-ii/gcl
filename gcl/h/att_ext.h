@@ -23,7 +23,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 /*  alloc.c  */
-char *alloc_page();
+void *alloc_page();
 object alloc_object();
 void *malloc(size_t);
 void *realloc(void *,size_t);
@@ -66,8 +66,8 @@ object big_plus();
 object big_times();
 object normalize_big_to_object();
 double big_to_double();
-/* EXTER  struct bignum big_fixnum1_body,big_fixnum2_body; */
-EXTER object big_fixnum1,big_fixnum2,big_fixnum3,big_fixnum4,big_fixnum5;
+EXTER  struct bignum big_fixnum1_body,big_fixnum2_body,big_fixnum3_body,big_fixnum4_body;
+EXTER object big_fixnum1,big_fixnum2,big_fixnum3,big_fixnum4;
 object maybe_replace_big();
 
 
@@ -225,7 +225,8 @@ object lex_block_sch();
 EXTER object sKtest;
 EXTER object sKtest_not;
 EXTER object sKkey;
-EXTER object sKrev;
+EXTER object sKinitial_element;
+/* EXTER object sKrev; */
 object car();
 object cdr();
 object kdr();
@@ -274,7 +275,7 @@ EXTER object sSdefmacroA;
 object macro_expand();
 
 /*  main.c  */
-EXTER char system_directory[512];
+EXTER char system_directory[];
 EXTER int ARGC;
 EXTER char **ARGV;
 void error();
@@ -387,6 +388,8 @@ object find_symbol();
 
 /*  pathname.d  */
 EXTER object Vdefault_pathname_defaults;
+EXTER object sKwild;
+EXTER object sKnewest;
 EXTER object sKstart;
 EXTER object sKend;
 EXTER object sKjunk_allowed;
@@ -710,5 +713,3 @@ object Ifuncall_n(object,int,...);
 object Ivs_values();
 object Icheck_one_type();
 object fSincorrect_type();
-
-

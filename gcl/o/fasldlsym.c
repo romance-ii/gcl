@@ -62,24 +62,26 @@ fasload(object faslfile) {
   coerce_to_filename(truename(faslfile), filename);
   if (!count)
     count=time(0);
-  ASSERT(snprintf(buf,sizeof(buf),"/tmp/ufas%dxXXXXXX",count++)>0);
-  ASSERT(mkstemp(buf)>=0);
+  massert(snprintf(buf,sizeof(buf),"/tmp/ufas%dxXXXXXX",count++)>0);
+  massert(mkstemp(buf)>=0);
 
-  ASSERT((nl=(void *) malloc(strlen(buf)+1+sizeof(nl))));
+  massert((nl=(void *) malloc(strlen(buf)+1+sizeof(nl))));
   nl->next = loaded_files;
   loaded_files = nl;
   strcpy(nl->name,buf);
 
-  ASSERT(snprintf(b,sizeof(b),"cc -shared %s -o %s",filename,buf)>0);
-  ASSERT(!system(b));
+  /* faslstream = open_stream(faslfile, smm_input, Cnil, sKerror); */
+  massert(snprintf(b,sizeof(b),"cc -shared %s -o %s",filename,buf)>0);
+  massert(!system(b));
 
   if (!(dlp = dlopen(buf,RTLD_NOW))) {
     fputs(dlerror(),stderr);
     FEerror("Cannot open for dynamic link ~a",1,make_simple_string(faslfile));
   }
   
+
   x=find_init_name1(buf,0);
-  ASSERT(x->st.st_fillp+1<sizeof(b));
+  massert(x->st.st_fillp+1<sizeof(b));
   memcpy(b,x->st.st_self,x->st.st_fillp);
   b[x->st.st_fillp]=0;
   if (!(fptr=dlsym(dlp,b))) {

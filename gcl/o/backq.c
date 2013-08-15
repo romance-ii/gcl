@@ -32,7 +32,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define	APPEND	5
 #define	NCONC	6
 
-#define	siScomma_at  sSYB
+#define	siScomma_at sSYB
 #define siScomma_dot sSYZ
 object sSXB;
 object sSYB;

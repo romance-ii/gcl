@@ -35,11 +35,8 @@ extern char *mach_brkpt;
 
 extern char *get_dbegin ();
 
-#undef SET_REAL_MAXPAGE
-#define SET_REAL_MAXPAGE real_maxpage = MAXPAGE
-
 #include <unistd.h> /* to get sbrk defined */
-extern void *my_sbrk(int incr);
+extern void *my_sbrk(long incr);
 #define sbrk my_sbrk
 
 
@@ -135,8 +132,6 @@ do {                                                    \
 
 /* si_addr not containing the faulting address is a bug in Darwin.
    Work around this by looking at the dar field of the exception state.  */
-#include <sys/ucontext.h>
-#include <sys/types.h>
 #define GET_FAULT_ADDR(sig,code,scp,addr) ((char *) (((ucontext_t *) scp)->uc_mcontext->es.dar))
 
 /*
@@ -197,3 +192,4 @@ if (realpath (buf, fub) == 0) {                             \
 (a_) = fub;                                                 \
 } while (0)
 
+#define RELOC_H "mach32_ppc_reloc.h"

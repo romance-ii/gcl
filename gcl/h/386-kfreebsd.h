@@ -36,3 +36,10 @@
    }\
 }
 #endif
+
+#define RELOC_H "elf32_i386_reloc.h"
+
+#ifndef HAVE_SYSCONF_PHYS_PAGES
+#error need SYSCONF_PHYS_PAGES to set real_maxpage
+#endif
+#define BRK_DOES_NOT_GUARANTEE_ALLOCATION

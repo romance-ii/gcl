@@ -168,7 +168,7 @@ only in very SAFE places.")
      
 
 void
-main_signal_handler(int signo)
+main_signal_handler(int signo,siginfo_t *a,void *b)
 {  int allowed = signals_allowed;
 #ifdef NEED_TO_REINSTALL_SIGNALS
        signal(signo,main_signal_handler);
@@ -202,7 +202,7 @@ invoke_handler(int signo, int allowed)
  {int prev_in_handler = in_signal_handler;
   in_signal_handler |= (allowed <= sig_normal ? 1 : 0);
   signals_allowed = allowed;
-  our_signal_handler[signo](signo);
+  our_signal_handler[signo](signo,0,0);
   signals_allowed = 0;
   in_signal_handler = prev_in_handler;
   after_interrupt(&buf,allowed); 

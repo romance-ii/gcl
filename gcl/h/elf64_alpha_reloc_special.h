@@ -1,4 +1,4 @@
-static ul ggot1,ggote;
+static ul ggot1,ggote,gotp;
 
 static int
 write_stub(ul s,ul *got,ul *gote) {
@@ -65,10 +65,11 @@ label_got_symbols(void *v1,Shdr *sec1,Shdr *sece,Sym *sym1,Sym *syme,const char 
   Sym *sym;
   Shdr *sec;
   void *v,*ve;
-  ul q=0,b;
+  ul q=0;
 
+  gotp=0;
   for (sym=sym1;sym<syme;sym++)
-    sym->st_size=0;
+    sym->st_other=sym->st_size=0;
 
   for (*gs=0,sec=sec1;sec<sece;sec++)
     if (sec->sh_type==SHT_RELA)
@@ -79,14 +80,10 @@ label_got_symbols(void *v1,Shdr *sec1,Shdr *sece,Sym *sym1,Sym *syme,const char 
 	    
 	  if (!sym->st_size || r->r_addend) { 
 	    q=++*gs; 
-	    if (!r->r_addend) sym->st_size=q; 
+	    if (!sym->st_size) sym->st_size=q;
 	    massert(!make_got_room_for_stub(sec1,sece,sym,st1,gs));
+	    sym->st_other=(*gs-q)<<1;
 	  }
-
-	  b=sizeof(r->r_addend)*4; 
-	  massert(!(r->r_addend>>b)); 
-	  q=r->r_addend ? q : sym->st_size; 
-	  r->r_addend|=(q<<=b); 
 
 	}
   

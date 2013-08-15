@@ -38,14 +38,10 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "gclincl.h"
 #include "config.h"
 
-#ifdef HAVE_BFD_BOOLEAN
-#define MY_BFD_BOOLEAN bfd_boolean
-#define MY_BFD_FALSE FALSE
-#define MY_BFD_TRUE TRUE
-#else
-#define MY_BFD_BOOLEAN int
-#define MY_BFD_FALSE 0
-#define MY_BFD_TRUE 1
+#ifdef __GNUC__
+#ifndef alloca
+#define alloca __builtin_alloca
+#endif
 #endif
 
 #ifdef IN_NUM_CO
@@ -96,7 +92,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define EXTER extern 
 #endif
 
-
 #if defined(GMP) || defined(NEED_MP_H)
 #include "../h/mp.h"
 #endif
@@ -106,6 +101,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "../h/sfun_argd.h"
 #include "../h/compbas.h"
 #include "../h/enum.h"
+#include "../h/bits.h"
 #include "../h/object.h"
 #include "../h/vs.h"
 #include "../h/bds.h"

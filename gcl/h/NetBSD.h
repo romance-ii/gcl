@@ -47,7 +47,7 @@
 #define deallocate_stream_buffer(x)
 
 
-#undef HAVE_XDR
+/* #undef HAVE_XDR */
 
 #define USE_ATT_TIME
 

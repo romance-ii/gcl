@@ -1,6 +1,5 @@
 #include "include.h"
 #include "num_include.h"
-
 #define IN_NEW_INIT
 #include "funlink.h"
 #define SI 0
@@ -18,18 +17,6 @@
   (pack == SI ? make_si_ordinary(string) : \
    pack == LISP ? make_ordinary(string) : \
    (error("Bad pack variable in MAKESYM\n"),Cnil))
-
-/* FIXME, possibly restore old MAKEFUN in place (in NewInit) here 
-   when STATIC_FUNCTION_POINTERS not defined */
-/* #define str(s) #s */
-/* #define xstr(s) str(s) */
-/* #undef DEFBFUN */
-/* #define DEFBFUN(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) \ */
-/*   {void *v,*q;\ */
-/*     if (!(v=dlopen("./libboot.so",RTLD_LAZY|RTLD_GLOBAL))) printf("%s\n",dlerror());\ */
-/*     if (!(q=dlsym(v,xstr(Mjoin(fname,_init))))) printf("%s\n",dlerror());\ */
-/*     fflush(stdout);\ */
-/*     ((void (*)())q)();} */
 
 #undef DEFUN
 #define DEFUN(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) \

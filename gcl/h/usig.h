@@ -1,4 +1,4 @@
-typedef void (*handler_function_type)(int);
+typedef void (*handler_function_type)(int,siginfo_t *,void *);
 
 EXTER handler_function_type our_signal_handler[32];
 #ifdef __MINGW32__

@@ -26,4 +26,5 @@
 			  (void *)memory->cfd.cfd_start+memory->cfd.cfd_size)
 
 #define SGC
-#define NODYNEXT
+
+#define RELOC_H "elf32_arm_reloc.h"

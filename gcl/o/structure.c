@@ -55,7 +55,7 @@ bad_raw_type(void)
 
 
 object
-structure_ref(object x, object name, int i)
+structure_ref(object x, object name, fixnum i)
 {unsigned short *s_pos;
  COERCE_DEF(name);
  if (type_of(x) != t_structure ||
@@ -103,7 +103,7 @@ FFN(siLstructure_ref1)(void)
 
 
 object
-structure_set(object x, object name, int i, object v)
+structure_set(object x, object name, fixnum i, object v)
 {unsigned short *s_pos;
  
  COERCE_DEF(name);

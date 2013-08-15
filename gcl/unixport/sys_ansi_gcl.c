@@ -4,13 +4,8 @@
 
 extern object user_init();
 
-
-void gcl_init_or_load1 (void (*)(void),char *);
 #define init_or_load(fn,file) do {extern void fn(void); gcl_init_or_load1(fn,file);} \
   while(0)
-
-/* #define mjoin(a,b) a ## b */
-/* #define Mjoin(a,b) mjoin(a,b) */
 
 #define ar_init(a) do {\
   char b[200];\

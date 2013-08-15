@@ -7,6 +7,11 @@
 #include HAVE_AOUT 
 #endif
 
+#ifdef _WIN32
+#define TEXT_NSCN 1
+#define DATA_NSCN 2
+#define BSS_NSCN 3
+#endif
 
 #ifdef AIX3
 #include <a.out.h>
@@ -94,7 +99,7 @@
 #define NTYPE(sym) ((sym)->n_type & N_TYPE)
 
 #ifndef N_SECTION
-#  define N_SECTION(sym) (sym->n_type & N_TYPE & ~N_EXT)
+#define N_SECTION(sym) (sym->n_type & N_TYPE & ~N_EXT)
 #endif 
 
 #define N_UNDEF N_UNDF

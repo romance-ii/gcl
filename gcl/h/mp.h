@@ -6,8 +6,6 @@
 /* define to show we included mp.h */
 #define _MP_H  
 
-/* #define MOST_NEG_FIXNUM (-2147483647-1) */
-/* #define MOST_POSITIVE_FIXNUM (2147483647) */
 
 #define MP_ALLOCATED(x) MP(x)->_mp_alloc
 #define MP_SELF(x) MP(x)->_mp_d

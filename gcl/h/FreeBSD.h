@@ -105,6 +105,3 @@ do {								\
 /* Begin for cmpinclude */
 #define SGC	/* can mprotect pages and so selective gc will work */
 /* End for cmpinclude */
-
-#define FREE_BSD
-#define NO_C99
