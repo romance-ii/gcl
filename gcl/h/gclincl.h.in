@@ -285,9 +285,6 @@
 /* fill bits needed in certain lisp structures */
 #undef LM9BITS
 
-/* bounds for low immediate fixnums */
-#undef LOW_SHFT
-
 /* maximum number of pages to be allocated */
 #undef MAXPAGE
 
