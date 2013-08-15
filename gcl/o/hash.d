@@ -198,9 +198,9 @@ BEGIN:
       h^=ihash_equal(x->pn.pn_name,depth);
       h^=ihash_equal(x->pn.pn_type,depth);
       /* version is ignored unless logical host */
-      if ((type_of(x->pn.pn_host) == t_string) &&
-	  (pathname_lookup(x->pn.pn_host,sSApathname_logicalA) != Cnil))
-	h^=ihash_equal(x->pn.pn_version,depth);
+      /* if ((type_of(x->pn.pn_host) == t_string) && */
+      /* 	  (pathname_lookup(x->pn.pn_host,sSApathname_logicalA) != Cnil)) */
+      /* 	h^=ihash_equal(x->pn.pn_version,depth); */
       h^=ihash_equal(x->pn.pn_version,depth);
       break;
     default:
