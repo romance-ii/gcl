@@ -91,7 +91,7 @@ CPP=
 
 boot.ini: boot.c grab_defs
 	[ -e $(DECL) ] || touch $(DECL)
-	$(CC) -DNO_DEFUN -DNO_BOOT_H $(CFLAGS) $(DEFS) -E $*.c | sed -e 's,^.* DEFUNB,DEFUNB,g' -e 's/DEF,//g' -e 's:\"[ ]*):\"):g' | ./grab_defs > $@
+	$(CC) -DNO_DEFUN -DNO_BOOT_H $(CFLAGS) $(DEFS) -E $*.c | sed -e 's,DEFUN,\nDEFUN,g' -e 's,^.* DEFUNB,DEFUNB,g' -e 's/DEF,//g' -e 's:\"[ ]*):\"):g' | ./grab_defs > $@
 
 boot.h: boot.ini
 	echo '#include "make-init.h"' > $@
