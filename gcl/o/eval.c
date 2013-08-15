@@ -1191,8 +1191,7 @@ fcalln_general(object first,va_list ap) {
       x =
 	(typ==f_object ?	(jj ? va_arg(ap,object) : first) :
 	 (typ==f_fixnum ? make_fixnum((jj ? va_arg(ap,fixnum) : (fixnum)first)) :
-	  (typ==f_integer ? make_integer((jj ? va_arg(ap,GEN) : (GEN)first)) :
-	   (object) (FEerror("bad type",0),Cnil))));
+	   (object) (FEerror("bad type",0),Cnil)));
       *(vs_top++) = x;
       jj++;
     }
@@ -1210,8 +1209,7 @@ fcalln_general(object first,va_list ap) {
   /* vs_base=old_vs_base; */
   return (restype== f_object ? x :
 	  (restype== f_fixnum ? (object) (fix(x)) :
-	   (restype== f_integer ? (object) (otoi(x)) :
-	    (object) (FEerror("bad type",0),Cnil))));
+	   (object) (FEerror("bad type",0),Cnil)));
 }
 
 object 

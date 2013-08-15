@@ -1230,9 +1230,6 @@ call_proc_new(object sym,ufixnum clp,ufixnum vld,void **link,ufixnum argd,object
 	case f_fixnum:
 	  y=make_fixnum((fixnum)y);
 	  break;
-	case f_integer:
-	  y=make_integer((GEN)y);
-	  break;
 	default:
 	  break;
 	}
@@ -1270,9 +1267,6 @@ call_proc_new(object sym,ufixnum clp,ufixnum vld,void **link,ufixnum argd,object
     switch(result_type) {
     case f_fixnum:
       res=(object)fix(res);
-      break;
-    case f_integer:
-      res=(object)otoi(res);
       break;
     default:
       break;
