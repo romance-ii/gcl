@@ -586,7 +586,7 @@ error:
 int
 TcpOutputProc ( int fd, char *buf, int toWrite, int *errorCodePtr, int block )
 {
-    int bytesWritten;
+    int bytesWritten=0;
     int error;
     int count=1000*30;
 
@@ -825,64 +825,63 @@ void sigkill()
 }
 
 
+static void
+init_signals_pendingPtr() { 
 
-static void init_signals_pendingPtr()
-{ static int where;
- if (sharedMemory.address) {
-   signalsPendingPtr = sharedMemory.address;
- } else {
-   signalsPendingPtr = &where;
- }
- gcl_signal(SIGKILL,sigkill);
- gcl_signal(SIGTERM,sigterm);
+  static unsigned int where;
+  if (sharedMemory.address) {
+    signalsPendingPtr = sharedMemory.address;
+  } else {
+    signalsPendingPtr = (void *)&where;
+  }
+  gcl_signal(SIGKILL,sigkill);
+  gcl_signal(SIGTERM,sigterm);
 #ifdef SIGABRT
- gcl_signal(SIGABRT,sigabrt);
+  gcl_signal(SIGABRT,sigabrt);
 #endif 
- 
- 
- 
+  
 }
 
+void
+close_shared_memory() {
 
-
-
-
-void close_shared_memory()
-{
-  if (sharedMemory.handle)  CloseHandle(sharedMemory.handle);
+  if (sharedMemory.handle)  
+    CloseHandle(sharedMemory.handle);
   sharedMemory.handle = NULL;
-  if (sharedMemory.address)  UnmapViewOfFile(sharedMemory.address);
+  if (sharedMemory.address)  
+    UnmapViewOfFile(sharedMemory.address);
   sharedMemory.address = NULL;
   init_signals_pendingPtr();
+  
 }
 
-void init_shared_memory (void)
-{
-    if ( ! is_shared_memory_initialised ) {
-        sprintf ( sharedMemory.name, "gcl-%d", getpid() );
-        sharedMemory.handle =
-            CreateFileMapping ( (HANDLE)-1,
-                                NULL,
-                                PAGE_READWRITE,
-                                0,
-                                sharedMemory.length,
-                                TEXT (sharedMemory.name) );
-        if ( sharedMemory.handle == NULL ) {
-            error("CreateFileMapping failed");
-        }
-        sharedMemory.address =
-            MapViewOfFile(sharedMemory.handle, /* Handle to mapping object.  */
-                           FILE_MAP_WRITE, /* Read/write permission */
-                           0,              /* Max.  object size.  */
-                           0,              /* Size of hFile.  */
-                           0);             /* Map entire file.  */
-        if ( sharedMemory.address == NULL ) {
-            error ( "MapViewOfFile failed" );
-        }
-        init_signals_pendingPtr();
-        atexit ( close_shared_memory );
-        is_shared_memory_initialised = TRUE;
-    }
+void
+init_shared_memory (void) {
+  static int n;
+
+  if (n) return;
+  n=1;
+
+  sharedMemory.address=0;
+  init_signals_pendingPtr();
+  return;
+
+  sprintf(sharedMemory.name,"gcl-%d",getpid());
+  sharedMemory.handle =
+    CreateFileMapping((HANDLE)-1,NULL,PAGE_READWRITE,0,sharedMemory.length ,TEXT(sharedMemory.name));
+  if (sharedMemory.handle == NULL)
+    error("CreateFileMapping failed");
+  sharedMemory.address =
+    MapViewOfFile(sharedMemory.handle, /* Handle to mapping object.  */
+		  FILE_MAP_WRITE,      /* Read/write permission */
+		  0,                   /* Max.  object size.  */
+		  0,                   /* Size of hFile.  */
+		  0);                  /* Map entire file.  */
+  if (sharedMemory.address == NULL)
+    error("MapViewOfFile failed");
+  init_signals_pendingPtr();
+  atexit(close_shared_memory);
+
 }
 
 /* The only signal REALLY handled somewhat under mingw is the
@@ -943,6 +942,7 @@ fix_filename ( object pathname, char *filename )
     }
 }
 
+
 char *GCLExeName ( void )
 {
     static char module_name_buf[128];
@@ -954,4 +954,3 @@ char *GCLExeName ( void )
     }
     return ( (char *) rv );
 }
-
