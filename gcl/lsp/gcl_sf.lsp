@@ -3,6 +3,8 @@
 (eval-when
  (eval compile) 
   
+ (defun sferr (&rest r) (print r))
+
  (defun foo-reader (stream subchar)
    (declare (ignore subchar) (optimize (safety 2)))
    (let ((x (read-delimited-list #\} stream)))
@@ -34,7 +36,7 @@
    (let ((s (si::open-int f :input 'character nil nil nil nil :default)))
     (do ((y nil x)(z nil y)) 
 	((eq 'eof (setq x (read s nil 'eof))) 
-	 (unless (and com td) (error "h read error"))
+	 (unless (and com td) (sferr "h read error" x))
 	 (list com td))
 	(when (and (member z '(|struct| |union|)) (consp x)) 
 	  (push (list z y x) com))
@@ -77,12 +79,12 @@
  
  (defun sb (c z &aux (q (load-time-value (mapcar 'bz '(0 1 2 3))))) ;FIXME dcomplex +kss+
    (or (car (member (+ (mod c (car q)) z) q :test '<=))
-       (error "boo")))
+       (sferr "boo" c z)))
  
  (defun cmp-norm-tpp (x) x)
 
  (defun mtpp (k y &aux (zz (car y))(z (if (consp zz) (car zz) zz))(u (when (consp zz) (eq (cdr zz) '|unsigned|))))
-   (cond ((caddr y) (unless u (error "bar")) (cmp-norm-tpp `(unsigned-byte ,(1+ (caddr y)))))
+   (cond ((caddr y) (unless u (sferr "bar" k y)) (cmp-norm-tpp `(unsigned-byte ,(1+ (caddr y)))))
 	 ((when (keywordp z) (eq k :object)) (mktp z));(get z 'lisp-type))
 	 ((mktp k));((get k 'lisp-type))
 	 (t)))
