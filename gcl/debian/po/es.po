@@ -38,6 +38,7 @@ msgstr ""
 "PO-Revision-Date: 2009-09-24 09:13+0100\n"
 "Last-Translator: Francisco Javier Cuadrado <fcocuadrado@gmail.com>\n"
 "Language-Team: Debian l10n Spanish <debian-l10n-spanish@lists.debian.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -46,13 +47,32 @@ msgstr ""
 #. Description
 #: ../in.gcl.templates:1001
 msgid "Use the work-in-progress ANSI build by default?"
-msgstr "¿Desea utilizar el paquete ANSI, que está en desarrollo, de forma predeterminada?"
+msgstr ""
+"¿Desea utilizar el paquete ANSI, que está en desarrollo, de forma "
+"predeterminada?"
 
 #. Type: boolean
 #. Description
 #: ../in.gcl.templates:1001
-msgid "GCL is in the process of providing an ANSI compliant image in addition to its traditional CLtL1 image still in production use.  Please see the README.Debian file for a brief description of these terms.  Setting this variable will determine which image you will use by default on executing 'gcl@EXT@'.  You can locally override this choice by setting the GCL_ANSI environment variable to any non-empty string for the ANSI build, and to the empty string for the CLtL1 build, e.g. GCL_ANSI=t gcl@EXT@.  The flavor of the build in force will be reported in the initial startup banner."
-msgstr "GCL está en proceso de incorporar una imagen compatible con ANSI en adición a su imagen CLtL1 tradicional que todavía se usa en producción. Por favor, vea el fichero README de Debian para una breve descripción acerca de estos términos. Al definir esta variable determinará qué imagen utilizar de manera predeterminada cuando ejecute «gcl@EXT@». Puede anular esta elección localmente definiendo la variable de entorno GCL_ANSI a una cadena no vacía para la compilación ANSI, y a una vacía para la compilación CLtL1, por ejemplo: GCL_ANSI=t gcl@EXT@. La versión de la compilación se indicará en el anuncio inicial de arranque."
+msgid ""
+"GCL is in the process of providing an ANSI compliant image in addition to "
+"its traditional CLtL1 image still in production use.  Please see the README."
+"Debian file for a brief description of these terms.  Setting this variable "
+"will determine which image you will use by default on executing 'gcl@EXT@'.  "
+"You can locally override this choice by setting the GCL_ANSI environment "
+"variable to any non-empty string for the ANSI build, and to the empty string "
+"for the CLtL1 build, e.g. GCL_ANSI=t gcl@EXT@.  The flavor of the build in "
+"force will be reported in the initial startup banner."
+msgstr ""
+"GCL está en proceso de incorporar una imagen compatible con ANSI en adición "
+"a su imagen CLtL1 tradicional que todavía se usa en producción. Por favor, "
+"vea el fichero README de Debian para una breve descripción acerca de estos "
+"términos. Al definir esta variable determinará qué imagen utilizar de manera "
+"predeterminada cuando ejecute «gcl@EXT@». Puede anular esta elección "
+"localmente definiendo la variable de entorno GCL_ANSI a una cadena no vacía "
+"para la compilación ANSI, y a una vacía para la compilación CLtL1, por "
+"ejemplo: GCL_ANSI=t gcl@EXT@. La versión de la compilación se indicará en el "
+"anuncio inicial de arranque."
 
 #. Type: boolean
 #. Description
@@ -63,8 +83,25 @@ msgstr "¿Desea utilizar la compilación con perfilado de forma predeterminada?"
 #. Type: boolean
 #. Description
 #: ../in.gcl.templates:2001
-msgid "GCL now has optional support for profiling via gprof.  Please see the documentation for si::gprof-start and si::gprof-quit for details. As this build is slower than builds without gprof support, it is not recommended for final production use. You can locally override the default choice made here by setting the GCL_PROF environment variable to any non-empty string for profiling support, and to the empty string for the more optimized builds, e.g. GCL_PROF=t gcl@EXT@.  If profiling is enabled, this will be reported in the initial startup banner."
-msgstr "Ahora GCL permite, opcionalmente, utilizar perfilado a través de gprof. Por favor, vea la documentación de «si::gprof-start» y de «si::gprof-quit» si desea más detalles. Dado que esta compilación es más lenta que otras sin el soporte de gprof, no se recomienda usarlo en producción. Puede anular esta elección de forma local mediante el establecimiento de la variable de entorno GCL_PROF a cualquier cadena no vacía para soporte de perfiles, y a la cadena vacía para los paquetes más optimizados, por ejemplo: GCL_PROF=t gcl. Si el perfilado está activo se indicará en el anuncio inicial de arranque."
+msgid ""
+"GCL now has optional support for profiling via gprof.  Please see the "
+"documentation for si::gprof-start and si::gprof-quit for details. As this "
+"build is slower than builds without gprof support, it is not recommended for "
+"final production use. You can locally override the default choice made here "
+"by setting the GCL_PROF environment variable to any non-empty string for "
+"profiling support, and to the empty string for the more optimized builds, e."
+"g. GCL_PROF=t gcl@EXT@.  If profiling is enabled, this will be reported in "
+"the initial startup banner."
+msgstr ""
+"Ahora GCL permite, opcionalmente, utilizar perfilado a través de gprof. Por "
+"favor, vea la documentación de «si::gprof-start» y de «si::gprof-quit» si "
+"desea más detalles. Dado que esta compilación es más lenta que otras sin el "
+"soporte de gprof, no se recomienda usarlo en producción. Puede anular esta "
+"elección de forma local mediante el establecimiento de la variable de "
+"entorno GCL_PROF a cualquier cadena no vacía para soporte de perfiles, y a "
+"la cadena vacía para los paquetes más optimizados, por ejemplo: GCL_PROF=t "
+"gcl. Si el perfilado está activo se indicará en el anuncio inicial de "
+"arranque."
 
 #~ msgid ""
 #~ "GCL is one of the oldest free common lisp systems still in use. Several "
@@ -104,4 +141,3 @@ msgstr "Ahora GCL permite, opcionalmente, utilizar perfilado a través de gprof.
 #~ "describiendo el nivel de conformidad logrado hasta ahora en /usr/share/"
 #~ "doc/gcl/test_results.gz. Se informará del tipo de paquete usado en el "
 #~ "anuncio inicial de arranque."
-
