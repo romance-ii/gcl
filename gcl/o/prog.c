@@ -53,7 +53,7 @@ FFD(Ftagbody)(object body)
 	object * VOL tinf_base;
 	object *env = lex_env;
 	object id = alloc_frame_id();
-	object bodysv = body;
+	VOL object bodysv = body;
 	object label;
 	enum type item_type;
 
@@ -289,24 +289,6 @@ FFN(Fprog2)(object arg)
 	vs_top = top+1;
 }
 
-/* static void */
-/* FFN(Fdebug1)(void) */
-/* { */
-/*   return; */
-/* } */
-
-/* static void */
-/* FFN(Fdebug2)(void) */
-/* { */
-/*   return; */
-/* } */
-
-/* static void */
-/* FFN(Fdebug3)(void) */
-/* { */
-/*   return; */
-/* } */
-
 void
 gcl_init_prog(void)
 {
@@ -320,7 +302,4 @@ gcl_init_prog(void)
 	sLprogn=make_special_form("PROGN",Fprogn);
 	make_special_form("PROG1",Fprog1);
 	make_special_form("PROG2",Fprog2);
-/* 	make_special_form("DEBUG1",Fdebug1); */
-/* 	make_special_form("DEBUG2",Fdebug2); */
-/* 	make_special_form("DEBUG3",Fdebug3); */
 }
