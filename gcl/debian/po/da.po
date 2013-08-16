@@ -1,0 +1,109 @@
+# Danish translation gcl.
+# Copyright (C) 2012 gcl & nedenstående oversættere.
+# This file is distributed under the same license as the gcl package.
+# Joe Hansen (joedalton2@yahoo.dk), 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gcl\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-01-21 08:47+0100\n"
+"PO-Revision-Date: 2012-03-31 12:42+0000\n"
+"Last-Translator: Joe Hansen <joedalton2@yahoo.dk>\n"
+"Language-Team: Danish <debian-l10n-danish@lists.debian.org>\n"
+"Language: da\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:1001
+msgid "Use the work-in-progress ANSI build by default?"
+msgstr "Brug den foreløbige ANSI bygget som standard?"
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:1001
+msgid ""
+"GCL is in the process of providing an ANSI compliant image in addition to "
+"its traditional CLtL1 image still in production use.  Please see the README."
+"Debian file for a brief description of these terms.  Setting this variable "
+"will determine which image you will use by default on executing 'gcl@EXT@'.  "
+"You can locally override this choice by setting the GCL_ANSI environment "
+"variable to any non-empty string for the ANSI build, and to the empty string "
+"for the CLtL1 build, e.g. GCL_ANSI=t gcl@EXT@.  The flavor of the build in "
+"force will be reported in the initial startup banner."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:2001
+msgid "Use the profiling build by default?"
+msgstr "Brug profileringen bygget som standard?"
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:2001
+msgid ""
+"GCL now has optional support for profiling via gprof.  Please see the "
+"documentation for si::gprof-start and si::gprof-quit for details. As this "
+"build is slower than builds without gprof support, it is not recommended for "
+"final production use. You can locally override the default choice made here "
+"by setting the GCL_PROF environment variable to any non-empty string for "
+"profiling support, and to the empty string for the more optimized builds, e."
+"g. GCL_PROF=t gcl@EXT@.  If profiling is enabled, this will be reported in "
+"the initial startup banner."
+msgstr ""
+
+#~ msgid ""
+#~ "GCL is in the process of providing an ANSI compliant image in addition to "
+#~ "its traditional CLtL1 image still in production use."
+#~ msgstr ""
+#~ "GCL er i gang med at tilbyde et ANSI-overholdende aftryk udover det "
+#~ "traditionelle CLtL1-aftryk som stadig er i produktionsbrug."
+
+#~ msgid ""
+#~ "Please see the README.Debian file for a brief description of these terms. "
+#~ "Choosing this option will determine which image will be used by default "
+#~ "when executing 'gcl@EXT@'."
+#~ msgstr ""
+#~ "Se venligst filen README.Debian for en kort beskrivelse af disse termer. "
+#~ "Valg af denne indstilling vil bestemme hvilket aftryk som vil blive brugt "
+#~ "som standard, når der køres »gcl@EXT@«."
+
+#~ msgid ""
+#~ "This setting may be overridden by setting the GCL_ANSI environment "
+#~ "variable to any non-empty string for the ANSI build, and to the empty "
+#~ "string for the CLtL1 build, e.g. GCL_ANSI=t gcl@EXT@. The currently "
+#~ "enforced build flavor will be reported in the initial startup banner."
+#~ msgstr ""
+#~ "Denne indstilling kan overskrives ved at angive miljøvariablen GCL_ANSI "
+#~ "til enhver streng der ikke er tom for ANSI-bygningen, og til den tomme "
+#~ "streng for CLtL1-bygningen, f.eks. GCL_ANSI=t gcl@EXT@. Den aktuelt "
+#~ "tvungne byggevariant vil blive rapporteret i det oprindelige "
+#~ "opstartsbanner."
+
+#~ msgid "GCL has optional support for profiling via gprof."
+#~ msgstr "GCL har valgfri understøttelse for profilering via gprof."
+
+#~ msgid ""
+#~ "Please see the documentation for si::gprof-start and si::gprof-quit for "
+#~ "details. As this build is slower than builds without gprof support, it is "
+#~ "not recommended for final production use."
+#~ msgstr ""
+#~ "Se venligst dokumentationen for si::gprof-start og si::gprof-quit for "
+#~ "detaljer. Da denne bygning er langsommere end bygninger uden gprof-"
+#~ "understøttelse, så anbefales den ikke for endelig produktionsbrug."
+
+#~ msgid ""
+#~ "Set the GCL_PROF environment variable to the empty string for more "
+#~ "optimized builds, or any non-empty string for profiling support; e.g. "
+#~ "GCL_PROF=t gcl@EXT@. If profiling is enabled, this will be reported in "
+#~ "the initial startup banner."
+#~ msgstr ""
+#~ "Angiv miljøvariablen GCL_PROF til den tomme streng for bedre optimerede "
+#~ "bygninger, eller enhver streng der ikke er tom for "
+#~ "profileringsunderstøttelse; f.eks. GCL_PROF=t gcl@EXT@. Hvis profilering "
+#~ "er aktiveret, vil denne blive rapporteret i det oprindelige "
+#~ "opstartsbanner."

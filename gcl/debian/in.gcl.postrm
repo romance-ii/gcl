@@ -1,0 +1,18 @@
+case "$1" in
+    purge)
+	    for ext in '~' '%' .bak .ucf-new .ucf-old .ucf-dist;  do
+		rm -f /etc/default/gcl@EXT@$ext
+	    done
+	    
+	    rm -f /etc/default/gcl@EXT@
+	    
+	    if which ucf >/dev/null; then
+		ucf --purge /etc/default/gcl@EXT@
+	    fi        
+	    if which ucfr >/dev/null; then
+		ucfr --purge gcl@EXT@ /etc/default/gcl@EXT@
+	    fi       
+	    ;;
+esac
+
+#DEBHELPER#

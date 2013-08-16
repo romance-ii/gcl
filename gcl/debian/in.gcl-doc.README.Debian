@@ -1,0 +1,9 @@
+New in 2.6.2
+------------
+
+The gcl.texi files and the resulting html, info, and dvi outputs have
+been removed pending an enquiry into the copyright and license status
+of the dpANS documents upon which they are presumably based.
+
+
+ -- Camm Maguire <camm@enhanced.com>, Fri Jun 25 22:05:31 2004

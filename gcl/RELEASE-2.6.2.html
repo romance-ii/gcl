@@ -1,0 +1,1599 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>GCL 2.6.2 tests</title>
+                                                                        
+          
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+</head>
+  <body>
+              <br>
+         <br>
+                 
+<div align="center"><font size="+2"><b>GCL 2.6.2 RELEASE NOTES<br>
+         </b></font></div>
+         <font size="+2"><br>
+         </font>The GCL team is happy to announce the release of version
+2.6.2,    the  latest achievement in the 'stable' series. &nbsp;While strictly
+speaking    a bug-fix only release, 2.6.2 incorporates several major improvements 
+over   the last stable release, 2.5.3. &nbsp;Some highlights:<br>
+     <br>
+         
+<ul>
+       <li>The development of a 'lisp compiler torture tester' by GCL developer 
+  Paul Dietz which repeatedly compiles randomly generated forms of specifiable 
+  length to test the compiler for correctness.</li>
+       <li>The application of several significant corrections to the GCL
+lisp   compiler to remove every known instance of miscompilation uncovered
+by this   tester. &nbsp;To our knowledge, GCL is alone with CLISP in passing 
+this torture  test for runs of effectively indefinite length.</li>
+       <li>Major performance improvements were applied to the lisp compiler 
+ to  enable it to complete random tests of great length in a reasonable amount 
+  of time.&nbsp;</li>
+       <li>Corrections to the GCL core files to enable very large image sizes 
+  in 64 bits, in which more than a billion cons cells can be allocated. &nbsp;Current 
+ 64bit options include amd64, ia64, and alpha running most flavors of GNU/Linux.</li>
+       <li>Corrections to the heap scaling behavior of the garbage collector, 
+  resulting in significant performance gains in many instances.</li>
+       <li>Support for the latest gcc and binutils versions on all platforms
+  but mingw</li>
+       <li>The elimination of many instances of unnecessary internal garbage
+  generation bringing the associated performance gains</li>
+       <li>Native support for execstack protected linux kernels, such as
+on  Fedora  core systems</li>
+       <li>Native support for FreeBSD, OpenBSD, and MacOSX</li>
+       <li>Static function pointer support to stabilize dynamic library usage 
+  on Itanium systems</li>
+       <li>Transparent readline initialization when compiled in</li>
+       <li>Support for profiling via gprof</li>
+       <li>Automatic disabling of SGC (stratified garbage collection) if
+the   image is executed on a kernel not supporting fault address recovery</li>
+       <li>Remove a memory leak associated with heavy bignum usage via the
+ introduction  of SGC contiguous pages</li>
+       <li>Several significant internal bug fixes, epecially in the mingw 
+port.</li>
+       <li>Alter the build process to perform a full self compile with full 
+ function  proclamation at build time.</li>
+       <li>GCL now compiles Axiom from scratch and carries it to all supported 
+  platforms with the current exception of mingw</li>
+       <li>GCL's ANSI build now in use for its first end-user application 
+--  maxima (current cvs)</li>
+       <li>New 64bit platform support -- amd64, with full native object relocation<br>
+       </li>
+         
+</ul>
+         The full changelog can be found in the source tree in the file 'debian/changelog'.<br>
+     <br>
+     &nbsp;<br>
+     The GCL team has subjected this release to a wide variety of tests and 
+ benchmarks.  &nbsp;While all such results are necessarily incomplete, one 
+ can nevertheless  usefully summarize the approximate state of affairs as 
+follows:<br>
+         
+<ul>
+          <li>GCL is about as portable as CLISP</li>
+      <li>The GCL lisp compiler is about as robust/correct as that of CLISP,
+  at least as measured by the random tester, which at present only covers
+a  mostly integer subset of lisp.</li>
+       <li>GCL is about as fast as CMUCL</li>
+       <li>GCL plays a major role in carrying the primary large open source 
+ lisp  end user applications to a wide variety of systems</li>
+       <li>GCL is still the least ANSI compliant of the freely available
+lisp   systems, &nbsp;though a modest level of compliance has been achieved
+in this  release. &nbsp;Much greater compliance has been achieved in the
+2.7.x (cvs  unstable) series yet to be officially released.</li>
+         
+</ul>
+         <br>
+     The specific test results are arranged in the following table. &nbsp;Some 
+  terms need defining:<br>
+<br>
+<table cellpadding="2" cellspacing="2" border="1" width="100%">
+  <tbody>
+    <tr>
+      <td valign="top">BFD<br>
+      </td>
+      <td valign="top">the method of relocating compiled lisp object modules
+into the running executable using the BFD library<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">custreloc<br>
+      </td>
+      <td valign="top">the method of relocating compiled   lisp object modules
+into the running executable using the native GCL code.   &nbsp;This method
+as well as the BFD method preserve the module loading across image saving
+and re-execution<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">dlopen<br>
+      </td>
+      <td valign="top">the method of dynamically   linking in compiled lisp
+object modules into the existing session only via   the system dynamic linker
+loader, ld.so.<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">SGC<br>
+      </td>
+      <td valign="top">Stratified   Garbage Collection -- an optional accelerated
+generational garbage collection   algorithm employing read-only memory<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">CLtL1<br>
+      </td>
+      <td valign="top">Common Lisp, the Language   vol I, referring to the
+book of the same name by Steele defining a widely   used lisp language standard
+prior to the ANSI standardization   process in 1994.<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">ANSI<br>
+      </td>
+      <td valign="top">the work in progress   image build attempting to eventually
+extend traditional GCL into full ANSI   complaince<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">Ansi tests<br>
+      </td>
+      <td valign="top">the results of the work in progress   ansi compliance
+test suite written by GCL developer Paul Dietz presented  as the number of
+failures divided by the total number of tests  run<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">Random tests<br>
+      </td>
+      <td valign="top">the results of the random 'compiler torture tester' 
+  presented as the number of tests/the size of the random forms/the number 
+ of variables passed to the random function<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+In the table below, green denotes a pass, yellow denotes an as yet unimplemented 
+  option, and red indicates failure. &nbsp;Blank cells indicate tests that 
+ have not been run.<br>
+     <br>
+         
+<table cellpadding="2" cellspacing="2" border="1" width="100%">
+              <tbody>
+                <tr>
+                  <th valign="top">System<br>
+                  </th>
+                  <th valign="top">CPU<br>
+                  </th>
+                  <th valign="top">Self Build<br>
+                  </th>
+                  <th valign="top">BFD<br>
+                  </th>
+                  <th valign="top">dlopen<br>
+                  </th>
+                  <th valign="top">custreloc<br>
+                  </th>
+                  <th valign="top">Preferred<br>
+         Linking<br>
+               </th>
+               <th valign="top">SGC<br>
+                  </th>
+                  <th valign="top">CLtL1<br>
+                  </th>
+                  <th valign="top">ANSI<br>
+                  </th>
+                  <th valign="top">ANSI tests<br>
+                  </th>
+                  <th valign="top">Random tests<br>
+                  </th>
+                  <th valign="top">Maxima 5.9.0/CLtL1<br>
+         (4)<br>
+                  </th>
+                  <th valign="top">Maxima CVS/ANSI<br>
+         (4)<br>
+                  </th>
+                  <th valign="top">ACL2 2.8/CLtL1<br>
+         (5)<br>
+                  </th>
+                  <th valign="top">Axiom CVS/CLtL1<br>
+         (6)<br>
+                  </th>
+                  <th valign="top">nqthm<br>
+            CLtL1<br>
+                  </th>
+                  <th valign="top">pc-nqthm<br>
+            CLtL1<br>
+                  </th>
+                </tr>
+                <tr>
+                  <td valign="top" bgcolor="#ffffff">Debian GNU/Linux (sid)<br>
+                  </td>
+                  <td valign="top" bgcolor="#ffffff">i386<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top">bfd<br>
+         or<br>
+         custreloc<br>
+               </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">303/<br>
+            10697<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">50000/10000/8<br>
+            500000/1000/8<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">(setq si::*multiply-stacks*
+    16)<br>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top">Debian GNU/Linux (sid)<br>
+                  </td>
+                  <td valign="top">sparc<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top">bfd<br>
+         or<br>
+         custreloc<br>
+               </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">303/<br>
+             10697<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top">Debian GNU/Linux (sid)<br>
+                  </td>
+                  <td valign="top">powerpc<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#ffff00"><br>
+                  </td>
+                  <td valign="top">bfd<br>
+               </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">303/<br>
+             10697<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top">Debian GNU/Linux (sid)<br>
+                  </td>
+                  <td valign="top">amd64<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#ffff00"><br>
+                  </td>
+                  <td valign="top">bfd<br>
+               </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">303/<br>
+             10697<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top">Debian GNU/Linux (sid)<br>
+                  </td>
+                  <td valign="top">arm<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#ffff00"><br>
+                  </td>
+                  <td valign="top">bfd<br>
+               </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">303/<br>
+             10697<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top">Debian GNU/Linux (sid)<br>
+                  </td>
+                  <td valign="top">m68k<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#ffff00"><br>
+                  </td>
+                  <td valign="top">bfd<br>
+               </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">303/<br>
+             10697<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top">Debian GNU/Linux (sid)<br>
+                  </td>
+                  <td valign="top">s390<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#ffff00"><br>
+                  </td>
+                  <td valign="top">bfd<br>
+               </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">303/<br>
+             10697<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top">Debian GNU/Linux (sid)<br>
+                  </td>
+                  <td valign="top">ia64<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#ffff00"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#ffff00"><br>
+                  </td>
+                  <td valign="top">dlopen<br>
+               </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">303/<br>
+             10697<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">(1)<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top">Debian GNU/Linux (sid)<br>
+                  </td>
+                  <td valign="top">hppa<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">-O0<br>
+                  </td>
+                  <td valign="top" bgcolor="#ffff00"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#ffff00"><br>
+                  </td>
+                  <td valign="top">dlopen<br>
+               </td>
+               <td valign="top" bgcolor="#ffffff"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">303/<br>
+             10697<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">(1)<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top">Debian GNU/Linux (sid)<br>
+                  </td>
+                  <td valign="top">mips<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#ffff00"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#ffff00"><br>
+                  </td>
+                  <td valign="top">dlopen<br>
+               </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">303/<br>
+             10697<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">(1)<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top">Debian GNU/Linux (sid)<br>
+                  </td>
+                  <td valign="top">mipsel<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#ffff00"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#ffff00"><br>
+                  </td>
+                  <td valign="top">dlopen<br>
+               </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">303/<br>
+             10697<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">(1)<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top">Debian GNU/Linux (sid)<br>
+                  </td>
+                  <td valign="top">alpha<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#ffff00"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#ffff00"><br>
+                  </td>
+                  <td valign="top">dlopen<br>
+               </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">303/<br>
+             10697<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">(1)<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top">Fedora FC1<br>
+                  </td>
+                  <td valign="top">i386<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top">bfd or<br>
+         custreloc<br>
+               </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">303/<br>
+             10697<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">12000/1000/8<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top">Solaris<br>
+                  </td>
+                  <td valign="top">sparc<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#ff0000"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top">bfd or<br>
+         custreloc<br>
+               </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">303/<br>
+             10697<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">4000/1000/8<br>
+       (4)<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top">Windows MINGW(a)<br>
+                  </td>
+                  <td valign="top">i386<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#ffff00"><br>
+                  </td>
+                  <td valign="top" bgcolor="#ffff00"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top">custreloc<br>
+               </td>
+               <td valign="top" colspan="1" bgcolor="#ffff00"><br>
+                  <br>
+                  </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+               </td>
+                           <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">303/<br>
+             10697<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">57000/1000/8<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">         <br>
+               </td>
+                  <td valign="top" bgcolor="#ff9900">(2)<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top">MacOSX<br>
+                  </td>
+                  <td valign="top">powerpc<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top">bfd<br>
+               </td>
+               <td valign="top" bgcolor="#99ff99">(3)<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">303/<br>
+              10697<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top">OpenBSD<br>
+                  </td>
+                  <td valign="top">i386<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#ff0000"><br>
+                  </td>
+                  <td valign="top" bgcolor="#ff0000"><br>
+                  </td>
+                  <td valign="top">bfd<br>
+               </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">303/<br>
+               10697<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top">FreeBSD<br>
+                  </td>
+                  <td valign="top">i386<br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top">custreloc<br>
+               </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33">303/<br>
+               10697<br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top" bgcolor="#33ff33"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+               </td>
+               <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                  <td valign="top"><br>
+                  </td>
+                </tr>
+                                               
+  </tbody>            
+</table>
+            <br>
+            Notes:<br>
+         <br>
+         (1) dlopen builds use file descriptors for each object load. &nbsp;The
+    step in the Axiom build process which regenerates its databases consumes
+   more than the conventional maximum of 1024 file descriptors available
+by   default on most UNIX systems.<br>
+           (2) An AXIOMsys executable can be produced, and is basically functional, 
+    but experiences sporadic errors of a type as yet unknown.<br>
+         (3) This is known to work on at least some versions of the OS, but 
+ others    report a hang (infinite loop) when enabling SGC. &nbsp;It is possible 
+ that this is due to a mprotect bug in older versions of the Darwin system 
+ shared libraries. &nbsp;'compatibility version of user 6.0.0' appears to 
+work.<br>
+         (4) On this machine, the underlying gcc was old (3.0) and segfaulted 
+  outside  of GCL when attempting to compile its produced C code after a few
+  thousand  &nbsp; &nbsp;&nbsp;&nbsp;&nbsp; iterations.<br>
+      <br>
+      (a) The preferred build environment for Mingw/Windows is gcc 3.3.1, 
+binutils   2.14.90, and the latest msys release.<br>
+         <br>
+     <br>
+     <br>
+     The following table presents the results of the popular gabriel benchmarks 
+  of three freely available lisp systems, GCL, CLISP and CMUCL. &nbsp;Times 
+  are presented as multiples of the time GCL took in completing the tests. 
+ &nbsp;Green &nbsp;indicates tests on which GCL is the fastest, while red 
+indicates tests on which GCLwas not the fastest. &nbsp; The benchmark code 
+can be found in ftp://ftp.ma.utexas.edu/gcl/gabriel.tgz. &nbsp;The number 
+of test iterations has been increased by a factor of 400 to overcome granularity 
+issues on modern machines. &nbsp;The '(print (time ...))' statements around 
+each test iteration were removed, again due to granularity and relative i/o 
+load. &nbsp;Likewise the special init.lsp file conventionally used to preallocate 
+GCL memory in such cases was removed as it is now mostly obsolete. &nbsp;Finally 
+the tests were modified slightly to place the optimization declamations at 
+the top of each file being compiled as suggested by a CMUCL expert. <br>
+<br>
+As with any benchmark, results can vary somewhat with the details of the
+executing machine. &nbsp;With lisp in particular, the ratios of the cache
+sizes, cpu speed, and memory bandwidths can impact such tests significantly.
+&nbsp;We present the results for two popular configurations below. &nbsp;While
+the precise details of the differences are as yet known, it is speculated
+that the first result is more dominated by in-cache cpu performance, while
+the latter is more dominated by memory access efficiency.<br>
+     <br>
+                 
+<table>
+ <tbody>
+    <tr>
+      <th> Dual Intel Xeon 2.4Ghz, 512 Mb, Linux 2.4.20<br>
+      </th>
+      <td align="center"> <b>Athlon XP 3000+ (2.1Ghz), 512 Mb, Linux 2.4.26</b><br>
+      </td>
+ <td> <br>
+      </td>
+    </tr>
+  </tbody><tbody>
+      <tr>
+   <td>               
+      <table cellpadding="2" cellspacing="2" border="1" width="20%">
+           <tbody>
+             <tr>
+               <td valign="top">Benchmark<br>
+               </td>
+               <td valign="top">GCL<br>
+         2.6.2<br>
+               </td>
+               <td valign="top">CMUCL 18e-9<br>
+               </td>
+               <td valign="top">CLISP <br>
+         2.33-2<br>
+               </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         BOYER       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         2.200       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            9.869       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         BROWSE       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         2.240       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            NA</td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         CTAK       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+         0.230       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+            1.890       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         DDERIV       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            2.148       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            2.909       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         DERIV       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            2.083       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            3.640       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         DESTRU-MOD       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            2.043       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           9.880       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         DESTRU       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.168       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            5.743       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         DIV2       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            2.222       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            3.911       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         FFT-MOD       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.585       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+          206.057       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         FFT       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.544       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+          176.088       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         FPRINT       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            2.136       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            3.742       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         FREAD       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.746       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            2.111       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         FRPOLY       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.524       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            5.112       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         PUZZLE-MOD       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           10.824       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           41.618       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         PUZZLE       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           11.324       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           37.671       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         STAK       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.536       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            9.836       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         TAK-MOD       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.465       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           15.053       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         TAK       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.486       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           14.629       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         TAKL       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.419       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           14.965       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         TAKR       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.933       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           12.327       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         TPRINT       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+            0.937       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+            1.263       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         TRAVERSE       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+            0.875       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+           8.378       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         TRIANG-MOD       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           7.067       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           26.814       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         TRIANG       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.281       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           18.565       </td>
+             </tr>
+             <tr>
+               <td valign="top">GEOMETRIC<br>
+         AVERAGE       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.00       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.86       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           10.33       </td>
+             </tr>
+            <tr>
+              <td valign="top">MEDIAN<br>
+              </td>
+              <td valign="top" bgcolor="#33ff33">1.00<br>
+              </td>
+              <td valign="top" bgcolor="#33ff33">1.67<br>
+              </td>
+              <td valign="top" bgcolor="#33ff33">9.87<br>
+              </td>
+            </tr>
+                                               
+        </tbody>                     
+      </table>
+      <div align="center">   </div>
+      </td>
+   <td>               
+      <table cellpadding="2" cellspacing="2" border="1" width="20%">
+           <tbody>
+             <tr>
+               <td valign="top">Benchmark<br>
+               </td>
+               <td valign="top">GCL<br>
+         2.6.2<br>
+               </td>
+               <td valign="top">CMUCL 18e<br>
+               </td>
+               <td valign="top">CLISP <br>
+         2.33<br>
+               </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         BOYER       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+         0.892       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+            6.316       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         BROWSE       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+         0.965       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+  NA</td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         CTAK       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+         0.435       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+            3.489       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         DDERIV       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+            0.822       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+            1.579       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         DERIV       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+            0.651       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+            1.639       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         DESTRU-MOD       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+            0.812       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+           4.779       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         DESTRU       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+            0.550       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+            3.239       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         DIV2       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+            0.599       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+            1.525       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         FFT-MOD       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            2.655       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+          337.207       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         FFT       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.923       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+          251.026       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         FPRINT       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            2.322       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            3.508       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         FREAD       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.890       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.900       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         FRPOLY       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.013       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            3.606       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         PUZZLE-MOD       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           5.976       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           20.350       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         PUZZLE       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           5.472       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           19.387       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         STAK       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.655       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            8.064       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         TAK-MOD       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.382       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           14.775       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         TAK       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.399       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           14.514       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         TAKL       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.281       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           12.877       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         TAKR       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.735       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           15.500       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         TPRINT       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            2.008       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.674       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         TRAVERSE       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+            0.770       </td>
+               <td valign="top" bgcolor="#ff0000"><br>
+           8.013       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         TRIANG-MOD       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           6.639       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           25.182       </td>
+             </tr>
+             <tr>
+               <td valign="top"><br>
+         TRIANG       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.000       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+            1.186       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+           16.948       </td>
+             </tr>
+             <tr>
+               <td valign="top">GEOMETRIC<br>
+         AVERAGE       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+         1.00       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+  1.40       </td>
+               <td valign="top" bgcolor="#33ff33"><br>
+  8.46       </td>
+             </tr>
+            <tr>
+              <td valign="top">MEDIAN<br>
+              </td>
+              <td valign="top" bgcolor="#33ff33">1.00<br>
+              </td>
+              <td valign="top" bgcolor="#33ff33">1.33<br>
+              </td>
+              <td valign="top" bgcolor="#33ff33">8.01<br>
+              </td>
+            </tr>
+                                               
+        </tbody>                     
+      </table>
+   </td>
+   </tr>
+         
+  </tbody>  
+</table>
+         <br>
+         <br>
+        Many improvements are planned for the 2.7.x development series time 
+ permitting,  the most important of which is to complete the task of building 
+ an ANSI compliant  GCL image.&nbsp; <br>
+       <br>
+      <br>
+     <br>
+    <br>
+   <br>
+  <br>
+ <br>
+</body>
+</html>
