@@ -213,7 +213,7 @@ unsigned num_marked_regions;
 
 /* Size of the heap.  */
 /* #define BIG_HEAP_SIZE 0x50000000 */
-#define BIG_HEAP_SIZE MAXPAGE*PAGESIZE
+#define BIG_HEAP_SIZE 262144*PAGESIZE
 int big_heap = BIG_HEAP_SIZE;
 
 /* Start of the heap.  */
@@ -1049,7 +1049,7 @@ unexec (char *outfile, char *infile, void *start_data, void *start_bss,
 
 /* Replacement for broken sbrk(2).  */
 
-void *my_sbrk (int incr)
+void *my_sbrk (long incr)
 {
   char               *temp, *ptr;
   kern_return_t       rtn;
@@ -1074,14 +1074,11 @@ void *my_sbrk (int incr)
     return (mach_brkpt);
   } else {
     ptr = mach_brkpt + incr;
-    if (ptr <= mach_maplimit) {
-      temp = mach_brkpt;
-      mach_brkpt = ptr;
-      return (temp);
-    } else {
-      unexec_error("my_sbrk(): no more memory\n");
-      return ((char *)-1);
-    }
+    if (ptr<mach_mapstart || ptr > mach_maplimit)
+      return (char *)-1;
+    temp = mach_brkpt;
+    mach_brkpt = ptr;
+    return (temp);
   }
 }
 
@@ -1100,189 +1097,95 @@ static size_t stub_size (malloc_zone_t *zone, const void *ptr)
     return (0);
 }
 
-static void *stub_malloc (malloc_zone_t *zone, size_t size)
-{
+#ifdef HAVE_MALLOC_ZONE_MEMALIGN
+static void *
+stub_memalign(size_t boundary, size_t size) {
+
+  extern void *my_malloc (size_t);
+  void *v=my_malloc(size+boundary-1);
+  return (void *)(((unsigned long)v+boundary-1)&~(boundary-1));
+
+}
+#endif
+
+static void *
+stub_malloc(malloc_zone_t *zone, size_t size) {
+
   extern void *my_malloc (size_t);
   return my_malloc (size);
+
 }
 
-static void *stub_calloc (malloc_zone_t *zone, size_t num_items, size_t size)
-{
+static void *
+stub_calloc(malloc_zone_t *zone, size_t num_items, size_t size) {
+
   extern void *my_calloc (size_t, size_t);
   return my_calloc (num_items, size);
+
 }
 
-static void *stub_valloc (malloc_zone_t *zone, size_t size)
-{
+static void *
+stub_valloc(malloc_zone_t *zone, size_t size) {
+
   extern void *my_valloc (size_t);
   return my_valloc (size);
+
 }
 
-static void *stub_realloc (malloc_zone_t *zone, void *ptr, size_t size)
-{
+static void *
+stub_realloc(malloc_zone_t *zone, void *ptr, size_t size) {
+
   extern void *my_realloc (void *, size_t);
   return my_realloc (ptr, size);
+
 }
 
-static void stub_free (malloc_zone_t *zone, void *ptr)
-{
+static void stub_free (malloc_zone_t *zone, void *ptr) {
+
   extern void my_free (void *ptr);
   my_free (ptr);
+
 }
 
 void init_darwin_zone_compat () {
+
   extern unsigned malloc_num_zones;
   extern malloc_zone_t **malloc_zones;
-  unsigned malloc_num_zones_copy;
-  malloc_zone_t **malloc_zones_copy;
-  /* malloc_zone_t *default_zone; */
-  kern_return_t rtn;
-  vm_map_t tself;
-  vm_size_t s;
+  unsigned nmzc;
+  malloc_zone_t *mzc[10];
   unsigned i;
+
+  nmzc=malloc_num_zones;
+  assert(nmzc<=sizeof(mzc)/sizeof(*mzc));
+  memcpy(mzc,malloc_zones,nmzc*sizeof(*mzc));
 
   gcl_zone = malloc_create_zone (0, 0);
   malloc_set_zone_name (gcl_zone, "GclZone");
-  gcl_zone->size    = (void *) stub_size;
-  gcl_zone->malloc  = (void *) stub_malloc;
-  gcl_zone->calloc  = (void *) stub_calloc;
-  gcl_zone->valloc  = (void *) stub_valloc;
-  gcl_zone->realloc = (void *) stub_realloc;
-  gcl_zone->free    = (void *) stub_free;
 
-  malloc_num_zones_copy = malloc_num_zones;
-  s = malloc_num_zones * sizeof (malloc_zone_t *);
-  
-  tself = mach_task_self ();
-  
-  rtn = vm_allocate (tself, (vm_address_t *) &malloc_zones_copy, s, 1);
-  
-  if (rtn != KERN_SUCCESS) {
-    mach_error ("init_darwin_zone_compat(): vm_allocate() failed", rtn);
-    exit (1);
-  }
+  gcl_zone->size               = (void *) stub_size;
+  gcl_zone->malloc             = (void *) stub_malloc;
+  gcl_zone->calloc             = (void *) stub_calloc;
+  gcl_zone->valloc             = (void *) stub_valloc;
+  gcl_zone->realloc            = (void *) stub_realloc;
+  gcl_zone->free               = (void *) stub_free;
+  gcl_zone->destroy            = (void *) stub_free;
+  gcl_zone->batch_malloc       = (void *) stub_malloc;
+  gcl_zone->batch_free         = (void *) stub_free;
 
-  memcpy (malloc_zones_copy, malloc_zones, s);
+#ifdef HAVE_MALLOC_ZONE_MEMALIGN
+  gcl_zone->free_definite_size = (void *) stub_free;
+  gcl_zone->memalign           = (void *) stub_memalign;
+#endif
 
-  for (i=0 ; i < malloc_num_zones_copy ; i++) {
-    malloc_zone_unregister (malloc_zones_copy [i]);
-  }
+  malloc_zone_unregister(gcl_zone);
+  for (i=0;i<nmzc;i++)
+    malloc_zone_unregister(mzc[i]);
 
   /* Make our zone the default zone.  */
   malloc_zone_register (gcl_zone);
-  
-  for (i=0 ; i < malloc_num_zones_copy ; i++) {
-    if (malloc_zones_copy [i] != gcl_zone)
-      malloc_zone_register (malloc_zones_copy [i]);
-  }
+  for (i=0;i<nmzc;i++)
+    malloc_zone_register (mzc[i]);
 
-  vm_deallocate (tself, (vm_address_t) malloc_zones_copy, s);
-
-}
-
-/* The file has non Mach-O stuff appended.  We need to now where the Mach-O
-   stuff ends.  Put this here, although it pertains to fasload()'ing, because
-   we'll stop using sfaslmacosx.c.  */
-
-int seek_to_end_ofile (FILE *fp)
-{
-  struct mach_header mach_header;
-  char *hdrbuf;
-  struct load_command *load_command;
-  struct segment_command *segment_command;
-  struct section *section;
-  struct symtab_command *symtab_command;
-  struct symseg_command *symseg_command;
-  int len, cmd, seg;
-  int end_sec, end_ofile;
-  malloc_zone_t *dzone = malloc_default_zone ();
-  
-  end_ofile = 0;
-  fseek (fp, 0L, 0);
-  len = fread ((char *)&mach_header, sizeof(struct mach_header), 1, fp);
-  
-  if (len == 1 && mach_header.magic == MH_MAGIC)
-    {
-      hdrbuf = (char *) malloc_zone_malloc (dzone, mach_header.sizeofcmds);
-      len = fread(hdrbuf, mach_header.sizeofcmds, 1, fp);
-    
-      if (len != 1)
-        {
-          unexec_error("seek_to_end_ofile(): failure reading Mach-O load commands\n");
-          return 0;
-        }
-    
-      load_command = (struct load_command *) hdrbuf;
-      for (cmd = 0; cmd < mach_header.ncmds; ++cmd)
-        {
-          switch (load_command->cmd)
-            {
-            case LC_SEGMENT:
-              segment_command = (struct segment_command *) load_command;
-              section = (struct section *) ((char *)(segment_command + 1));
-              for (seg = 0; seg < segment_command->nsects; ++seg, ++section)
-                {
-                  end_sec = section->offset + section->size;
-                  if (end_sec > end_ofile)
-                    end_ofile = end_sec;
-                }
-              break;
-            
-            case LC_SYMTAB:
-              symtab_command = (struct symtab_command *) load_command;
-              end_sec = symtab_command->symoff
-                + symtab_command->nsyms * sizeof(struct nlist);
-              if (end_sec > end_ofile)
-                end_ofile = end_sec;
-              end_sec = symtab_command->stroff + symtab_command->strsize;
-              if (end_sec > end_ofile)
-                end_ofile = end_sec;
-              break;
-            
-            case LC_SYMSEG:
-              symseg_command = (struct symseg_command *) load_command;
-              end_sec = symseg_command->offset + symseg_command->size;
-              if (end_sec > end_ofile)
-                end_ofile = end_sec;
-              break;
-            }
-          load_command = (struct load_command *)
-            ((char *)load_command + load_command->cmdsize);
-        }
-    
-      malloc_zone_free (dzone, hdrbuf);
-      fseek(fp, end_ofile, 0);
-    
-      return 1;
-    }
-  
-  return 0;
-}
-
-/* Return where the first __DATA segment starts in memory.  */
-
-char *get_dbegin ()
-{
-  static char *dbegin = 0;
-  if (dbegin == 0) {
-    const struct segment_command *data = getsegbyname (SEG_DATA);
-    if (data != NULL)
-      dbegin = (char *) data->vmaddr;
-  }
-  return dbegin;
-}
-
-/* Return the size of the first __DATA segment.  */
-
-unsigned long get_dsize ()
-{
-  static unsigned long dsize = 0;
-  if (dsize == 0) {
-    const struct segment_command *data = getsegbyname (SEG_DATA);
-    if (data != NULL)
-      dsize = data->vmsize;
-  }
-  return dsize;
 }
 
 #ifdef UNIXSAVE
