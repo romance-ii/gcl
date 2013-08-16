@@ -191,50 +191,13 @@
 
  (defvar *system-banner*)
 
- (defun gcl-top-level nil
-
-   (set-up-top-level)
-   
-   (cond ((get-command-arg "-compile")
-	  (let (;(system::*quit-tag* (cons nil nil))
-					;(system::*quit-tags* nil) (system::*break-level* '())
-					;(system::*break-env* nil) (system::*ihs-base* 1)
-					;(system::*ihs-top* 1) (system::*current-ihs* 1)
-		(*break-enable* nil) result)
-	    (setq result
-		  (system:error-set
-		   '(progn
-		      (compile-file
-		       (get-command-arg "-compile")
-		       :output-file 
-		       (or (get-command-arg "-o")
-			   (get-command-arg "-compile"))
-		       :o-file
-		       (cond ((equalp
-			       (get-command-arg "-o-file")
-			       "nil") nil)
-			     ((get-command-arg "-o-file" t))
-			     (t t))
-		       :c-file (get-command-arg "-c-file" t)
-		       :h-file (get-command-arg "-h-file" t)
-		       :data-file (get-command-arg "-data-file" t)
-		       :system-p (get-command-arg "-system-p" t)))))
-	    (bye (if (or (and (find-package "COMPILER") 
-			      (find-symbol "*ERROR-P*" (find-package "COMPILER"))
-			      (symbol-value (find-symbol "*ERROR-P*" (find-package "COMPILER"))))
-			 (equal result '(nil))) 1 0))))
-	 ((get-command-arg "-batch")
-	  (setf *top-level-hook* #'bye))
-	 ((get-command-arg "-f"))
-	 (t (when (boundp '*gcl-major-version*)
-	      (unless (boundp '*system-banner*) (setq *system-banner* (default-system-banner))))
-	    (when (boundp '*system-banner*)
-	      (format t "~a~%" *system-banner*))
-	    (format t "Temporary directory for compiler files set to ~a~%" *tmp-dir*)))
-   (setq *ihs-top* (ihs-top))
-;   (in-package 'system::user) ;(incf system::*ihs-top* 2)
-   (setq *package* (user-package))
-   (top-level1))
+(defun gcl-top-level nil
+  
+  (set-up-top-level)
+  
+  (in-package :user)
+  (setq *ihs-top* (ihs-top))
+  (top-level1))
 
 (defun top-level nil (gcl-top-level))
 
@@ -865,8 +828,6 @@ First directory is checked for first name and all extensions etc."
 
 (defvar si::*lib-directory* (namestring (make-pathname :directory (list :parent))))
 
-(defvar *tmp-dir*)
-
 (defun set-up-top-level (&aux (i (argc)) tem)
   (declare (fixnum i))
   (reset-lib-syms)
@@ -884,24 +845,17 @@ First directory is checked for first name and all extensions etc."
       (setq *load-path* (cons (string-concatenate *lib-directory* "xgcl-2/") *load-path*)))
     (when (not (boundp '*system-directory*)) 
       (setq *system-directory* 
-	    (namestring	(truename (make-pathname :name nil :type nil :defaults (argv 0))))))
-    (set-dir '*system-directory* "-dir")
-    (when (multiple-value-setq (tem tem) (get-command-arg "-f"))
-      (let (*load-verbose*)
-	(process-some-args *command-args*)
-	(setq *command-args* tem)
-	(do-f (car *command-args*))))))
+	    (namestring	(truename (make-pathname :name nil :type nil :defaults (argv 0))))))))
 
 (defun do-f (file )
-  (let ((eof '(nil)) tem
-	*break-enable*)
+  (let ((eof '(nil)) tem *break-enable*)
     (catch *quit-tag*
       (with-open-file 
        (st file)
-       (READ-LINE ST)
-       (LOOP
-	(SETQ TEM (READ ST NIL EOF))
-	(COND ((EQ EOF TEM) (return nil)))
-	(EVAL TEM)))
+       (read-line st)
+       (loop
+	(setq tem (read st nil eof))
+	(cond ((eq eof tem) (return nil)))
+	(eval tem)))
       (bye))
     (bye 1)))
