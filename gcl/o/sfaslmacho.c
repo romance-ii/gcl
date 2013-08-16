@@ -6,64 +6,262 @@
 #include <mach/mach.h>
 #include <mach-o/loader.h>
 #include <mach-o/reloc.h>
-#ifdef __ppc__
-#include <mach-o/ppc/reloc.h>
-#endif
 #include <mach-o/nlist.h>
 #include <mach-o/getsect.h>
 
-#include "ptable.h"
+#ifdef _LP64
+#define mach_header			mach_header_64
+#define nlist    			nlist_64
+#define segment_command			segment_command_64
+#undef  LC_SEGMENT
+#define LC_SEGMENT			LC_SEGMENT_64
+#define section				section_64
+#undef MH_MAGIC
+#define MH_MAGIC			MH_MAGIC_64
+#endif
 
-#include "sfasli.c"
+#ifndef S_16BYTE_LITERALS
+#define S_16BYTE_LITERALS 0
+#endif
+
+#define ALLOC_SEC(sec) ({ul _fl=sec->flags&SECTION_TYPE;\
+      _fl<=S_SYMBOL_STUBS || _fl==S_16BYTE_LITERALS;})
+
+#define LOAD_SEC(sec) ({ul _fl=sec->flags&SECTION_TYPE;\
+      (_fl<=S_SYMBOL_STUBS || _fl==S_16BYTE_LITERALS) && _fl!=S_ZEROFILL;})
+
+
+#define MASK(n) (~(~0L << (n)))
+
+
 
 typedef unsigned long ul;
 
-#define massert(a_) if (!(a_)) FEerror("The assertion ~a on line ~a of ~a in function ~a failed",4,\
-                    make_simple_string(#a_),make_fixnum(__LINE__),\
-                    make_simple_string(__FILE__),make_simple_string(__FUNCTION__))
+
+
+#ifdef STATIC_RELOC_VARS
+STATIC_RELOC_VARS
+#endif
+
+
+
+static int
+ovchk(ul v,ul m) {
+
+  m|=m>>1;
+  v&=m;
+
+  return (!v || v==m);
+
+}
+
+static int
+store_val(ul *w,ul m,ul v) {
+
+  massert(ovchk(v,~m));
+  *w=(v&m)|(*w&~m);
+
+  return 0;
+
+}
+
+static int
+add_val(ul *w,ul m,ul v) {
+
+  return store_val(w,m,v+(*w&m));
+
+}
+
+
+#ifndef _LP64
+/*redirect trampolines gcc-4.0 gives no reloc for stub sections on x86 only*/
+static int
+redirect_trampoline(struct relocation_info *ri,ul o,ul rel,
+		    struct section *sec1,ul *io1,struct nlist *n1,ul *a) {
+
+  struct section *js=sec1+ri->r_symbolnum-1;
+
+  if (ri->r_extern)
+    return 0;
+
+  if ((js->flags&SECTION_TYPE)!=S_SYMBOL_STUBS)
+    return 0;
+
+  if (ri->r_pcrel) o+=rel;
+  o-=js->addr;
+  
+  massert(!(o%js->reserved2));
+  o/=js->reserved2;
+  massert(o>=0 && o<js->size/js->reserved2);
+  
+  *a=n1[io1[js->reserved1+o]].n_value;
+  ri->r_extern=1;
+  
+  return 0;
+  
+}
+#endif
+
+static int
+relocate(struct relocation_info *ri,struct section *sec,
+	 struct section *sec1,ul start,ul *io1,struct nlist *n1,ul *got,ul *gote) {
+
+  struct scattered_relocation_info *sri=(void *)ri;
+  ul *q=(void *)(sec->addr+(sri->r_scattered ? sri->r_address : ri->r_address));
+  ul a,rel=(ul)(q+1);
+
+  if (sri->r_scattered)
+    a=sri->r_value;
+  else if (ri->r_extern)
+    a=n1[ri->r_symbolnum].n_value;
+  else
+    a=start;
+
+  switch(sri->r_scattered ? sri->r_type : ri->r_type) {
+    
+#include RELOC_H
+
+  default:
+    FEerror("Unknown reloc type\n",0);
+    break;
+    
+  }
+
+  return 0;
+  
+}  
+
+static int
+relocate_symbols(struct nlist *n1,struct nlist *ne,char *st1,ul start) {
+
+  struct nlist *n;
+  struct node *nd;
+
+  for (n=n1;n<ne;n++)
+    
+    if (n->n_sect) 
+      n->n_value+=start; 
+    else if ((nd=find_sym_ptable(st1+n->n_un.n_strx)))
+      n->n_value=nd->address; 
+
+  return 0;
+  
+}
+
+static int
+find_init_address(struct nlist *n1,struct nlist *ne,const char *st1,ul *init) {
+
+  struct nlist *n;
+
+  for (n=n1;n<ne && strncmp("_init",st1+n->n_un.n_strx,5);n++);
+  massert(n<ne);
+
+  *init=n->n_value;
+
+  return 0;
+
+}
+
+
+
+static object
+load_memory(struct section *sec1,struct section *sece,void *v1,
+	    ul *p,ul **got,ul **gote,ul *start) { 
+
+  ul sz,gsz,sa,ma,a,fl;
+  struct section *sec;
+  object memory;
+  
+  BEGIN_NO_INTERRUPT;
+
+  for (*p=sz=ma=0,sa=-1,sec=sec1;sec<sece;sec++)
+    
+    if (ALLOC_SEC(sec)) {
+    
+      if (sec->addr<sa) {
+	sa=sec->addr;
+	ma=1<<sec->align;
+      }
+
+      a=sec->addr+sec->size;
+      if (sz<a) sz=a;
+
+      fl=sec->flags&SECTION_TYPE;
+      if (fl==S_NON_LAZY_SYMBOL_POINTERS || fl==S_LAZY_SYMBOL_POINTERS)
+	*p+=sec->size*sizeof(struct relocation_info)/sizeof(void *);
+      
+    }
+  
+  ma=ma>sizeof(struct contblock) ? ma-1 : 0; 
+  sz+=ma;
+
+  gsz=0;
+  if (**got) {
+    gsz=(**got+1)*sizeof(**got)-1;
+    sz+=gsz;
+  }
+  
+  memory=alloc_object(t_cfdata); 
+  memory->cfd.cfd_size=sz; 
+  memory->cfd.cfd_self=0; 
+  memory->cfd.cfd_start=0; 
+  memory->cfd.cfd_start=alloc_contblock(sz);
+
+  a=(ul)memory->cfd.cfd_start;
+  a=(a+ma)&~ma;
+  for (sec=sec1;sec<sece;sec++)
+    if (ALLOC_SEC(sec)) {
+      sec->addr+=a;  
+      if (LOAD_SEC(sec))
+	memcpy((void *)sec->addr,v1+sec->offset,sec->size);
+    }
+
+  if (**got) {
+    sz=**got;
+    *got=(void *)memory->cfd.cfd_start+memory->cfd.cfd_size-gsz;
+    gsz=sizeof(**got)-1;
+    *got=(void *)(((ul)*got+gsz)&~gsz);
+    *gote=*got+sz;
+  }
+
+  *start=a;
+  
+  END_NO_INTERRUPT;
+
+  return memory;
+
+} 
+
 
 static int
 parse_file(void *v1,
 	   struct section **sec1,struct section **sece,
 	   struct nlist **n1,struct nlist **ne,
-	   char **st1,ul **io1,
-	   ul *s,ul *ma,ul *p) {
+	   char **st1,char **ste,ul **io1) {
  
   struct mach_header *mh;
   struct load_command *lc;
   struct symtab_command *sym=NULL;
   struct dysymtab_command *dsym=NULL;
   struct segment_command *seg;
-  struct section *sec;
-  ul i,a,fl;
+  ul i;
   void *v=v1;
 
   mh=v;
   v+=sizeof(*mh);
   
-  for (i=0,*sec1=NULL,*s=*ma=*p=0;(lc=v) && i<mh->ncmds;i++,v+=lc->cmdsize)
+  for (i=0,*sec1=NULL;(lc=v) && i<mh->ncmds;i++,v+=lc->cmdsize)
     
     switch(lc->cmd) {
       
     case LC_SEGMENT:
       
-      massert(!*sec1);
-      
-      for (seg=v,*sec1=sec=(void *)(seg+1),*sece=*sec1+seg->nsects;sec<*sece;sec++) {
-	
-	a=sec->addr+sec->size;
-	*s=*s<a ? a : *s;
+      if (*sec1 && *sece>*sec1) continue;
 
-	a=(1<<sec->align)-1;
-	/* *s=(*s+a) & ~a; */
-	/* *s+=sec->size; */
-	if (*ma<a) *ma=a;
+      seg=v;
+      *sec1=(void *)(seg+1);
+      *sece=*sec1+seg->nsects;
 
-	fl=sec->flags&SECTION_TYPE;
-	if (fl==S_NON_LAZY_SYMBOL_POINTERS || fl==S_LAZY_SYMBOL_POINTERS)
-	  *p+=sec->size*sizeof(struct relocation_info)/sizeof(void *);
-	
-      }
       break;
     case LC_SYMTAB:
       massert(!sym);
@@ -71,6 +269,7 @@ parse_file(void *v1,
       *n1=v1+sym->symoff;
       *ne=*n1+sym->nsyms;
       *st1=v1+sym->stroff;
+      *ste=*st1+sym->strsize;
       break;
     case LC_DYSYMTAB:
       massert(!dsym);
@@ -83,22 +282,53 @@ parse_file(void *v1,
 
 }
 
+
 static int
-relocate_symbols(struct nlist *n1,struct nlist *ne,char *st1,ul start) {
+set_symbol_stubs(void *v1,struct nlist *n1,struct nlist *ne,ul *uio,const char *st1) {
+ 
+  struct mach_header *mh;
+  struct load_command *lc;
+  struct segment_command *seg;
+  struct section *sec1,*sec,*sece;
+  ul i,ns;
+  void *v=v1,*vv;
+  int *io1,*io,*ioe;
 
-  struct nlist *n;
-  struct node *nd;
-
-  for (n=n1;n<ne;n++) 
+  mh=v;
+  v+=sizeof(*mh);
+  
+  for (i=0;(lc=v) && i<mh->ncmds;i++,v+=lc->cmdsize)
     
-    if (n->n_sect) 
-      n->n_value+=start; 
-    else if ((nd=find_sym_ptable(st1+n->n_un.n_strx))) 
-      n->n_value=nd->address; 
+    switch(lc->cmd) {
+      
+    case LC_SEGMENT:
+      
+      for (seg=v,sec1=sec=(void *)(seg+1),sece=sec1+seg->nsects;sec<sece;sec++) {
+	
+	ns=sec->flags&SECTION_TYPE;
+	if (ns!=S_SYMBOL_STUBS && 
+	    ns!=S_LAZY_SYMBOL_POINTERS &&
+	    ns!=S_NON_LAZY_SYMBOL_POINTERS)
+	  continue;
+	
+	io1=(void *)uio;
+	io1+=sec->reserved1;
+	if (!sec->reserved2) sec->reserved2=sizeof(void *);
+	ioe=io1+sec->size/sec->reserved2;
 
+	for (io=io1,vv=(void *)sec->addr;io<ioe;vv+=sec->reserved2,io++)
+	  if (*io>=0 && *io<ne-n1)
+	    if (!n1[*io].n_value)
+	      n1[*io].n_value=(ul)vv;
+
+      }
+      
+    }
+  
   return 0;
   
 }
+
 
 static int
 maybe_gen_fake_relocs(void *v1,struct section *sec,void **p,ul *io1) {
@@ -133,201 +363,147 @@ maybe_gen_fake_relocs(void *v1,struct section *sec,void **p,ul *io1) {
 
 }
 
-/*sectdiff relocs automatically relative and local*/
-static int
-skip_sectdiffs(struct relocation_info **rip) {
-
-  struct relocation_info *ri=*rip;
-  struct scattered_relocation_info *sri=(void *)ri;
-
-  if (!sri->r_scattered)
-    return 0;
-
-  switch(sri->r_type) {
-#if defined (__ppc__)
-  case PPC_RELOC_SECTDIFF:
-  case PPC_RELOC_HI16_SECTDIFF:
-  case PPC_RELOC_LO16_SECTDIFF:
-  case PPC_RELOC_HA16_SECTDIFF:
-  case PPC_RELOC_LO14_SECTDIFF:
-  case PPC_RELOC_LOCAL_SECTDIFF:
-#else	  
-  case GENERIC_RELOC_LOCAL_SECTDIFF:
-  case GENERIC_RELOC_SECTDIFF:
-#endif
-    (*rip)++;
-    return 1;
-    break;
-  default:
-      FEerror("Unknown trampoline reloc type",0);
-    break;
-  }
-  
-  return 0;
-
-}
-
-/*redirect trampolines gcc-4.0 gives no reloc for stub sections on x86 only*/
-static int
-maybe_redirect_trampoline(struct relocation_info *ri,
-			  ul val,ul rela,
-			  struct section *sec1,ul *io1) {
-
-  struct section *js=sec1+ri->r_symbolnum-1;
-  ul o=0;
-
-  if (ri->r_extern)
-    return 0;
-
-  if ((js->flags&SECTION_TYPE)!=S_SYMBOL_STUBS)
-    return 0;
-
-#ifdef __ppc__
-  if (ri->r_type==PPC_RELOC_JBSR)
-    o=ri[1].r_address;
-#else
-  if (ri->r_type==GENERIC_RELOC_VANILLA)
-    o=val;
-#endif
-  else FEerror("Unknown trampoline reloc type",0);
-  
-  if (ri->r_pcrel) o+=rela;
-  o-=js->addr;
-  
-  massert(!(o%js->reserved2));
-  o/=js->reserved2;
-  massert(o>=0 && o<js->size/js->reserved2);
-  
-  ri->r_symbolnum=io1[js->reserved1+o];
-  ri->r_extern=1;
-  
-  return 0;
-  
-}
 
 static int
-relocate(struct relocation_info **rip,ul *q,
-	 ul val,ul start,ul rel,
-	 struct nlist *n1) {
+relocate_code(void *v1,struct section *sec1,struct section *sece,
+	      void **p,ul *io1,struct nlist *n1,ul *got,ul *gote,ul start) {
 
-  struct relocation_info *ri=*rip;
-  ul a=ri->r_extern ? n1[ri->r_symbolnum].n_value : 0;
-
-  switch(ri->r_type) {
-    
-#ifdef __ppc__
-  case PPC_RELOC_VANILLA:
-
-    val+=a ? a : start;
-    if (ri->r_pcrel) val-=rel;
-    *q=val;
-
-    break;
-
-  case PPC_RELOC_JBSR:
-    if (ri->r_extern) {
-
-      ul tmp;
-
-#define REL(a_,val_,e_) ({ul _a=a_,_b=0xfc000000,_c=0x02000000;\
-	  ((_a&_c)?(_a&_b)==_b : !(_a&_b)) ? (val_&_b)|(_a&~_b)|e_ : 0;})
-
-      if ((tmp=REL(a,val,0x3)))
-	val=tmp;
-      else if ((tmp=REL(a-(ul)q,val,0x1)))
-	val=tmp;
-
-      *q=val;
-      
-    }
-    (*rip)++;
-    break;
-
-#else
-
-  case GENERIC_RELOC_VANILLA:
-    
-    val=a ? a : val+start;
-    if (ri->r_pcrel) val-=rel;
-    *q=val;
-    
-    break;
-
-#endif
-
-  default:
-    FEerror("Unknown reloc type\n",0);
-    break;
-    
-  }
-
-  return 0;
-  
-}  
-
-static int
-relocate_section(void *v1,void *d1,
-		 struct section *sec1,struct nlist *n1,ul *io1,
-		 void *d,struct section *sec) {
-
-  struct relocation_info *ri,*re;
-  ul *q,val,rel,start=(ul)d1;
-
-  massert(sec->addr-sec1->addr==d-d1);
-
-  for (ri=v1+sec->reloff,re=ri+sec->nreloc;ri<re;ri++) {
-      
-    if (skip_sectdiffs(&ri))
-      continue;
-
-    q=d+ri->r_address;
-    val=*q;
-    rel=(ul)(q+1);
-
-    maybe_redirect_trampoline(ri,val,rel-start,sec1,io1);
-
-    /*relative structure preserved*/
-    if (!ri->r_extern && ri->r_pcrel)
-      continue;
-    
-    relocate(&ri,q,val,start,rel,n1);
-    
-  }
-  
-  return 0;
-  
-}
-
-
-static int
-relocate_sections(void *v1,void *d1,struct section *sec1,struct section *sece,
-		  void **p,ul *io1,struct nlist *n1) {
-
-  ul a;
   struct section *sec;
-  void *d;
+  struct relocation_info *ri,*re;
 
-  for (d=d1,sec=sec1;sec<sece;d+=sec->size,sec++) {
+  for (sec=sec1;sec<sece;sec++) {
     
-    if ((sec->flags&SECTION_TYPE)==S_ZEROFILL) {
-      d-=sec->size;
+    if (!LOAD_SEC(sec))
       continue;
-    }
 
-    a=(1<<sec->align)-1;
-    
-    d=(void *)(((ul)d+a) & ~a);
-    memcpy(d,v1+sec->offset,sec->size);
-    
     maybe_gen_fake_relocs(v1,sec,p,io1);
 
-    relocate_section(v1,d1,sec1,n1,io1,d,sec);
-
+    for (ri=v1+sec->reloff,re=ri+sec->nreloc;ri<re;ri++)
+      relocate(ri,sec,sec1,start,io1,n1,got,gote);
+  
   }
 
   return 0;
 
 }
+
+static int 
+load_self_symbols() {
+
+  struct section *sec1=NULL,*sece=NULL;
+  struct nlist *sym1=NULL,*sym,*syme=NULL;
+  struct node *a;
+  ul ns,sl,*uio=NULL;
+  char *strtab=NULL,*ste,*s;
+  void *addr,*addre;
+  FILE *f;
+  
+  massert(f=fopen(kcl_self,"r"));
+  massert(addr=get_mmap(f,&addre));
+
+  parse_file(addr,&sec1,&sece,&sym1,&syme,&strtab,&ste,&uio);
+
+  set_symbol_stubs(addr,sym1,syme,uio,strtab);
+
+  for (ns=sl=0,sym=sym1;sym<syme;sym++) {
+    
+    if (sym->n_type & N_STAB)
+      continue;
+    if (!(sym->n_type & N_EXT))
+      continue;
+
+    ns++;
+    sl+=strlen(sym->n_un.n_strx+strtab)+1;
+
+  }
+  
+  c_table.alloc_length=c_table.length=ns;
+  assert(c_table.ptable=malloc(sizeof(*c_table.ptable)*c_table.alloc_length));
+  assert(s=malloc(sl));
+
+  for (a=c_table.ptable,sym=sym1;sym<syme;sym++) {
+    
+    if (sym->n_type & N_STAB)
+      continue;
+    if (!(sym->n_type & N_EXT))
+      continue;
+
+    a->address=sym->n_value;
+    a->string=s;
+    strcpy(s,sym->n_un.n_strx+strtab);
+
+    a++;
+    s+=strlen(s)+1;
+
+  }
+  
+  qsort(c_table.ptable,c_table.length,sizeof(*c_table.ptable),node_compare);
+
+  massert(!un_mmap(addr,addre));
+  massert(!fclose(f));
+
+  return 0;
+
+}
+
+int 
+seek_to_end_ofile(FILE *f) {
+
+  struct mach_header *mh;
+  struct load_command *lc;
+  struct symtab_command *st=NULL;
+  void *addr,*addre;
+  int i;
+  
+  massert(addr=get_mmap(f,&addre));
+
+  mh=addr;
+  lc=addr+sizeof(*mh);
+  
+  for (i=0;i<mh->ncmds;i++,lc=(void *)lc+lc->cmdsize)
+    if (lc->cmd==LC_SYMTAB) {
+      st=(void *) lc;
+      break;
+    }
+  massert(st);
+
+  fseek(f,st->stroff+st->strsize,SEEK_SET);
+
+  massert(!un_mmap(addr,addre));
+
+  return 0;
+
+}
+
+#ifndef GOT_RELOC
+#define GOT_RELOC(a) 0
+#endif
+
+static int
+label_got_symbols(void *v1,struct section *sec,struct nlist *n1,struct nlist *ne,ul *gs) {
+
+  struct relocation_info *ri,*re;
+  struct nlist *n;
+
+  *gs=0;
+  for (n=n1;n<ne;n++)
+    n->n_desc=0;
+
+  for (ri=v1+sec->reloff,re=ri+sec->nreloc;ri<re;ri++)
+
+    if (GOT_RELOC(ri)) {
+    
+      massert(ri->r_extern);
+      n=n1+ri->r_symbolnum;
+      if (!n->n_desc)
+	n->n_desc=++*gs;
+
+    }
+
+  return 0;
+  
+}
+
 
 int
 fasload(object faslfile) {
@@ -335,57 +511,45 @@ fasload(object faslfile) {
   FILE *fp;
   object data;
   char filename[256];
-  long init_address=-1;
+  ul init_address=-1;
   object memory;
-  void *v1,*v,*ve,*d1,*p;
-  struct stat ss;
-  int l;
+  void *v1,*ve,*p;
   struct section *sec1,*sece=NULL;
-  struct nlist *n1=NULL,*n,*ne=NULL;
-  char *st1=NULL;
-  ul s=0,ma=0,*io1=NULL,rls;
+  struct nlist *n1=NULL,*ne=NULL;
+  char *st1=NULL,*ste=NULL;
+  ul gs,*got=&gs,*gote,*io1=NULL,rls,start;
 
   coerce_to_filename(faslfile, filename);
   faslfile = open_stream(faslfile, smm_input, Cnil, sKerror);
   fp = faslfile->sm.sm_fp;
-  l=fileno(fp);
 
-  stat(filename,&ss);
-  v=v1=mmap(0,ss.st_size,PROT_READ|PROT_WRITE,MAP_PRIVATE,l,0);
-  ve=v1+ss.st_size;
+  massert(v1=get_mmap(fp,&ve));
 
-  parse_file(v1,&sec1,&sece,&n1,&ne,&st1,&io1,&s,&ma,&rls);
+  parse_file(v1,&sec1,&sece,&n1,&ne,&st1,&ste,&io1);
 
-  memory = alloc_object(t_cfdata);
-  memory->cfd.cfd_self = 0;
-  memory->cfd.cfd_start = 0;
-  memory->cfd.cfd_size = s;
+  label_got_symbols(v1,sec1,n1,ne,got);
+
+  massert(memory=load_memory(sec1,sece,v1,&rls,&got,&gote,&start));
   
-  ma=ma>sizeof(char *)-1 ? ma : 0;
-  d1=alloc_contblock(memory->cfd.cfd_size+ma);
-  d1=(void *)(((ul)d1+ma) & ~ma);
-  memory->cfd.cfd_start=d1;
-
   massert(p=alloca(rls));
   
-  relocate_symbols(n1,ne,st1,(ul)d1);
+  relocate_symbols(n1,ne,st1,start);
 
-  relocate_sections(v1,d1,sec1,sece,&p,io1,n1);
+  find_init_address(n1,ne,st1,&init_address);
 
-  SEEK_TO_END_OFILE(fp);
+  relocate_code(v1,sec1,sece,&p,io1,n1,got,gote,start);
+
+  fseek(fp,(void *)ste-v1,SEEK_SET);
   data = feof(fp) ? 0 : read_fasl_vector(faslfile);
   
 #ifdef CLEAR_CACHE
   CLEAR_CACHE;
 #endif
   
-  for (n=n1;n<ne && strncmp("_init",st1+n->n_un.n_strx,5);n++);
-  massert(n<ne);
-  init_address=n->n_value-(ul)d1;
-  
-  munmap(v1,ve-v1);
+  massert(!un_mmap(v1,ve));
   close_stream(faslfile);
   
+  init_address-=(ul)memory->cfd.cfd_start;
   call_init(init_address,memory,data,0);
   
   if(symbol_value(sLAload_verboseA)!=Cnil)
@@ -395,3 +559,4 @@ fasload(object faslfile) {
 
  }
 
+#include "sfasli.c"
