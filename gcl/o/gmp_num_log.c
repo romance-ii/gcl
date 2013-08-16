@@ -9,10 +9,10 @@ object big_log_op();
 object normalize_big(object);
 
 static object
-log_op(int (*op) (/* ??? */), void (*mp_op) (/* ??? */))
+log_op(fixnum (*op) (/* ??? */), void (*mp_op) (/* ??? */))
 {
 	object x;
-	int	narg, i, j;
+	fixnum	narg, i, j;
 	
 
 	narg = vs_top - vs_base;
