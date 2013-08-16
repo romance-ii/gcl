@@ -55,6 +55,8 @@ object small_fixnum ( int i ) {
 }
 #endif
 
+#if !defined(IM_FIX_BASE)
+
 #define BIGGER_FIXNUM_RANGE
 
 #ifdef BIGGER_FIXNUM_RANGE
@@ -78,7 +80,7 @@ DEFUN("ALLOCATE-BIGGER-FIXNUM-RANGE",object,fSallocate_bigger_fixnum_range,
   return Ct;
 }
 #endif
-
+#endif
 
 
 object
