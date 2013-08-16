@@ -195,6 +195,8 @@ cplus(object a, object b) {
  
  return(cmod(number_plus(a,b)));
 
+}
+
 DEFUN("CMOD",object,fScmod,SI,1,1,NONE,OO,OO,OO,OO,(object num),"") {
   num=cmod(num);
   RETURN1(num);
