@@ -1,0 +1,17 @@
+On Debian, for example, gcl can be run and tested under wine as follows:
+
+(as root)
+
+aptitude install mingw32 mingw32-runtime mingw32-binutils wine
+
+If necessary, as root
+
+update-binfmts --enable wine
+
+Then as a normal user,
+
+export PATH=/usr/i586-mingw32msvc/bin:$PATH
+export CC=/usr/bin/i586-mingw32msvc-gcc
+
+./configure --host=mingw32 && make
+
