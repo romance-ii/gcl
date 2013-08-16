@@ -2,6 +2,7 @@
 #ifndef FIRSTWORD
 #include "include.h"
 #endif
+#include "num_include.h"
 
 /*  #include "arith.h"   */
 
@@ -20,17 +21,9 @@ object *gclModulus;
 
 /* Note: the gclModulus is guaranteed > 0 */
 
-#define FIX_MOD(X,MOD) {register int MOD_2; \
+#define FIX_MOD(X,MOD) {register fixnum MOD_2; \
 			     if (X > (MOD_2=(MOD >>1))) X=X-MOD; else \
 			       if (X < -MOD_2)  X=X+MOD;}
-
-
-
-/*  #define MYmake_fixnum(doto,x) \ */
-/*    {register int CMPt1; \ */
-/*     doto \ */
-/*     ((((CMPt1=(x))+1024)&-2048)==0?small_fixnum(CMPt1):make_fixnum(CMPt1));} */
-
 
 
 object ctimes(object a, object b),cplus(object a, object b),cdifference(object a, object b),cmod(object x);
@@ -68,76 +61,139 @@ int a,b,mod;
 }
 #endif
 
+/* #if sizeof(fixnum) != sizeof(mp_limb_t) */
+/* #error fixnum mp_limb_t size mismatch */
+/* #endif */
+
+static fixnum
+fdblrem(fixnum a,fixnum b,fixnum mod) {
+
+  fixnum h,sign;
+  mp_limb_t ar[2],q[2],aa;
+
+  if (a<0) {
+    a= -a; 
+    sign= (b<0) ? (b= -b,1) : -1;
+  } else
+    sign= (b<0) ? (b= -b,-1) : 1;
+
+  aa = a;
+  ar[1]=mpn_mul_1(ar,&aa,1,b);
+  h = mpn_divrem_1(q,0,ar,2,mod);
+
+  return ((sign<0) ? -h :h);
+
+}
+
 object	  
-cmod(object x)
-{register object mod = *gclModulus;
- if (mod==Cnil) return(x);
-else
- if((type_of(mod)==t_fixnum && type_of(x)==t_fixnum))
-    {register fixnum xx,mm;
-     mm=fix(mod);
-     if (mm==2) {xx= (fix(x) & 1); return(small_fixnum(xx));}
-     xx=(fix(x)%mm);
-     FIX_MOD(xx,mm);
-     return make_fixnum(xx);
-   }
- else
-   {object qp,rp,mod2;
+cmod(object x) {
+
+  register object mod = *gclModulus;
+
+  if (mod==Cnil) 
+    return(x);
+
+  else if ((type_of(mod)==t_fixnum && type_of(x)==t_fixnum)) {
+
+    register fixnum xx,mm=fix(mod);
+    
+    if (mm==2) 
+      return small_fixnum((fix(x)&1));
+
+    xx=(fix(x)%mm);
+    FIX_MOD(xx,mm);
+    return make_fixnum(xx);
+
+  } else {
+
+    object rp,mod2;
     int compare;
-    integer_quotient_remainder_1(x,mod,&qp,&rp);
+
+    integer_quotient_remainder_1(x,mod,NULL,&rp);
     mod2=shift_integer(mod,-1);
     compare = number_compare(rp,small_fixnum(0));
-    if (compare >= 0)
-      {compare=number_compare(rp,mod2);
-       if (compare > 0) rp=number_minus(rp,mod);}
+    if (compare >= 0) {
+
+      compare=number_compare(rp,mod2);
+      if (compare > 0) rp=number_minus(rp,mod);
+
+    } else if (number_compare(number_negate(mod2), rp) > 0)
+      rp = number_plus(rp,mod);
+
+    return rp;
+
+  }
+
+}
+
+
+object
+ctimes(object a, object b) {
+
+  object mod = *gclModulus;
+
+  if (FIXNUMP(mod)) {
+    
+    register fixnum res, m=fix(mod);
+
+    if (sizeof(fixnum)==sizeof(int) || (m>>(sizeof(int)*8)==(m>>(sizeof(fixnum)*8-1))))
+
+      res=dblrem(fix(a),fix(b),m);
+
     else
-      if (number_compare(number_negate(mod2), rp) > 0)
-	{rp = number_plus(rp,mod);}
-    return rp;}}
+      
+      res=fdblrem(fix(a),fix(b),m);
+
+    FIX_MOD(res,m);
+    return make_fixnum(res);
+
+  } else if (mod==Cnil)
+    return(our_times(a,b));
+
+  return cmod(number_times(a,b));
+
+}
 
 
-#include "num_include.h"
-/* #define MOST_POSITIVE_FIX (((unsigned int) (~0) ) /2) */
 #define SMALL_MODULUS_P(mod) (FIXNUMP(mod) && (fix(mod) < (MOST_POSITIVE_FIX)/2))
-object
-ctimes(object a, object b)
-{object mod = *gclModulus;
- if (FIXNUMP(mod))
-     {register fixnum res, m ;
-      res=dblrem(fix(a),fix(b),m=fix(mod));
-      FIX_MOD(res,m);
-      return make_fixnum(res);}
-else if (mod==Cnil)
-  { return(our_times(a,b));}
- return cmod(number_times(a,b));}
-
 
 object
-cdifference(object a, object b)
-{object mod = *gclModulus;
- if (SMALL_MODULUS_P(mod))
-   {register fixnum res,m;
+cdifference(object a, object b) {
+
+  object mod = *gclModulus;
+
+  if (SMALL_MODULUS_P(mod)) {
+    
+    register fixnum res,m;
+
     res=((fix(a)-fix(b))%(m=fix(mod)));
     FIX_MOD(res,m);
-    return make_fixnum(res);}
- else if (mod==Cnil)
-     return (our_minus(a,b));
- else return(cmod(number_minus(a,b)));}
+    return make_fixnum(res);
+
+  } else if (mod==Cnil)
+    return (our_minus(a,b));
+
+ else return(cmod(number_minus(a,b)));
+
+}
 
 object
-cplus(object a, object b)
-{object mod = *gclModulus;
- if (SMALL_MODULUS_P(mod))
-   {register fixnum res,m;
-    res=((fix(a)+fix(b))%(m=fix(mod)));
-    FIX_MOD(res,m);
-    return make_fixnum(res);}
- else
-   if (mod==Cnil)
-     return (our_plus(a,b));
- else
-   return(cmod(number_plus(a,b)));}
+cplus(object a, object b) {
 
+  object mod = *gclModulus;
+
+ if (SMALL_MODULUS_P(mod)) {
+
+   register fixnum res,m;
+
+   res=((fix(a)+fix(b))%(m=fix(mod)));
+   FIX_MOD(res,m);
+   return make_fixnum(res);
+
+ } else if (mod==Cnil)
+   return (our_plus(a,b));
+ 
+ return(cmod(number_plus(a,b)));
 
 DEFUN("CMOD",object,fScmod,SI,1,1,NONE,OO,OO,OO,OO,(object num),"") {
   num=cmod(num);
