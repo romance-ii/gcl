@@ -43,11 +43,12 @@ License for more details.
 #define Rela Mjoin(Elf,_Rela)
 #define Word Elf32_Word
 
-#define   ELF_R_SYM(a)   Mjoin(ELF,_R_SYM)(a)
-#define  ELF_R_TYPE(a)   Mjoin(ELF,_R_TYPE)(a)
-#define  ELF_R_INFO(a,b) Mjoin(ELF,_R_INFO)(a,b)
-#define ELF_ST_BIND(a)   Mjoin(ELF,_ST_BIND)(a)
-#define ELF_ST_TYPE(a)   Mjoin(ELF,_ST_TYPE)(a)
+#define   ELF_R_SYM(a)         Mjoin(ELF,_R_SYM)(a)
+#define  ELF_R_TYPE(a)         Mjoin(ELF,_R_TYPE)(a)
+#define  ELF_R_INFO(a,b)       Mjoin(ELF,_R_INFO)(a,b)
+#define ELF_ST_BIND(a)         Mjoin(ELF,_ST_BIND)(a)
+#define ELF_ST_TYPE(a)         Mjoin(ELF,_ST_TYPE)(a)
+#define ELF_ST_VISIBILITY(a)   Mjoin(ELF,_ST_VISIBILITY)(a)
 
 
 #define ulmax(a_,b_) ({ul _a=a_,_b=b_;_a<_b ? _b : _a;})
@@ -443,6 +444,10 @@ load_ptable(struct node **a,char **s,Sym *sym1,Sym *syme,const char *st1,
     (*a)->string=(*s);
     strcpy((*s),st1+sym->st_name);
 
+#ifdef FIX_HIDDEN_SYMBOLS
+    FIX_HIDDEN_SYMBOLS(st1,a,sym1,sym,syme);
+#endif
+
     (*a)++;
     (*s)+=strlen(*s)+1;
 
@@ -515,6 +520,25 @@ seek_to_end_ofile(FILE *fp) {
 
 }
 
+#ifdef HAVE_BUILTIN_CLEAR_CACHE
+static int
+clear_protect_memory(object memory) {
+
+  void *p,*pe;
+  int i;
+
+  p=(void *)((unsigned long)memory->cfd.cfd_start & ~(PAGESIZE-1));
+  pe=(void *)((unsigned long)(memory->cfd.cfd_start+memory->cfd.cfd_size + PAGESIZE-1) & ~(PAGESIZE-1));
+
+  i=mprotect(p,pe-p,PROT_READ|PROT_WRITE|PROT_EXEC);
+
+  __builtin___clear_cache((void *)memory->cfd.cfd_start,(void *)memory->cfd.cfd_start+memory->cfd.cfd_size);
+
+  return i;
+
+}
+#endif
+
 int
 fasload(object faslfile) {
 
@@ -552,10 +576,14 @@ fasload(object faslfile) {
   massert(!un_mmap(v1,ve));
   close_stream(faslfile);
   
+#ifdef HAVE_BUILTIN_CLEAR_CACHE
+  massert(!clear_protect_memory(memory));
+#else
 #ifdef CLEAR_CACHE
   CLEAR_CACHE;
 #endif
-  
+#endif  
+
   init_address-=(ul)memory->cfd.cfd_start;
   call_init(init_address,memory,data,0);
   
