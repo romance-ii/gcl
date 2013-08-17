@@ -1,5 +1,0 @@
-       
-#(#! 
-(lisp::in-package "SI")
-#(system::readline-init system::lisp :package-error "Cannot coerce ~S to a package~%" :inherited lisp::keyword ":~A" "Gcl" lisp::specific-error system::package-size (system::%init . #((system::mf (lisp::quote system::init-readline) 0) (system::debug (lisp::quote system::init-readline) (lisp::quote (#:g1411 #:g1403 #:g1414))))))
-)
