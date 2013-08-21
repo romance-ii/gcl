@@ -172,7 +172,7 @@ ILLEGAL:
 
 DEFUN("IHS-TOP",object,fSihs_top,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
   fixnum i=ihs_top-ihs_org;
-  for (;i>=0 && type_of(ihs_org[i].ihs_function)==t_function && 
+  for (;i>0 && type_of(ihs_org[i].ihs_function)==t_function && 
 	 ihs_org[i].ihs_function->fun.fun_self==FFN(fSihs_top);i--);
   RETURN1(make_fixnum(i));
 }
@@ -301,6 +301,7 @@ DEFUN("SCH-FRS-BASE",object,fSsch_frs_base,SI,2,2,NONE,OO,OO,OO,OO,(object x0,ob
   ihs_ptr y;
   
   /* 2 args */
+  if (type_of(x1)!=t_fixnum || fix(x1)>ihs_top-ihs_org || fix(x1)<0) RETURN1(Cnil);
   y = get_ihs_ptr(x1);
   for (x = get_frame_ptr(x0);
        x <= frs_top && x->frs_ihs < y; 

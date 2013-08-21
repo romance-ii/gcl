@@ -40,7 +40,7 @@
 	  (*error-stack* (if (member ',fn error-stack) error-stack (cons ',fn error-stack)))
  	  (no-bind (and error-stack (not (eq *error-stack* error-stack))))
 	  (*ihs-base* (if no-bind *ihs-base* (1+ *ihs-top*)))
-	  (*ihs-top*  (if no-bind *ihs-top*  (1- (find-ihs ',fn (ihs-top)))))
+	  (*ihs-top*  (if no-bind *ihs-top*  (max 0 (1- (find-ihs ',fn (ihs-top))))))
 	  (*frs-base* (if no-bind *frs-base* (or (sch-frs-base *frs-top* *ihs-base*) (1+ (frs-top)))))
 	  (*frs-top*  (if no-bind *frs-top* (frs-top)))
 	  (*current-ihs* *ihs-top*))
