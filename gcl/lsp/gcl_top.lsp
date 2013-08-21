@@ -195,7 +195,7 @@
   
   (set-up-top-level)
   
-  (in-package :user)
+  (setq *package* (user-package))
   (setq *ihs-top* (ihs-top))
   (top-level1))
 
