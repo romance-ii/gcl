@@ -191,7 +191,7 @@ static void
 TCL_signal_error(x)
      char *x;
 {char buf[300] ;
- sprintf("error %s",x);
+  snprintf(buf,sizeof(buf),"error %s",x);
  Tcl_Eval(interp,buf);
  dfprintf(stderr,x);
 }
