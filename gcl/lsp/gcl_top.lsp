@@ -848,15 +848,13 @@ First directory is checked for first name and all extensions etc."
       (setq *system-directory* 
 	    (namestring	(truename (make-pathname :name nil :type nil :defaults (argv 0))))))))
 
-(defun do-f (file )
-  (let ((eof '(nil)) tem *break-enable*)
-    (catch *quit-tag*
-      (with-open-file 
-       (st file)
-       (read-line st)
-       (loop
-	(setq tem (read st nil eof))
-	(cond ((eq eof tem) (return nil)))
-	(eval tem)))
-      (bye))
-    (bye 1)))
+(defun do-f (file &aux *break-enable*)
+  (catch *quit-tag*
+    (labels ((read-loop (st &aux (tem (read st nil 'eof))) (when (eq tem 'eof) (bye)) (eval tem) (read-file st))
+	     (read-file (st) (read-line st) (read-loop st)))
+	    (if file
+		(with-open-file
+		 (st file)
+		 (read-file st))
+	      (read-file *standard-input*))))
+  (bye 1))
