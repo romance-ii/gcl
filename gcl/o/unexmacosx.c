@@ -179,7 +179,7 @@ static unsigned long pagesize;
 
 static int infd, outfd;
 
-static malloc_zone_t *gcl_zone;
+static malloc_zone_t gcl_zone_body,*gcl_zone;
 
 /* file offset of input file's data segment */
 static off_t data_segment_old_fileoff = 0;
@@ -529,7 +529,8 @@ copy_data_segment (struct load_command *lc)
 	       || strncmp (sectp->sectname, "__cfstring", 16) == 0
 	       || strncmp (sectp->sectname, "__gcc_except_tab", 16) == 0
 	       || strncmp (sectp->sectname, "__program_vars", 16) == 0
-	       || strncmp (sectp->sectname, "__objc_", 7) == 0)
+	       || strncmp (sectp->sectname, "__objc_", 7) == 0
+	       || strncmp (sectp->sectname, "__got", 5) == 0)/*FIXME check this, but appears to work*/
 	{
 	  if (!unexec_copy (sectp->offset, old_file_offset, sectp->size))
 	    unexec_error ("cannot copy section %s", sectp->sectname);
@@ -1159,8 +1160,7 @@ void init_darwin_zone_compat () {
   assert(nmzc<=sizeof(mzc)/sizeof(*mzc));
   memcpy(mzc,malloc_zones,nmzc*sizeof(*mzc));
 
-  gcl_zone = malloc_create_zone (0, 0);
-  malloc_set_zone_name (gcl_zone, "GclZone");
+  gcl_zone=&gcl_zone_body;
 
   gcl_zone->size               = (void *) stub_size;
   gcl_zone->malloc             = (void *) stub_malloc;
@@ -1177,7 +1177,6 @@ void init_darwin_zone_compat () {
   gcl_zone->memalign           = (void *) stub_memalign;
 #endif
 
-  malloc_zone_unregister(gcl_zone);
   for (i=0;i<nmzc;i++)
     malloc_zone_unregister(mzc[i]);
 
@@ -1192,3 +1191,4 @@ void init_darwin_zone_compat () {
 #include "save.c"
 #endif
 
+/* void init_darwin_zone_compat () {} */
