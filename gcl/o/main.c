@@ -230,7 +230,7 @@ minimize_image(void) {
 #endif
   
 #if defined(BSD) || defined(ATT)  
-  brk(core_end);
+  mbrk(core_end);
 #endif
   
   cbgbccount = tm_table[t_contiguous].tm_adjgbccnt = tm_table[t_contiguous].tm_opt_maxpage = 0;
