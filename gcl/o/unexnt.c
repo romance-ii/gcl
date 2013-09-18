@@ -920,9 +920,10 @@ get_data_end (void)
 
 unsigned long
 probe_heap_size(void *base,unsigned long try,unsigned long inc,unsigned long max) {
+  void *r;
   if (!(r=VirtualAlloc(base,try,MEM_RESERVE,PAGE_NOACCESS)))
     return try>inc ? probe_heap_size(base,try-inc,inc>>1,max) : 0;
-  VirtualFree (p, try, MEM_DECOMMIT);
+  VirtualFree (r, try, MEM_DECOMMIT);
   return (!inc || try >=max) ? try : probe_heap_size(base,try+inc,inc,max);
 }
 
@@ -965,9 +966,9 @@ allocate_heap (void)
      the region below the 256MB line for our malloc arena - 229MB is
      still a pretty decent arena to play in!  */
 
-  void *base = 0x10100000;
+  void *base = (void *)0x10100000,*ptr;
 
-  reserved_heap_size=probe_heap_size(base,PAGESIZE,(1UL<<34),(1UL<<35));
+  reserved_heap_size=probe_heap_size(base,PAGESIZE,(1UL<<31),(1UL<<30));
   ptr = VirtualAlloc ((void *) base,get_reserved_heap_size (),MEM_RESERVE,PAGE_NOACCESS);
 
   DBEGIN = (DBEGIN_TY) ptr;
