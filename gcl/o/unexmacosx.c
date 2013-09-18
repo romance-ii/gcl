@@ -212,9 +212,7 @@ vm_range_t marked_regions [MAX_MARKED_REGIONS];
 unsigned num_marked_regions;
 
 /* Size of the heap.  */
-/* #define BIG_HEAP_SIZE 0x50000000 */
-#define BIG_HEAP_SIZE 262144*PAGESIZE
-int big_heap = BIG_HEAP_SIZE;
+static unsigned long big_heap;
 
 /* Start of the heap.  */
 char *mach_mapstart = 0;
@@ -1050,22 +1048,33 @@ unexec (char *outfile, char *infile, void *start_data, void *start_bss,
 
 /* Replacement for broken sbrk(2).  */
 
+#include <sys/mman.h>
+#include <errno.h>
+unsigned long
+probe_big_heap(unsigned long try,unsigned long inc,unsigned long max) {
+
+  void *r;
+
+  if ((r=mmap(NULL, try, PROT_READ|PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0))==(void *)-1)
+    return errno==ENOMEM ? probe_big_heap(try-inc,inc>>1,max) : 0;
+  munmap(r,try);
+  return (!inc || try >=max) ? try : probe_big_heap(try+inc,inc,max);
+
+}
+
 void *my_sbrk (long incr)
 {
   char               *temp, *ptr;
-  kern_return_t       rtn;
-  
+
   if (mach_brkpt == 0) {
-    if ((rtn = vm_allocate (mach_task_self (), (vm_address_t *) &mach_brkpt,
-                            big_heap, 1)) != KERN_SUCCESS) {
-      unexec_error("my_sbrk(): vm_allocate() failed\n");
+
+    big_heap=(1UL)<<35;
+    if (!(big_heap=probe_big_heap(PAGESIZE,big_heap>>1,big_heap))) {
+      unexec_error("my_sbrk(): probe_big_heap() failed\n");
       return ((char *)-1);
     }
-    if (!mach_brkpt) {
-      /* Call this instead of fprintf() because no allocation is performed.  */
-      unexec_error("my_sbrk(): cannot allocate heap\n");
-      return ((char *)-1);        
-    }
+
+    mach_brkpt=mmap(NULL, big_heap, PROT_READ|PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
         
     mach_mapstart = mach_brkpt;
     mach_maplimit = mach_brkpt + big_heap;
