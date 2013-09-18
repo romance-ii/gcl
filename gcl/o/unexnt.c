@@ -966,7 +966,7 @@ allocate_heap (void)
      the region below the 256MB line for our malloc arena - 229MB is
      still a pretty decent arena to play in!  */
 
-  void *base = NULL,*ptr;/*(void *)0x10100000*/
+  void *base = (void *)0x10100000,*ptr;/*FIXME, someday figure out how to let the heap start address default */
 
   reserved_heap_size=probe_heap_size(base,PAGESIZE,(1UL<<31),-1);
   ptr = VirtualAlloc ((void *) base,get_reserved_heap_size (),MEM_RESERVE,PAGE_NOACCESS);
