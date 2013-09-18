@@ -1056,7 +1056,7 @@ probe_big_heap(unsigned long try,unsigned long inc,unsigned long max) {
   void *r;
 
   if ((r=mmap(NULL, try, PROT_READ|PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0))==(void *)-1)
-    return errno==ENOMEM ? probe_big_heap(try-inc,inc>>1,max) : 0;
+    return try>inc ? probe_big_heap(try-inc,inc>>1,max) : 0;
   munmap(r,try);
   return (!inc || try >=max) ? try : probe_big_heap(try+inc,inc,max);
 
