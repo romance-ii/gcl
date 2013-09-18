@@ -968,7 +968,7 @@ allocate_heap (void)
 
   void *base = (void *)0x10100000,*ptr;
 
-  reserved_heap_size=probe_heap_size(base,PAGESIZE,(1UL<<31),(1UL<<30));
+  reserved_heap_size=probe_heap_size(base,PAGESIZE,(1UL<<31),-1);
   ptr = VirtualAlloc ((void *) base,get_reserved_heap_size (),MEM_RESERVE,PAGE_NOACCESS);
 
   DBEGIN = (DBEGIN_TY) ptr;
