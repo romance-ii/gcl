@@ -918,6 +918,14 @@ get_data_end (void)
   return data_region_end;
 }
 
+unsigned long
+probe_heap_size(void *base,unsigned long try,unsigned long inc,unsigned long max) {
+  if (!(r=VirtualAlloc(base,try,MEM_RESERVE,PAGE_NOACCESS)))
+    return try>inc ? probe_heap_size(base,try-inc,inc>>1,max) : 0;
+  VirtualFree (p, try, MEM_DECOMMIT);
+  return (!inc || try >=max) ? try : probe_heap_size(base,try+inc,inc,max);
+}
+
 static char *
 allocate_heap (void)
 {
@@ -957,34 +965,12 @@ allocate_heap (void)
      the region below the 256MB line for our malloc arena - 229MB is
      still a pretty decent arena to play in!  */
 
-  unsigned long base = 0x01100000;   /*  27MB */
-  /*   unsigned long base = 0x01B00000; */  /*  27MB */
-  unsigned long end  = 2*PAGESIZE*65536; /* 256MB */
-  void *ptr = NULL;
+  void *base = 0x10100000;
 
-#define NTHEAP_PROBE_BASE 0
-#if NTHEAP_PROBE_BASE /* This is never normally defined */
-  /* Macros in gbc.c depend on DBEGIN being divisible by 32 */
-  /* Try various addresses looking for one the kernel will let us have.  */
-  while (!ptr && (base < end))
-    {
-      reserved_heap_size = end - base;
-      ptr = VirtualAlloc ((void *) base,
-			  get_reserved_heap_size (),
-			  MEM_RESERVE,
-			  PAGE_NOACCESS);
-      base += 0x00100000;  /* 1MB increment */
-      DBEGIN = (DBEGIN_TY) ptr;
-    }
-#else
-  reserved_heap_size = end - base;
-  ptr = VirtualAlloc ((void *) base,
-		      get_reserved_heap_size (),
-		      MEM_RESERVE,
-		      PAGE_NOACCESS);
+  reserved_heap_size=probe_heap_size(base,PAGESIZE,(1UL<<34),(1UL<<35));
+  ptr = VirtualAlloc ((void *) base,get_reserved_heap_size (),MEM_RESERVE,PAGE_NOACCESS);
 
   DBEGIN = (DBEGIN_TY) ptr;
-#endif
 
   return ptr;
 }
