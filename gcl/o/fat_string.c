@@ -30,9 +30,11 @@ enum type what_to_collect;
 
 object sSAprofile_arrayA;
 #ifdef NO_PROFILE
-void
-profil(void)
-{;}
+#ifdef DARWIN/*FIXME macosx10.8 has a prototype (which must match here) but unlinkable function in 64bit*/
+int profil(char *buf, size_t bufsiz, unsigned long offset, unsigned int scale){return 0;}
+#else
+void profil(void){;}
+#endif
 #endif
 
 
