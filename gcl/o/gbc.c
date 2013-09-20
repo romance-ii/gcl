@@ -1353,14 +1353,6 @@ GBC(enum type t) {
     i = (rb_end < (rb_start1 + i) ? (rb_start1 + i) : rb_end) - heap_end;
     alloc_page(-(i + PAGESIZE - 1)/PAGESIZE);
     
-    { 
-      struct pageinfo *v;
-      for (v=contblock_list_head;v;v=v->next) {
-	void *p=pagetochar(page(v)),*pe=p+mbytes(v->in_use);
-	bzero(p,pe-p);
-      }
-    }
-
   }
   
 #ifdef DEBUG

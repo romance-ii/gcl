@@ -645,7 +645,7 @@ sgc_mark_phase(void) {
     if (WRITABLE_PAGE_P(page(v))) {
       struct contblock *c=CB_DATA_START(v),*ce=CB_DATA_END(v),**cbpp;
       for (;c<ce;c++)
-	if (!get_sgc_bit(v,c)) {/*FIXME clear mark of free in separate loop*/
+	if (!get_sgc_bit(v,c)) {
 	  for (cbpp=&cb_pointer;*cbpp && (c<*cbpp || (void *)c>=(void *)(*cbpp)+(*cbpp)->cb_size);cbpp=&(*cbpp)->cb_link);
 	  if (!*cbpp)
 	    set_mark_bit(v,c);
