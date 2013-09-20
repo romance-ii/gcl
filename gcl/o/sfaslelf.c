@@ -269,7 +269,9 @@ load_memory(Shdr *sec1,Shdr *sece,void *v1,ul **got,ul **gote) {
   memory->cfd.cfd_self=0;
   memory->cfd.cfd_start=0;/*gc protect*/
   memory->cfd.cfd_dlist=Cnil;
+  prefer_low_mem_contblock=TRUE;
   memory->cfd.cfd_start=alloc_contblock(sz);
+  prefer_low_mem_contblock=FALSE;
 
   a=(ul)memory->cfd.cfd_start;
   a=(a+ma)&~ma;

@@ -193,7 +193,9 @@ load_memory(struct scnhdr *sec1,struct scnhdr *sece,void *st) {
   memory->cfd.cfd_size=sz;
   memory->cfd.cfd_self=0;
   memory->cfd.cfd_start=0;
+  prefer_low_mem_contblock=TRUE;
   memory->cfd.cfd_start=alloc_contblock(sz);
+  prefer_low_mem_contblock=FALSE;
 
   for (sec=sec1;sec<sece;sec++) {
     sec->s_paddr+=(ul)memory->cfd.cfd_start;

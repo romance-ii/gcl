@@ -466,25 +466,37 @@ Use ALLOCATE to expand the space.",
 #else
 #define TOTAL_THIS_TYPE(tm) (tm->tm_nppage * tm->tm_npage)
 #endif
+bool prefer_low_mem_contblock=FALSE;
+
 inline void *
 alloc_from_freelist(struct typemanager *tm,fixnum n) {
 
-  void *p;
+  void *p,*v,*vp;
   struct contblock **cbpp;
   fixnum i;
 
   switch (tm->tm_type) {
 
   case t_contiguous:
-    for(cbpp= &cb_pointer; (*cbpp)!=NULL; cbpp= &(*cbpp)->cb_link)
+    for (cbpp= &cb_pointer,v=(void *)-1,vp=NULL; (*cbpp)!=NULL; cbpp= &(*cbpp)->cb_link)
       if ((*cbpp)->cb_size >= n) {
-	p=(void *)(*cbpp);
-	i=(*cbpp)->cb_size-n;
-	*cbpp=(*cbpp)->cb_link;
-	--ncb;
-	insert_contblock(p+n,i);
-	return(p);
+	if (!prefer_low_mem_contblock) {
+	  vp=cbpp;
+	  break;
+	} else if ((void *)(*cbpp)<v) {
+	  v=*cbpp;
+	  vp=cbpp;
+	}
       }
+    if (vp) {
+      cbpp=vp;
+      p=(void *)(*cbpp);
+      i=(*cbpp)->cb_size-n;
+      *cbpp=(*cbpp)->cb_link;
+      --ncb;
+      insert_contblock(p+n,i);
+      return(p);
+    }
     break;
 
   case t_relocatable:

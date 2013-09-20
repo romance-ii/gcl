@@ -1027,6 +1027,7 @@ EXTER struct typemanager tm_table[ (int)t_other ];
 /*
  Contiguous block header.
 */
+EXTER bool prefer_low_mem_contblock;
 struct contblock {            /*  contiguous block header  */
 
   fixnum cb_size;             /*  size in bytes  */
