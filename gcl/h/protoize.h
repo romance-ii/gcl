@@ -1778,3 +1778,9 @@ set_tm_maxpage(struct typemanager *,fixnum);
 
 fixnum
 elt_size(fixnum);
+
+void
+init_gmp_rnd_state(__gmp_randstate_struct *);
+
+inline void
+set_sgc_bit(struct pageinfo *,void *);

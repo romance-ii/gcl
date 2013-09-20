@@ -91,13 +91,14 @@ add_page_to_contblock_list(void *p,fixnum m) {
   }
   
 #ifdef SGC
-  if (sgc_enabled)
+  if (sgc_enabled && tm_table[t_contiguous].tm_sgc) {
+    memset(CB_SGCF_START(pp),-1,CB_DATA_START(pp)-CB_SGCF_START(pp));
     pp->sgc_flags=SGC_PAGE_FLAG;
+    }
 #endif
   
   ncbpage+=m;
-  p+=mbytes(m)+sizeof(struct pageinfo);
-  insert_contblock(p,PAGESIZE*m-(p-(void *)pp));
+  insert_contblock(CB_DATA_START(pp),CB_DATA_END(pp)-CB_DATA_START(pp));
 
 }
 
@@ -936,8 +937,7 @@ init_tm(enum type t, char *name, int elsize, int nelts, int sgc,int distinct) {
 #ifdef SGC	
   tm_table[(int)t].tm_sgc = sgc;
   tm_table[(int)t].tm_sgc_max = 3000;
-  tm_table[(int)t].tm_sgc_minfree = (int)
-    (0.4 * tm_table[(int)t].tm_nppage);
+  tm_table[(int)t].tm_sgc_minfree = (0.4 * tm_table[(int)t].tm_nppage);
 #endif
   
 }
@@ -1163,7 +1163,7 @@ DEFUN("ALLOCATE-SGC",object,fSallocate_sgc,SI
   x2=make_fixnum((100*tm->tm_sgc_minfree)/tm->tm_nppage);
   res= list(3,x,x1,x2);
   
-  if(min<0 || max< min || min > 3000 || free_percent < 0 || free_percent > 100)
+  if(min<0 || max< min || free_percent < 0 || free_percent > 100)
     goto END;
   tm->tm_sgc_max=max;
   tm->tm_sgc=min;

@@ -108,9 +108,6 @@ off_check(void *v,void *ve,fixnum i,struct pageinfo *pi) {
 }
 #endif
 
-#define CB_DATA_SIZE(z_)   ({fixnum _z=(z_);_z*PAGESIZE-mbytes(_z)-sizeof(struct pageinfo);})
-#define CB_MARK_START(pi_) ((void *)(pi_)+sizeof(struct pageinfo))
-#define CB_DATA_START(pi_) ({struct pageinfo *_pi=(pi_);CB_MARK_START(_pi)+mbytes(_pi->in_use);})
 
 inline struct pageinfo *
 get_pageinfo(void *x) {
@@ -120,8 +117,8 @@ get_pageinfo(void *x) {
 }
 
 inline char
-get_mark_bit(struct pageinfo *pi,char *x) {
-  char *v=CB_MARK_START(pi),*ve=CB_DATA_START(pi);
+get_bit(char *v,struct pageinfo *pi,void *x) {
+  void *ve=CB_DATA_START(pi);
   fixnum off=(x-ve)>>LOG_BYTES_CONTBLOCK,i=off>>LOG_BITS_CHAR,s=off&~(~0UL<<LOG_BITS_CHAR);
 #ifdef CONTBLOCK_MARK_DEBUG
   off_check(v,ve,i,pi);
@@ -130,8 +127,8 @@ get_mark_bit(struct pageinfo *pi,char *x) {
 }
 
 inline void
-set_mark_bit(struct pageinfo *pi,char *x) {
-  char *v=CB_MARK_START(pi),*ve=CB_DATA_START(pi);
+set_bit(char *v,struct pageinfo *pi,void *x) {
+  void *ve=CB_DATA_START(pi);
   fixnum off=(x-ve)>>LOG_BYTES_CONTBLOCK,i=off>>LOG_BITS_CHAR,s=off&~(~0UL<<LOG_BITS_CHAR);
 #ifdef CONTBLOCK_MARK_DEBUG
   off_check(v,ve,i,pi);
@@ -139,6 +136,25 @@ set_mark_bit(struct pageinfo *pi,char *x) {
   v[i]|=(1UL<<s);
 }
 
+inline char
+get_mark_bit(struct pageinfo *pi,void *x) {
+  return get_bit(CB_MARK_START(pi),pi,x);
+}
+
+inline void
+set_mark_bit(struct pageinfo *pi,void *x) {
+  set_bit(CB_MARK_START(pi),pi,x);
+}
+
+inline char
+get_sgc_bit(struct pageinfo *pi,void *x) {
+  return get_bit(CB_SGCF_START(pi),pi,x);
+}
+
+inline void
+set_sgc_bit(struct pageinfo *pi,void *x) {
+  set_bit(CB_SGCF_START(pi),pi,x);
+}
 
 static void
 mark_contblock(void *p, fixnum s) {
@@ -1193,6 +1209,9 @@ contblock_sweep_phase(void) {
       insert_contblock(p, q - p);
       p = q + CPTR_SIZE;
     }
+
+    bzero(CB_MARK_START(v),CB_SGCF_START(v)-CB_MARK_START(v));
+
   }
 #ifdef DEBUG
   if (debug) {
@@ -1201,6 +1220,8 @@ contblock_sweep_phase(void) {
     fflush(stdout);
   }
 #endif
+  
+
 }
 
 
