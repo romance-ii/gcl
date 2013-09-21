@@ -7696,7 +7696,101 @@ fi
 
 if test "$HAVE_SBRK" = "1" ; then
 
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ADDR_NO_RANDOMIZE constant" >&5
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ADDR_COMPAT_LAYOUT constant" >&5
+$as_echo_n "checking for ADDR_COMPAT_LAYOUT constant... " >&6; }
+   if test "$cross_compiling" = yes; then :
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "cannot run test program while cross compiling
+See \`config.log' for more details" "$LINENO" 5; }
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+            #include <sys/personality.h>
+ 	    #include <stdio.h>
+
+int
+main ()
+{
+
+	    FILE *f;
+	    if (!(f=fopen("conftest1","w"))) return -1;
+	    fprintf(f,"%x",ADDR_COMPAT_LAYOUT);
+	    return 0;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  ADDR_COMPAT_LAYOUT=`cat conftest1`
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes $ADDR_COMPAT_LAYOUT" >&5
+$as_echo "yes $ADDR_COMPAT_LAYOUT" >&6; }
+else
+  ADDR_COMPAT_LAYOUT=0
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define ADDR_COMPAT_LAYOUT 0
+_ACEOF
+
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ADDR_LIMIT_3GB constant" >&5
+$as_echo_n "checking for ADDR_LIMIT_3GB constant... " >&6; }
+   if test "$cross_compiling" = yes; then :
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "cannot run test program while cross compiling
+See \`config.log' for more details" "$LINENO" 5; }
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+            #include <sys/personality.h>
+ 	    #include <stdio.h>
+
+int
+main ()
+{
+
+	    FILE *f;
+	    if (!(f=fopen("conftest1","w"))) return -1;
+	    fprintf(f,"%x",ADDR_LIMIT_3GB);
+	    return 0;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  ADDR_LIMIT_3GB=`cat conftest1`
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes $ADDR_LIMIT_3GB" >&5
+$as_echo "yes $ADDR_LIMIT_3GB" >&6; }
+else
+  ADDR_LIMIT_3GB=0
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define ADDR_LIMIT_3GB 0
+_ACEOF
+
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ADDR_NO_RANDOMIZE constant" >&5
 $as_echo_n "checking for ADDR_NO_RANDOMIZE constant... " >&6; }
    if test "$cross_compiling" = yes; then :
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5

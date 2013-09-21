@@ -1,5 +1,11 @@
 /* h/gclincl.h.in.  Generated from configure.in by autoheader.  */
 
+/* constant to reserve upper 3Gb for C stack */
+#undef ADDR_COMPAT_LAYOUT
+
+/* only 3Gb of address space */
+#undef ADDR_LIMIT_3GB
+
 /* punt guess for no randomize value */
 #undef ADDR_NO_RANDOMIZE
 

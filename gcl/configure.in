@@ -1364,7 +1364,41 @@ AC_RUN_IFELSE([
 
 if test "$HAVE_SBRK" = "1" ; then
 
-   AC_MSG_CHECKING([for ADDR_NO_RANDOMIZE constant])
+   AC_MSG_CHECKING([for ADDR_COMPAT_LAYOUT constant])
+   AC_RUN_IFELSE([
+	AC_LANG_PROGRAM([[
+            #include <sys/personality.h>
+ 	    #include <stdio.h>
+	    ]],[[
+	    FILE *f;
+	    if (!(f=fopen("conftest1","w"))) return -1;
+	    fprintf(f,"%x",ADDR_COMPAT_LAYOUT);
+	    return 0;
+        ]])],
+	[ADDR_COMPAT_LAYOUT=`cat conftest1`
+	AC_MSG_RESULT([yes $ADDR_COMPAT_LAYOUT])],
+	[ADDR_COMPAT_LAYOUT=0
+	AC_MSG_RESULT([no])]
+	AC_DEFINE_UNQUOTED(ADDR_COMPAT_LAYOUT,0,[constant to reserve upper 3Gb for C stack]))
+
+   AC_MSG_CHECKING([for ADDR_LIMIT_3GB constant])
+   AC_RUN_IFELSE([
+	AC_LANG_PROGRAM([[
+            #include <sys/personality.h>
+ 	    #include <stdio.h>
+	    ]],[[
+	    FILE *f;
+	    if (!(f=fopen("conftest1","w"))) return -1;
+	    fprintf(f,"%x",ADDR_LIMIT_3GB);
+	    return 0;
+        ]])],
+	[ADDR_LIMIT_3GB=`cat conftest1`
+	AC_MSG_RESULT([yes $ADDR_LIMIT_3GB])],
+	[ADDR_LIMIT_3GB=0
+	AC_MSG_RESULT([no])]
+	AC_DEFINE_UNQUOTED(ADDR_LIMIT_3GB,0,[only 3Gb of address space]))
+
+  AC_MSG_CHECKING([for ADDR_NO_RANDOMIZE constant])
    AC_RUN_IFELSE([
 	AC_LANG_PROGRAM([[
             #include <sys/personality.h>
