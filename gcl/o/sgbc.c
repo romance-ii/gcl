@@ -642,7 +642,7 @@ sgc_mark_phase(void) {
   }
   
   for (v=contblock_list_head;v;v=v->next)
-    if (WRITABLE_PAGE_P(page(v))) {
+    if (v->sgc_flags&SGC_PAGE_FLAG) {
       struct contblock *c=CB_DATA_START(v),*ce=CB_DATA_END(v),**cbpp;
       for (;c<ce;c++)
 	if (!get_sgc_bit(v,c)) {

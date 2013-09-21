@@ -129,11 +129,8 @@ EXTER void *data_start;
 #define CB_BITS     CPTR_SIZE*CHAR_SIZE
 #define ceil(a_,b_) (((a_)+(b_)-1)/(b_))
 #define npage(m_)   ceil(m_,PAGESIZE)
-#define cpage(m_)   ({ufixnum _m=(m_);ceil(1+sizeof(struct pageinfo)+_m+(2*_m/(CB_BITS-1)),PAGESIZE);})
+#define cpage(m_)   ({ufixnum _m=(m_);ceil(sizeof(struct pageinfo)+_m+2*ceil(_m,(CB_BITS-2)),PAGESIZE);})
 #define mbytes(p_)  ceil((p_)*PAGESIZE-sizeof(struct pageinfo),CB_BITS)
-/* #define npage(m_) (((m_)+PAGESIZE-1)/PAGESIZE) */
-/* #define cpage(m_) ({ufixnum _m=(m_);((1+sizeof(struct pageinfo)+_m+(2*_m/(CPTR_SIZE*CHAR_SIZE-1))+PAGESIZE-1)/PAGESIZE);}) */
-/* #define mbytes(p_) (((p_)*PAGESIZE-sizeof(struct pageinfo)+(CPTR_SIZE*CHAR_SIZE)-1)/(CPTR_SIZE*CHAR_SIZE)) */
 #define tpage(tm_,m_) (tm_->tm_type==t_relocatable ? npage(m_-(rb_limit-rb_pointer)) : (tm_->tm_type==t_contiguous ? cpage(m_) : npage(m_)))
 
 #define CB_DATA_SIZE(z_)   ({fixnum _z=(z_);_z*PAGESIZE-2*mbytes(_z)-sizeof(struct pageinfo);})
