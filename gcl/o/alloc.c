@@ -90,6 +90,7 @@ add_page_to_contblock_list(void *p,fixnum m) {
     contblock_list_tail=p;
   }
   
+  bzero(pagetochar(page(pp)),CB_DATA_START(pp)-(void *)pagetochar(page(pp)));
 #ifdef SGC
   if (sgc_enabled && tm_table[t_contiguous].tm_sgc) {
     memset(CB_SGCF_START(pp),-1,CB_DATA_START(pp)-CB_SGCF_START(pp));
