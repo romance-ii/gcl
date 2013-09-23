@@ -303,7 +303,7 @@ add_page_to_freelist(char *p, struct typemanager *tm) {
  }
 
  x= (object)pagetochar(page(p));
- set_type_of(x,t);
+ /* set_type_of(x,t); */
  make_free(x);
 
 #ifdef SGC
@@ -744,6 +744,7 @@ make_cons(object a,object d) {
   static struct typemanager *tm=tm_table+t_cons;/*FIXME*/
   object obj=alloc_mem(tm,tm->tm_size);
 
+ /* set_type_of(obj,t_cons); */
   obj->c.c_car = a;
   obj->c.c_cdr = d;
 
@@ -757,7 +758,7 @@ make_cons(object a,object d) {
 
 inline object on_stack_cons(object x, object y)
 {object p = (object) alloca_val;
- set_type_of(p,t_cons);
+ /* set_type_of(p,t_cons); */
  p->c.c_car=x;
  p->c.c_cdr=y;
  return p;

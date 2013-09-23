@@ -695,6 +695,7 @@ initlisp(void) {
  	Cnil->s.s_mflag = FALSE;
 	Cnil->s.s_hash = ihash_equal1(Cnil,0);
 	
+	Ct->fw=0;
 	set_type_of(Ct,t_symbol);
  	Ct->s.s_dbind = Ct;
 	Ct->s.tt=1;

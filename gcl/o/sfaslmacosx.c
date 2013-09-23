@@ -65,7 +65,7 @@ static NSSymbol
 get_init_sym(NSModule module,object ff) {
 
   static object inf;
-  struct string st;
+  static struct string st;
   object x;
   char ib[MAXPATHLEN+1];
   NSSymbol v;
@@ -73,7 +73,7 @@ get_init_sym(NSModule module,object ff) {
   if (!inf) {
 
     object x;
-    struct string st;
+    static struct string st;
     set_type_of(&st,t_string);
     st.st_self="COMPILER";
     st.st_dim=st.st_fillp=strlen(st.st_self);

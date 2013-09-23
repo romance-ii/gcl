@@ -63,17 +63,17 @@ object small_fixnum ( int i ) {
 struct {int min,max;} bigger_fixnums;
 
 struct fixnum_struct *bigger_fixnum_table;
-DEFUN("ALLOCATE-BIGGER-FIXNUM-RANGE",object,fSallocate_bigger_fixnum_range,
-      SI,2,2,NONE,OI,IO,OO,OO,(fixnum min,fixnum max),"") 
-{ int j; 
-  if (min <= max); else {FEerror("Need Min < Max",0);}
-  bigger_fixnum_table= (void *) malloc(sizeof(struct fixnum_struct)*
-				       (max - min));
+DEFUN("ALLOCATE-BIGGER-FIXNUM-RANGE",object,fSallocate_bigger_fixnum_range,SI,2,2,NONE,OI,IO,OO,OO,(fixnum min,fixnum max),"")  {
+  int j; 
+  if (min > max) FEerror("Need Min <= Max",0);
+  bigger_fixnum_table=(void *)malloc(sizeof(struct fixnum_struct)*(max - min));
   
-  for (j=min ; j < max ; j=j+1)
-    { 		set_type_of(bigger_fixnum_table+j - min,t_fixnum);
-		bigger_fixnum_table[j - min].FIXVAL = j;
-	      }
+  for (j=min ; j < max ; j=j+1) { 		
+    object x=(object)(bigger_fixnum_table+j-min);
+    x->fw=0;
+    set_type_of(x,t_fixnum);
+    x->FIX.FIXVAL=j;
+  }
   bigger_fixnums.min=min;
   bigger_fixnums.max=max;
   

@@ -468,21 +468,77 @@ object if_exists, if_does_not_exist;
 		  }
 		}
 		if (fp == NULL) {
-		    if (if_does_not_exist == sKerror)
-			    cannot_open(fn);
-		    else if (if_does_not_exist == sKcreate) {
-			    fp = fopen_not_dir(fname, "w");
-			    if (fp == NULL)
-				    cannot_create(fn);
-			    fclose(fp);
-			    fp = fopen_not_dir(fname, "r");
-			    if (fp == NULL)
-				    cannot_open(fn);
-		    } else if (if_does_not_exist == Cnil)
-			    return(Cnil);
-		    else
-			    FEerror("~S is an illegal IF-DOES-NOT-EXIST option.",
-				1, if_does_not_exist);
+		        if (sSAallow_gzipped_fileA->s.s_dbind != sLnil)
+			  { 
+			    static struct string st;
+			    char buf[256];
+			    if (snprintf(buf,sizeof(buf),"%s.gz",fname)<=0)
+			      FEerror("Cannot write .gz filename",0);
+			    st.st_self=buf;
+			    st.st_dim=st.st_fillp=strlen(buf);
+			    set_type_of(&st,t_string);
+			    if (file_exists((object)&st)) {
+			      FILE *pp;
+			      int n;
+			      if (!(fp=tmpfile()))
+				FEerror("Cannot create temporary file",0);
+			      if (snprintf(buf,sizeof(buf),"zcat %s.gz",fname)<=0)
+				FEerror("Cannot write zcat pipe name",0);
+			      if (!(pp=popen(buf,"r")))
+				FEerror("Cannot open zcat pipe",0);
+			      while((n=fread(buf,1,sizeof(buf),pp)))
+				if (!fwrite(buf,1,n,fp))
+				  FEerror("Cannot write pipe output to temporary file",0);
+			      if (pclose(pp)<0)
+				FEerror("Cannot close zcat pipe",0);
+			      if (fseek(fp,0,SEEK_SET))
+				FEerror("Cannot rewind temporary file\n",0); 
+			      goto AGAIN;
+			    }
+			  }
+			      
+/* 			    fp = fopen_not_dir(buf,"r"); */
+/* 			    if (fp) */
+/* 			      {  */
+/* #ifdef NO_MKSTEMP */
+/* 	                        char *tmp; */
+/* #else */
+/* 	                        char tmp[200]; */
+/* #endif */
+/* 				char command [500]; */
+/* 				fclose(fp); */
+/* #ifdef NO_MKSTEMP */
+/* 				tmp = tmpnam(0); */
+/* #else */
+/* 				snprintf(tmp,sizeof(tmp),"uzipXXXXXX"); */
+				/* mkstemp(tmp); */ /* fixme: catch errors */
+/* #endif */
+/* 				unzipped = make_simple_string(tmp); */
+/* 				sprintf(command,"gzip -dc %s > %s",buf,tmp); */
+/* 				fp = 0; */
+/* 				if (0 == system(command)) */
+/* 				  { */
+/* 				    fp = fopen_not_dir(tmp,"r"); */
+/* 				    if (fp)  */
+/* 				      goto AGAIN; */
+/* 				    /\* should not get here *\/ */
+/* 				    else { unlink(tmp);}} */
+/* 			      }} */
+			if (if_does_not_exist == sKerror)
+				cannot_open(fn);
+			else if (if_does_not_exist == sKcreate) {
+				fp = fopen_not_dir(fname, "w");
+				if (fp == NULL)
+					cannot_create(fn);
+				fclose(fp);
+				fp = fopen_not_dir(fname, "r");
+				if (fp == NULL)
+					cannot_open(fn);
+			} else if (if_does_not_exist == Cnil)
+				return(Cnil);
+			else
+			 FEerror("~S is an illegal IF-DOES-NOT-EXIST option.",
+				 1, if_does_not_exist);
 		}
 	} else if (smm == smm_output || smm == smm_io) {
 		if (fname[0] == '|')

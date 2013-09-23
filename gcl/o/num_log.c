@@ -726,7 +726,7 @@ DEFUN("BIT-ARRAY-OP",object,fSbit_array_op,SI,4,4,NONE,OO,OO,OO,OO,
 
 		    b=(object)p;
 		    for (b1=b,i=0;i<x->a.a_rank;i++,b1=b1->c.c_cdr) {
-		      set_type_of(b1,t_cons); 
+		      /* set_type_of(b1,t_cons);  */
 		      b1->c.c_car=make_fixnum(x->a.a_dims[i]);
 		      b1->c.c_cdr=i<x->a.a_rank-1 ? (object)++p : Cnil;
 		    }

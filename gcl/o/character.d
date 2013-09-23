@@ -597,6 +597,7 @@ gcl_init_character()
 
 	for (i = 0;  i < CHCODELIM;  i++) {
 	  object x=(object)(character_table+i);
+	  x->fw=0;
 	  set_type_of(x,t_character);
 	  x->ch.ch_code = i;
 	  x->ch.tt=((' ' <= i && i < '\177') || i == '\n');
