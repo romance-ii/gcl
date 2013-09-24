@@ -924,8 +924,8 @@ init_tm(enum type t, char *name, int elsize, int nelts, int sgc,int distinct) {
     return;
   }
   tm_table[(int)t].tm_type = t;
-  tm_table[(int)t].tm_size = ROUND_UP_PTR(elsize);
-  tm_table[(int)t].tm_nppage = (PAGESIZE-sizeof(struct pageinfo))/ROUND_UP_PTR(elsize);
+  tm_table[(int)t].tm_size = elsize ? ROUND_UP_PTR(elsize) : 1;
+  tm_table[(int)t].tm_nppage = (PAGESIZE-sizeof(struct pageinfo))/tm_table[(int)t].tm_size;
   tm_table[(int)t].tm_free = OBJNULL;
   tm_table[(int)t].tm_nfree = 0;
   /* tm_table[(int)t].tm_nused = 0; */
@@ -1069,10 +1069,8 @@ gcl_init_alloc(void) {
   init_tm(t_function, "xFUNCTION", sizeof(struct function), 85 ,1,0);
   init_tm(t_cfdata, "cCFDATA", sizeof(struct cfdata), 102 ,1,0);
   init_tm(t_spice, "!SPICE", sizeof(struct spice), 4096 ,1,0);
-  tm_table[t_relocatable].tm_nppage = PAGESIZE;
-  init_tm(t_relocatable, "%RELOCATABLE-BLOCKS", 1000,0,20,0);
-  tm_table[t_contiguous].tm_nppage = PAGESIZE;
-  init_tm(t_contiguous, "_CONTIGUOUS-BLOCKS", 1001,0,20,0);
+  init_tm(t_relocatable, "%RELOCATABLE-BLOCKS", 0,0,20,1);
+  init_tm(t_contiguous, "_CONTIGUOUS-BLOCKS", 0,0,20,1);
   
   
   ncb = 0;
