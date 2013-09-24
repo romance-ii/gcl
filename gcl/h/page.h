@@ -72,11 +72,8 @@ enum sgc_type { SGC_NORMAL,   /* not allocated since the last sgc */
 /* check if a relblock address is new relblock */
 #define SGC_RELBLOCK_P(x)  ((char *)(x) >= rb_start)
 
-/* the following assumes that the char s,m fields of first word
-   have same length as a short
-   (x->d.m || x->d.s) would be an equivalent for our purposes */
-/* struct sgc_firstword {short t; short sm;}; */
-#define SGC_OR_M(x)  (is_marked_or_free((object)x) || (pageinfo(x)->type==t_cons  ? pageinfo(x)->sgc_flags&SGC_PAGE_FLAG : ((object)x)->d.s))
+/* is this an sgc cell? encompasses all free cells.  Used where cell cannot yet be marked */
+#define SGC_OR_M(x)  (pageinfo(x)->type==t_cons  ? pageinfo(x)->sgc_flags&SGC_PAGE_FLAG : ((object)x)->d.s)
 
 #ifndef SIGPROTV
 #define SIGPROTV SIGSEGV

@@ -643,11 +643,11 @@ sgc_mark_phase(void) {
   
   for (v=contblock_list_head;v;v=v->next)
     if (v->sgc_flags&SGC_PAGE_FLAG) {
-      struct contblock *c=CB_DATA_START(v),*ce=CB_DATA_END(v),**cbpp;
+      struct contblock *c=CB_DATA_START(v),*ce=CB_DATA_END(v)/* ,**cbpp */;
       for (;c<ce;c++)
 	if (!get_sgc_bit(v,c)) {
-	  for (cbpp=&cb_pointer;*cbpp && (c<*cbpp || (void *)c>=(void *)(*cbpp)+(*cbpp)->cb_size);cbpp=&(*cbpp)->cb_link);
-	  if (!*cbpp)
+	  /* for (cbpp=&cb_pointer;*cbpp && (c<*cbpp || (void *)c>=(void *)(*cbpp)+(*cbpp)->cb_size);cbpp=&(*cbpp)->cb_link); */
+	  /* if (!*cbpp) */
 	    set_mark_bit(v,c);
 	}
     }
