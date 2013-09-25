@@ -1312,6 +1312,8 @@ DEFUN("GET-HOLE-SIZE",object,fSget_hole_size,SI,0,0,NONE,OO,OO,OO,OO,(void),"") 
 
 static unsigned long start,end,gprof_on;
 static void *initial_monstartup_pointer;
+bool capture_gprof_array=1;
+object gprof_array=Cnil;
 
 void
 gprof_cleanup(void) {
@@ -1320,6 +1322,7 @@ gprof_cleanup(void) {
 
   if (initial_monstartup_pointer) {
     _mcleanup();
+    gprof_array=Cnil;
     gprof_on=0;
   }
 
@@ -1356,6 +1359,7 @@ DEFUN("GPROF-START",object,fSgprof_start,SI
   if (!gprof_on) {
     start=start ? start : textstart;
     end=end ? end : textend;
+    capture_gprof_array=1;
     monstartup(start,end);
     gprof_on=1;
     if (!n && atexit(gprof_cleanup)) {
@@ -1395,6 +1399,7 @@ DEFUN("GPROF-QUIT",object,fSgprof_quit,SI
   if (chdir(P_tmpdir))
     FEerror("Cannot change directory to tmpdir", 0);
   _mcleanup();
+  gprof_array=Cnil;
   if (snprintf(b1,sizeof(b1),"gprof %s",kcl_self)<=0)
     FEerror("Cannot write gprof command line", 0);
   if (!(pp=popen(b1,"r")))
@@ -1571,6 +1576,10 @@ malloc(size_t size) {
 #ifdef GCL_GPROF
   if (!initflag && size>(textend-textstart) && !initial_monstartup_pointer) 
     initial_monstartup_pointer=malloc_list->c.c_car->st.st_self;
+  if (gprof_array==Cnil && capture_gprof_array && size>(textend-textstart)) {
+    gprof_array=malloc_list->c.c_car;
+    capture_gprof_array=0;
+  }
 #endif
   
   in_malloc=0;

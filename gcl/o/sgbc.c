@@ -1456,6 +1456,11 @@ sgc_start(void) {
 	  SET_WRITABLE(page(pi)+i);
       else
 	tm_of(t_contiguous)->tm_alt_npage+=pi->in_use;
+#ifdef GCL_GPROF
+    if (gprof_array!=Cnil)
+      for (i=0;i<(gprof_array->st.st_fillp +PAGESIZE-1)/PAGESIZE;i++)
+	SET_WRITABLE(page(gprof_array->st.st_self)+i);
+#endif
     for (i=page(heap_end);i<page(old_rb_start);i++)
 	SET_WRITABLE(i);
     tm_of(t_relocatable)->tm_alt_npage=page(rb_start)-page(old_rb_start);
