@@ -402,12 +402,13 @@ edit_double(int n, double d, int *sp, char *s, int *ep) {
     else
       FEerror("Can't print a non-number.",0);}
   else
-    sprintf(b, "%*.*e",FPRC+8,FPRC, d);
+    sprintf(b, "%*.*e",FPRC+8,FPRC,d);
   if (b[FPRC+3] != 'e') {
     sprintf(b, "%*.*e",FPRC+7,FPRC,d);
     *ep = (b[FPRC+5]-'0')*10 + (b[FPRC+6]-'0');
   } else
     *ep = (b[FPRC+5]-'0')*100 + (b[FPRC+6]-'0')*10 + (b[FPRC+7]-'0');
+
   *sp = 1;
   if (b[0] == '-')
     *sp *= -1;
@@ -416,6 +417,10 @@ edit_double(int n, double d, int *sp, char *s, int *ep) {
 
   truncate_double(b,d,n!=9);
 
+  if (b[0]!=' ') {
+    b[1]=b[0];
+    (*ep)++;
+  }
   if (b[2]=='0') (*ep)++;
   b[2] = b[1];
   p = b + 2;
