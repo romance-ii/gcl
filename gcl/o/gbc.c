@@ -1324,7 +1324,7 @@ GBC(enum type t) {
   
   if ((int)t >= (int)t_contiguous) {
 
-    i=rb_pointer-REAL_RB_START;/*FIXME*/
+    i=rb_pointer-REAL_RB_START+PAGESIZE;/*FIXME*/
 
 #ifdef SGC
     if (sgc_enabled==0)
