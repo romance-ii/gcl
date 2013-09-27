@@ -8427,6 +8427,66 @@ _ACEOF
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $cstack_address" >&5
 $as_echo "$cstack_address" >&6; }
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking cstack bits" >&5
+$as_echo_n "checking cstack bits... " >&6; }
+if test "$cross_compiling" = yes; then :
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "cannot run test program while cross compiling
+See \`config.log' for more details" "$LINENO" 5; }
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+	#include <stdio.h>
+	#include <stdlib.h>
+	void *
+	foo() {
+	      int i;
+	      return (void *)&i;
+        }
+
+	void gprof_cleanup() {};
+	int *cs_org;
+	int main(int argc,char **argv,char **envp) {
+	void *v ;
+	FILE *fp = fopen("conftest1","w");
+	unsigned long i,j;
+
+	#ifdef CAN_UNRANDOMIZE_SBRK
+	#include "h/unrandomize.h"
+	#endif
+	j=1;
+	j<<=$PAGEWIDTH;
+	j<<=16;
+	i=(unsigned long)&v;
+	if (foo()>i) i-=j;
+	j--;
+	i+=j;
+	i&=~j;
+	for (j=0;(i>>j)!=(i>>(sizeof(long)*8-1));j++);
+	fprintf(fp,"%d",j);
+	fclose(fp);
+	return 0;
+}
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  cstack_bits=`cat conftest1`
+else
+  cstack_bits=0
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+
+cat >>confdefs.h <<_ACEOF
+#define CSTACK_BITS $cstack_bits
+_ACEOF
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $cstack_bits" >&5
+$as_echo "$cstack_bits" >&6; }
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking NEG_CSTACK_ADDRESS" >&5
 $as_echo_n "checking NEG_CSTACK_ADDRESS... " >&6; }
 if test "$cross_compiling" = yes; then :
@@ -8445,7 +8505,7 @@ main ()
 {
 
 	return (long)$cstack_address<0 ? 0 : -1;
-
+}
   ;
   return 0;
 }
@@ -8453,12 +8513,14 @@ _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
+	neg_cstack_address=1
 
 $as_echo "#define NEG_CSTACK_ADDRESS 1" >>confdefs.h
 
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
+	neg_cstack_address=0
 fi
 rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
   conftest.$ac_objext conftest.beam conftest.$ac_ext
@@ -8657,13 +8719,13 @@ $as_echo_n "checking finding default linker script... " >&6; }
    if test "`cat gcl.script | wc -l`" != "0" ; then
       { $as_echo "$as_me:${as_lineno-$LINENO}: result: got it" >&5
 $as_echo "got it" >&6; }
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking trying to adjust heap start" >&5
-$as_echo_n "checking trying to adjust heap start... " >&6; }
+      { $as_echo "$as_me:${as_lineno-$LINENO}: trying to adjust text start" >&5
+$as_echo "$as_me: trying to adjust text start" >&6;}
       cp gcl.script gcl.script.def
 
       n=-1;
       k=0;
-      lim=30;
+      lim=64;
       max=0;
       min=$lim;
       while test $n -lt $lim ; do
@@ -8674,20 +8736,37 @@ $as_echo_n "checking trying to adjust heap start... " >&6; }
         if ( $CC -Wl,-T gcl.script foo.c -o foo && ./foo ) >/dev/null 2>&1 ; then
          if test $n -lt $min ; then min=$n; fi;
          if test $n -gt $max; then max=$n; fi;
+	elif test $max -gt 0 ; then
+	 break;
         fi;
         n=`$AWK 'END {print n+1}' n=$n </dev/null`
       done
 
-      echo $min $max
+      { $as_echo "$as_me:${as_lineno-$LINENO}: min log text start $min" >&5
+$as_echo "$as_me: min log text start $min" >&6;}
+      { $as_echo "$as_me:${as_lineno-$LINENO}: max log text start $max" >&5
+$as_echo "$as_me: max log text start $max" >&6;}
+
+      if test $neg_cstack_address -eq 1 ; then #FIXME test this
+      	 if test $cstack_bits -lt $max ; then
+	    max=$cstack_bits;
+            { $as_echo "$as_me:${as_lineno-$LINENO}: max log text start reduced to $max considering c stack address" >&5
+$as_echo "$as_me: max log text start reduced to $max considering c stack address" >&6;}
+	 fi
+      fi
 
       j=-1;
       low_shft="";
       if test $min -le $max ; then
-            if test $max -ge $enable_minlowimmfix ; then #check neg stack here
+            if test $max -ge $enable_fastimmfix && test "$enable_immfix" = "yes" ; then
 	        j=`$AWK 'END {for (i=j=0;j<=n;j++) i=i ? i*2 : 1;printf("%x\n",3*i)}' n=$max </dev/null`
 		low_shft=`$AWK 'END {print n+1}' n=$max </dev/null`;
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: raising log text to $j for a $max bit wide low immfix table" >&5
+$as_echo "$as_me: raising log text to $j for a $max bit wide low immfix table" >&6;}
             else
 	        j=`$AWK 'END {for (i=j=0;j<=n;j++) i=i ? i*2 : 1;printf("%x\n",3*i)}' n=$min </dev/null`
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: lowering log text to $j to maximize data area" >&5
+$as_echo "$as_me: lowering log text to $j to maximize data area" >&6;}
 	    fi
       fi
 
@@ -8711,21 +8790,24 @@ _ACEOF
       fi
 
 #      echo $j;
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking our linker script" >&5
+$as_echo_n "checking our linker script... " >&6; }
       if test "$j" -ne "-1" ; then
             cat gcl.script.def | $AWK '/SIZEOF_HEADERS/ {gsub("0x[0-9]*","0x" j,$0);} {print}' j=$j >gcl.script
-            { $as_echo "$as_me:${as_lineno-$LINENO}: checking linker script" >&5
-$as_echo_n "checking linker script... " >&6; }
 	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: done" >&5
 $as_echo "done" >&6; }
 	    rm -f gcl.script.def
 	    LDFLAGS="$LDFLAGS -Wl,-T gcl.script "
 	    cp gcl.script unixport
       else
-	 { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot or not needed" >&5
-$as_echo "cannot or not needed" >&6; }
+	 { $as_echo "$as_me:${as_lineno-$LINENO}: result: none found or not needed" >&5
+$as_echo "none found or not needed" >&6; }
 	 rm -f gcl.script gcl.script.def
       fi
       rm -rf foo.c foo
+  else
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: not found" >&5
+$as_echo "not found" >&6; }
   fi
 
    old_LDFLAGS="$LDFLAGS"

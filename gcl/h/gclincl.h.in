@@ -35,6 +35,9 @@
 /* C stack alignment */
 #undef CSTACK_ALIGNMENT
 
+/* log starting C stack address */
+#undef CSTACK_BITS
+
 /* whether C stack grows up or down */
 #undef CSTACK_DIRECTION
 

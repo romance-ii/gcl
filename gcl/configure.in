@@ -1687,14 +1687,52 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[
 AC_DEFINE_UNQUOTED(CSTACK_ADDRESS,$cstack_address,[starting C stack address])
 AC_MSG_RESULT($cstack_address)
 
+AC_MSG_CHECKING([cstack bits])
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
+	#include <stdio.h>
+	#include <stdlib.h>
+	void *
+	foo() {
+	      int i;
+	      return (void *)&i;
+        }
+
+	void gprof_cleanup() {};
+	int *cs_org;
+	int main(int argc,char **argv,char **envp) {
+	void *v ;
+	FILE *fp = fopen("conftest1","w");
+	unsigned long i,j;
+
+	#ifdef CAN_UNRANDOMIZE_SBRK
+	#include "h/unrandomize.h"
+	#endif
+	j=1;
+	j<<=$PAGEWIDTH;
+	j<<=16;
+	i=(unsigned long)&v;
+	if (foo()>i) i-=j;
+	j--;
+	i+=j;
+	i&=~j;
+	for (j=0;(i>>j)!=(i>>(sizeof(long)*8-1));j++);
+	fprintf(fp,"%d",j);
+	fclose(fp);
+	return 0;
+}]])],[cstack_bits=`cat conftest1`],[cstack_bits=0])
+AC_DEFINE_UNQUOTED(CSTACK_BITS,$cstack_bits,[log starting C stack address])
+AC_MSG_RESULT($cstack_bits)
+
 AC_MSG_CHECKING(NEG_CSTACK_ADDRESS)
 AC_RUN_IFELSE([AC_LANG_PROGRAM([[
 	#include <stdio.h>
 	]],[[
 	return (long)$cstack_address<0 ? 0 : -1;
-]])],[AC_MSG_RESULT(yes)
-   AC_DEFINE(NEG_CSTACK_ADDRESS,1,[C stack address is negative])],
-   [AC_MSG_RESULT(no)])
+}]])],[AC_MSG_RESULT(yes)
+	neg_cstack_address=1
+	AC_DEFINE(NEG_CSTACK_ADDRESS,1,[C stack address is negative])],
+      [AC_MSG_RESULT(no)
+	neg_cstack_address=0])
 
 
 AC_MSG_CHECKING([finding CSTACK_ALIGNMENT])
@@ -1794,12 +1832,12 @@ if ./foo ; then
 
    if test "`cat gcl.script | wc -l`" != "0" ; then
       AC_MSG_RESULT(got it)
-      AC_MSG_CHECKING([trying to adjust heap start])
+      AC_MSG_NOTICE([trying to adjust text start])
       cp gcl.script gcl.script.def
 
       n=-1;
       k=0;
-      lim=30;
+      lim=64;
       max=0;
       min=$lim;
       while test $n -lt $lim ; do
@@ -1810,20 +1848,32 @@ if ./foo ; then
         if ( $CC -Wl,-T gcl.script foo.c -o foo && ./foo ) >/dev/null 2>&1 ; then
          if test $n -lt $min ; then min=$n; fi; 
          if test $n -gt $max; then max=$n; fi; 
+	elif test $max -gt 0 ; then
+	 break;
         fi;
         n=`$AWK 'END {print n+1}' n=$n </dev/null`
       done	  
 
-      echo $min $max
+      AC_MSG_NOTICE([min log text start $min])
+      AC_MSG_NOTICE([max log text start $max])
+
+      if test $neg_cstack_address -eq 1 ; then #FIXME test this
+      	 if test $cstack_bits -lt $max ; then
+	    max=$cstack_bits;
+            AC_MSG_NOTICE([max log text start reduced to $max considering c stack address])
+	 fi	
+      fi
 
       j=-1;
       low_shft="";
       if test $min -le $max ; then
-            if test $max -ge $enable_minlowimmfix ; then #check neg stack here
+            if test $max -ge $enable_fastimmfix && test "$enable_immfix" = "yes" ; then
 	        j=`$AWK 'END {for (i=j=0;j<=n;j++) i=i ? i*2 : 1;printf("%x\n",3*i)}' n=$max </dev/null`
 		low_shft=`$AWK 'END {print n+1}' n=$max </dev/null`;
+		AC_MSG_NOTICE([raising log text to $j for a $max bit wide low immfix table])
             else					
 	        j=`$AWK 'END {for (i=j=0;j<=n;j++) i=i ? i*2 : 1;printf("%x\n",3*i)}' n=$min </dev/null`
+		AC_MSG_NOTICE([lowering log text to $j to maximize data area])
 	    fi
       fi
 
@@ -1835,18 +1885,20 @@ if ./foo ; then
       fi					     
 
 #      echo $j;
+      AC_MSG_CHECKING([our linker script])
       if test "$j" -ne "-1" ; then
             cat gcl.script.def | $AWK '/SIZEOF_HEADERS/ {gsub("0x[[0-9]]*","0x" j,$0);} {print}' j=$j >gcl.script
-            AC_MSG_CHECKING([linker script])
 	    AC_MSG_RESULT([done])
 	    rm -f gcl.script.def
 	    LDFLAGS="$LDFLAGS -Wl,-T gcl.script "
 	    cp gcl.script unixport
       else
-	 AC_MSG_RESULT([cannot or not needed])
+	 AC_MSG_RESULT([none found or not needed])
 	 rm -f gcl.script gcl.script.def
       fi
       rm -rf foo.c foo
+  else
+      AC_MSG_RESULT([not found])
   fi 
 
    old_LDFLAGS="$LDFLAGS"
