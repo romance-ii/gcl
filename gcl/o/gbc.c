@@ -136,8 +136,6 @@ set_bit(char *v,struct pageinfo *pi,void *x) {
   v[i]|=(1UL<<s);
 }
 
-int set_bits_slow=0;
-
 #define bit_get(v,i,s) ((v[i]>>s)&0x1)
 #define bit_set(v,i,s) (v[i]|=(1UL<<s))
 #define ptr_get(v,i,s) (v+(((i<<LOG_BITS_CHAR)|s)<<LOG_BYTES_CONTBLOCK))
@@ -156,7 +154,7 @@ set_bits(char *v,struct pageinfo *pi,void *x1,void *x2) {
     bit_set(v,i1,s1);
   i1++;
   if (i2>i1) memset(v+i1,-1,(i2-i1));
-  for (;s2>=0;s2--)
+  for (;--s2>=0;)
     bit_set(v,i2,s2);
 
 }
