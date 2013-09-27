@@ -162,8 +162,7 @@ int get_bits_slow=0;
 inline void *
 get_bits(char *v,struct pageinfo *pi,void *x) {
   void *ds=CB_DATA_START(pi),*de=CB_DATA_END(pi);
-  fixnum off=(x-ds)>>LOG_BYTES_CONTBLOCK,i=off>>LOG_BITS_CHAR,s=off&~(~0UL<<LOG_BITS_CHAR);
-  fixnum ie=(de-ds)>>(LOG_BYTES_CONTBLOCK+LOG_BITS_CHAR);
+  fixnum off=(x-ds)>>LOG_BYTES_CONTBLOCK,i=off>>LOG_BITS_CHAR,s=off&~(~0UL<<LOG_BITS_CHAR),ie=mbytes(pi->in_use);
   bool z=(v[i]>>s)&0x1;
   char cz;
   if (get_bits_slow)
