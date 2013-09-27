@@ -164,18 +164,18 @@ get_bits(char *v,struct pageinfo *pi,void *x) {
   void *ds=CB_DATA_START(pi),*de=CB_DATA_END(pi);
   fixnum off=(x-ds)>>LOG_BYTES_CONTBLOCK,i=off>>LOG_BITS_CHAR,s=off&~(~0UL<<LOG_BITS_CHAR),ie=mbytes(pi->in_use);
   bool z=(v[i]>>s)&0x1;
-  char cz;
-  if (get_bits_slow)
-    for (;x<de && z==get_bit(v,pi,x);x+=sizeof(struct contblock));
-  else {
-    for (;++s<CHAR_SIZE && z==((v[i]>>s)&0x1););
-    if (s==CHAR_SIZE) {
-      for (cz=z?-1:0;++i<ie && v[i]==cz;);
-      for (s=-1;++s<CHAR_SIZE && z==((v[i]>>s)&0x1););
-    }
-    x=ds+(((i<<LOG_BITS_CHAR)|s)<<LOG_BYTES_CONTBLOCK);
+  char cz=z?-1:0;
+  for (;++s<CHAR_SIZE && z==((v[i]>>s)&0x1););
+  if (s==CHAR_SIZE) {
+    for (;++i<ie && v[i]==cz;);
+    if (i<ie) for (s=-1;++s<CHAR_SIZE && z==((v[i]>>s)&0x1);); else s=CHAR_SIZE-1;
+    massert(s<CHAR_SIZE);
   }
-  return x<de ? x : de;
+  ds+=(((i<<LOG_BITS_CHAR)|s)<<LOG_BYTES_CONTBLOCK);
+  if (get_bits_slow)
+    for (;x<ds;x+=sizeof(struct contblock))
+      massert(z==get_bit(v,pi,x));
+  return ds<de ? ds : de;
 }
 
 inline char
