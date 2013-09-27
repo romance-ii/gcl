@@ -138,43 +138,52 @@ set_bit(char *v,struct pageinfo *pi,void *x) {
 
 int set_bits_slow=0;
 
+#define bit_get(v,i,s) ((v[i]>>s)&0x1)
+#define bit_set(v,i,s) (v[i]|=(1UL<<s))
+#define ptr_get(v,i,s) (v+(((i<<LOG_BITS_CHAR)|s)<<LOG_BYTES_CONTBLOCK))
+#define ptr_set(x,v,i,s) ({fixnum _o=(x-v)>>LOG_BYTES_CONTBLOCK;i=_o>>LOG_BITS_CHAR;s=_o&~(~0UL<<LOG_BITS_CHAR);})
+
 inline void
 set_bits(char *v,struct pageinfo *pi,void *x1,void *x2) {
-  void *ve=CB_DATA_START(pi);
-  fixnum off1=(x1-ve)>>LOG_BYTES_CONTBLOCK,i1=off1>>LOG_BITS_CHAR,s1=off1&~(~0UL<<LOG_BITS_CHAR);
-  fixnum off2=(x2-ve)>>LOG_BYTES_CONTBLOCK,i2=off2>>LOG_BITS_CHAR,s2=off2&~(~0UL<<LOG_BITS_CHAR);
-  if (set_bits_slow)
-    for (;x1<x2;x1+=sizeof(struct contblock))
-      set_bit(v,pi,x1);
-  else {
-    for (;s1<CHAR_SIZE;s1++)
-      v[i1]|=(1UL<<s1);
-    i1++;
-    if (i2>i1) memset(v+i1,-1,(i2-i1));
-    for (;s2>=0;s2--)
-      v[i2]|=(1UL<<s2);
-  }
+
+  void *ds=CB_DATA_START(pi);
+  fixnum i1,s1,i2,s2;
+
+  ptr_set(x1,ds,i1,s1);
+  ptr_set(x2,ds,i2,s2);
+
+  for (;s1<CHAR_SIZE;s1++)
+    bit_set(v,i1,s1);
+  i1++;
+  if (i2>i1) memset(v+i1,-1,(i2-i1));
+  for (;s2>=0;s2--)
+    bit_set(v,i2,s2);
 
 }
 
-int get_bits_slow=0;
-
 inline void *
 get_bits(char *v,struct pageinfo *pi,void *x) {
+
   void *ds=CB_DATA_START(pi),*de=CB_DATA_END(pi);
-  fixnum off=(x-ds)>>LOG_BYTES_CONTBLOCK,i=off>>LOG_BITS_CHAR,s=off&~(~0UL<<LOG_BITS_CHAR),ie=mbytes(pi->in_use);
-  bool z=(v[i]>>s)&0x1;
-  char cz=z?-1:0;
-  for (;++s<CHAR_SIZE && z==((v[i]>>s)&0x1););
+  fixnum i,s,ie=mbytes(pi->in_use);
+  bool z;
+  char cz;
+
+  ptr_set(x,ds,i,s);
+  z=bit_get(v,i,s);
+  cz=z?-1:0;
+
+  for (;++s<CHAR_SIZE && z==bit_get(v,i,s););
   if (s==CHAR_SIZE) {
     for (;++i<ie && v[i]==cz;);
-    if (i<ie) for (s=-1;++s<CHAR_SIZE && z==((v[i]>>s)&0x1);); else s=CHAR_SIZE-1;
-    massert(s<CHAR_SIZE);
+    if (i<ie) for (s=-1;++s<CHAR_SIZE && z==bit_get(v,i,s);); else s=CHAR_SIZE-1;
+    /* massert(s<CHAR_SIZE); */
   }
-  ds+=(((i<<LOG_BITS_CHAR)|s)<<LOG_BYTES_CONTBLOCK);
-  if (get_bits_slow)
-    for (;x<ds;x+=sizeof(struct contblock))
-      massert(z==get_bit(v,pi,x));
+  ds=ptr_get(ds,i,s);
+
+  /* for (;x<ds;x+=sizeof(struct contblock)) */
+  /*   massert(z==get_bit(v,pi,x)); */
+
   return ds<de ? ds : de;
 }
 

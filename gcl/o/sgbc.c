@@ -568,9 +568,9 @@ sgc_mark_phase(void) {
   for (v=contblock_list_head;v;v=v->next)
     if (v->sgc_flags&SGC_PAGE_FLAG) {
       void *s=CB_DATA_START(v),*e=CB_DATA_END(v),*p,*q;
-      bool z=get_mark_bit(v,s);
+      bool z=get_sgc_bit(v,s);
       for (p=s;p<e;) {
-	q=get_bits(CB_MARK_START(v),v,p);
+	q=get_sgc_bits(v,p);
 	if (!z)
 	  set_mark_bits(v,p,q);
 	z=1-z;
@@ -729,7 +729,7 @@ sgc_contblock_sweep_phase(void) {
 
     z=get_mark_bit(v,s);
     for (p=s;p<e;) {
-      q=get_bits(CB_MARK_START(v),v,p);
+      q=get_mark_bits(v,p);
       if (!z)
 	insert_contblock(p,q-p);
       z=1-z;
