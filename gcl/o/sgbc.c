@@ -1116,9 +1116,12 @@ sgc_start(void) {
       long again=0,nfree = tm->tm_nfree;
       char *p=alloc_page(n);
       if (tm->tm_nfree > nfree) again=1;  /* gc freed some objects */
+      if (tm->tm_npage+n>tm->tm_maxpage)
+	if (!set_tm_maxpage(tm,tm->tm_npage+n))
+	  n=0;
       while (n-- > 0) {
 	/* (sgc_enabled=1,add_page_to_freelist(p,tm),sgc_enabled=0); */
-	(add_page_to_freelist(p,tm));
+	add_page_to_freelist(p,tm);
 	p += PAGESIZE;
       }
       if (again) 
@@ -1182,7 +1185,8 @@ sgc_start(void) {
       void *old_contblock_list_tail=contblock_list_tail;
 
       if (maxcbpage<ncbpage+z)
-	massert(set_tm_maxpage(tm_table+t_contiguous,ncbpage+z));
+	if (!set_tm_maxpage(tm_table+t_contiguous,ncbpage+z))
+	  z=0;
 
       add_pages(tm_table+t_contiguous,z);
 
