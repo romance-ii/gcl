@@ -1111,7 +1111,7 @@ set_key_struct(struct key *ks, object data)
       {int m=ks->defaults[i].i;
         ks->defaults[i].o=
 	  (m==-2 ? Cnil :
-	   m==-1 ? (object)0 :
+	   m==-1 ? OBJNULL :
 	   data->cfd.cfd_self[m]);}
 }}
 

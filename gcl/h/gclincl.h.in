@@ -240,6 +240,9 @@
 /* fraction of core to separate reloc and heap */
 #undef HOLEDIV
 
+/* number of pages to use for hole */
+#undef HOLEPAGE
+
 /* Host cpu */
 #undef HOST_CPU
 
@@ -291,6 +294,9 @@
 /* fill bits needed in certain lisp structures */
 #undef LM9BITS
 
+/* upper immediate fixnum bound */
+#undef LOW_SHFT
+
 /* maximum number of pages to be allocated */
 #undef MAXPAGE
 
@@ -320,6 +326,9 @@
 
 /* no uname call */
 #undef NO_UNAME
+
+/* lowest address non-object */
+#undef OBJNULL
 
 /* can use C extension for object alignment */
 #undef OBJ_ALIGN

@@ -153,8 +153,7 @@ typedef union int_object iobject;
  OBJect NULL value.
  It should not coincide with any legal object value.
 */
-/* #define OBJNULL  ((object)NULL) */
-#define OBJNULL  ((object)DBEGIN)
+/* #define	OBJNULL		((object)NULL) */
 
 /*
  Definition of each implementation type.
@@ -176,7 +175,7 @@ struct fixnum_struct {
 #define       fix_imm_fixnum(a_)        ((fixnum)a_)
 #define      mark_imm_fixnum(a_)        ((a_)=((object)((fixnum)(a_)+(LOW_IM_FIX<<1))))
 #define    unmark_imm_fixnum(a_)        ((a_)=((object)((fixnum)(a_)-(LOW_IM_FIX<<1))))
-#define        is_imm_fixnum(a_)        ((fixnum)(a_)<data_start)
+#define        is_imm_fixnum(a_)        ((fixnum)(a_)<(fixnum)OBJNULL)
 #define is_unmrkd_imm_fixnum(a_)        ((fixnum)(a_)<LOW_IM_FIX)
 #define is_marked_imm_fixnum(a_)        (is_imm_fixnum(a_)*!is_unmrkd_imm_fixnum(a_))
 #define           is_imm_fix(a_)        INT_IN_BITS(a_,LOW_SHFT-1)
@@ -227,7 +226,7 @@ struct fixnum_struct {
 			    (valid_cdr(_z) ?  (_z==Cnil ? t_symbol : t_cons)  : _z->d.t));})
   
 /*Note preserve sgc flag here                                         VVV*/
-#define set_type_of(x,y) ({object _x=(object)(x);enum type _y=(y);_x->d.f=0;if (_y!=t_cons) {_x->d.e=1;_x->d.t=_y;}})
+#define set_type_of(x,y) ({object _x=(object)(x);enum type _y=(y);_x->d.f=0;if (_y!=t_cons) {_x->d.e=1;_x->d.t=_y;_x->fw|=(fixnum)OBJNULL;}})
 
 
 #define consp(x)         ({register object _z=(object)(x);\

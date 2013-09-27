@@ -19,8 +19,20 @@ AC_ARG_ENABLE(holediv,
 AC_DEFINE_UNQUOTED(HOLEDIV,$enable_holediv,[fraction of core to separate reloc and heap])
 
 
-AC_ARG_ENABLE(vssize,
-[ --enable-vssize=XXXX   will compile in a value stack of size XXX],
+dnl AC_ARG_ENABLE(maxpage,
+dnl [ --enable-maxpage=XXXX  will compile in a page table of size XXX
+dnl                          (eg '--enable-maxpage=64*1024' would produce
+dnl 			 64K pages allowing 256 MB if pages are 4K each)],
+dnl ,enable_maxpage=$def_maxpage)
+
+
+AC_ARG_ENABLE(minlowimmfix,[ --enable-minlowimmfix=XXXX will reject low immediate fixnums unless 1<<XXXX can be attained] ,
+,enable_minlowimmfix=29)
+
+AC_ARG_ENABLE(holepage,[ --enable-holepage=XXXX will compile in a XXX-sized hole between the heap and relocatable memory area (eg '--enable-holepage=64*1024' would give 64K pages allowing 256 MB if pages are 4K each)] ,
+[AC_DEFINE_UNQUOTED(HOLEPAGE,$enable_holepage,[number of pages to use for hole])])
+
+AC_ARG_ENABLE(vssize,[ --enable-vssize=XXXX will compile in a value stack of size XXX] ,
 ,enable_vssize=262144)
 AC_DEFINE_UNQUOTED(VSSIZE,$enable_vssize,[value stack size])
 
@@ -1779,32 +1791,63 @@ if ./foo ; then
    $CC -Wl,--verbose foo.c -o foo 2>&1 | \
        $AWK '/==================================================/ {i=1-i;next} {if (i) print}' >gcl.script
    rm -rf foo.c foo
+
    if test "`cat gcl.script | wc -l`" != "0" ; then
       AC_MSG_RESULT(got it)
-      AC_MSG_CHECKING([trying to lower heap start])
+      AC_MSG_CHECKING([trying to adjust heap start])
       cp gcl.script gcl.script.def
-      cat gcl.script.def | $AWK '/SIZEOF_HEADERS/ {gsub("0x...","0x000",$0);} {print}' |  sed 's,\. = 0x10000000;,/*. = 0x10000000;*/,1' >gcl.script
-      if diff gcl.script.def gcl.script >/dev/null 2>&1 ; then
-	 AC_MSG_RESULT([cannot or not needed])
-	 rm -f gcl.script gcl.script.def
-      else
-	 AC_MSG_CHECKING([linker script])
-	 echo "int main() {return 0;}" >foo.c
-	 if $CC -Wl,-T gcl.script foo.c -o foo >/dev/null 2>&1 && ./foo >/dev/null 2>&1 ; then
+
+      n=-1;
+      k=0;
+      lim=30;
+      max=0;
+      min=$lim;
+      while test $n -lt $lim ; do
+        j=`$AWK 'END {for (i=j=0;j<=n;j++) i=i ? i*2 : 1;printf("%x\n",3*i)}' n=$n </dev/null`
+        cat gcl.script.def | $AWK '/SIZEOF_HEADERS/ {gsub("0x[[0-9]]*","0x" j,$0);} {print}' j=$j >gcl.script
+#        diff -u gcl.script.def gcl.script
+        echo "int main() {return 0;}" >foo.c
+        if ( $CC -Wl,-T gcl.script foo.c -o foo && ./foo ) >/dev/null 2>&1 ; then
+         if test $n -lt $min ; then min=$n; fi; 
+         if test $n -gt $max; then max=$n; fi; 
+        fi;
+        n=`$AWK 'END {print n+1}' n=$n </dev/null`
+      done	  
+
+      echo $min $max
+
+      j=-1;
+      low_shft="";
+      if test $min -le $max ; then
+            if test $max -ge $enable_minlowimmfix ; then #check neg stack here
+	        j=`$AWK 'END {for (i=j=0;j<=n;j++) i=i ? i*2 : 1;printf("%x\n",3*i)}' n=$max </dev/null`
+		low_shft=`$AWK 'END {print n+1}' n=$max </dev/null`;
+            else					
+	        j=`$AWK 'END {for (i=j=0;j<=n;j++) i=i ? i*2 : 1;printf("%x\n",3*i)}' n=$min </dev/null`
+	    fi
+      fi
+
+      if test "$low_shft" != "" ; then
+            AC_DEFINE_UNQUOTED(LOW_SHFT,$low_shft,[upper immediate fixnum bound])      	 
+            AC_DEFINE_UNQUOTED(OBJNULL,(object)0x$j,[lowest address non-object])      	 
+      else				   
+            AC_DEFINE_UNQUOTED(OBJNULL,NULL,[lowest address non-object])      	 
+      fi					     
+
+#      echo $j;
+      if test "$j" -ne "-1" ; then
+            cat gcl.script.def | $AWK '/SIZEOF_HEADERS/ {gsub("0x[[0-9]]*","0x" j,$0);} {print}' j=$j >gcl.script
+            AC_MSG_CHECKING([linker script])
 	    AC_MSG_RESULT([done])
 	    rm -f gcl.script.def
 	    LDFLAGS="$LDFLAGS -Wl,-T gcl.script "
 	    cp gcl.script unixport
-	 else
-	     AC_MSG_RESULT([failed])
-	     rm -f gcl.script gcl.script.def
-	 fi	  
-         rm -rf foo.c foo
+      else
+	 AC_MSG_RESULT([cannot or not needed])
+	 rm -f gcl.script gcl.script.def
       fi
-   else
-     AC_MSG_RESULT([none])
-     rm -f gcl.script
-   fi
+      rm -rf foo.c foo
+  fi 
 
    old_LDFLAGS="$LDFLAGS"
    LDFLAGS="$LDFLAGS $TLDFLAGS"

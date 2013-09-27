@@ -744,6 +744,8 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 enable_holediv
+enable_minlowimmfix
+enable_holepage
 enable_vssize
 enable_bdssize
 enable_ihssize
@@ -1407,7 +1409,9 @@ Optional Features:
  --enable-holediv=XXXX  will specify that 1/XXXX of the core
                          should be used as the hole between the
 			 heap and relocatable memory area
- --enable-vssize=XXXX   will compile in a value stack of size XXX
+ --enable-minlowimmfix=XXXX will reject low immediate fixnums unless 1<<XXXX can be attained
+ --enable-holepage=XXXX will compile in a XXX-sized hole between the heap and relocatable memory area (eg '--enable-holepage=64*1024' would give 64K pages allowing 256 MB if pages are 4K each)
+ --enable-vssize=XXXX will compile in a value stack of size XXX
  --enable-bdssize=XXXX  will compile in a binding stack of size XXX
  --enable-ihssize=XXXX  will compile in a invocation history stack of size XXX
  --enable-frssize=XXXX  will compile in a frame stack of size XXX
@@ -2533,6 +2537,26 @@ cat >>confdefs.h <<_ACEOF
 #define HOLEDIV $enable_holediv
 _ACEOF
 
+
+
+
+
+# Check whether --enable-minlowimmfix was given.
+if test "${enable_minlowimmfix+set}" = set; then :
+  enableval=$enable_minlowimmfix;
+else
+  enable_minlowimmfix=29
+fi
+
+
+# Check whether --enable-holepage was given.
+if test "${enable_holepage+set}" = set; then :
+  enableval=$enable_holepage;
+cat >>confdefs.h <<_ACEOF
+#define HOLEPAGE $enable_holepage
+_ACEOF
+
+fi
 
 
 # Check whether --enable-vssize was given.
@@ -8629,39 +8653,80 @@ $as_echo_n "checking finding default linker script... " >&6; }
    $CC -Wl,--verbose foo.c -o foo 2>&1 | \
        $AWK '/==================================================/ {i=1-i;next} {if (i) print}' >gcl.script
    rm -rf foo.c foo
+
    if test "`cat gcl.script | wc -l`" != "0" ; then
       { $as_echo "$as_me:${as_lineno-$LINENO}: result: got it" >&5
 $as_echo "got it" >&6; }
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking trying to lower heap start" >&5
-$as_echo_n "checking trying to lower heap start... " >&6; }
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking trying to adjust heap start" >&5
+$as_echo_n "checking trying to adjust heap start... " >&6; }
       cp gcl.script gcl.script.def
-      cat gcl.script.def | $AWK '/SIZEOF_HEADERS/ {gsub("0x...","0x000",$0);} {print}' |  sed 's,\. = 0x10000000;,/*. = 0x10000000;*/,1' >gcl.script
-      if diff gcl.script.def gcl.script >/dev/null 2>&1 ; then
-	 { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot or not needed" >&5
-$as_echo "cannot or not needed" >&6; }
-	 rm -f gcl.script gcl.script.def
+
+      n=-1;
+      k=0;
+      lim=30;
+      max=0;
+      min=$lim;
+      while test $n -lt $lim ; do
+        j=`$AWK 'END {for (i=j=0;j<=n;j++) i=i ? i*2 : 1;printf("%x\n",3*i)}' n=$n </dev/null`
+        cat gcl.script.def | $AWK '/SIZEOF_HEADERS/ {gsub("0x[0-9]*","0x" j,$0);} {print}' j=$j >gcl.script
+#        diff -u gcl.script.def gcl.script
+        echo "int main() {return 0;}" >foo.c
+        if ( $CC -Wl,-T gcl.script foo.c -o foo && ./foo ) >/dev/null 2>&1 ; then
+         if test $n -lt $min ; then min=$n; fi;
+         if test $n -gt $max; then max=$n; fi;
+        fi;
+        n=`$AWK 'END {print n+1}' n=$n </dev/null`
+      done
+
+      echo $min $max
+
+      j=-1;
+      low_shft="";
+      if test $min -le $max ; then
+            if test $max -ge $enable_minlowimmfix ; then #check neg stack here
+	        j=`$AWK 'END {for (i=j=0;j<=n;j++) i=i ? i*2 : 1;printf("%x\n",3*i)}' n=$max </dev/null`
+		low_shft=`$AWK 'END {print n+1}' n=$max </dev/null`;
+            else
+	        j=`$AWK 'END {for (i=j=0;j<=n;j++) i=i ? i*2 : 1;printf("%x\n",3*i)}' n=$min </dev/null`
+	    fi
+      fi
+
+      if test "$low_shft" != "" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define LOW_SHFT $low_shft
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define OBJNULL (object)0x$j
+_ACEOF
+
       else
-	 { $as_echo "$as_me:${as_lineno-$LINENO}: checking linker script" >&5
+
+cat >>confdefs.h <<_ACEOF
+#define OBJNULL NULL
+_ACEOF
+
+      fi
+
+#      echo $j;
+      if test "$j" -ne "-1" ; then
+            cat gcl.script.def | $AWK '/SIZEOF_HEADERS/ {gsub("0x[0-9]*","0x" j,$0);} {print}' j=$j >gcl.script
+            { $as_echo "$as_me:${as_lineno-$LINENO}: checking linker script" >&5
 $as_echo_n "checking linker script... " >&6; }
-	 echo "int main() {return 0;}" >foo.c
-	 if $CC -Wl,-T gcl.script foo.c -o foo >/dev/null 2>&1 && ./foo >/dev/null 2>&1 ; then
 	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: done" >&5
 $as_echo "done" >&6; }
 	    rm -f gcl.script.def
 	    LDFLAGS="$LDFLAGS -Wl,-T gcl.script "
 	    cp gcl.script unixport
-	 else
-	     { $as_echo "$as_me:${as_lineno-$LINENO}: result: failed" >&5
-$as_echo "failed" >&6; }
-	     rm -f gcl.script gcl.script.def
-	 fi
-         rm -rf foo.c foo
+      else
+	 { $as_echo "$as_me:${as_lineno-$LINENO}: result: cannot or not needed" >&5
+$as_echo "cannot or not needed" >&6; }
+	 rm -f gcl.script gcl.script.def
       fi
-   else
-     { $as_echo "$as_me:${as_lineno-$LINENO}: result: none" >&5
-$as_echo "none" >&6; }
-     rm -f gcl.script
-   fi
+      rm -rf foo.c foo
+  fi
 
    old_LDFLAGS="$LDFLAGS"
    LDFLAGS="$LDFLAGS $TLDFLAGS"
