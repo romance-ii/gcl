@@ -136,19 +136,28 @@ set_bit(char *v,struct pageinfo *pi,void *x) {
   v[i]|=(1UL<<s);
 }
 
+int set_bits_slow=0;
+
 inline void
 set_bits(char *v,struct pageinfo *pi,void *x1,void *x2) {
   void *ve=CB_DATA_START(pi);
   fixnum off1=(x1-ve)>>LOG_BYTES_CONTBLOCK,i1=off1>>LOG_BITS_CHAR,s1=off1&~(~0UL<<LOG_BITS_CHAR);
   fixnum off2=(x2-ve)>>LOG_BYTES_CONTBLOCK,i2=off2>>LOG_BITS_CHAR,s2=off2&~(~0UL<<LOG_BITS_CHAR);
-  for (;s1<CHAR_SIZE;s1++)
-    v[i1]|=(1UL<<s1);
-  i1++;
-  if (i2>i1) memset(v+i1,-1,(i2-i1));
-  for (;s2>=0;s2--)
-    v[i2]|=(1UL<<s2);
+  if (set_bits_slow)
+    for (;x1<x2;x1+=sizeof(struct contblock))
+      set_bit(v,pi,x1);
+  else {
+    for (;s1<CHAR_SIZE;s1++)
+      v[i1]|=(1UL<<s1);
+    i1++;
+    if (i2>i1) memset(v+i1,-1,(i2-i1));
+    for (;s2>=0;s2--)
+      v[i2]|=(1UL<<s2);
+  }
 
 }
+
+int get_bits_slow=0;
 
 inline void *
 get_bits(char *v,struct pageinfo *pi,void *x) {
@@ -157,12 +166,16 @@ get_bits(char *v,struct pageinfo *pi,void *x) {
   fixnum ie=(de-ds)>>(LOG_BYTES_CONTBLOCK+LOG_BITS_CHAR);
   bool z=(v[i]>>s)&0x1;
   char cz;
-  for (;++s<CHAR_SIZE && z==((v[i]>>s)&0x1););
-  if (s==CHAR_SIZE) {
-    for (cz=z?-1:0;++i<ie && v[i]==cz;);
-    for (s=-1;++s<CHAR_SIZE && z==((v[i]>>s)&0x1););
+  if (get_bits_slow)
+    for (;x<de && z==get_bit(v,pi,x);x+=sizeof(struct contblock));
+  else {
+    for (;++s<CHAR_SIZE && z==((v[i]>>s)&0x1););
+    if (s==CHAR_SIZE) {
+      for (cz=z?-1:0;++i<ie && v[i]==cz;);
+      for (s=-1;++s<CHAR_SIZE && z==((v[i]>>s)&0x1););
+    }
+    x=ds+(((i<<LOG_BITS_CHAR)|s)<<LOG_BYTES_CONTBLOCK);
   }
-  x=ds+(((i<<LOG_BITS_CHAR)|s)<<LOG_BYTES_CONTBLOCK);
   return x<de ? x : de;
 }
 
