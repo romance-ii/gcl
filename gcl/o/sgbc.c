@@ -75,25 +75,21 @@ joe() {;}
 static void *mcsh,*mcsl;
 extern int cstack_dir;
 
-static void
+inline void
 sgc_mark_cons(object x) {
-  
-  object d;
-
-  cs_check(x);
   
   if (cstack_dir==-1 ? mcsl>(void *)&x : mcsl<(void *)&x)
     mcsl=&x;
 
   do {
-    d=x->c.c_cdr;
+    object d=x->c.c_cdr;
     mark(x);
     sgc_mark_object(x->c.c_car);
     x=d;
     if (!IS_WRITABLE(page(x)) || is_marked_or_free(x))
       return;
-  } while (type_of(x)==t_cons);
-  sgc_mark_object1(x);
+  } while (valid_cdr(x));
+  if (x!=Cnil) sgc_mark_object1(x);
 
 }
 
@@ -136,13 +132,17 @@ sgc_mark_object1(object x) {
   if(x==sdebug) joe1();
 #endif
   
-  if ((tp=type_of(x))==t_cons) {
+  tp=type_of(x);
+
+  if (tp==t_cons) {
     sgc_mark_cons(x);
     return;
   }
 
   mark(x);
+
   switch (tp) {
+
   case t_fixnum:
     break;
     
@@ -179,15 +179,11 @@ sgc_mark_object1(object x) {
     if (x->s.s_self == NULL)
       break;
     /* to do */
-    if (what_to_collect >= t_contiguous) {
-      if (inheap(x->s.s_self)) {
-	if (what_to_collect == t_contiguous)
-	  mark_contblock(x->s.s_self,
-			 x->s.s_fillp);
-      } else if(SGC_RELBLOCK_P(x->s.s_self))
-	x->s.s_self =
-	  copy_relblock(x->s.s_self, x->s.s_fillp);
-    }
+    if (inheap(x->s.s_self)) {
+      if (what_to_collect == t_contiguous)
+	mark_contblock(x->s.s_self,x->s.s_fillp);
+    } else if (SGC_RELBLOCK_P(x->s.s_self) && COLLECT_RELBLOCK_P)
+      x->s.s_self = copy_relblock(x->s.s_self, x->s.s_fillp);
     break;
     
   case t_package:
@@ -196,23 +192,14 @@ sgc_mark_object1(object x) {
     sgc_mark_object(x->p.p_shadowings);
     sgc_mark_object(x->p.p_uselist);
     sgc_mark_object(x->p.p_usedbylist);
-    if (what_to_collect != t_contiguous)
-      break;
-    if (x->p.p_internal != NULL)
-      mark_contblock((char *)(x->p.p_internal),
-		     x->p.p_internal_size*sizeof(object));
-    if (x->p.p_external != NULL)
-      mark_contblock((char *)(x->p.p_external),
-		     x->p.p_external_size*sizeof(object));
-    break;
-    
-  case t_cons:
-    /*
-      sgc_mark_object(x->c.c_car);
-      x = x->c.c_cdr;
-      goto BEGIN;
-    */
-    sgc_mark_cons(x);
+    if (what_to_collect == t_contiguous) {
+      if (x->p.p_internal != NULL)
+	mark_contblock((char *)(x->p.p_internal),
+		       x->p.p_internal_size*sizeof(object));
+      if (x->p.p_external != NULL)
+	mark_contblock((char *)(x->p.p_external),
+		       x->p.p_external_size*sizeof(object));
+    }
     break;
     
   case t_hashtable:
@@ -226,31 +213,22 @@ sgc_mark_object1(object x) {
 	sgc_mark_object(x->ht.ht_self[i].c_car);
       }
     }
-    if ((short)what_to_collect >= (short)t_contiguous) {
-      if (inheap(x->ht.ht_self)) {
-	if (what_to_collect == t_contiguous)
-	  mark_contblock((char *)(x->ht.ht_self),
-			 j * sizeof(struct cons));
-      } else if(SGC_RELBLOCK_P(x->ht.ht_self))
-	x->ht.ht_self =
-	  copy_relblock((char *)(x->ht.ht_self),
-			j * sizeof(struct cons));
-    }
+    if (inheap(x->ht.ht_self)) {
+      if (what_to_collect == t_contiguous)
+	mark_contblock((char *)(x->ht.ht_self),j * sizeof(struct cons));
+    } else if (SGC_RELBLOCK_P(x->ht.ht_self) && COLLECT_RELBLOCK_P)
+      x->ht.ht_self=(void *)copy_relblock((char *)x->ht.ht_self,j*sizeof(struct cons));;
     break;
     
   case t_array:
     if ((x->a.a_displaced) != Cnil)
       sgc_mark_displaced_field(x);
-    if (what_to_collect >= t_contiguous &&
-	x->a.a_dims != NULL) {
+    if (x->a.a_dims != NULL) {
       if (inheap(x->a.a_dims)) {
 	if (what_to_collect == t_contiguous)
-	  mark_contblock((char *)(x->a.a_dims),
-			 sizeof(fixnum)*x->a.a_rank);
-      } else  if(SGC_RELBLOCK_P(x->a.a_dims))
-	x->a.a_dims =
-	  copy_relblock((char *)(x->a.a_dims),
-			sizeof(fixnum)*x->a.a_rank);
+	  mark_contblock((char *)(x->a.a_dims),sizeof(fixnum)*x->a.a_rank);
+      } else if (SGC_RELBLOCK_P(x->a.a_dims) && COLLECT_RELBLOCK_P)
+	x->a.a_dims =  copy_relblock((char *)(x->a.a_dims),sizeof(fixnum)*x->a.a_rank);
     }
     if ((enum aelttype)x->a.a_elttype == aet_ch)
       goto CASE_STRING;
@@ -268,8 +246,7 @@ sgc_mark_object1(object x) {
     switch((enum aelttype)x->a.a_elttype){
     case aet_lf:
       j= sizeof(longfloat)*x->a.a_dim;
-      if ((what_to_collect >= t_contiguous) &&
-	  !(inheap(cp)) && SGC_RELBLOCK_P(x->a.a_self))
+      if ((COLLECT_RELBLOCK_P) && !(inheap(cp)) && SGC_RELBLOCK_P(x->a.a_self))
 	ROUND_RB_POINTERS_DOUBLE;
       break;
     case aet_nnchar:
@@ -309,21 +286,17 @@ sgc_mark_object1(object x) {
     cp = p;
     j *= sizeof(object);
   COPY:
-    if (what_to_collect >= t_contiguous) {
-      if (inheap(cp)) {
-	if (what_to_collect == t_contiguous)
-	  mark_contblock(cp, j);
-      } else if (!SGC_RELBLOCK_P(cp)) 
-	;
-      else if (x->a.a_displaced == Cnil) {
+    if (inheap(cp)) {
+      if (what_to_collect == t_contiguous)
+	mark_contblock(cp, j);
+    } else if (SGC_RELBLOCK_P(cp) && COLLECT_RELBLOCK_P) {
+      if (x->a.a_displaced == Cnil) {
 #ifdef HAVE_ALLOCA
 	if (!NULL_OR_ON_C_STACK(cp))  /* only if body of array not on C stack */
 #endif			  
-	  x->a.a_self = copy_relblock(cp, j);
-      }
-      else if (x->a.a_displaced->c.c_car == Cnil) {
-	i = (long)copy_relblock(cp, j)
-	  - (long)(x->a.a_self);
+	  x->a.a_self = (object *)copy_relblock(cp, j);
+      } else if (x->a.a_displaced->c.c_car == Cnil) {
+	i = (long)(object *)copy_relblock(cp, j) - (long)(x->a.a_self);
 	adjust_displaced(x, i);
       }
     }
@@ -338,53 +311,16 @@ sgc_mark_object1(object x) {
       goto CASE_SPECIAL;
     
   case t_bignum:
-/* #ifndef GMP */
-/*     if ((int)what_to_collect >= (int)t_contiguous) { */
-/*       j = x->big.big_length; */
-/*       cp = (char *)x->big.big_self; */
-/*       if (cp == NULL) */
-/* 	break; */
-/*       if  (j != lg(MP(x))  && */
-	   /* we don't bother to zero this register,
-	      and its contents may get over written */
-/* 	   ! (x ==  big_register_1 && */
-/* 	      (int)(cp) <= top && */
-/* 	      (int) cp >= bot)) */
-	
-/* 	printf("bad length 0x%x ",x); */
-/*       j = j * sizeof(int); */
-      
-/*       if (inheap(cp)) { */
-/* 	if (what_to_collect == t_contiguous) */
-/* 	  mark_contblock(cp, j); */
-/*       } else { */
-/* 	if (SGC_RELBLOCK_P(cp)) */
-/* 	  x->big.big_self = (plong *)copy_relblock(cp, j);}} */
-/* #endif */ /* no gmp */
-#ifndef GMP_USE_MALLOC
-    if (what_to_collect >= t_contiguous) {
-      j = MP_ALLOCATED(x);
-      cp = MP_SELF(x);
-      if (cp == 0)
-	break;
-/* #ifdef PARI */
-/*       if (j != lg(MP(x))  && */
-	  /* we don't bother to zero this register,
-	     and its contents may get over written */
-/* 	  ! (x == big_register_1 && */
-/* 	     (int)(cp) <= top && */
-/* 	     (int) cp >= bot)) */
-/* 	printf("bad length 0x%x ",x); */
-/* #endif */
-      j = j * MP_LIMB_SIZE;
-      if (inheap(cp)) {
-	if (what_to_collect == t_contiguous)
-	  mark_contblock(cp, j);
-      } else 
-	if (SGC_RELBLOCK_P(cp))
-	  MP_SELF(x) = copy_relblock(cp, j);
-    }
-#endif /* not GMP_USE_MALLOC */
+    j = MP_ALLOCATED(x);
+    cp = (char *)MP_SELF(x);
+    if (cp == 0)
+      break;
+    j = j * MP_LIMB_SIZE;
+    if (inheap(cp)) {
+      if (what_to_collect == t_contiguous)
+	mark_contblock(cp, j);
+    } else if (SGC_RELBLOCK_P(cp) && COLLECT_RELBLOCK_P)
+      MP_SELF(x) = (void *) copy_relblock(cp, j);
     break;
     
     
@@ -398,13 +334,11 @@ sgc_mark_object1(object x) {
       break;
     
   COPY_STRING:
-    if (what_to_collect >= t_contiguous) {
-      if (inheap(cp)) {
-	if (what_to_collect == t_contiguous)
-	  mark_contblock(cp, j);
-      }
-      else if (!SGC_RELBLOCK_P(cp)) ;
-      else if (x->st.st_displaced == Cnil)
+    if (inheap(cp)) {
+      if (what_to_collect == t_contiguous)
+	mark_contblock(cp, j);
+    } else if (SGC_RELBLOCK_P(cp) && COLLECT_RELBLOCK_P) {
+      if (x->st.st_displaced == Cnil)
 	x->st.st_self = copy_relblock(cp, j);
       else if (x->st.st_displaced->c.c_car == Cnil) {
 	i = copy_relblock(cp, j) - cp;
@@ -439,16 +373,11 @@ sgc_mark_object1(object x) {
       for (i = 0, j = S_DATA(def)->length;  i < j;  i++)
 	if (s_type[i]==aet_object && ON_WRITABLE_PAGE(&STREF(object,x,s_pos[i])))
 	  sgc_mark_object(STREF(object,x,s_pos[i]));
-      if (what_to_collect >= t_contiguous) {
-	if (inheap(x->str.str_self)) {
-	  if (what_to_collect == t_contiguous)
-	    mark_contblock((char *)p,
-			   S_DATA(def)->size);
-	  
-	} else if(SGC_RELBLOCK_P(p))
-	  x->str.str_self =
-	    copy_relblock((char *)p, S_DATA(def)->size);
-      }
+      if (inheap(x->str.str_self)) {
+	if (what_to_collect == t_contiguous)
+	  mark_contblock((char *)p,S_DATA(def)->size);
+      } else if (SGC_RELBLOCK_P(p) && (COLLECT_RELBLOCK_P))
+	x->str.str_self = copy_relblock((char *)p, S_DATA(def)->size);
     }
     break;
     
@@ -508,37 +437,32 @@ sgc_mark_object1(object x) {
     /*FIXME: centralize this*/
     /*FIXME: SGC_CONTBLOCK_P? */
 #define SGC_MARK_CP(a_,b_) {fixnum _t=(b_);if (inheap((a_))) {\
-                              if (what_to_collect == t_contiguous) mark_contblock((void *)(a_),_t);\
-                           } else if (SGC_RELBLOCK_P((a_))) (a_)=copy_relblock((void *)(a_),_t);}
+	if (what_to_collect == t_contiguous) mark_contblock((void *)(a_),_t); \
+      } else if (SGC_RELBLOCK_P((a_)) && COLLECT_RELBLOCK_P) (a_)=(void *)copy_relblock((void *)(a_),_t);}
 
-#define SGC_MARK_MP(a_) {if ((a_)->_mp_d) \
-                           SGC_MARK_CP((a_)->_mp_d,(a_)->_mp_alloc*MP_LIMB_SIZE);}
+#define SGC_MARK_MP(a_) {if ((a_)->_mp_d) SGC_MARK_CP((a_)->_mp_d,(a_)->_mp_alloc*MP_LIMB_SIZE);}
 
   case t_random:
-    if ((int)what_to_collect >= (int)t_contiguous) {
-      SGC_MARK_MP(x->rnd.rnd_state._mp_seed);
+    SGC_MARK_MP(x->rnd.rnd_state._mp_seed);
 #if __GNU_MP_VERSION < 4 || (__GNU_MP_VERSION == 4 && __GNU_MP_VERSION_MINOR < 2)
-      if (x->rnd.rnd_state._mp_algdata._mp_lc) {
-	SGC_MARK_MP(x->rnd.rnd_state._mp_algdata._mp_lc->_mp_a);
-	if (!x->rnd.rnd_state._mp_algdata._mp_lc->_mp_m2exp) SGC_MARK_MP(x->rnd.rnd_state._mp_algdata._mp_lc->_mp_m);
-	SGC_MARK_CP(x->rnd.rnd_state._mp_algdata._mp_lc,sizeof(*x->rnd.rnd_state._mp_algdata._mp_lc));
-      }
-#endif
+    if (x->rnd.rnd_state._mp_algdata._mp_lc) {
+      SGC_MARK_MP(x->rnd.rnd_state._mp_algdata._mp_lc->_mp_a);
+      if (!x->rnd.rnd_state._mp_algdata._mp_lc->_mp_m2exp) SGC_MARK_MP(x->rnd.rnd_state._mp_algdata._mp_lc->_mp_m);
+      SGC_MARK_CP(x->rnd.rnd_state._mp_algdata._mp_lc,sizeof(*x->rnd.rnd_state._mp_algdata._mp_lc));
     }
+#endif
     break;
     
   case t_readtable:
     if (x->rt.rt_self == NULL)
       break;
     if (what_to_collect == t_contiguous)
-      mark_contblock((char *)(x->rt.rt_self),
-		     RTABSIZE*sizeof(struct rtent));
+      mark_contblock((char *)(x->rt.rt_self),RTABSIZE*sizeof(struct rtent));
     for (i = 0;  i < RTABSIZE;  i++) {
       sgc_mark_object(x->rt.rt_self[i].rte_macro);
       if (x->rt.rt_self[i].rte_dtab != NULL) {
 	if (what_to_collect == t_contiguous)
-	  mark_contblock((char *)(x->rt.rt_self[i].rte_dtab),
-			 RTABSIZE*sizeof(object));
+	  mark_contblock((char *)(x->rt.rt_self[i].rte_dtab),RTABSIZE*sizeof(object));
 	for (j = 0;  j < RTABSIZE;  j++)
 	  sgc_mark_object(x->rt.rt_self[i].rte_dtab[j]);
       }
@@ -588,7 +512,7 @@ sgc_mark_object1(object x) {
       break;
     if (what_to_collect == t_contiguous) {
       if (!MAYBE_DATA_P((x->cfd.cfd_start)) ||
-	  get_mark_bit(get_pageinfo(x->cfd.cfd_start),x->cfd.cfd_start))
+	  get_mark_bit(get_pageinfo(x->cfd.cfd_start),x->cfd.cfd_start))/*FIXME unnecessary?*/
 	break;
       mark_contblock(x->cfd.cfd_start, x->cfd.cfd_size);
       mark_link_array(x->cfd.cfd_start,x->cfd.cfd_start+x->cfd.cfd_size);
@@ -643,13 +567,20 @@ sgc_mark_phase(void) {
   
   for (v=contblock_list_head;v;v=v->next)
     if (v->sgc_flags&SGC_PAGE_FLAG) {
-      struct contblock *c=CB_DATA_START(v),*ce=CB_DATA_END(v)/* ,**cbpp */;
-      for (;c<ce;c++)
-	if (!get_sgc_bit(v,c)) {
-	  /* for (cbpp=&cb_pointer;*cbpp && (c<*cbpp || (void *)c>=(void *)(*cbpp)+(*cbpp)->cb_size);cbpp=&(*cbpp)->cb_link); */
-	  /* if (!*cbpp) */
-	    set_mark_bit(v,c);
-	}
+      void *s=CB_DATA_START(v),*e=CB_DATA_END(v),*p,*q;
+      bool z=get_mark_bit(v,s);
+      for (p=s;p<e;) {
+	q=get_bits(CB_MARK_START(v),v,p);
+	if (!z)
+	  set_mark_bits(v,p,q);
+	z=1-z;
+	p=q;
+      }
+      /* struct contblock *c=CB_DATA_START(v),*ce=CB_DATA_END(v); */
+      /* for (;c<ce;c++) */
+      /* 	if (!get_sgc_bit(v,c)) { */
+      /* 	    set_mark_bit(v,c); */
+      /* 	} */
     }
 	    
   mark_stack_carefully(vs_top-1,vs_org,0);
@@ -719,7 +650,7 @@ sgc_mark_phase(void) {
 
 static void
 sgc_sweep_phase(void) {
-  STATIC long i, j, k;
+  STATIC long j, k;
   STATIC object x;
   STATIC char *p;
   STATIC struct typemanager *tm;
@@ -727,46 +658,22 @@ sgc_sweep_phase(void) {
   int size;
   STATIC struct pageinfo *v;
   
-#ifdef DEBUG
-  if (debug)
-    printf("type map\n");
-#endif
   for (v=cell_list_head;v;v=v->next) {
-    enum type tp=v->type;
 
-    i=page(v);
+    tm = tm_of((enum type)v->type);
+    
+    if (!WRITABLE_PAGE_P(page(v))) 
+      continue;
 
-    if (tp == t_contiguous) {
-      if (debug) {
-	printf("-");
-	continue;
-      }
-    }
-    if (tp >= t_end)
-      continue;
-    
-    tm = tm_of((enum type)tp);
-    
-    /*
-      general sweeper
-    */
-    
-#ifdef DEBUG
-    if (debug) {
-      printf("%c", tm->tm_name[0]);
-      /*
-	fflush(stdout);
-      */
-    }
-#endif
-    if (!WRITABLE_PAGE_P(i)) 
-      continue;
-    p = pagetochar(i);
+    p = pagetochar(page(v));
     f = tm->tm_free;
     k = 0;
     size=tm->tm_size;
-    if (v->sgc_flags&SGC_PAGE_FLAG) {/*(SGC_PAGE_P(i))*/
+
+    if (v->sgc_flags&SGC_PAGE_FLAG) {
+
       for (j = tm->tm_nppage; --j >= 0;  p += size) {
+
 	x = (object)p;
 	
 	if (is_free(x))
@@ -775,60 +682,32 @@ sgc_sweep_phase(void) {
 	  unmark(x);
 	  continue;
 	}
+
 	if (pageinfo(x)->type!=t_cons && x->d.s == SGC_NORMAL)
 	  continue;
 	
 	/* it is ok to free x */
 	
-#ifdef OLD_DISPLACE
-	/* old_displace: from might be free, to not */
-	if(type_of(x) >=t_array && type_of(x) <= t_bitvector) {
-	  /*			case t_array:
-				case t_vector:
-				case t_string:
-				case t_bitvector:
-	  */			
-	  if (x->a.a_displaced->c.c_car != Cnil) {
-	    undisplace(x);
-	    /* The cons x->a.a_displaced cons has been saved,
-	       so as to save the pointer to x->a.a_displaced->c.c_car;
-	       However any arrays in its cdr, must have been
-	       freed, or we would not be freeing x.   To avoid
-	       having a cons with trash in the cdr we set the
-	       cdr to nil
-	    */				    
-	    x->a.a_displaced->c.c_cdr = Cnil;
-	  }
-	}
-#endif /* OLD_DISPLACE */
-#ifdef GMP_USE_MALLOC			
-	if (type_of(x) == t_bignum) 
-	  mpz_clear(MP(x));
-#endif
-	
 	SET_LINK(x,f);
 	make_free(x);
-	if (pagetoinfo(i)->type!=t_cons) x->d.s = SGC_RECENT;
+	if (v->type!=t_cons) x->d.s = SGC_RECENT;
 	f = x;
 	k++;
+
       }
       tm->tm_free = f;
       tm->tm_nfree += k;
-      pagetoinfo(i)->in_use-=k;
-    }
-    else /*non sgc_page */
+      v->in_use-=k;
+
+    } else /*non sgc_page */
       for (j = tm->tm_nppage; --j >= 0;  p += size) {
 	x = (object)p;
-	if (is_marked(x) && !is_free(x)) {unmark(x);}
+	if (is_marked(x) && !is_free(x)) {
+	  unmark(x);
+	}
       }
     
   }
-#ifdef DEBUG
-  if (debug) {
-    putchar('\n');
-    fflush(stdout);
-  }
-#endif
 }
 
 
@@ -836,50 +715,33 @@ static void
 sgc_contblock_sweep_phase(void) {
 
   STATIC char *s, *e, *p, *q;
-  STATIC struct contblock *cbp;
   STATIC struct pageinfo *v;
   
   cb_pointer = NULL;
   ncb = 0;
   for (v=contblock_list_head;v;v=v->next) {
+    bool z;
 
     if (!(v->sgc_flags&SGC_PAGE_FLAG)) continue;
 
     s=CB_DATA_START(v);
     e=CB_DATA_END(v);
 
-    for (p = s;  p < e;) {
-      if (get_mark_bit(v,p)) {
-	/* SGC cont pages: cont blocks must be no smaller than
-	   sizeof(struct contblock), and must not have a sweep
-	   granularity greater than this amount (e.g. CPTR_SIZE) if
-	   contblock leaks are to be avoided.  Used to be aligned at
-	   PTR_ALIGN. CM 20030827 */
-	p += CPTR_SIZE;
-	continue;
-      }
-      q = p + CPTR_SIZE;
-      while (q < e) {
-	if (!get_mark_bit(v,q)) {
-	  q += CPTR_SIZE;
-	  continue;
-	}
-	break;
-      }
-      insert_contblock(p, q - p);
-      p = q + CPTR_SIZE;
+    z=get_mark_bit(v,s);
+    for (p=s;p<e;) {
+      q=get_bits(CB_MARK_START(v),v,p);
+      if (!z)
+	insert_contblock(p,q-p);
+      z=1-z;
+      p=q;
     }
 
     bzero(CB_MARK_START(v),CB_SGCF_START(v)-CB_MARK_START(v));
 
   }
-#ifdef DEBUG
-  if (debug) {
-    for (cbp = cb_pointer; cbp != NULL; cbp = cbp->cb_link)
-      printf("%ld-byte contblock\n", cbp->cb_size);
-    fflush(stdout);
-  }
-#endif
+
+  sweep_link_array();
+
 }
 
 
@@ -1173,7 +1035,8 @@ memprotect_test_reset(void) {
 #define WSGC(tm) ({struct typemanager *_tm=tm;long _t=MMAX(MMIN(_tm->tm_opt_maxpage,_tm->tm_npage),_tm->tm_sgc);_t*scale;})
 /* If opt_maxpage is set, add full pages to the sgc set if needed
    too. 20040804 CM*/
-#define FSGC(tm) (tm->tm_type==t_cons ? tm->tm_nppage : (tm->tm_opt_maxpage ? 0 : tm->tm_sgc_minfree))
+/* #define FSGC(tm) (tm->tm_type==t_cons ? tm->tm_nppage : (tm->tm_opt_maxpage ? 0 : tm->tm_sgc_minfree)) */
+#define FSGC(tm) (tm->tm_type==t_cons ? tm->tm_nppage : tm->tm_sgc_minfree)
 
 DEFVAR("*WRITABLE*",sSAwritableA,SI,Cnil,"");
 
@@ -1359,9 +1222,9 @@ sgc_start(void) {
     if (TM_BASE_TYPE_P(i) && (np=(tm=tm_of(i))->tm_sgc)) {
       object f=tm->tm_free ,x,y,next;
       fixnum count=0;
-      x=y=0;
+      x=y=OBJNULL;
       
-      while (f!=0) {
+      while (f!=OBJNULL) {
 	next=OBJ_LINK(f);
 #ifdef SDEBUG	     
 	if (!is_free(f))
@@ -1404,13 +1267,11 @@ sgc_start(void) {
 	
 	for (cbpp=&cb_pointer;*cbpp;)
 	  if ((void *)*cbpp>=p && (void *)*cbpp<pe) {
-	    struct contblock *c1=*cbpp,*c,*ce=(void *)c1+(*cbpp)->cb_size;
-	    void *l=(*cbpp)->cb_link;
-	    for (c=c1;c<ce;c++)
-	      set_sgc_bit(pi,c);
+	    void *s=*cbpp,*e=s+(*cbpp)->cb_size,*l=(*cbpp)->cb_link;
+	    set_sgc_bits(pi,s,e);
 	    tmp_cb_pointer=cb_pointer;
 	    cb_pointer=new_cb_pointer;
-	    insert_contblock((void *)c1,(void *)ce-(void *)c1);
+	    insert_contblock(s,e-s);
 	    new_cb_pointer=cb_pointer;
 	    cb_pointer=tmp_cb_pointer;
 	    *cbpp=l;
@@ -1457,9 +1318,12 @@ sgc_start(void) {
       else
 	tm_of(t_contiguous)->tm_alt_npage+=pi->in_use;
 #ifdef GCL_GPROF
-    if (gprof_array!=Cnil)
-      for (i=0;i<(gprof_array->st.st_fillp +PAGESIZE-1)/PAGESIZE;i++)
-	SET_WRITABLE(page(gprof_array->st.st_self)+i);
+    {
+      extern object gprof_array;
+      if (gprof_array!=Cnil)
+	for (i=0;i<(gprof_array->st.st_fillp +PAGESIZE-1)/PAGESIZE;i++)
+	  SET_WRITABLE(page(gprof_array->st.st_self)+i);
+    }
 #endif
     for (i=page(heap_end);i<page(old_rb_start);i++)
 	SET_WRITABLE(i);
@@ -1534,7 +1398,7 @@ sgc_quit(void) {
       object f,y;
       
       f=tm->tm_free;
-      if (f==0) 
+      if (f==OBJNULL) 
 	tm->tm_free=tm->tm_alt_free;
       else {
 	/* tack the alt_free onto the end of free */
@@ -1548,7 +1412,7 @@ sgc_quit(void) {
 	}
 	
 	count=0;
-	if (f=tm->tm_alt_free)
+	if (f==tm->tm_alt_free)
 	  while(y= F_LINK(f)) {
 	    if(y->d.s != SGC_NORMAL)
 	      printf("[alt_bad %d]",y);
@@ -1557,14 +1421,14 @@ sgc_quit(void) {
 	
 #endif
 	f=tm->tm_free;
-	while((y= (object) F_LINK(f)))
+	while((y= (object) F_LINK(f))!=OBJNULL)
 	  f=y;
 	F_LINK(f)= (long)(tm->tm_alt_free);
       }
       /* tm->tm_free has all of the free objects */
       tm->tm_nfree += tm->tm_alt_nfree;
       tm->tm_alt_nfree = 0;
-      tm->tm_alt_free = 0;
+      tm->tm_alt_free = OBJNULL;
       
     }
 

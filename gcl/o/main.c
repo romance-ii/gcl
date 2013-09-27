@@ -217,7 +217,7 @@ minimize_image(void) {
   
   if (in_sgc) sgc_quit();
   holepage=new_holepage=1;
-  GBC(t_contiguous);
+  GBC(t_relocatable);
   if (in_sgc) sgc_start();
   new = (void *)(((((ufixnum)rb_pointer)+ PAGESIZE-1)/PAGESIZE)*PAGESIZE);
   core_end = new;
@@ -265,7 +265,7 @@ DEFUN("SET-LOG-MAXPAGE-BOUND",fixnum,fSset_log_maxpage_bound,SI,1,1,NONE,II,OO,O
 
   l=l<def ? l : def;
   end=data_start+(1L<<l)-PAGESIZE;
-  GBC(t_contiguous);
+  GBC(t_relocatable);
   dend=heap_end+PAGESIZE+(((rb_pointer-REAL_RB_START)+PAGESIZE-1)&(-PAGESIZE));
   if (end >= dend) {
     minimize_image();
