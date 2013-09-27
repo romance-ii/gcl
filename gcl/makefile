@@ -101,7 +101,7 @@ $(PORTDIR)/saved_ansi_gcl: $(PORTDIR)/saved_pcl_gcl
 	cd $(@D) && $(MAKE) $(@F)
 
 ansi-tests/test_results: $(PORTDIR)/saved_ansi_gcl
-	cd $(@D) && rm -f *.o rt/*.o && echo '(load "gclload.lsp")' | ../$< >$(@F) 2>&1 & j=$$! ; \
+	cd $(@D) && rm -f *.o rt/*.o && echo '(load "gclload.lsp")' | ../$<  2>&1 |tee $(@F) & j=$$! ; \
 		tail -f --pid=$$j --retry $@ & wait $$j
 
 #$(PCLDIR)/saved_gcl_pcl: $(PORTDIR)/saved_gcl
