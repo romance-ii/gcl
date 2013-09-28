@@ -145,15 +145,20 @@ inline void
 set_bits(char *v,struct pageinfo *pi,void *x1,void *x2) {
 
   void *ds=CB_DATA_START(pi);
-  fixnum i1,s1,i2,s2;
+  fixnum i1,s1,i2,s2,se;
 
   ptr_set(x1,ds,i1,s1);
   ptr_set(x2,ds,i2,s2);
 
-  for (;s1<CHAR_SIZE;s1++)
+  if (i1==i2) {
+    se=s2;
+    s2=0;
+  } else
+    se=CHAR_SIZE;
+
+  for (;s1<se;s1++)
     bit_set(v,i1,s1);
-  i1++;
-  if (i2>i1) memset(v+i1,-1,(i2-i1));
+  if (i2>++i1) memset(v+i1,-1,(i2-i1));
   for (;--s2>=0;)
     bit_set(v,i2,s2);
 
