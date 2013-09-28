@@ -417,7 +417,7 @@ edit_double(int n, double d, int *sp, char *s, int *ep) {
 
   truncate_double(b,d,n!=9);
 
-  if (b[0]!=' ') {
+  if (isdigit(b[0])) {
     b[1]=b[0];
     (*ep)++;
   }
