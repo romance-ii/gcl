@@ -1279,7 +1279,6 @@ void
 GBC(enum type t) {
 
   long i,j;
-  struct apage *pp, *qq;
 #ifdef SGC
   int in_sgc = sgc_enabled;
 #endif
@@ -1437,10 +1436,7 @@ GBC(enum type t) {
     
     if (rb_start < rb_start1) {
       j = (rb_pointer-rb_start + PAGESIZE - 1)/PAGESIZE;
-      pp = (struct apage *)rb_start;
-      qq = (struct apage *)rb_start1;
-      for (i = 0;  i < j;  i++)
-	*pp++ = *qq++;
+      memcpy(rb_start,rb_start1,j*PAGESIZE);
     }
     
 #ifdef SGC
