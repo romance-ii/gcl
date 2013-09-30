@@ -59,6 +59,8 @@ sbrk1(n)
 #define sbrk sbrk1
 #endif /* DEBUG_SBRK */
 
+long starting_hole_div=10;
+long starting_relb_div=20;
 long new_holepage;
 long resv_pages=40;
 
@@ -1027,14 +1029,13 @@ gcl_init_alloc(void) {
   
   set_maxpage();
   
-  /* holepage = INIT_HOLEPAGE; */
-  holepage = available_pages/10;
+  holepage=new_holepage;
+
 #ifdef GCL_GPROF
   if (holepage<textpage)
      holepage=textpage;
 #endif
 
-  new_holepage = available_pages/10;
   /* Unused (at present) tm_distinct flag added.  Note that if cons
      and fixnum share page types, errors will be introduced.
 
@@ -1081,8 +1082,7 @@ gcl_init_alloc(void) {
     set_tm_maxpage(tm_table+t_contiguous,textpage);
 #endif
 
-  set_tm_maxpage(tm_table+t_relocatable,19);
-  nrbpage=9;
+  nrbpage=0;
 
 #ifdef __linux__
   /* Some versions of the Linux startup code are broken.
@@ -1419,32 +1419,23 @@ DEFUN("GPROF-QUIT",object,fSgprof_quit,SI
 
 #endif
 
-DEFUNM("SET-HOLE-SIZE",object,fSset_hole_size,SI
-	   ,1,2,NONE,OI,IO,OO,OO,(fixnum npages,...),"")
-{
-
-  int reserve;
-  va_list ap;
-  fixnum nargs=INIT_NARGS(1);
-  fixnum vals=(fixnum)fcall.valp;
-  object l=Cnil,f=OBJNULL;
-  object *base=vs_top;
-
-  reserve=30;
-  va_start(ap,npages);
-  reserve=(fixnum)NEXT_ARG(nargs,ap,l,f,(object)30);
-  va_end(ap);
+DEFUN("SET-STARTING-HOLE-DIVISOR",fixnum,fSset_starting_hole_divisor,SI,1,1,NONE,II,OO,OO,OO,(fixnum div),"") {
+  if (div>0 && div <100)
+    starting_hole_div=div;
+  return starting_hole_div;
+}
   
-  if (npages < 1 ||
-      npages > real_maxpage - page(heap_end)
-      - 2*nrbpage - real_maxpage/32)
-    FEerror("Illegal value for the hole size.", 0);
-  new_holepage = npages;
-  if (reserve <0 || reserve > new_holepage)
-    FEerror("Illegal value for the hole size.", 0);
-  reserve_pages_for_signal_handler=reserve;
+DEFUN("SET-STARTING-RELBLOCK-DIVISOR",fixnum,fSset_starting_hole_divisor,SI,1,1,NONE,II,OO,OO,OO,(fixnum div),"") {
+  if (div>0 && div <100)
+    starting_relb_div=div;
+  return starting_relb_div;
+}
   
-  RETURN2(make_fixnum(npages),make_fixnum(reserve_pages_for_signal_handler));
+DEFUN("SET-HOLE-SIZE",object,fSset_hole_size,SI,1,2,NONE,OI,IO,OO,OO,(fixnum npages,...),"") {
+
+  printf("This function is obsolete -- use SET-STARTING-HOLE-DIVISOR instead\n");
+
+  RETURN2(make_fixnum(new_holepage),make_fixnum(reserve_pages_for_signal_handler));
 
 }
 

@@ -1055,7 +1055,7 @@ EXTER fixnum ncb;   /*  number of contblocks  */
 EXTER fixnum holepage;   /*  hole pages  */
 #define nrbpage    tm_table[t_relocatable].tm_npage
 #define rbgbccount tm_table[t_relocatable].tm_gbccount
-  
+EXTER fixnum new_holepage,starting_hole_div,starting_relb_div;
 
 #ifdef SGC
 EXTER char *old_rb_start;			/*  read-only relblock start  */
