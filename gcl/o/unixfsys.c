@@ -359,7 +359,7 @@ truename(object pathname)
 		}
 	} else
 		sprintf(truefilename, "%s/%s", p, q);
-	chdir(current_directory);
+	massert(!chdir(current_directory));
 	vs_push(make_simple_string(truefilename));
 	pathname = coerce_to_pathname(vs_head);
 	vs_reset;

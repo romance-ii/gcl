@@ -540,10 +540,10 @@ char **argv;
   fdout = ostream->sm.sm_int0;
   if (fork() == 0)
     { /* the child --- replace standard in and out with descriptors given */
-      dup2(fdin,0);
-      dup2(fdout,1);
-      close(fdin);
-      close(fdout);
+      close(0);
+      massert(dup(fdin)>=0);
+      close(1);
+      massert(dup(fdout)>=0);
       fprintf(stderr, "\n***** Spawning process %s ", pname);
       if (execvp(pname, argv) == -1)
 	{
