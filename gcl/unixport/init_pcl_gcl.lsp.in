@@ -109,6 +109,7 @@
   (setq compiler::*init-lsp* @LI-INIT-LSP@)
 
   (defvar si::*system-banner* (si::default-system-banner))
+ (setq si::*optimize-maximum-pages* t)
 
   (in-package 'user)
   (import 'si::info)
