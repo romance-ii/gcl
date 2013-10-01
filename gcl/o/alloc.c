@@ -60,7 +60,7 @@ sbrk1(n)
 #endif /* DEBUG_SBRK */
 
 long starting_hole_div=10;
-long starting_relb_div=20;
+long starting_relb_heap_mult=2;
 long new_holepage;
 long resv_pages=40;
 
@@ -1426,10 +1426,10 @@ DEFUN("SET-STARTING-HOLE-DIVISOR",fixnum,fSset_starting_hole_divisor,SI,1,1,NONE
   return starting_hole_div;
 }
   
-DEFUN("SET-STARTING-RELBLOCK-DIVISOR",fixnum,fSset_starting_relb_divisor,SI,1,1,NONE,II,OO,OO,OO,(fixnum div),"") {
-  if (div>0 && div <100)
-    starting_relb_div=div;
-  return starting_relb_div;
+DEFUN("SET-STARTING-RELBLOCK-HEAP-MULTIPLE",fixnum,fSset_starting_relb_heap_multiple,SI,1,1,NONE,II,OO,OO,OO,(fixnum mult),"") {
+  if (mult>=0)
+    starting_relb_heap_mult=mult;
+  return starting_relb_heap_mult;
 }
   
 DEFUN("SET-HOLE-SIZE",object,fSset_hole_size,SI,1,2,NONE,OI,IO,OO,OO,(fixnum npages,...),"") {

@@ -205,7 +205,7 @@ update_real_maxpage(void) {
   available_pages-=resv_pages;
 
   new_holepage=available_pages/starting_hole_div;
-  j*=2;
+  j*=starting_relb_heap_mult;
   if (maxrbpage<j)
     massert(set_tm_maxpage(tm_table+t_relocatable,j));
 
