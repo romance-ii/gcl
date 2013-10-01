@@ -1362,8 +1362,6 @@ DEFUN("MV-REF",object,fSmv_ref,SI,1,1,NONE,OI,OO,OO,OO,(ufixnum i),"") {
   if (i >= (sizeof(MVloc)/sizeof(object)))
     FEerror("Bad mv index",0);
   x = MVloc[i];
-  if (x == 0)
-    FEerror("Null value",0);
   return x;
 }
 
