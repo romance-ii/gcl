@@ -193,14 +193,21 @@ update_real_maxpage(void) {
 #endif
 
   available_pages=real_maxpage-first_data_page;
-  for (i=t_start;i<t_other;i++)
-    available_pages-=tm_table[i].tm_type==t_relocatable ? 2*tm_table[i].tm_maxpage : tm_table[i].tm_maxpage;
+  for (i=t_start,j=0;i<t_other;i++) {
+    long k=tm_table[i].tm_maxpage;
+    if (tm_table[i].tm_type==t_relocatable)
+      k*=2;
+    else
+      j+=k;
+    available_pages-=k;
+  }
   resv_pages=40<available_pages ? 40 : available_pages;
   available_pages-=resv_pages;
 
   new_holepage=available_pages/starting_hole_div;
-  if (maxrbpage<available_pages/starting_relb_div)
-    massert(set_tm_maxpage(tm_table+t_relocatable,available_pages/starting_relb_div));
+  j*=2;
+  if (maxrbpage<j)
+    massert(set_tm_maxpage(tm_table+t_relocatable,j));
 
   return 0;
 
