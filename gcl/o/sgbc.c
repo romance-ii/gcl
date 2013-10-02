@@ -565,40 +565,23 @@ sgc_mark_phase(void) {
     }
   }
   
-  for (v=contblock_list_head;v;v=v->next)
-    if (v->sgc_flags&SGC_PAGE_FLAG) {
-      void *s=CB_DATA_START(v),*e=CB_DATA_END(v),*p,*q;
-      bool z=get_sgc_bit(v,s);
-      for (p=s;p<e;) {
-	q=get_sgc_bits(v,p);
-	if (!z)
-	  set_mark_bits(v,p,q);
-	z=1-z;
-	p=q;
-      }
-      /* struct contblock *c=CB_DATA_START(v),*ce=CB_DATA_END(v); */
-      /* for (;c<ce;c++) */
-      /* 	if (!get_sgc_bit(v,c)) { */
-      /* 	    set_mark_bit(v,c); */
-      /* 	} */
-    }
+  /* mark all non recent data on writable contiguous pages */
+  if (what_to_collect == t_contiguous)
+    for (v=contblock_list_head;v;v=v->next)
+      if (v->sgc_flags&SGC_PAGE_FLAG) {
+	void *s=CB_DATA_START(v),*e=CB_DATA_END(v),*p,*q;
+	bool z=get_sgc_bit(v,s);
+	for (p=s;p<e;) {
+	  q=get_sgc_bits(v,p);
+	  if (!z)
+	    set_mark_bits(v,p,q);
+	  z=1-z;
+	  p=q;
+	}
 	    
   mark_stack_carefully(vs_top-1,vs_org,0);
-  /* clear_stack(vs_top,vs_limit); */
   mark_stack_carefully(MVloc+(sizeof(MVloc)/sizeof(object)),MVloc,0);
-  /* 
-     for (p = vs_org;  p < vs_top;  p++) {
-     if (p && (inheap(*p)))
-     sgc_mark_object(*p);
-     }
-  */
-#ifdef DEBUG
-  if (debug) {
-    printf("value stack marked\n");
-    fflush(stdout);
-  }
-#endif
-  
+
   for (bdp = bds_org;  bdp<=bds_top;  bdp++) {
     sgc_mark_object(bdp->bds_sym);
     sgc_mark_object(bdp->bds_val);
