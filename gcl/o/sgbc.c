@@ -508,8 +508,6 @@ sgc_mark_object1(object x) {
       while(i-- > 0)
 	sgc_mark_object(x->cfd.cfd_self[i]);
     }
-    if (x->cfd.cfd_start == NULL)
-      break;
     if (what_to_collect == t_contiguous) {
       mark_contblock(x->cfd.cfd_start, x->cfd.cfd_size);
       mark_link_array(x->cfd.cfd_start,x->cfd.cfd_start+x->cfd.cfd_size);
