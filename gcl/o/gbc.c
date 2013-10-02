@@ -855,9 +855,6 @@ mark_object(object x) {
     if (x->cfd.cfd_start == NULL)
       break;
     if (what_to_collect == t_contiguous) {
-      if (!MAYBE_DATA_P((x->cfd.cfd_start)) ||
-	  get_mark_bit(get_pageinfo(x->cfd.cfd_start),x->cfd.cfd_start))/*FIXME unnecessary?*/
-	break;
       mark_contblock(x->cfd.cfd_start, x->cfd.cfd_size);
       mark_link_array(x->cfd.cfd_start,x->cfd.cfd_start+x->cfd.cfd_size);
     }
