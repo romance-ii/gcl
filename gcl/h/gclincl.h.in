@@ -366,9 +366,6 @@
 /* fill bits needed in certain lisp structures */
 #undef QM4BITS
 
-/* address at which shared lib placement terminates heap growth */
-#undef SHARED_LIB_HEAP_CEILING
-
 /* have sigcontext in signal.h */
 #undef SIGNAL_H_HAS_SIGCONTEXT
 

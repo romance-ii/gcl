@@ -1774,54 +1774,60 @@ AC_DEFINE_UNQUOTED(CSTACK_DIRECTION,$cstack_direction,[whether C stack grows up 
 AC_MSG_RESULT($cstack_direction)
 
 
-AC_MSG_CHECKING(for shared library/C stack ceiling to heap)
-if test "$use" = "mingw" ; then
-  heap_ceiling=2000000000
-else
-if test "$use" = "solaris-i386" ; then
-  heap_ceiling=0x0
-else
-if test "$enable_static" = "yes" ; then
-  heap_ceiling=0x0
-else
-if ! test -x `which ldd` && ! test -d /proc/self ; then
-   heap_ceiling=0x0
-else
-if test -d /proc/self ; then
-   heap_ceiling=0x`/bin/cat /proc/self/maps | egrep "/lib/([[^/]]*/)?ld" | cut -f1 -d- | head -1`
-else
-#echo -e "#include <stdio.h>\n int main() {printf(\"foo\");return 0;}" >foo.c
-#$CC foo.c -o foo
-   AAWK=`which $AWK`
-# | grep -v ld-kfreebsd needed on some strange bsd amd64 boxes
-   heap_ceiling=`ldd $AAWK | tail -n 1 | $AWK '{print $NF}' | tr -d '()'`
-fi
-AC_RUN_IFELSE([AC_LANG_PROGRAM([[
-	#include <stdio.h>
-	]],[[
-	FILE *fp=fopen("conftest1","w");
-	unsigned long h=$heap_ceiling,d=$dbegin,c=$cstack_address;
-	h=h<d ? 0 : h;
-	h=c>d && c<h ? c : h;
-	fprintf(fp,"0x%lx",h);
-	return 0;]])],[heap_ceiling=`cat conftest1`],[AC_MSG_ERROR([failed])])
-fi
-fi
-fi
-fi
-AC_MSG_RESULT($heap_ceiling)
-AC_DEFINE_UNQUOTED(SHARED_LIB_HEAP_CEILING,$heap_ceiling,
-	[address at which shared lib placement terminates heap growth])
+dnl AC_MSG_CHECKING(for shared library/C stack ceiling to heap)
+dnl if test "$use" = "mingw" ; then
+dnl   heap_ceiling=2000000000
+dnl else
+dnl if test "$use" = "solaris-i386" ; then
+dnl   heap_ceiling=0x0
+dnl else
+dnl if test "$enable_static" = "yes" ; then
+dnl   heap_ceiling=0x0
+dnl else
+dnl if ! test -x `which ldd` && ! test -f /proc/self/maps ; then
+dnl    heap_ceiling=0x0
+dnl else
+dnl if test -f /proc/self/maps ; then
+dnl    heap_ceiling=0x`/bin/cat /proc/self/maps | grep "/lib.*/ld-" | cut -f1 -d- | head -1`
+dnl else 
+dnl if test "`which ldd`" = "" ; then 
+dnl    heap_ceiling=0x0
+dnl else
+dnl #echo -e "#include <stdio.h>\n int main() {printf(\"foo\");return 0;}" >foo.c
+dnl #$CC foo.c -o foo
+dnl    AAWK=`which awk`
+dnl # | grep -v ld-kfreebsd needed on some strange bsd amd64 boxes
+dnl    heap_ceiling=`ldd $AAWK | tail -n 1 | $AWK '{print $NF}' | tr -d '()'`
+dnl fi
+dnl fi
+dnl AC_RUN_IFELSE([AC_LANG_PROGRAM([[
+dnl 	#include <stdio.h>
+dnl 	]],[[
+dnl 	FILE *fp=fopen("conftest1","w");
+dnl 	unsigned long h=$heap_ceiling,d=$dbegin,c=$cstack_address;
+dnl 	h=h<d ? 0 : h;
+dnl 	h=c>d && c<h ? c : h;
+dnl 	fprintf(fp,"0x%lx",h);
+dnl 	return 0;]])],[heap_ceiling=`cat conftest1`],[AC_MSG_ERROR([failed])])
+dnl fi
+dnl fi
+dnl fi
+dnl fi
+dnl AC_MSG_RESULT($heap_ceiling)
+dnl AC_DEFINE_UNQUOTED(SHARED_LIB_HEAP_CEILING,$heap_ceiling,
+dnl 	[address at which shared lib placement terminates heap growth])
 
-## Don't lower heap start if C stack is below default dbegin, as we're
-# likely to get more heap this way.
-if test "$enable_static" = "yes" ; then 
-   echo "int main() {return !((unsigned long)$dbegin < (unsigned long)$cstack_address);}" >foo.c
-else
-   echo "int main() {return !($heap_ceiling && (unsigned long)$dbegin < (unsigned long)$cstack_address);}" >foo.c
-fi
-$CC foo.c -o foo
-if ./foo ; then
+dnl ## Don't lower heap start if C stack is below default dbegin, as we're
+dnl # likely to get more heap this way.
+dnl if test "$enable_static" = "yes" ; then 
+dnl    echo "int main() {return !((unsigned long)$dbegin < (unsigned long)$cstack_address);}" >foo.c
+dnl else
+dnl    echo "int main() {return !($heap_ceiling && (unsigned long)$dbegin < (unsigned long)$cstack_address);}" >foo.c
+dnl fi
+dnl $CC foo.c -o foo
+dnl if ./foo ; then
+
+if test "$use" != "386-gnu" ; then #hurd can push .data below C stack, but sbrk(0) remains above, foiling unexec
 
    AC_MSG_CHECKING([finding default linker script])
    touch unixport/gcl.script
@@ -1901,6 +1907,7 @@ if ./foo ; then
       AC_MSG_RESULT([not found])
   fi 
 
+<<<<<<< HEAD
    old_LDFLAGS="$LDFLAGS"
    LDFLAGS="$LDFLAGS $TLDFLAGS"
    AC_MSG_CHECKING([revised DBEGIN])
@@ -2034,6 +2041,12 @@ if test "$tmp_cssize" != "$enable_cssize" ; then
    AC_MSG_RESULT($enable_cssize)
 else
    AC_MSG_RESULT($enable_cssize is OK)
+=======
+else
+ 
+     AC_DEFINE_UNQUOTED(OBJNULL,NULL,[lowest address non-object])      	 
+
+>>>>>>> f2da399... define OBJNULL for hurd
 fi
 AC_DEFINE_UNQUOTED(CSSIZE,$enable_cssize,[maximum C stack size])
 
