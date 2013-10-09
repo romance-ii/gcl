@@ -181,7 +181,7 @@ number_expt(object x, object y)
 			if (number_evenp(y)) {
 				x = number_times(x, x);
 				vs_top[-1] = x;
-				y = integer_divide1(y, small_fixnum(2));
+				y = integer_divide1(y, small_fixnum(2),0);
 				vs_top[-2] = y;
 			} else {
 				z = number_times(z, x);
@@ -323,6 +323,32 @@ COMPLEX:
 	z = number_expt(x, plus_half);}
 	vs_reset;
 	return(z);
+}
+
+object
+number_abs(object x) {
+  object r,i,z;
+  switch(type_of(x)) {
+  case t_complex:
+    if (number_zerop(x)) return x;
+    r=number_abs(x->cmp.cmp_real);
+    i=number_abs(x->cmp.cmp_imag);
+    if (number_compare(r,i)<0) {
+      object z=i;
+      i=r;
+      r=z;
+    }
+    z=number_divide(i,r);
+    return number_times(r,number_sqrt(one_plus(number_times(z,z))));
+   break;
+  default:
+    return number_minusp(x) ? number_negate(x) : x;
+  }
+}
+
+object
+number_signum(object x) {
+  return number_zerop(x) ? x : number_divide(x,number_abs(x));
 }
 
 static object
