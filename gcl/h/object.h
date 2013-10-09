@@ -1333,10 +1333,6 @@ EXTER unsigned plong signals_allowed, signals_pending  ;
 #define endp(a) (consp(a) ? FALSE : ((a)==Cnil ? TRUE : ({TYPE_ERROR((a),sLlist);FALSE;})))
 
 
-#define eql(a_,b_)    ({register object _a=(a_);register object _b=(b_);_a==_b || eql1(_a,_b);})
-#define equal(a_,b_)  ({register object _a=(a_);register object _b=(b_);_a==_b || equal1(_a,_b);})
-#define equalp(a_,b_) ({register object _a=(a_);register object _b=(b_);_a==_b || equalp1(_a,_b);})
-
 extern void *stack_alloc_start,*stack_alloc_end;
 
 
@@ -1446,3 +1442,11 @@ EXTER object null_string;
 #define INIT_NARGS(_n) ({fixnum _v=VFUN_NARGS;_v=_v<0 ? _v+_n : _v-_n;_v;})
 
 #define object_to_object(x) x
+
+#define proper_list(a) (type_of(a)==t_cons || (a)==Cnil)
+
+#define IMMNIL(x) (is_imm_fixnum(x)||x==Cnil)
+
+#define eql(a_,b_)    ({register object _a=(a_);register object _b=(b_);_a==_b || (!IMMNIL(_a)&&!IMMNIL(_b)&&eql1(_a,_b));})
+#define equal(a_,b_)  ({register object _a=(a_);register object _b=(b_);_a==_b || (!IMMNIL(_a)&&!IMMNIL(_b)&&equal1(_a,_b));})
+#define equalp(a_,b_) ({register object _a=(a_);register object _b=(b_);_a==_b || (_a!=Cnil&&_b!=Cnil&&equalp1(_a,_b));})

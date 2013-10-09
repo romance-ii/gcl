@@ -26,6 +26,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include <stdlib.h>
+#include <string.h>
 #include "include.h"
 
 DEFUN("NULL",object,fLnull,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
@@ -175,7 +176,7 @@ DEFUN("EQ",object,fLeq,LISP,2,2,NONE,OO,OO,OO,OO,(object x0,object x1),"") {
 bool
 eql1(register object x,register object y) {
 
-  if (x==Cnil||y==Cnil||is_imm_fixnum(x)||is_imm_fixnum(y)) return FALSE;
+  /*x and y are not == and not Cnil and not immfix*/
 
   if (valid_cdr(x)||valid_cdr(y)||x->d.t!=y->d.t) return FALSE;
   
@@ -187,6 +188,12 @@ eql1(register object x,register object y) {
 
 }
 
+/*for sublis1-inline*/
+bool
+oeql(object x,object y) {
+  return eql(x,y) ? TRUE : FALSE;
+}
+
 DEFUN("EQL",object,fLeql,LISP,2,2,NONE,OO,OO,OO,OO,(object x0,object x1),"") {
   RETURN1(eql(x0,x1) ? Ct : Cnil);
 }
@@ -195,16 +202,13 @@ DEFUN("EQL",object,fLeql,LISP,2,2,NONE,OO,OO,OO,OO,(object x0,object x1),"") {
 bool
 equal1(register object x, register object y) {
 
-  register int cx;
+  /*x and y are not == and not Cnil and not immfix*/
+
+  if (valid_cdr(x)) return valid_cdr(y)&&equal(x->c.c_car,y->c.c_car)&&equal(x->c.c_cdr,y->c.c_cdr);
+
+  if (valid_cdr(y)) return FALSE;
   
-  for (;x!=y && (cx=consp(x)) && consp(y);x=x->c.c_cdr,y=y->c.c_cdr)
-    if (!equal(x->c.c_car,y->c.c_car)) return FALSE;
-
-  if (x==y) return TRUE;
-  if (cx)   return FALSE;
-  if (x==Cnil||y==Cnil||is_imm_fixnum(x)||is_imm_fixnum(y)) return FALSE;
-
-  if (valid_cdr(y)||x->d.t!=y->d.t)
+  if (x->d.t!=y->d.t)
     return FALSE;
   
   switch(x->d.t) {
@@ -232,14 +236,10 @@ equal1(register object x, register object y) {
 	equal(x->pn.pn_device, y->pn.pn_device) &&
 	equal(x->pn.pn_directory, y->pn.pn_directory) &&
 	equal(x->pn.pn_name, y->pn.pn_name) &&
-	equal(x->pn.pn_type, y->pn.pn_type)) {
-      /* version is ignored unless logical host */
-      if ((type_of(x->pn.pn_host)==t_string) &&
-	  (pathname_lookup(x->pn.pn_host,sSApathname_logicalA) != Cnil))
-	return(equal(x->pn.pn_version, y->pn.pn_version) ? TRUE : FALSE);
-      else
-	return(TRUE);
-    } else
+	equal(x->pn.pn_type, y->pn.pn_type) &&
+	equal(x->pn.pn_version, y->pn.pn_version))
+      return(TRUE);
+    else
       return(FALSE);
 
     eqlm(x,y);
@@ -248,27 +248,27 @@ equal1(register object x, register object y) {
 
 }
 
-
 DEFUN("EQUAL",object,fLequal,LISP,2,2,NONE,OO,OO,OO,OO,(object x0,object x1),"") {
   RETURN1(equal(x0, x1) ? Ct : Cnil);
 }
 
-
-
+/*for sublis1-inline*/
+bool
+oequal(object x,object y) {
+  return equal(x,y) ? TRUE : FALSE;
+}
 
 bool
 equalp1(register object x, register object y) {
 
-  register int cx;
   enum type tx,ty;
   fixnum j;
   
-  for (;x!=y && (cx=consp(x)) && consp(y);x=x->c.c_cdr,y=y->c.c_cdr)
-    if (!equalp(x->c.c_car,y->c.c_car)) return FALSE;
+  /*x and y are not == and not Cnil*/
 
-  if (x==y) return TRUE;
-  if (cx||listp(y))   return FALSE;
-  if (x==Cnil) return FALSE;
+  if (listp(x)) return listp(y)&&equalp(x->c.c_car,y->c.c_car)&&equalp(x->c.c_cdr,y->c.c_cdr);
+    
+  if (listp(y)) return FALSE;
 
   tx=is_imm_fixnum(x) ? t_fixnum : x->d.t;
   ty=is_imm_fixnum(y) ? t_fixnum : y->d.t;
@@ -319,7 +319,6 @@ equalp1(register object x, register object y) {
 
   default:
     break;
-
   }
   
   if (tx != ty)
@@ -414,10 +413,16 @@ equalp1(register object x, register object y) {
 
 }
 
+/*for sublis1-inline*/
+bool 
+oequalp(object x,object y) {
+  return equalp(x,y) ? TRUE : FALSE;
+}
 
 DEFUN("EQUALP",object,fLequalp,LISP,2,2,NONE,OO,OO,OO,OO,(object x0,object x1),"") {
   RETURN1(equalp(x0,x1) ? Ct : Cnil);
 }
+
 
 static void
 FFN(Fand)(object args) {

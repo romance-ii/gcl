@@ -432,10 +432,6 @@ extern object search_local_pathname();
 extern object coerce_to_local_namestring();
 extern object expand_pathname();
 
-/*  prediate.c  */
-
-int eql1(),equal1(),eq();
-
 /*  print.d  */
 EXTER object sKupcase;
 EXTER object sKdowncase;
