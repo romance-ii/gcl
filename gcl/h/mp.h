@@ -73,7 +73,7 @@ typedef struct
 #define subsi(u,a,b) mpz_sub(u,SI_TO_MP(a,big_fixnum1),b)
 #define subis(u,a,b) (b >= 0 ?  mpz_sub_ui(u,a,b) : mpz_add_ui(u,a,ineg(b)))
 #define subss(u,a,b) subis(u,SI_TO_MP(a,big_fixnum1),b)
-#define shifti(u,a,w) (w>=0 ? mpz_mul_2exp(u,a,w) : mpz_fdiv_q_2exp(u,MP(x),ineg(w)))
+#define shifti(u,a,w) (w>=0 ? mpz_mul_2exp(u,a,w) : mpz_fdiv_q_2exp(u,a,ineg(w)))
 
 
 
