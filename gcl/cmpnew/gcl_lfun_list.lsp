@@ -507,6 +507,8 @@
 ;;     NIL NIL) 
 ;; (DEFSYSFUN 'SI::BIT-ARRAY-OP "siLbit_array_op" NIL T NIL NIL)
 
+(dolist (l '(ldb-test logtest))
+  (setf (get l 'predicate) t))
 
 
 
