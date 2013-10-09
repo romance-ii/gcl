@@ -107,7 +107,7 @@ make_fixnum1(long i)
 object
 make_ratio(object num, object den,int pre_cancelled)
 {
-	object g, r, integer_divide1(object x, object y), get_gcd(object x, object y);
+	object g, r, get_gcd(object x, object y);
 	vs_mark;
 
 	if (den==small_fixnum(0) /* number_zerop(den) */)
@@ -124,21 +124,11 @@ make_ratio(object num, object den,int pre_cancelled)
 		return(num);
 	if (!pre_cancelled) {
 	  g = get_gcd(num, den);
-	  vs_push(g);
-	  num = integer_divide1(num, g); /*FIXME exact division here*/
-	  vs_push(num);
-	  den = integer_divide1(den, g);
-	  vs_push(den);
+	  num = integer_divide1(num, g,0); /*FIXME exact division here*/
+	  den = integer_divide1(den, g,0);
 	  if(den==small_fixnum(1)/* type_of(den) == t_fixnum && fix(den) == 1 */) {
-	    vs_reset;
 	    return(num);
 	  }
-	  /* Impossible, as gcd is positive, and den is made positive above. */
-/* 	  if(type_of(den) == t_fixnum && fix(den) == -1) { */
-/* 	    num = number_negate(num); */
-/* 	    vs_reset; */
-/* 	    return(num); */
-/* 	  } */
 	}
 	r = alloc_object(t_ratio);
 	r->rat.rat_num = num;
@@ -264,14 +254,14 @@ number_to_double(object x)
 	      if (ISNORMAL(dx))
 		dx*=0.5;
 	      else {
-		xx=integer_divide1(xx,small_fixnum(2));
+		xx=integer_divide1(xx,small_fixnum(2),0);
 		dx=number_to_double(xx);
 	      }
 
 	      if (ISNORMAL(dy))
 		dy*=0.5;
 	      else {
-		yy=integer_divide1(yy,small_fixnum(2));
+		yy=integer_divide1(yy,small_fixnum(2),0);
 		dy=number_to_double(yy);
 	      }
 

@@ -44,6 +44,11 @@ object plus_half, minus_half;
    * it is not zero, and
    * its exponent is non-zero.
 */
+
+#ifndef IEEEFLOAT
+#error this file needs IEEEFLOAT
+#endif
+
 int 
 gcl_isnormal_double(double d) {
 
@@ -52,13 +57,9 @@ gcl_isnormal_double(double d) {
   if (!ISFINITE(d) || !d)
     return 0;
 
-#ifdef IEEEFLOAT
   u.d = d;
   /*FIXME 64, and 0x7f below*/
   return (u.i[HIND] & 0x7ff00000) != 0;
-#else
-#error gcl_isnormal_double only implemented for IEEE
-#endif
 
 }
 
@@ -69,71 +70,10 @@ int gcl_isnormal_float(float f)
   if (!ISFINITE(f) || !f)
     return 0;
 
-#ifdef IEEEFLOAT
   u.f = f;
   return (u.i & 0x7f800000) != 0;
-#else
-#error gcl_isnormal_float only implemented for IEEE
-#endif
 
 }
-
-#ifdef VAX
-/*
-	radix = 2
-
-	SEEEEEEEEHHHHHHH	The redundant most significant fraction bit
-	HHHHHHHHHHHHHHHH	is not expressed.
-	LLLLLLLLLLLLLLLL
-	LLLLLLLLLLLLLLLL
-*/
-#endif
-#ifdef IBMRT
-
-
-
-
-
-
-
-
-#endif
-#ifdef IEEEFLOAT
-#ifdef NS32K
-
-
-
-
-
-
-
-#else
-/*
-	radix = 2
-
-	SEEEEEEEEEEEHHHHHHHHHHHHHHHHHHHH	The redundant most
-	LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL	significant fraction bit
-						is not expressed.
-*/
-#endif
-#endif
-#ifdef MV
-
-
-
-
-
-
-#endif
-#ifdef S3000
-/*
-	radix = 16
-
-	SEEEEEEEHHHHHHHHHHHHHHHHHHHHHHHH
-	LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
-*/
-#endif
-
 
 DEFUN("ISFINITE",object,fSisfinite,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
@@ -153,10 +93,7 @@ DEFUN("ISFINITE",object,fSisfinite,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
 }
 
-
-
-
-void
+static void
 integer_decode_double(double d, int *hp, int *lp, int *ep, int *sp)
 {
 	int h, l;
@@ -168,24 +105,9 @@ integer_decode_double(double d, int *hp, int *lp, int *ep, int *sp)
 		*sp = 1;
 		return;
 	}
-#ifdef NS32K
-
-
-#else
 	u.d=d;
 	h=u.i[HIND];
 	l=u.i[LIND];
-/* 	h = *((int *)(&d) + HIND); */
-/* 	l = *((int *)(&d) + LIND); */
-#endif
-#ifdef VAX
-	*ep = ((h >> 7) & 0xff) - 128 - 56;
-	h = ((h >> 15) & 0x1fffe) | (((h & 0x7f) | 0x80) << 17);
-	l = ((l >> 16) & 0xffff) | (l << 16);
-	/* is this right!!!! I don't believe it --wfs */
-	h = h >> 1;
-#endif
-#ifdef IEEEFLOAT
 	if (ISNORMAL(d)) {
 	  *ep = ((h & 0x7ff00000) >> 20) - 1022 - 53;
 	  h = ((h & 0x000fffff) | 0x00100000);
@@ -193,12 +115,6 @@ integer_decode_double(double d, int *hp, int *lp, int *ep, int *sp)
 	  *ep = ((h & 0x7fe00000) >> 20) - 1022 - 53 + 1;
 	  h = (h & 0x001fffff);
 	}
-#endif
-#ifdef S3000
-	*ep = ((h & 0x7f000000) >> 24) - 64 - 14;
-	h = (h & 0x00ffffff);
-#endif
-	/*FIXME 64, note int args*/
 	if (32-BIG_RADIX)
 	  /* shift for making bignum */
 	  { h = h << (32-BIG_RADIX) ; 
@@ -210,45 +126,6 @@ integer_decode_double(double d, int *hp, int *lp, int *ep, int *sp)
 	*sp = (d > 0.0 ? 1 : -1);
 }
 
-#ifdef VAX
-/*
-	radix = 2
-
-	SEEEEEEEEMMMMMMM	The redundant most significant fraction bit
-	MMMMMMMMMMMMMMMM	is not expressed.
-*/
-#endif
-#ifdef IBMRT
-
-
-
-
-
-
-#endif
-#ifdef IEEEFLOAT
-/*
-	radix = 2
-
-	SEEEEEEEEMMMMMMMMMMMMMMMMMMMMMMM	The redundant most
-						significant fraction bit
-						is not expressed.
-*/
-#endif
-#ifdef MV
-
-
-
-
-
-#endif
-#ifdef S3000
-/*
-	radix = 16
-
-	SEEEEEEEMMMMMMMMMMMMMMMMMMMMMMMM
-*/
-#endif
 static void
 integer_decode_float(double d, int *mp, int *ep, int *sp)
 {
@@ -266,15 +143,6 @@ integer_decode_float(double d, int *mp, int *ep, int *sp)
 	u.f=f;
 	m=u.i;
 /* 	m = *(int *)(&f); */
-#ifdef VAX
-	*ep = ((m >> 7) & 0xff) - 128 - 24;
-	*mp = ((m >> 16) & 0xffff) | (((m & 0x7f) | 0x80) << 16);
-#endif
-#ifdef IBMRT
-
-
-#endif
-#ifdef IEEEFLOAT
 	if (ISNORMAL(f)) {
 	  *ep = ((m & 0x7f800000) >> 23) - 126 - 24;
 	  *mp = (m & 0x007fffff) | 0x00800000;
@@ -282,15 +150,6 @@ integer_decode_float(double d, int *mp, int *ep, int *sp)
 	  *ep = ((m & 0x7f000000) >> 23) - 126 - 24 + 1;
 	  *mp = m & 0x00ffffff;
 	}
-#endif
-#ifdef MV
-
-
-#endif
-#ifdef S3000
-	*ep = ((m & 0x7f000000) >> 24) - 64 - 6;
-	*mp = m & 0x00ffffff;
-#endif
 	*sp = (f > 0.0 ? 1 : -1);
 }
 
@@ -301,26 +160,8 @@ double_exponent(double d)
 
 	if (d == 0.0)
 		return(0);
-#ifdef VAX
-	return(((*(int *)(&d) >> 7) & 0xff) - 128);
-#endif
-#ifdef IBMRT
-
-#endif
-#ifdef IEEEFLOAT
-#ifdef NS32K
-
-#else
 	u.d=d;
 	return (((u.i[HIND] & 0x7ff00000) >> 20) - 1022);
-#endif
-#endif
-#ifdef MV
-
-#endif
-#ifdef S3000
-	return(((*(int *)(&d) & 0x7f000000) >> 24) - 64);
-#endif
 }
 
 static double
@@ -332,92 +173,41 @@ set_exponent(double d, int e)
 		return(0.0);
 	  
 	u.d=d;
-	u.i[HIND]
-#ifdef VAX
-	= *(int *)(&d) & 0xffff807f | ((e + 128) << 7) & 0x7f80;
-#endif
-#ifdef IBMRT
-
-#endif
-#ifdef IEEEFLOAT
-#ifdef NS32K
-
-#else
-	= (u.i[HIND] & 0x800fffff) | (((e + 1022) << 20) & 0x7ff00000);
-#endif
-#endif
-#ifdef MV
-
-#endif
-#ifdef S3000
-	= *(int *)(&d) & 0x80ffffff | ((e + 64) << 24) & 0x7f000000;
-#endif
+	u.i[HIND]= (u.i[HIND] & 0x800fffff) | (((e + 1022) << 20) & 0x7ff00000);
 	return(u.d);
 }
 
 
 object
-double_to_integer(double d)
-{
-	int h, l, e, s;
-	object x;
-	object shift_integer(object x, fixnum w);
-	vs_mark;
+double_to_integer(double d) {
 
-	if (d == 0.0)
-		return(small_fixnum(0));
-	integer_decode_double(d, &h, &l, &e, &s);
-#ifdef VAX
-	if (e <= -BIG_RADIX) {
-		h >>= (-e) - BIG_RADIX;
-#endif
-#ifdef IBMRT
+  int h, l, e, s;
+  object x;
+  vs_mark;
+  
+  if (d == 0.0)
+    return(small_fixnum(0));
+  integer_decode_double(d, &h, &l, &e, &s);
 
-
-#endif
-#ifdef IEEEFLOAT
-	if (e <= -BIG_RADIX) {
-		e = (-e) - BIG_RADIX;
-		if (e >= BIG_RADIX)
-			return(small_fixnum(0));
-		h >>= e;
-#endif
-#ifdef MV
-
-
-#endif
-#ifdef S3000
-	if (e <= -8) {
-		h >>= 4*(-e) - BIG_RADIX;
-#endif
-		return(make_fixnum(s*h));
-	}
-	if (h != 0 || l<0)
-		x = bignum2(h, l);
-	else
-		x = make_fixnum(l);
-	vs_push(x);
-#ifdef VAX
-	x = shift_integer(x, e);
-#endif
-#ifdef IBMRT
-
-#endif
-#ifdef IEEEFLOAT
-	x = shift_integer(x, e);
-#endif
-#ifdef MV
-
-#endif
-#ifdef S3000
-	x = shift_integer(x, 4*e);
-#endif
-	if (s < 0) {
-		vs_push(x);
-		x = number_negate(x);
-	}
-	vs_reset;
-	return(x);
+  if (e <= -BIG_RADIX) {
+    e = (-e) - BIG_RADIX;
+    if (e >= BIG_RADIX)
+      return(small_fixnum(0));
+    h >>= e;
+    return(make_fixnum(s*h));
+  }
+  if (h != 0 || l<0)
+    x = bignum2(h, l);
+  else
+    x = make_fixnum(l);
+  vs_push(x);
+  x = integer_fix_shift(x, e);
+  if (s < 0) {
+    vs_push(x);
+    x = number_negate(x);
+  }
+  vs_reset;
+  return(x);
 }
 
 static object
@@ -504,11 +294,87 @@ LFD(Ldenominator)(void)
 		vs_base[0] = small_fixnum(1);
 }
 
+inline void
+intdivrem(object x,object y,fixnum d,object *q,object *r) {
+
+  enum type tx=type_of(x),ty=type_of(y);
+  object z,q2,q1;
+
+  if (number_zerop(y)==TRUE)
+    zero_divisor();
+
+  switch(tx) {
+  case t_fixnum:
+  case t_bignum:
+    switch (ty) {
+    case t_fixnum:
+    case t_bignum:
+      integer_quotient_remainder_1(x,y,q,r,d);
+      return;
+    case t_ratio:
+      z=integer_divide1(number_times(y->rat.rat_den,x),y->rat.rat_num,d);
+      if (q) *q=z;
+      if (r) *r=num_remainder(x,y,z);
+      return;
+    default:
+      break;
+    }
+    break;
+  case t_ratio:
+    switch (ty) {
+    case t_fixnum:
+    case t_bignum:
+      z=integer_divide1(x->rat.rat_num,number_times(x->rat.rat_den,y),d);
+      if (q) *q=z;
+      if (r) *r=num_remainder(x,y,z);
+      return;
+    case t_ratio:
+      z=integer_divide1(number_times(x->rat.rat_num,y->rat.rat_den),number_times(x->rat.rat_den,y->rat.rat_num),d);
+      if (q) *q=z;
+      if (r) *r=num_remainder(x,y,z);
+      return;
+    default:
+      break;
+    }
+    break;
+  default:
+    break;
+  }
+
+  q2=number_divide(x,y);
+  q1=double_to_integer(number_to_double(q2));
+  if (d && (d<0 ? number_minusp(q2) : number_plusp(q2)) && number_compare(q2, q1))
+    q1 = d<0 ? one_minus(q1) : one_plus(q1);
+  if (q) *q=q1;
+  if (r) *r=num_remainder(x,y,q1);
+  return;
+  
+}
+
+object
+number_ldb(object x,object y) {
+  return ifuncall2(sLldb,x,y);
+}
+
+object
+number_ldbt(object x,object y) {
+  return ifuncall2(sLldb_test,x,y);
+}
+
+object
+number_dpb(object x,object y,object z) {
+  return ifuncall3(sLdpb,x,y,z);
+}
+
+object
+number_dpf(object x,object y,object z) {
+  return ifuncall3(sLdeposit_field,x,y,z);
+}
+
 DEFUNM("FLOOR",object,fLfloor,LISP,1,2,NONE,OO,OO,OO,OO,(object x,...),"") {
 
   fixnum nargs=INIT_NARGS(1);
-  object f=OBJNULL,l=Cnil,y,z,w,q,q1;
-  double d;
+  object f=OBJNULL,l=Cnil,y;
   fixnum vals=(fixnum)fcall.valp;
   object *base=vs_top;
   va_list ap;
@@ -517,339 +383,46 @@ DEFUNM("FLOOR",object,fLfloor,LISP,1,2,NONE,OO,OO,OO,OO,(object x,...),"") {
   y=NEXT_ARG(nargs,ap,l,f,make_fixnum(1));
   va_end(ap);
 
-  if (y!=make_fixnum(1))
-    goto TWO_ARG;
+  intdivrem(x,y,-1,&x,&y);
 
-  switch (type_of(x)) {
-    
-  case t_fixnum:
-  case t_bignum:
-    RETURN2(x,make_fixnum(0));
-    
-  case t_ratio:
-    q = x;
-    y = small_fixnum(1);
-    goto RATIO;
-    
-  case t_shortfloat:
-    d = (double)(sf(x));
-    q1 = double_to_integer(d);
-    d -= number_to_double(q1);
-    if (sf(x) < 0.0 && d != 0.0) {
-      vs_push(q1);
-      q1 = one_minus(q1);
-      d += 1.0;
-    }
-    RETURN2(q1,make_shortfloat((shortfloat)d));
-    
-  case t_longfloat:
-    d = lf(x);
-    q1 = double_to_integer(d);
-    d -= number_to_double(q1);
-    if (lf(x) < 0.0 && d != 0.0) {
-      vs_push(q1);
-      q1 = one_minus(q1);
-      d += 1.0;
-    }
-    RETURN2(q1,make_longfloat(d));
-    
-  default:
-    FEwrong_type_argument(TSor_rational_float, x);
-  }
+  RETURN2(x,y);
 
- TWO_ARG:
-  if ( number_zerop ( y ) == TRUE ) DIVISION_BY_ZERO(sLfloor,list(2,x,y));
-  if ((type_of(x) == t_fixnum || type_of(x) == t_bignum) &&
-      (type_of(y) == t_fixnum || type_of(y) == t_bignum)) {
-    if (number_zerop(x))
-      RETURN2(make_fixnum(0),make_fixnum(0));
-    
-    integer_quotient_remainder_1(x, y, &z, &w);
-    if (number_minusp(x) ? number_plusp(y) : number_minusp(y)) {
-      if (number_zerop(w))
-	RETURN2(z,w);
-      z = one_minus(z);
-      w = number_plus(w, y);
-    }
-    RETURN2(z,w);
-  }
-
-  check_type_or_rational_float(&x);
-  check_type_or_rational_float(&y);
-  q = number_divide(x, y);
-  
-  switch (type_of(q)) {
-
-  case t_fixnum:
-  case t_bignum:
-    RETURN2(q,make_fixnum(0));
-	
-  case t_ratio:
-  RATIO:
-    q1 = integer_divide1(q->rat.rat_num, q->rat.rat_den);
-    if (number_minusp(q))
-      q1 = one_minus(q1);
-    else
-      q1 = q1;
-    RETURN2(q1,num_remainder(x, y, q1));
-
-  case t_shortfloat:
-  case t_longfloat:
-    q1 = double_to_integer(number_to_double(q));
-    if (number_minusp(q) && number_compare(q, q1)) 
-      q1 = one_minus(q1);
-    else
-      q1 = q1;
-    RETURN2(q1,num_remainder(x, y, q1));
-
-  default:
-    TYPE_ERROR(q,sLreal);
-    RETURN2(make_fixnum(0),make_fixnum(0));
-  }
 }
 
-LFD(Lceiling)(void)
-{
-	object x, y, q, q1;
-	double d;
-	int n;
-	object one_plus(object x);
+DEFUNM("CEILING",object,fLceiling,LISP,1,2,NONE,OO,OO,OO,OO,(object x,...),"") {
 
-	n = vs_top - vs_base;
-	if (n == 0)
-		too_few_arguments();
-	if (n > 1)
-		goto TWO_ARG;
-	x = vs_base[0];
-	switch (type_of(x)) {
+  fixnum nargs=INIT_NARGS(1);
+  object f=OBJNULL,l=Cnil,y;
+  fixnum vals=(fixnum)fcall.valp;
+  object *base=vs_top;
+  va_list ap;
 
-	case t_fixnum:
-	case t_bignum:
-		vs_push(small_fixnum(0));
-		return;
+  va_start(ap,x);
+  y=NEXT_ARG(nargs,ap,l,f,make_fixnum(1));
+  va_end(ap);
 
-	case t_ratio:
-		q = x;
-		y = small_fixnum(1);
-		goto RATIO;		
+  intdivrem(x,y,1,&x,&y);
 
-	case t_shortfloat:
-		d = (double)(sf(x));
-		q1 = double_to_integer(d);
-		d -= number_to_double(q1);
-		if (sf(x) > 0.0 && d != 0.0) {
-			vs_push(q1);
-			q1 = one_plus(q1);
-			d -= 1.0;
-		}
-		vs_base = vs_top;
-		vs_push(q1);
-		vs_push(make_shortfloat((shortfloat)d));
-		return;
+  RETURN2(x,y);
 
-	case t_longfloat:
-		d = lf(x);
-		q1 = double_to_integer(d);
-		d -= number_to_double(q1);
-		if (lf(x) > 0.0 && d != 0.0) {
-			vs_push(q1);
-			q1 = one_plus(q1);
-			d -= 1.0;
-		}
-		vs_base = vs_top;
-		vs_push(q1);
-		vs_push(make_longfloat(d));
-		return;
-
-	default:
-		FEwrong_type_argument(TSor_rational_float, x);
-	}
-
-TWO_ARG:
-	if (n > 2)
-		too_many_arguments();
-	x = vs_base[0];
-	y = vs_base[1];
-        if ( number_zerop ( y ) == TRUE ) DIVISION_BY_ZERO(sLceiling,list(2,x,y));
-	if ((type_of(x) == t_fixnum || type_of(x) == t_bignum) &&
-	    (type_of(y) == t_fixnum || type_of(y) == t_bignum)) {
-		vs_base = vs_top;
-		if (number_zerop(x)) {
-			vs_push(small_fixnum(0));
-			vs_push(small_fixnum(0));
-			return;
-		}
-		vs_push(Cnil);
-		vs_push(Cnil);
-		integer_quotient_remainder_1(x, y, &vs_base[0], &vs_base[1]);
-		if (number_plusp(x) ? number_plusp(y) : number_minusp(y)) {
-			if (number_zerop(vs_base[1]))
-				return;
-			vs_base[0] = one_plus(vs_base[0]);
-			vs_base[1] = number_minus(vs_base[1], y);
-		}
-		return;
-	}
-	check_type_or_rational_float(&vs_base[0]);
-	check_type_or_rational_float(&vs_base[1]);
-	q = number_divide(x, y);
-	vs_push(q);
-	switch (type_of(q)) {
-	case t_fixnum:
-	case t_bignum:
-		vs_base = vs_top;
-		vs_push(q);
-		vs_push(small_fixnum(0));
-		break;
-	
-	case t_ratio:
-	RATIO:
-		q1 = integer_divide1(q->rat.rat_num, q->rat.rat_den);
-		if (number_plusp(q)) {
-			vs_push(q1);
-			q1 = one_plus(q1);
-		} else
-			q1 = q1;
-		vs_base = vs_top;
-		vs_push(q1);
-		vs_push(num_remainder(x, y, q1));
-		return;
-
-	case t_shortfloat:
-	case t_longfloat:
-		q1 = double_to_integer(number_to_double(q));
-		if (number_plusp(q) && number_compare(q, q1)) {
-			vs_push(q1);
-			q1 = one_plus(q1);
-		} else
-			q1 = q1;
-		vs_base = vs_top;
-		vs_push(q1);
-		vs_push(num_remainder(x, y, q1));
-		return;
-	default:
-	  break;
-	}
 }
 
-static void
-truncate_2(object x,object y) {
+DEFUNM("TRUNCATE",object,fLtruncate,LISP,1,2,NONE,OO,OO,OO,OO,(object x,...),"") {
 
-  enum type tx=type_of(x),ty=type_of(y);
-  object q,q1;
+  fixnum nargs=INIT_NARGS(1);
+  object f=OBJNULL,l=Cnil,y;
+  fixnum vals=(fixnum)fcall.valp;
+  object *base=vs_top;
+  va_list ap;
 
-  if ((tx==t_fixnum || tx==t_bignum) &&
-      (ty==t_fixnum || ty==t_bignum)) {
-    
-    fixnum fx=fix(x),fy=fix(y),t;
-    
-    if (ty==t_fixnum && !fy) DIVISION_BY_ZERO(sLtruncate,list(2,x,y));
-    
-    if (tx==t_fixnum && fx!=MOST_NEGATIVE_FIX) {
-      
-      if (ty==t_fixnum) {
-	vs_base[0]=make_fixnum((t=fx/fy));
-	vs_base[1]=make_fixnum(fx-t*fy);
-	return;
-      }
-      vs_base[0]=small_fixnum(0);
-      vs_base[1]=x;
-      return;
-    }
-    if (ty==t_fixnum && fy>0)
-      integer_quotient_remainder_1_ui(x, fy, vs_base, vs_base+1);
-    else
-      integer_quotient_remainder_1(x, y, vs_base, vs_base+1);
-    return;
-  }
-  
-  
-  if ( number_zerop ( y ) == TRUE ) DIVISION_BY_ZERO(sLtruncate,list(2,x,y));
-  if ((type_of(x) == t_fixnum || type_of(x) == t_bignum) &&
-      (type_of(y) == t_fixnum || type_of(y) == t_bignum)) {
-    integer_quotient_remainder_1(x, y, &vs_base[0], &vs_base[1]);
-    return;
-  }
-  check_type_or_rational_float(&vs_base[0]);
-  check_type_or_rational_float(&vs_base[1]);
-  q = number_divide(x, y);
-  vs_push(q);
-  switch (type_of(q)) {
-  case t_fixnum:
-  case t_bignum:
-    vs_base = vs_top;
-    vs_push(q);
-    vs_push(small_fixnum(0));
-    break;
-    
-  case t_ratio:
-    q1 = integer_divide1(q->rat.rat_num, q->rat.rat_den);
-    vs_base = vs_top;
-    vs_push(q1);
-    vs_push(num_remainder(x, y, q1));
-    return;
-    
-  case t_shortfloat:
-  case t_longfloat:
-    q1 = double_to_integer(number_to_double(q));
-    vs_base = vs_top;
-    vs_push(q1);
-    vs_push(num_remainder(x, y, q1));
-    return;
-  default:
-    break;
-  }
-}
+  va_start(ap,x);
+  y=NEXT_ARG(nargs,ap,l,f,make_fixnum(1));
+  va_end(ap);
 
-LFD(Ltruncate)(void)
-{
-	object x, y, q1;
-	int n;
+  intdivrem(x,y,0,&x,&y);
 
-	n = vs_top - vs_base;
-	if (n == 0)
-		too_few_arguments();
-	if (n > 1)
-		goto TWO_ARG;
-	x = vs_base[0];
-	switch (type_of(x)) {
+  RETURN2(x,y);
 
-	case t_fixnum:
-	case t_bignum:
-		vs_push(small_fixnum(0));
-		return;
-
-	case t_ratio:
-		q1 = integer_divide1(x->rat.rat_num, x->rat.rat_den);
-		vs_base = vs_top;
-		vs_push(q1);
-		vs_push(number_minus(x, q1));
-		return;
-
-	case t_shortfloat:
-		q1 = double_to_integer((double)(sf(x)));
-		vs_base = vs_top;
-		vs_push(q1);
-		vs_push(number_minus(x, q1));
-		return;
-
-	case t_longfloat:
-		q1 = double_to_integer(lf(x));
-		vs_base = vs_top;
-		vs_push(q1);
-		vs_push(number_minus(x, q1));
-		return;
-
-	default:
-		FEwrong_type_argument(TSor_rational_float, x);
-	}
-
-TWO_ARG:
-	if (n > 2)
-		too_many_arguments();
-	x = vs_base[0];
-	y = vs_base[1];
-	truncate_2(x,y);
 }
 
 LFD(Lround)(void)
@@ -944,7 +517,7 @@ TWO_ARG:
 	
 	case t_ratio:
 	RATIO:
-		q1 = integer_divide1(q->rat.rat_num, q->rat.rat_den);
+	  q1 = integer_divide1(q->rat.rat_num, q->rat.rat_den,0);/*FIXME*/
 		vs_push(q1);
 		r = number_minus(q, q1);
 		vs_push(r);
@@ -984,23 +557,15 @@ TWO_ARG:
 	}
 }
 
-LFD(Lmod)(void)
-{
-	check_arg(2);
-	fcall.valp=(fixnum)vs_base;
-	VFUN_NARGS=2;
-	FFN(fLfloor)(vs_base[0],vs_base[1]);
-	/* Lfloor(); */
-	/* vs_base=vs_top-1; */
+DEFUN("MOD",object,fLmod,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+  intdivrem(x,y,-1,NULL,&y);
+  RETURN1(y);
 }
 
-LFD(Lrem)(void)
-{
-	check_arg(2);
-	Ltruncate();
-	vs_base++;
+DEFUN("REM",object,fLrem,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+  intdivrem(x,y,0,NULL,&y);
+  RETURN1(y);
 }
-
 
 LFD(Ldecode_float)(void)
 {
@@ -1530,12 +1095,7 @@ gcl_init_num_co(void)
 	make_function("FLOAT", Lfloat);
 	make_function("NUMERATOR", Lnumerator);
 	make_function("DENOMINATOR", Ldenominator);
-	/* make_function("FLOOR", Lfloor); */
-	make_function("CEILING", Lceiling);
-	make_function("TRUNCATE", Ltruncate);
 	make_function("ROUND", Lround);
-	make_function("MOD", Lmod);
-	make_function("REM", Lrem);
 	make_function("DECODE-FLOAT", Ldecode_float);
 	make_function("SCALE-FLOAT", Lscale_float);
 	make_function("FLOAT-RADIX", Lfloat_radix);

@@ -881,12 +881,21 @@ number_divide(object x, object y)
 }
 
 object
-integer_divide1(object x, object y)
-{
-	object q, r;
+integer_divide1(object x, object y,fixnum d) {
+  object q;
 
-	integer_quotient_remainder_1(x, y, &q, &r);
-	return(q);
+  integer_quotient_remainder_1(x, y, &q, NULL,d);
+  return(q);
+
+}
+
+object
+integer_divide2(object x, object y,fixnum d,object *r) {
+  object q;
+
+  integer_quotient_remainder_1(x, y, &q, r,d);
+  return(q);
+
 }
 
 object
@@ -937,11 +946,18 @@ get_gcd(object x, object y)
 	  else
 	    return(x);
 	}
+<<<<<<< HEAD
 
 	r=new_bignum();
 	mpz_gcd(MP(r),MP(x),MP(y));
 	return normalize_big(r);
 	  
+=======
+	integer_quotient_remainder_1(x, y, NULL, &r,0);
+	 x = y;
+	 y = r;
+	goto L;
+>>>>>>> 79f5881... faster division algorithms -- FIXME centralize mod, do round
 }
 
 /* (+          )   */

@@ -109,8 +109,8 @@ cmod(object x) {
     object rp,mod2;
     int compare;
 
-    integer_quotient_remainder_1(x,mod,NULL,&rp);
-    mod2=shift_integer(mod,-1);
+    integer_quotient_remainder_1(x,mod,NULL,&rp,0);/*FIXME*/
+    mod2=integer_fix_shift(mod,-1);
     compare = number_compare(rp,small_fixnum(0));
     if (compare >= 0) {
 

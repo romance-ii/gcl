@@ -516,36 +516,45 @@ bignum2( int h,  int l)
 }
 
 void
-integer_quotient_remainder_1(object x, object y, object *qp, object *rp) {
-  
-  object q=qp ? new_bignum() : big_fixnum3;
-  object r=rp ? new_bignum() : big_fixnum4;
+integer_quotient_remainder_1(object x, object y, object *qp, object *rp,fixnum d) {
 
-  /* we may need to coerce the fixnums to MP here, and
-     we use the temporary storage of the rp/qp as inputs.
-     since overlap is allowed in the mpz_tdiv_qr operation..
-  */    
-  mpz_tdiv_qr(MP(q),MP(r),INTEGER_TO_MP(x,big_fixnum1),INTEGER_TO_MP(y,big_fixnum2));
-  if (qp) *qp = normalize_big(q);
-  if (rp) *rp = normalize_big(r);
-  return;
+  if (type_of(x)==t_fixnum && type_of(y)==t_fixnum) {
+    fixnum fx=fix(x),fy=fix(y);
+    if (fx!=-fx) {/*MOST_NEGATIVE_FIX*/
+      if (qp) {
+	fixnum z=fixnum_div(fx,fy,d);
+	if (rp) *rp=make_fixnum(fx-fy*z);
+	*qp=make_fixnum(z);
+      } else if (rp)
+	*rp=make_fixnum(fixnum_rem(fx,fy,d));
+      return;
+    }
+  }
+
+  {
+    
+    __mpz_struct *b1=INTEGER_TO_MP(x,big_fixnum1),*b2=INTEGER_TO_MP(y,big_fixnum2);
+    
+    if (qp) {
+      if (rp) {
+	void (*f)()=d<0 ? mpz_fdiv_qr : (d>0 ? mpz_cdiv_qr : mpz_tdiv_qr);
+	f(MP(big_fixnum3),MP(big_fixnum4),b1,b2);
+	*rp=maybe_replace_big(big_fixnum4);
+      } else {
+	void (*f)()=d<0 ? mpz_fdiv_q : (d>0 ? mpz_cdiv_q : mpz_tdiv_q);
+	f(MP(big_fixnum3),b1,b2);
+      }
+      *qp=maybe_replace_big(big_fixnum3);
+    } else if (rp) {
+      void (*f)()=d<0 ? mpz_fdiv_r : (d>0 ? mpz_cdiv_r : mpz_tdiv_r);
+      f(MP(big_fixnum4),b1,b2);
+      *rp=maybe_replace_big(big_fixnum4);
+    }
+
+  }
+
 }
 
-void
-integer_quotient_remainder_1_ui(object x, unsigned long y, object *qp, object *rp) {
-  
-  object q=qp ? new_bignum() : big_fixnum3;
-  object r=rp ? new_bignum() : big_fixnum4;
-
-  /* we may need to coerce the fixnums to MP here, and
-     we use the temporary storage of the rp/qp as inputs.
-     since overlap is allowed in the mpz_tdiv_qr operation..
-  */    
-  mpz_tdiv_qr_ui(MP(q),MP(r),INTEGER_TO_MP(x,big_fixnum1),y);
-  if (qp) *qp = normalize_big(q);
-  if (rp) *rp = normalize_big(r);
-  return;
-}
 
 #define HAVE_MP_COERCE_TO_STRING
      
