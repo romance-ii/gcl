@@ -248,6 +248,10 @@ FFN(Fthe)(object args)
 	}
 }
 
+DEF_ORDINARY("LDB",sLldb,LISP,"");
+DEF_ORDINARY("LDB-TEST",sLldb_test,LISP,"");
+DEF_ORDINARY("DPB",sLdpb,LISP,"");
+DEF_ORDINARY("DEPOSIT-FIELD",sLdeposit_field,LISP,"");
 DEF_ORDINARY("COMPILE",sLcompile,LISP,"");
 DEF_ORDINARY("COMPILE-TOPLEVEL",sKcompile_toplevel,KEYWORD,"");
 DEF_ORDINARY("DECLARE",sLdeclare,LISP,"");

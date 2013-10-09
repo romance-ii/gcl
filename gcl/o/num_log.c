@@ -39,17 +39,84 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 
-static int
-ior_op(int i, int j)
-{
-	return(i | j);
+inline object
+fixnum_big_shift(fixnum x,fixnum w) {
+  MPOP(return,shifti,SI_TO_MP(x,big_fixnum1),w);
 }
 
-static int
-xor_op(int i, int j)
-{
-	return(i ^ j);
+inline object
+integer_fix_shift(object x, fixnum w) { 
+  if (type_of(x)==t_fixnum)
+    return fixnum_shft(fix(x),w);
+  MPOP(return,shifti,MP(x),w);
 }
+	
+inline object
+integer_shift(object x,object y) {
+  enum type tx=type_of(x),ty=type_of(y);
+  if (ty==t_fixnum)
+    return integer_fix_shift(x,fix(y));
+  else {
+    if (eql(x,make_fixnum(0)))
+      return x;
+    if (big_sign(y)<0)
+      return make_fixnum((tx==t_fixnum ? fix(x) : big_sign(x))<0 ? -1 : 0);
+    FEerror("Insufficient memory",0);
+    return Cnil;
+  }
+}
+      
+inline bool
+integer_bitp(object p,object x) {
+  enum type tp=type_of(p),tx=type_of(x);
+
+  if (tp==t_fixnum) {
+    if (tx==t_fixnum)
+      return fixnum_bitp(fix(p),fix(x));
+    else 
+      return big_bitp(x,fix(p));
+  } else if (big_sign(p)<0)
+    return 0;
+  else if (tx==t_fixnum)/*fixme integer_minusp*/
+    return fix(x)<0;
+  else return big_sign(x)<0;
+}
+
+inline object
+integer_length(object x) {
+  return make_fixnum(type_of(x)==t_fixnum ? fixnum_length(fix(x)) : MP_SIZE_IN_BASE2(MP(x)));
+}
+
+inline object
+integer_count(object x) {
+  return make_fixnum(type_of(x)==t_fixnum ? fixnum_count(fix(x)) : MP_BITCOUNT(MP(x)));
+}
+
+#define DEFLOG(a_,b_,c_) \
+  LFD(a_)(void) {				\
+	 object x;				\
+	 int narg, i;				\
+	 					\
+	 narg = vs_top - vs_base;		\
+	 for (i = 0; i < narg; i++)			\
+	   check_type_integer(&vs_base[i]);		\
+	 if (narg == 0) {				\
+	 vs_top = vs_base;				\
+	 vs_push(c_);					\
+	 return;					\
+	 }						\
+	 if (narg == 1)					\
+	   return;					\
+	 x = log_op(b_);				\
+	 vs_top = vs_base;				\
+	 vs_push(x);					\
+  }
+
+DEFLOG(Llogior,BOOLIOR,small_fixnum(0));
+DEFLOG(Llogxor,BOOLXOR,small_fixnum(0));
+DEFLOG(Llogand,BOOLAND,small_fixnum(-1));
+DEFLOG(Llogeqv,BOOLEQV,small_fixnum(-1));
+
 
 
 /* #define IF1(a_) BF(1,a_,f,b) */
@@ -162,6 +229,58 @@ B2OP(IOR,ior)
 B2OP(XOR,xor)
 
 
+DEFUN("BOOLE",object,fLboole,LISP,3,3,NONE,OO,OO,OO,OO,(object x,object y,object z),"") {
+  check_type_integer(&x);
+  check_type_integer(&y);
+  check_type_integer(&z);
+  RETURN1(log_op2(fixint(o),x,y));
+}
+
+
+DEFUN("ASH",object,fLash,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+
+  check_type_integer(&x);
+  check_type_integer(&y);
+  RETURN1(integer_shift(x,y));
+
+}
+
+DEFUN("LOGBITP",object,fLlogbitp,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+
+  check_type_integer(&x);
+  check_type_integer(&y);
+  RETURN1(integer_bitp(x,y)?Ct:Cnil);
+
+}
+
+DEFUN("LOGCOUNT",object,fLlogcount,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+
+  check_type_integer(&x);
+  RETURN1(integer_count(x));
+
+}
+
+DEFUN("INTEGER-LENGTH",object,fLloglength,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+
+  check_type_integer(&x);
+  RETURN1(integer_length(x));
+
+}
+
+
+#define W_SIZE (8*sizeof(int))
+
+static fixnum
+ior_op(fixnum i, fixnum j)
+{
+	return(i | j);
+}
+
+static int
+xor_op(int i, int j)
+{
+	return(i ^ j);
+}
 
 static int
 and_op(int i, int j)
@@ -247,375 +366,7 @@ b_c2_op(int i, int j)
 	return(~j);
 }
 
-#ifdef NEVER
-int (*intLogOps)()[16]= {
-  b_clr_op,  /* 0 */
-  b_and_op,  /* 01 */
-  b_andc2_op,  /* 02 */
-  b_1_op,  /* 03 */
-  b_andc1_op,  /* 04 */
-  b_2_op,  /* 05 */
-  b_xor_op,  /* 06 */
-  b_ior_op,  /* 07 */
-  b_nor_op,  /* 010 */
-  b_eqv_op,  /* 011 */
-  b_c2_op,  /* 012 */
-  b_orc2_op,  /* 013 */
-  b_c1_op,  /* 014 */
-  b_orc1_op,  /* 015 */
-  b_nand_op,  /* 016 */
-  b_set_op,  /* 017 */
-}
-#endif
 
-
-static int
-fix_bitp(object x, int p)
-{
-	if (p > LOG_WORD_SIZE-2) {		/* fix = sign + bit0-30 */
-		if (fix(x) < 0)
-			return(1);
-		else
-			return(0);
-	}
-	return((fix(x) >> p) & 1);
-}	
-
-static int
-count_int_bits(int x)
-{
-	int	i, count;
-
-	count = 0;
-	for (i=0; i <= (LOG_WORD_SIZE-1); i++) count += ((x >> i) & 1);
-	return(count);
-}
-
-static int
-count_bits(object x)
-{
-	int i, count=0;
-
-	if (type_of(x) == t_fixnum) {
-		i = fix(x);
-		if (i < 0) i = ~i;
-		count = count_int_bits(i);
-	} else if (type_of(x) == t_bignum)
-	  {
-	    count= MP_BITCOUNT(MP(x));
-	  }
-	else 
-		FEwrong_type_argument(sLinteger, x);
-	return(count);
-}
-
-/*
-	double_shift(h, l, w, hp, lp) shifts the int h & l ( 31 bits)
-	w bits to left ( w > 0) or to right ( w < 0).
-	result is returned in *hp and *lp.
-*/
-
-
-
-object
-shift_integer(object x, fixnum w) { 
-  if (type_of(x) == t_fixnum) { 
-    if (w <= 0){   
-      w = -w;
-      if (w >= LOG_WORD_SIZE || w<0 /*most-negative-fixnum*/) 
-	return small_fixnum(fix(x) < 0 ? -1 :0);
-      else
-	return make_fixnum (fix(x) >> (w));
-    }
-    MPOP(return, shifti,SI_TO_MP(fix(x),big_fixnum1),w);
-  }
-  else
-    if (type_of(x) == t_bignum) {
-      MPOP(return,shifti,MP(x),w);
-    }
-  FEwrong_type_argument(sLinteger, x);
-  return(Cnil);
-}
-	
-
-static fixnum
-int_bit_length(fixnum i) {
-  fixnum j;
-  for (j=LOG_WORD_SIZE-1;j>=0 && !((i>>j)&1);j--);
-  return j+1;
-}
-
-	
-/* 	count = 0; */
-/* 	for (j = 0; j <= (LOG_WORD_SIZE-1) ; j++) */
-/* 		if (((i >> j) & 1) == 1) count = j + 1; */
-/* 	return(count); */
-/* } */
-
-
-
-LFD(Llogior)(void)
-{
-	object  x;
-	int	narg, i;
-	int	ior_op(int i, int j);
-
-	narg = vs_top - vs_base;
-	for (i = 0; i < narg; i++)
-		check_type_integer(&vs_base[i]);
-	if (narg == 0) {
-		vs_top = vs_base;
-		vs_push(small_fixnum(0));
-		return;
-	}
-	if (narg == 1)
-		return;
-	x = log_op(ior_op,mp_ior_op);
-	vs_top = vs_base;
-	vs_push(x);
-}
-
-LFD(Llogxor)(void)
-{
-	object  x;
-	int	narg, i;
-	int	xor_op(int i, int j);
-
-	narg = vs_top - vs_base;
-	for (i = 0; i < narg; i++)
-		check_type_integer(&vs_base[i]);
-	if (narg == 0) {
-		vs_top = vs_base;
-		vs_push(small_fixnum(0));
-		return;
-	}
-	if (narg == 1) return;
-	x = log_op(xor_op,mp_xor_op);
-	vs_top = vs_base;
-	vs_push(x);
-}
-
-LFD(Llogand)(void)
-{
-	object  x;
-	int	narg, i;
-	int	and_op(int i, int j);
-
-	narg = vs_top - vs_base;
-	for (i = 0; i < narg; i++)
-		check_type_integer(&vs_base[i]);
-	if (narg == 0) {
-		vs_top = vs_base;
-		vs_push(small_fixnum(-1));
-		return;
-	}
-	if (narg == 1) return;
-	x = log_op(and_op,mp_and_op);
-	vs_top = vs_base;
-	vs_push(x);
-}
-
-LFD(Llogeqv)(void)
-{
-	object  x;
-	int	narg, i;
-	int	eqv_op(int i, int j);
-
-	narg = vs_top - vs_base;
-	for (i = 0; i < narg; i++)
-		check_type_integer(&vs_base[i]);
-	if (narg == 0) {
-		vs_top = vs_base;
-		vs_push(small_fixnum(-1));
-		return;
-	}
-	if (narg == 1) return;
-	x = log_op(eqv_op,mp_eqv_op);
-	vs_top = vs_base;
-	vs_push(x);
-}
-
-LFD(Lboole)(void)
-{
-	object  x;
-	object	o;
-	int	(*op)()=NULL;
-	void	(*mp_op)() = (void *) 0;
-
-	check_arg(3);
-	check_type_integer(&vs_base[0]);
-	check_type_integer(&vs_base[1]);
-	check_type_integer(&vs_base[2]);
-	o = vs_base[0];
-
-	switch(fixint(o)) {
-		case BOOLCLR:	op = b_clr_op; mp_op = mp_b_clr_op;	break;
-		case BOOLSET:	op = b_set_op; mp_op = mp_b_set_op;	break;
-		case BOOL1:	op = b_1_op; mp_op = mp_b_1_op;	break;
-		case BOOL2:	op = b_2_op; mp_op = mp_b_2_op;	break;
-		case BOOLC1:	op = b_c1_op; mp_op =mp_b_c1_op;	break;
-		case BOOLC2:	op = b_c2_op; mp_op =mp_b_c2_op;	break;
-		case BOOLAND:	op = and_op; mp_op = mp_and_op;	break;
-		case BOOLIOR:	op = ior_op; mp_op = mp_ior_op;	break;
-		case BOOLXOR:	op = xor_op; mp_op = mp_xor_op;	break;
-		case BOOLEQV:	op = eqv_op; mp_op = mp_eqv_op;	break;
-		case BOOLNAND:	op = nand_op; mp_op =mp_nand_op;	break;
-		case BOOLNOR:	op = nor_op; mp_op = mp_nor_op;	break;
-		case BOOLANDC1:	op = andc1_op; mp_op = mp_andc1_op;	break;
-		case BOOLANDC2:	op = andc2_op; mp_op = mp_andc2_op;	break;
-		case BOOLORC1:	op = orc1_op; mp_op =mp_orc1_op;	break;
-		case BOOLORC2:	op = orc2_op; mp_op =mp_orc2_op;	break;
-		default:
-			FEerror("~S is an invalid logical operator.",
-				1, o);
-	}
-	vs_base++;
-	x = log_op(op,mp_op);
-	vs_base--;
-	vs_top = vs_base;
-	vs_push(x);
-}
-
-LFD(Llogbitp)(void)
-{
-	object	x, p;
-	int	i;
-
-	check_arg(2);
-	check_type_non_negative_integer(&vs_base[0]);
-	check_type_integer(&vs_base[1]);
-	p = vs_base[0];
-	x = vs_base[1];
-	if (type_of(p) == t_fixnum)
-		if (type_of(x) == t_fixnum)
-			i = fix_bitp(x, fix(p));
-		else
-			i = big_bitp(x, fix(p));
-	else if (big_sign(p) < 0)
-			i = 0;
-		/*
-		   bit position represented by bignum is out of
-		   our address space. So, result is returned
-		   according to sign of integer.
-		*/
-
-	else if (type_of(x) == t_fixnum)
-		if (fix(x) < 0)
-			i = 1;
-		else
-			i = 0;
-	else if (big_sign(x) < 0)
-			i = 1;
-		else
-			i = 0;
-
-	vs_top = vs_base;
-	if (i)
-		vs_push(Ct);
-	else
-		vs_push(Cnil);
-}
-
-DEFUN("ASH",object,fLash,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
-
-  int w,sign_x;
-  
-  check_type_integer(&x);
-  check_type_integer(&y);
-
-  if (type_of(y) == t_fixnum) {
-    w = fix(y);
-    RETURN1(shift_integer(x,w));
-  } 
-
-  if (x==small_fixnum(0))
-    RETURN1(x);
-
-  if (type_of(x) == t_fixnum)
-    sign_x=fix(x)>0 ? 1 : -1;
-  else
-    sign_x = big_sign(x);
-  if (big_sign(y) < 0)
-    RETURN1(sign_x < 0 ? small_fixnum(-1) : small_fixnum(0));
-  else
-    FEerror("Insufficient memory.", 0);
-  RETURN1(Cnil);
-}
-
-LFD(Llogcount)(void)
-{
-	object	x;
-	int	i;
-
-	check_arg(1);
-	check_type_integer(&vs_base[0]);
-	x = vs_base[0];
-	i = count_bits(x);
-	vs_top = vs_base;
-	vs_push(make_fixnum(i));
-}
-
-LFD(Linteger_length)(void)
-{
-	object	x;
-	int count=0, i;
-
-	check_arg(1);
-	x = vs_base[0];
-	if (type_of(x) == t_fixnum) {
-		i = fix(x);
-		if (i < 0) i = ~i;
-		count = int_bit_length(i);
-	} else if (type_of(x) == t_bignum) 
-	  count = MP_SIZE_IN_BASE2(MP(x));
-	else
-	      	FEwrong_type_argument(sLinteger, x);
-	vs_top = vs_base;
-	vs_push(make_fixnum(count));
-}
-
-/* #define W_SIZE (8*sizeof(int)) */
-/* static object */
-/* bitand(object a, object b, object c) */
-/* { int d= a->bv.bv_fillp; */
-/*   int *ap,*bp,*cp; */
-/*   d=(d+W_SIZE-1)/W_SIZE; */
-/*   ap= (int *)(a->bv.bv_self); */
-/*   bp= (int *)(b->bv.bv_self); */
-/*   cp= (int *)(c->bv.bv_self); */
-/*   while (--d >= 0) */
-/*     { *cp++ = *bp++ & *ap++; */
-/*     } */
-/*   return c; */
-/* } */
-
-/* static object */
-/* bitior(object a, object b, object c) */
-/* { int *ap,*cp,*bp, d= a->bv.bv_fillp; */
-/*   d=(d+W_SIZE-1)/W_SIZE; */
-/*    ap= (int *)((a->bv.bv_self)); */
-/*    bp= (int *)(b->bv.bv_self); */
-/*    cp= (int *)(c->bv.bv_self); */
-/*   while (--d >= 0) */
-/*     { *cp++ = *bp++ | *ap++; */
-/*     } */
-/*   return c; */
-/* } */
-
-/* Note in order to be equal we assume that the part above the
-   fill pointer is 0 up to the next word */
-
-/* static int */
-/* bvequal(object a, object b) */
-/* { int *ap,*bp, d= a->bv.bv_fillp; */
-/*   d=(d+W_SIZE-1)/W_SIZE; */
-/*  ap= (int *)(a->bv.bv_self); */
-/*  bp= (int *)(b->bv.bv_self); */
-/*   while (--d >= 0) */
-/*     { if (*ap++ != *bp++) return 1; */
-/*     } */
-/*   return 0; */
-/* } */
 
   
 DEFUN("BIT-ARRAY-OP",object,fSbit_array_op,SI,4,4,NONE,OO,OO,OO,OO,
@@ -861,17 +612,7 @@ gcl_init_num_log(void)
 	make_constant("BOOLE-ORC1", make_fixnum(BOOLORC1));
 	make_constant("BOOLE-ORC2", make_fixnum(BOOLORC2));
 
-	make_function("LOGIOR", Llogior);
-	make_function("LOGXOR", Llogxor);
-	make_function("LOGAND", Llogand);
-	make_function("LOGEQV", Llogeqv);
-	make_function("BOOLE", Lboole);
-	make_function("LOGBITP", Llogbitp);
-/* 	make_function("ASH", Lash); */
-	make_function("LOGCOUNT", Llogcount);
-	make_function("INTEGER-LENGTH", Linteger_length);
 
 	sLbit = make_ordinary("BIT");
-/* 	make_si_function("BIT-ARRAY-OP", siLbit_array_op); */
 }
 

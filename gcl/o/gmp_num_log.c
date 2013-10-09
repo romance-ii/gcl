@@ -8,176 +8,84 @@
 object big_log_op();
 object normalize_big(object);
 
+static fixnum
+fixnum_log_op2(fixnum op,fixnum x,fixnum y) {
+  
+  return fixnum_boole(op,x,y);
+
+}
+
 static object
-log_op(fixnum (*op) (/* ??? */), void (*mp_op) (/* ??? */))
-{
-	object x;
-	fixnum	narg, i, j;
-	
+integer_log_op2(fixnum op,object x,enum type tx,object y,enum type ty) {
 
-	narg = vs_top - vs_base;
-	if (narg < 2) too_few_arguments();
-	i = narg;
-	while(--i >= 0)
-		{if (type_of(vs_base[i]) == t_bignum) goto BIG_OP;
-		if (type_of(vs_base[i]) != t_fixnum) FEwrong_type_argument(sLinteger, vs_base[i]);
-		  };
-	j = fix(vs_base[0]);
-	i = 1;
-	while (i < narg) {
-		j = (*op)(j, fix(vs_base[i]));
-		i++;
-	}
-	return(make_fixnum(j));
-
-BIG_OP:
-	{ object u = new_bignum();
-	 MP_ASSIGN_OBJECT(MP(u),vs_base[0]);
-	i = 1;
-	while (i < narg) {
-	  object y = vs_base[i];
-	  (*mp_op) (MP(u),MP(u), INTEGER_TO_TEMP_MP(y,big_fixnum1));
-	  i++;
-	}
-	x = normalize_big(u);
-	return(x);
-	}
-}
-
-
-static void
-mp_and_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
-{
-	mpz_and(u,i,j);
-         /* (i & j); */
-}
-
-static void
-mp_eqv_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
-{
-	mpz_xor(u,i,j);
-        mpz_com(u,u);
-      /* (~(i ^ j)); */
+  object u=big_fixnum1;
+  object ux=tx==t_bignum ? x : (mpz_set_si(MP(big_fixnum2),fix(x)), big_fixnum2);
+  object uy=ty==t_bignum ? y : (mpz_set_si(MP(big_fixnum3),fix(y)), big_fixnum3);
+  
+  switch(op) {
+  case BOOLCLR:	 mpz_set_si(MP(u),0);break;
+  case BOOLSET:	 mpz_set_si(MP(u),-1);break;
+  case BOOL1:	 mpz_set(MP(u),MP(ux));break;
+  case BOOL2:	 mpz_set(MP(u),MP(uy));break;
+  case BOOLC1:	 mpz_com(MP(u),MP(ux));break;
+  case BOOLC2:	 mpz_com(MP(u),MP(uy));break;
+  case BOOLAND:	 mpz_and(MP(u),MP(ux),MP(uy));break;
+  case BOOLIOR:	 mpz_ior(MP(u),MP(ux),MP(uy));break;
+  case BOOLXOR:	 mpz_xor(MP(u),MP(ux),MP(uy));break;
+  case BOOLEQV:	 mpz_xor(MP(u),MP(ux),MP(uy));mpz_com(MP(u),MP(u));break;
+  case BOOLNAND: mpz_and(MP(u),MP(ux),MP(uy));mpz_com(MP(u),MP(u));break;
+  case BOOLNOR:	 mpz_ior(MP(u),MP(ux),MP(uy));mpz_com(MP(u),MP(u));break;
+  case BOOLANDC1:mpz_com(MP(u),MP(ux));mpz_and(MP(u),MP(u),MP(uy));break;
+  case BOOLANDC2:mpz_com(MP(u),MP(uy));mpz_and(MP(u),MP(ux),MP(u));break;
+  case BOOLORC1: mpz_com(MP(u),MP(ux));mpz_ior(MP(u),MP(u),MP(uy));break;
+  case BOOLORC2: mpz_com(MP(u),MP(uy));mpz_ior(MP(u),MP(ux),MP(u));break;
+  default:break;/*FIXME error*/
+  }
+    
+  return u;
 
 }
 
-static void
-mp_nand_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
-{
-	mpz_and(u,i,j);
-        mpz_com(u,u);
-	/* (~(i & j)); */
+inline object
+log_op2(fixnum op,object x,object y) {
+
+  enum type tx=type_of(x),ty=type_of(y);
+
+  if (tx==t_fixnum && ty==t_fixnum)
+    return make_fixnum(fixnum_log_op2(op,fix(x),fix(y)));
+  else
+    return maybe_replace_big(integer_log_op2(op,x,tx,y,ty));
 }
 
-static void
-mp_nor_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
-{
-/*      mpz_ior(u,u,j); */
-/*      mpz_com(u,i); */
-     mpz_ior(u,i,j);
-     mpz_com(u,u);
-     /* (~(i | j)); */
-}
+static object
+log_op(fixnum op) {
 
-static void
-mp_andc1_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
-{
-     mpz_com(i,i);
-     mpz_and(u,i,j);
-	/* ((~i) & j); */
-}
+  fixnum i,n=vs_top-vs_base,fx=0;
+  enum type tx,ty;
+  object x,y;
+  
+  if ((tx=type_of(x=vs_base[0]))==t_fixnum) {fx=fix(x);x=OBJNULL;}
+  for (i=1;i<n;i++) {
+    ty=type_of(y=vs_base[i]);
+    if (tx==t_fixnum&&ty==t_fixnum)
+      fx=fixnum_log_op2(op,fx,fix(y));
+    else {
+      x=normalize_big(integer_log_op2(op,x==OBJNULL ? make_fixnum(fx) : x,tx,y,ty));
+      if ((tx=type_of(x))==t_fixnum) {fx=fix(x);x=OBJNULL;}
+    }
+  }
 
-static void
-mp_andc2_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
-{
-      mpz_com(j,j);
-      mpz_and(u,i,j);
-	/* (i & (~j));*/
-}
+  return x==OBJNULL ? make_fixnum(fx) : maybe_replace_big(x);
 
-static void
-mp_orc1_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
-{
-   mpz_com(i,i);
-   mpz_ior(u,i,j);
-/*	((~i) | j); */
-}
-
-static void
-mp_orc2_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
-{
-    mpz_com(j,j);
-    mpz_ior(u,i,j);
-	/* (i | (~j)); */
-}
-
-static void
-mp_b_clr_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
-{
-    mpz_set_si(u,0);
-/* 	(0); */
-}
-
-static void
-mp_b_set_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
-{
-   mpz_set_si(u,-1);
-	/* (-1); */
-}
-
-static void
-mp_b_1_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
-{
-    mpz_set(u,i);
-   /*	(i); */
-}
-
-static void
-mp_b_2_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
-{
-   mpz_set(u,j);
-/* 	(j); */
-}
-
-static void
-mp_b_c1_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
-{
-  mpz_com(u,i);
-	/* (~i); */
-}
-
-static void
-mp_b_c2_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
-{
-   mpz_com(u,j);
-	/* (~j); */
 }
 
 
 
 
 static int
-big_bitp(object x, int p)
+big_bitp(object x, ufixnum p)
 {
   return mpz_tstbit(MP(x),p);
-}
-
-
-
-   
-
-static void
-mp_ior_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
-{
-	mpz_ior(u,i,j);
-    /* (i | j); */
-}
-
-static void
-mp_xor_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
-{
-	mpz_xor(u,i,j);
-  /* (i ^ j); */
 }
 
 static int

@@ -255,35 +255,11 @@
   (multiple-value-bind (i r) (round x y)
     (values (float i (if (floatp x) x 1.0)) r)))
 
-
-;(defun lognand (x y) (boole boole-nand x y))
-;(defun lognor (x y) (boole boole-nor x y))
-;(defun logandc1 (x y) (boole boole-andc1 x y))
-;(defun logorc1 (x y) (boole boole-orc1 x y))
-;(defun logorc2 (x y) (boole boole-orc2 x y))
-
-;(defun lognot (x) (logxor -1 x))
 (defun logtest (x y) 
   (declare (optimize (safety 1)))
   (check-type x integer)
   (check-type y integer)
   (not (zerop (logand x y))))
 
-
-
-
-
-
-
-(defun ldb-test (bytespec integer)
-  (not (zerop (ldb bytespec integer))))
-
-
-
-
-
 (defun deposit-field (newbyte bytespec integer)
   (dpb (ash newbyte (- (byte-position bytespec))) bytespec integer))
-
-;(defdlfun (:double "cblas_ddot" "libblas.so") :int :double* :int :double* :int)
-
