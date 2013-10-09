@@ -28,24 +28,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 object Vrandom_state;
 
-
-#define BOOLCLR		0
-#define BOOLSET		017
-#define BOOL1		03
-#define BOOL2		05
-#define BOOLC1		014
-#define BOOLC2		012
-#define BOOLAND		01
-#define BOOLIOR		07
-#define BOOLXOR		06
-#define BOOLEQV		011
-#define BOOLNAND	016
-#define BOOLNOR		010
-#define BOOLANDC1	04
-#define BOOLANDC2	02
-#define BOOLORC1	015
-#define BOOLORC2	013
-
 #ifndef PI
 #define PI			3.141592653589793
 #endif
