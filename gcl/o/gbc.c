@@ -362,6 +362,11 @@ mark_cons(object x) {
 #define MARK_LINK_ARRAY(x_) ((*(unsigned long *)(x_))|=1UL)
 #define CLEAR_LINK_ARRAY(x_) ((*(unsigned long *)(x_))&=~(1UL))
 
+/* #define COLLECT_RELBLOCK_P (what_to_collect == t_relocatable || what_to_collect == t_contiguous) */
+bool collect_both=0;
+
+#define COLLECT_RELBLOCK_P (what_to_collect == t_relocatable || collect_both)
+
 static void
 mark_link_array(void *v,void *ve) {
 
@@ -376,7 +381,7 @@ mark_link_array(void *v,void *ve) {
   p=(void *)sLAlink_arrayA->s.s_dbind->v.v_self;
   pe=(void *)p+sLAlink_arrayA->s.s_dbind->v.v_fillp;
 
-  if (is_marked(sLAlink_arrayA->s.s_dbind)
+  if (is_marked(sLAlink_arrayA->s.s_dbind) && COLLECT_RELBLOCK_P
 #ifdef SGC
       && (!sgc_enabled || SGC_RELBLOCK_P(sLAlink_arrayA->s.s_dbind->v.v_self))
 #endif
@@ -444,11 +449,6 @@ sweep_link_array(void) {
   prune_link_array();
 
 }
-
-/* #define COLLECT_RELBLOCK_P (what_to_collect == t_relocatable || what_to_collect == t_contiguous) */
-bool collect_both=0;
-
-#define COLLECT_RELBLOCK_P (what_to_collect == t_relocatable || collect_both)
 
 static void
 mark_object(object x) {
