@@ -232,6 +232,7 @@ EXPORT_GMP_CALL(3,void,ior,1,mpz_t,mpz_t,mpz_t)
 EXPORT_GMP_CALL(2,void,com,1,mpz_t,mpz_t)
 EXPORT_GMP_CALL(2,int,tstbit,0,mpz_t,gmp_ulint)
  MEM_GMP_CALL(1,void,mpz_init,1,mpz_t)
+ MEM_GMP_CALL(2,void,mpz_init_set,1,mpz_t,mpz_t)
 EXPORT_GMP_CALL(2,void,set,1,mpz_t,mpz_t)
 EXPORT_GMP_CALL(2,void,set_ui,1,mpz_t,gmp_ulint)
 EXPORT_GMP_CALL(2,void,set_si,1,mpz_t,gmp_lint)
@@ -365,6 +366,7 @@ EXPORT_GMP_CALL(2,void,abs,1,mpz_t,mpz_t)
 #define __gmpz_com m__gmpz_com
 #define __gmpz_tstbit m__gmpz_tstbit
 #define __gmpz_init m__gmpz_init
+#define __gmpz_init_set m__gmpz_init_set
 #define __gmpz_set m__gmpz_set
 #define __gmpz_set_ui m__gmpz_set_ui
 #define __gmpz_set_si m__gmpz_set_si
