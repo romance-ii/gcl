@@ -1015,106 +1015,40 @@ if test "$enable_locbfd" = "yes" ; then
 	export C_INCLUDE_PATH=`pwd`/binutils/include:`pwd`/binutils/bfd:$C_INCLUDE_PATH
 fi
 
-if test "$enable_statsysbfd" = "yes" || test "$enable_dynsysbfd" = "yes" || test "$enable_locbfd" = "yes" ; then
-
-   AC_CHECK_HEADER(bfd.h,
-   AC_CHECK_LIB(bfd,bfd_init,
-#
-# Old binutils appear to need CONST defined to const
-#
-	AC_MSG_CHECKING(if need to define CONST for bfd)
-	AC_RUN_IFELSE([AC_LANG_PROGRAM([[
-		#define IN_GCC
-		#include <bfd.h>
-		]],[[symbol_info t; return 0;]])],
-		[AC_MSG_RESULT(no)],
-		[AC_RUN_IFELSE([AC_LANG_PROGRAM([[
-			#define CONST const
-			#define IN_GCC
-			#include <bfd.h>
-			]],[[symbol_info t; return 0;]])],
-			[AC_MSG_RESULT(yes) 
-			AC_DEFINE(NEED_CONST,1,[binutils requires CONST definition])],
-			[AC_MSG_ERROR([cannot use bfd])])])
-	,,-liberty))
-
-	AC_DEFINE(HAVE_LIBBFD,1,[use libbfd])
-
-#
-# BFD boolean syntax
-#
-
-	AC_MSG_CHECKING(for useable bfd_boolean)
-	AC_RUN_IFELSE([AC_LANG_PROGRAM([[
-		#define IN_GCC
-		#include <bfd.h>
-		bfd_boolean foo() {return FALSE;}
-		]],[[return 0;]])],
-		[AC_MSG_RESULT(yes) 
-		AC_DEFINE(HAVE_BFD_BOOLEAN,1,[bfd_boolean defined])],
-		[AC_MSG_RESULT(no)])
+AC_MSG_CHECKING([__builtin_clzl])
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
+  #include <stdio.h>
+  #include <unistd.h>
+  int main() {
+      unsigned long u;
+      long j;
+      if (__builtin_clzl(0)!=sizeof(long)*8)
+      	 return -1;
+      for (u=1,j=sizeof(long)*8-1;j>=0;j--,u<<=1)
+      	  if (__builtin_clzl(u)!=j)
+  	     return -1;
+      return 0;
+   }]])],[AC_MSG_RESULT([yes])
+	  AC_DEFINE(HAVE_CLZL,[1],[clzl instruction])],
+	  [AC_MSG_RESULT([no])])
 
 
-#
-# Newer BFD libraries need a dummy output bfd
-#
- 	AC_CHECK_MEMBER([struct bfd_link_info.output_bfd],
- 		AC_DEFINE(HAVE_OUTPUT_BFD,1,[output_bfd element present]), [], 
-		[
-		#include <bfd.h>
-		#include <bfdlink.h>
-		])
-	AC_SUBST(HAVE_OUTPUT_BFD)
-#
-# FIXME: Need to workaround mingw before this point -- CM
-#
-	if test "$enable_statsysbfd" = "yes" && ! $CC -v 2>&1 | fgrep ming > /dev/null ; then
-
-		echo 'int main() {bfd_init();bfd_openr("/dev/null",0);return 0;}' >foo.c
-		MP=`$CC [ -Wl,-M ] -static -o foo foo.c -lbfd -liberty -ldl 2>&1 | grep -v : | tr '()' '\012\012' | $AWK '{print $NF}' | sort | uniq`
-		rm -f foo.c foo
-
-flib() {
-      $AWK '{i=split($1,A,"/");
-             for (j=1;j<=i;j++) 
-	     	 if (j>1 && A[[j]]=="..") {
-		    j--;
-		    i-=2;
-		    for (k=j;k<=i;k++) 
-		    	A[[k]]=A[[k+2]];
-		    j--;
-		 } 
-		 for (j=1;j<=i;j++) 
-		     printf("%s%s",A[[j]],j!=i ? "/" : "")}'
-}
-
-		if echo "$MP " | tr ' ' '\012' | grep -q libbfd.a ; then
-		   LIBBFD="`echo "$MP " | tr ' ' '\012' | grep libbfd.a | flib`"
-		else
-		   echo Guessing path to libbfd.a due to gcc bug
-		   LIBBFD="/usr/lib/libbfd.a"
-		fi   
-		if echo "$MP " | tr ' ' '\012' | grep -q libiberty.a ; then
-		   LIBIBERTY="`echo "$MP " | tr ' ' '\012' | grep libiberty.a | flib`"
-		else
-		   echo Guessing path to libiberty.a due to gcc bug
-		   LIBIBERTY="/usr/lib/libiberty.a"
-		fi   
-		BUILD_BFD=copy_bfd
-		AC_CHECK_LIB(z,inflate,
-			[TLIBS="$TLIBS -lz"],
-			AC_MSG_ERROR([Need zlib for bfd linking]),[])
-		AC_CHECK_LIB(dl,dlsym,
-			[TLIBS="$TLIBS -ldl"],
-			AC_MSG_ERROR([Need libdl for bfd linking]),[])
-		AC_SUBST(BUILD_BFD)
-		AC_SUBST(LIBBFD)
-		AC_SUBST(LIBIBERTY)
-	else if test "$enable_dynsysbfd" = "yes" ; then
-		TLIBS="$TLIBS -lbfd -liberty -ldl"
-	fi
-	fi
-fi
+case $use in
+     sh4*) ;;     #FIXME, these exceptions needed as of gcc 4.7
+     hppa*) ;;    #FIXME
+     powerpc*) ;; #FIXME
+     alpha*) ;;   #FIXME
+     ia64*) ;;    #FIXME
+     *) 
+     AC_MSG_CHECKING(__builtin___clear_cache)
+     		AC_TRY_COMPILE([],
+			       [void *v,*ve;
+			        __builtin___clear_cache(v,ve);
+				],
+				[AC_DEFINE(HAVE_BUILTIN_CLEAR_CACHE,1,[have __builtin__clear_cache instruction])
+				 AC_MSG_RESULT(yes)],
+				 AC_MSG_RESULT(no));;
+esac
 
 #AC_CONFIG_SUBDIRS($MY_SUBDIRS)
 

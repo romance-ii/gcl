@@ -78,11 +78,14 @@
 /* Define to 1 if you have the <asm/signal.h> header file. */
 #undef HAVE_ASM_SIGNAL_H
 
-/* bfd_boolean defined */
-#undef HAVE_BFD_BOOLEAN
-
 /* have bsdgettimeofday */
 #undef HAVE_BSDGETTIMEOFDAY
+
+/* have __builtin__clear_cache instruction */
+#undef HAVE_BUILTIN_CLEAR_CACHE
+
+/* clzl instruction */
+#undef HAVE_CLZL
 
 /* Define to 1 if you have the <complex.h> header file. */
 #undef HAVE_COMPLEX_H
@@ -146,9 +149,6 @@
 
 /* Have objc_malloc.h */
 #undef HAVE_OBJC_MALLOC_H
-
-/* output_bfd element present */
-#undef HAVE_OUTPUT_BFD
 
 /* have putenv call */
 #undef HAVE_PUTENV
@@ -314,9 +314,6 @@
 
 /* Have builtin_nan */
 #undef NAN
-
-/* binutils requires CONST definition */
-#undef NEED_CONST
 
 /* C stack address is negative */
 #undef NEG_CSTACK_ADDRESS
