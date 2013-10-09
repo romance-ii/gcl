@@ -128,31 +128,36 @@ new_bignum(void)
 #define GC_PROTECTED_SELF (__u)->_mp_d
 #define END_GCPROTECT if (__u==MP(big_gcprotect)) (__u)->_mp_d = 0
  
-
-
 static object
-make_bignum(__mpz_struct *u)
-{ object ans ;
- int size;
- {BEGIN_NO_INTERRUPT;
- /* make sure we follow the bignum body of u if it gets moved... */
- { GCPROTECT(u);
- ans = alloc_object(t_bignum);
- size = u->_mp_size;
- MP(ans)->_mp_d = 0;
- if (size == 0 )
-   size = 1;
- else if (size < 0) size= -size;
- MP(ans)->_mp_d = (mp_ptr) gcl_gmp_alloc (size*MP_LIMB_SIZE);
- MP(ans)->_mp_alloc = size;
- MP(ans)->_mp_size = u->_mp_size;
- memcpy(MP(ans)->_mp_d,GC_PROTECTED_SELF,size*MP_LIMB_SIZE);
- END_GCPROTECT;
- }
- END_NO_INTERRUPT;
- return ans;
- }
-} 
+make_bignum(__mpz_struct *u) {
+  object ans=alloc_object(t_bignum);
+  mpz_init_set(MP(ans),u);
+  return ans;
+}
+
+/* static object */
+/* make_bignum(__mpz_struct *u) */
+/* { object ans ; */
+/*  int size; */
+/*  {BEGIN_NO_INTERRUPT; */
+/*  /\* make sure we follow the bignum body of u if it gets moved... *\/ */
+/*  { GCPROTECT(u); */
+/*  ans = alloc_object(t_bignum); */
+/*  size = u->_mp_size; */
+/*  MP(ans)->_mp_d = 0; */
+/*  if (size == 0 ) */
+/*    size = 1; */
+/*  else if (size < 0) size= -size; */
+/*  MP(ans)->_mp_d = (mp_ptr) gcl_gmp_alloc (size*MP_LIMB_SIZE); */
+/*  MP(ans)->_mp_alloc = size; */
+/*  MP(ans)->_mp_size = u->_mp_size; */
+/*  memcpy(MP(ans)->_mp_d,GC_PROTECTED_SELF,size*MP_LIMB_SIZE); */
+/*  END_GCPROTECT; */
+/*  } */
+/*  END_NO_INTERRUPT; */
+/*  return ans; */
+/*  } */
+/* }  */
 
 /* coerce a mpz_t to a bignum or fixnum */
 
