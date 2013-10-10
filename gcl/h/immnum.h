@@ -20,12 +20,21 @@
 EXTER inline fixnum
 lnabs(fixnum x) {return x<0 ? ~x : x;}
 
-EXTER inline fixnum
-clz(fixnum x) {
+EXTER inline char
+clz(ufixnum x) {
 #ifdef HAVE_CLZL
   return x ? __builtin_clzl(x) : sizeof(x)*8;
 #else
-  return 0;
+  {char i;for (i=0;i<sizeof(x)*8 && !((x>>(sizeof(x)*8-1-i))&0x1);i++); return i;}
+#endif
+}
+
+EXTER inline char
+ctz(ufixnum x) {
+#ifdef HAVE_CTZL
+  return __builtin_ctzl(x);/*x ? __builtin_clzl(x) : sizeof(x)*8;*/
+#else
+  {char i;for (i=0;i<sizeof(x)*8 && !((x>>i)&0x1);i++); return i;}
 #endif
 }
 

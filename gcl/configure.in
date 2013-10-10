@@ -1032,6 +1032,23 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 	  AC_DEFINE(HAVE_CLZL,[1],[clzl instruction])],
 	  [AC_MSG_RESULT([no])])
 
+AC_MSG_CHECKING([__builtin_ctzl])
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
+  #include <stdio.h>
+  #include <unistd.h>
+  int main() {
+      unsigned long u;
+      long j;
+      if (__builtin_ctzl(0)!=sizeof(long)*8)
+      	 return -1;
+      for (u=1,j=0;j<sizeof(long)*8-1;j++,u<<=1)
+      	  if (__builtin_ctzl(u)!=j)
+  	     return -1;
+      return 0;
+   }]])],[AC_MSG_RESULT([yes])
+	  AC_DEFINE(HAVE_CTZL,[1],[ctzl instruction])],
+	  [AC_MSG_RESULT([no])])
+
 
 case $use in
      sh4*) ;;     #FIXME, these exceptions needed as of gcc 4.7

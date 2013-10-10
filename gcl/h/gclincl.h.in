@@ -90,6 +90,9 @@
 /* Define to 1 if you have the <complex.h> header file. */
 #undef HAVE_COMPLEX_H
 
+/* ctzl instruction */
+#undef HAVE_CTZL
+
 /* have readline completion matches */
 #undef HAVE_DECL_RL_COMPLETION_MATCHES
 
