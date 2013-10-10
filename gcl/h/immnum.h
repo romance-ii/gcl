@@ -82,7 +82,11 @@ immnum_count(object x) {return iif(x) ? mif(fixnum_count(fif(x))) : integer_coun
   0 bounded by 2^0, +-1 by 2^1,mpf by 2^(bs-1), which is sign bit
   protect labs from most negative fix, here all immfix ok*/
 EXTER inline bool
-fixnum_mul_safe(fixnum x,fixnum y) {return clz(labs(x))+clz(labs(y))>sizeof(x)*8+1;}
+fixnum_mul_safe_abs(fixnum x,fixnum y) {return clz(x)+clz(y)>sizeof(x)*8+1;}
+EXTER inline object
+safe_mul_abs(fixnum x,fixnum y) {return fixnum_mul_safe_abs(x,y) ? make_fixnum(x*y) : fixnum_times(x,y);}
+EXTER inline bool
+fixnum_mul_safe(fixnum x,fixnum y) {return fixnum_mul_safe_abs(labs(x),labs(y));}
 EXTER inline object
 safe_mul(fixnum x,fixnum y) {return fixnum_mul_safe(x,y) ? make_fixnum(x*y) : fixnum_times(x,y);}
 EXTER inline object
@@ -313,6 +317,43 @@ immnum_min(object x,object y) {return iif2(x,y) ? ((ufixnum)x<=(ufixnum)y ? x : 
 
 EXTER inline bool
 immnum_logt(object x,object y) {return iif2(x,y) ? fixnum_boole(BOOLAND,fif(x),fif(y))!=0 : !number_zerop(log_op2(BOOLAND,x,y));}
+
+EXTER inline fixnum
+fixnum_gcd(fixnum x,fixnum y) {
+
+  fixnum t;
+  char tx,ty;
+  
+  if (!x) return y;
+  if (!y) return x;
+
+  tx=ctz(x);
+  ty=ctz(y);
+  tx=tx<ty ? tx : ty;
+  x>>=tx;
+  y>>=tx;
+  t=x&0x1 ? -y : x>>1;
+  do {
+    t>>=ctz(t);
+    if (t>0) x=t; else y=-t;
+    t=x-y;
+  } while (t);
+
+  return x<<tx;
+
+}
+
+EXTER inline object
+immnum_gcd(object x,object y) {return iif2(x,y) ? mif(fixnum_gcd(labs(fif(x)),labs(fif(y)))) : get_gcd(x,y);}
+
+EXTER inline object
+fixnum_lcm(fixnum x,fixnum y) {
+  fixnum g=fixnum_gcd(x,y);
+  return g ? safe_mul_abs(x,fixnum_div(y,g,0)) : make_fixnum(0);
+}
+
+EXTER inline object
+immnum_lcm(object x,object y) {return iif2(x,y) ? fixnum_lcm(labs(fif(x)),labs(fif(y))) : get_lcm(x,y);}
 
 #endif
 
