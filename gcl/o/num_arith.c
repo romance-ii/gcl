@@ -64,7 +64,7 @@ inline object
 fixnum_times(fixnum i, fixnum j) {
 
 #ifdef HAVE_CLZL
-  if (fixnum_mul_safe(i,j))
+  if (i!=MOST_NEGATIVE_FIX && j!=MOST_NEGATIVE_FIX && fixnum_mul_safe(i,j))
 #else
   if (i>=0 ? (j>=0 ? (!i || j<= (MOST_POSITIVE_FIX/i)) : (j==-1 || i<= (MOST_NEGATIVE_FIX/j))) :
       (j>=0 ? (i==-1 || j<= (MOST_NEGATIVE_FIX/i)) : (i>MOST_NEGATIVE_FIX && -i<= (MOST_POSITIVE_FIX/-j))))

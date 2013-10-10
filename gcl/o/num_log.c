@@ -46,8 +46,10 @@ fixnum_big_shift(fixnum x,fixnum w) {
 
 inline object
 integer_fix_shift(object x, fixnum w) { 
-  if (type_of(x)==t_fixnum)
-    return fixnum_shft(fix(x),w);
+  if (type_of(x)==t_fixnum) {
+    fixnum fx=fix(x);
+    return (fx!=MOST_NEGATIVE_FIX || w<0) ? fixnum_shft(fx,w) : fixnum_big_shift(fx,w);
+  }
   MPOP(return,shifti,MP(x),w);
 }
 	

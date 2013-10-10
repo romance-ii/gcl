@@ -22,7 +22,6 @@ lnabs(fixnum x) {return x<0 ? ~x : x;}
 
 EXTER inline fixnum
 clz(fixnum x) {
-  x=lnabs(x);
 #ifdef HAVE_CLZL
   return x ? __builtin_clzl(x) : sizeof(x)*8;
 #else
@@ -31,7 +30,7 @@ clz(fixnum x) {
 }
 
 EXTER inline char
-fixnum_length(fixnum x) {return sizeof(x)*8-clz(x);}
+fixnum_length(fixnum x) {return sizeof(x)*8-clz(lnabs(x));}
 
 EXTER inline object
 immnum_length(object x) {return iif(x) ? mif(fixnum_length(fif(x))) : integer_length(x);}
@@ -56,7 +55,9 @@ fixnum_popcount(ufixnum x) {
   x=POPC&(x+(x>>4));
   x+=x>>8;
   x+=x>>16;
+#if SIZEOF_LONG == 8
   x+=x>>32;
+#endif
   return x&POPD;
 }
 
@@ -67,8 +68,12 @@ fixnum_count(fixnum x) {return fixnum_popcount(lnabs(x));}
 EXTER inline object
 immnum_count(object x) {return iif(x) ? mif(fixnum_count(fif(x))) : integer_count(x);}
 
+/*bs=sizeof(long)*8;
+  lb=bs-clz(labs(x));|x*y|=|x|*|y|<2^(lbx+lby)<2^(bs-1);
+  0 bounded by 2^0, +-1 by 2^1,mpf by 2^(bs-1), which is sign bit
+  protect labs from most negative fix, here all immfix ok*/
 EXTER inline bool
-fixnum_mul_safe(fixnum x,fixnum y) {return clz(x)+clz(y)>sizeof(x)*8+2;}
+fixnum_mul_safe(fixnum x,fixnum y) {return clz(labs(x))+clz(labs(y))>sizeof(x)*8+1;}
 EXTER inline object
 safe_mul(fixnum x,fixnum y) {return fixnum_mul_safe(x,y) ? make_fixnum(x*y) : fixnum_times(x,y);}
 EXTER inline object
@@ -169,7 +174,7 @@ fixnum_rshft(fixnum x,fixnum y) {
 }
 EXTER inline object
 fixnum_lshft(fixnum x,fixnum y) {
-  return clz(x)>y ? make_fixnum(x<<y) : (x ? fixnum_big_shift(x,y) : make_fixnum(0));
+  return clz(labs(x))>y ? make_fixnum(x<<y) : (x ? fixnum_big_shift(x,y) : make_fixnum(0));
 }
 EXTER inline object
 fixnum_shft(fixnum x,fixnum y) {
