@@ -327,8 +327,11 @@ COMPLEX:
 
 object
 number_abs(object x) {
+
   object r,i,z;
+
   switch(type_of(x)) {
+
   case t_complex:
     if (number_zerop(x)) return x;
     r=number_abs(x->cmp.cmp_real);
@@ -340,15 +343,57 @@ number_abs(object x) {
     }
     z=number_divide(i,r);
     return number_times(r,number_sqrt(one_plus(number_times(z,z))));
-   break;
+
+  case t_fixnum:
+    {fixnum fx=fix(x);return fx==MOST_NEGATIVE_FIX ? fixnum_add(1,MOST_POSITIVE_FIX) : (fx<0 ? make_fixnum(-fx) : x);}
+
+  case t_bignum:
+    return big_sign(x)<0 ? big_minus(x) : x;
+
+  case t_ratio:
+    {object n=number_abs(x->rat.rat_num);return n==x ? x : make_ratio(n,x->rat.rat_den);}
+
+  case t_shortfloat:
+    return sf(x)<0.0 ? make_shortfloat(-sf(x)) : x;
+
+  case t_longfloat:
+    return lf(x)<0.0 ? make_longfloat(-lf(x)) : x;
+
   default:
-    return number_minusp(x) ? number_negate(x) : x;
+    FEwrong_type_argument(sLnumber,x);
+    return(Cnil);
   }
 }
 
 object
 number_signum(object x) {
-  return number_zerop(x) ? x : number_divide(x,number_abs(x));
+
+  switch (type_of(x)) {
+
+  case t_fixnum:
+    {fixnum fx=fix(x);return make_fixnum(fx<0 ? -1 : (fx==0 ? 0 : 1));}
+
+  case t_bignum:
+    return make_fixnum(big_sign(x)<0 ? -1 : 1);
+
+  case t_ratio:
+    return number_signum(x->rat.rat_num);
+
+  case t_shortfloat:
+    return make_shortfloat(sf(x)<0.0 ? -1.0 : (sf(x)==0.0 ? 0.0 : 1.0));
+
+  case t_longfloat:
+    return make_longfloat(lf(x)<0.0 ? -1.0 : (lf(x)==0.0 ? 0.0 : 1.0));
+
+  case t_complex:
+    return number_zerop(x) ? x : number_divide(x,number_abs(x));
+
+  default:
+    FEwrong_type_argument(sLnumber,x);
+    return(Cnil);
+
+  }
+
 }
 
 static object
