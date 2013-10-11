@@ -153,8 +153,7 @@ LFD(Lsleep)(void)
 	vs_push(Cnil);
 }
 
-DEFUNM("GET-INTERNAL-RUN-TIMES",object,fSget_internal_run_times,SI
-	   ,0,0,NONE,OO,OO,OO,OO,(),"") {
+DEFUNM("GET-INTERNAL-RUN-TIMES",object,fSget_internal_run_times,SI,0,0,NONE,OO,OO,OO,OO,(),"") {
 
   object *base=vs_top;
 
@@ -163,10 +162,9 @@ DEFUNM("GET-INTERNAL-RUN-TIMES",object,fSget_internal_run_times,SI
 #else
   struct tms buf;
   fixnum vals=(fixnum)fcall.valp;
-
-  /*   check_arg(0); */
+  
   times(&buf);
-  RETURN2(make_fixnum(buf.tms_utime),make_fixnum(buf.tms_cutime));
+  RETURN4(make_fixnum(buf.tms_utime),make_fixnum(buf.tms_cutime),make_fixnum(buf.tms_stime),make_fixnum(buf.tms_cstime));
   
 #endif	
   
