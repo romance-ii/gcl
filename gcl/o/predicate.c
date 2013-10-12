@@ -204,7 +204,23 @@ equal1(register object x, register object y) {
 
   /*x and y are not == and not Cnil and not immfix*/
 
+#ifdef __MINGW32__ /*FIXME mingw compiler cannot do tail recursion and blows out stack*/
+ BEGIN:
+  if (valid_cdr(x)) {
+    if (valid_cdr(y)&&equal(x->c.c_car,y->c.c_car)) {
+      x=x->c.c_cdr;
+      y=y->c.c_cdr;
+      if (x==y) return TRUE;
+      if (IMMNIL(x)||IMMNIL(y)) return FALSE;
+      goto BEGIN;
+    } else
+      return FALSE;
+  }
+#else
+  
   if (valid_cdr(x)) return valid_cdr(y)&&equal(x->c.c_car,y->c.c_car)&&equal(x->c.c_cdr,y->c.c_cdr);
+
+#endif
 
   if (valid_cdr(y)) return FALSE;
   
