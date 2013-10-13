@@ -1794,7 +1794,7 @@ if test "$use" != "386-gnu" ; then #hurd can push .data below C stack, but sbrk(
 
       n=-1;
       k=0;
-      lim=64;
+      lim=`$AWK 'END {printf("%d\n",m*8-2)}' m=$ac_cv_sizeof_long`;
       max=0;
       min=$lim;
       while test $n -lt $lim ; do
