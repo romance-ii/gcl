@@ -408,7 +408,7 @@ fasload(object faslfile) {
 	
   for (sec=sec1;sec<sece;sec++)
     if (sec->s_flags&0xe0)
-      for (rel=st+sec->s_relptr,rele=rel+sec->s_nreloc;rel<rele;rel++)
+      for (rel=st+sec->s_relptr,rele=rel+(sec->s_flags&0x1000000 ? rel->r.r_count : sec->s_nreloc);rel<rele;rel++)
 	relocate(sec,rel,sy1+rel->r_symndx);
   
   fseek(fp,(void *)ste-st,0);
