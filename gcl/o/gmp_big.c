@@ -131,6 +131,7 @@ new_bignum(void)
 static object
 make_bignum(__mpz_struct *u) {
   object ans=alloc_object(t_bignum);
+  memset(MP(ans),0,sizeof(*MP(ans)));
   mpz_init_set(MP(ans),u);
   return ans;
 }
