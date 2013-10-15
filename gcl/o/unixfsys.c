@@ -524,6 +524,13 @@ DEFUN("STAT",object,fSstat,SI,1,1,NONE,OO,OO,OO,OO,(object path),"") {
 
   bzero(filename,sizeof(filename));
   coerce_to_filename(path,filename);
+#ifdef __MINGW32__
+  {
+    char *p=filename+strlen(filename)-1;
+    for (;p>=filename && *p=='/';p--)
+      *p=0;
+  }
+#endif
   if (lstat(filename,&ss))
     RETURN1(Cnil);
   else {/* ctime_r insufficiently portable */
