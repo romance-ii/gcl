@@ -326,7 +326,11 @@ unexec (char *new_name, char *old_name, void *start_data, void *start_bss,
     dos_header = (PIMAGE_DOS_HEADER) out_file.file_base;
     nt_header = (PIMAGE_NT_HEADERS) ((char *) dos_header + dos_header->e_lfanew);
 
-    
+ 
+    nt_header->OptionalHeader.SizeOfStackReserve=0x800000;
+    /* nt_header->OptionalHeader.SizeOfHeapReserve=0x80000000; */
+    /* nt_header->OptionalHeader.SizeOfHeapCommit=0x80000000; */
+   
     nt_header->OptionalHeader.CheckSum = 0;
 //    nt_header->FileHeader.TimeDateStamp = time (NULL);
 //    dos_header->e_cp = size / 512;
@@ -966,10 +970,11 @@ allocate_heap (void)
      the region below the 256MB line for our malloc arena - 229MB is
      still a pretty decent arena to play in!  */
 
-  void *base = (void *)0x10100000,*ptr;/*FIXME, someday figure out how to let the heap start address default */
+  void *base = (void *)0x20000000,*ptr;/*FIXME, someday figure out how to let the heap start address default *//*(void *)0x10100000*/
 
   reserved_heap_size=probe_heap_size(base,PAGESIZE,(1UL<<31),-1);
   ptr = VirtualAlloc ((void *) base,get_reserved_heap_size (),MEM_RESERVE,PAGE_NOACCESS);
+  printf("probe results: %lu at %p\n",reserved_heap_size,ptr);
 
   DBEGIN = (DBEGIN_TY) ptr;
 
