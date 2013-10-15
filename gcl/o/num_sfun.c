@@ -108,100 +108,146 @@ number_exp(object x)
 	}
 }
 
+inline object
+number_fix_iexpt(object x,fixnum y,fixnum ly,fixnum j) {
+  object z;
+  
+  if (j+1==ly) return x;
+  z=number_fix_iexpt(number_times(x,x),y,ly,j+1);
+  return fixnum_bitp(j,y) ? number_times(x,z) : z;
+}
+
+inline object
+number_big_iexpt(object x,object y,fixnum ly,fixnum j) {
+  object z;
+  
+  if (j+1==ly) return x;
+  z=number_big_iexpt(number_times(x,x),y,ly,j+1);
+  return mpz_tstbit(MP(y),j) ? number_times(x,z) : z;
+
+}
+
+inline object
+number_zero_expt(object x,bool promote_short_p) {
+
+  switch (type_of(x)) {
+  case t_fixnum:
+  case t_bignum:
+  case t_ratio:
+    return make_fixnum(1);
+  case t_shortfloat:
+    return promote_short_p ? make_longfloat(1.0) : make_shortfloat(1.0);
+  case t_longfloat:
+    return make_longfloat(1.0);
+  case t_complex:
+    return make_complex(number_zero_expt(x->cmp.cmp_real,promote_short_p),small_fixnum(0));
+  default:
+    FEwrong_type_argument(sLnumber,x);
+    return Cnil;
+  }
+
+}
+
+
+inline object
+number_ui_expt(object x,fixnum fy) {
+
+  switch (type_of(x)) {
+  case t_fixnum:
+    { 
+      fixnum fx=fix(x);
+      object z;
+      MPOP(z=,mpz_ui_pow_ui,labs(fx),fy);
+      if (fx<0&&(fy&0x1)) return number_negate(z); else return z;
+    }
+  case t_bignum:
+    MPOP(return,mpz_pow_ui,MP(x),fy);
+  case t_ratio:
+    {
+      object n=number_ui_expt(x->rat.rat_num,fy),d=number_ui_expt(x->rat.rat_den,fy),z=alloc_object(t_ratio);
+      z->rat.rat_num=n;
+      z->rat.rat_den=d;/*No need to make_ratio as no common factors*/
+      return z;
+    }
+
+  case t_shortfloat:
+  case t_longfloat:
+  case t_complex:
+    {
+      fixnum ly=fixnum_length(fy);
+
+      return ly ? number_fix_iexpt(x,fy,ly,0) : number_zero_expt(x,0);
+
+    }
+	
+  default:
+    FEwrong_type_argument(sLnumber,x);
+    return Cnil;
+  }
+    
+}
+
+inline object
+number_ump_expt(object x,object y) {
+  return number_big_iexpt(x,y,fix(integer_length(y)),0);
+}
+
+inline object
+number_log_expt(object x,object y) {
+  return number_zerop(y) ? number_zero_expt(y,type_of(x)==t_longfloat) : number_exp(number_times(number_nlog(x),y));
+}
+
+inline object
+number_invert(object x,object y,object z) {
+
+  switch (type_of(z)) {
+  case t_shortfloat:
+    if (!ISNORMAL(sf(z))) return number_log_expt(x,y);
+    break;
+  case t_longfloat:
+    if (!ISNORMAL(lf(z))) return number_log_expt(x,y);
+    break;
+  }
+  return number_divide(small_fixnum(1),z);
+}
+    
+
+inline object 
+number_si_expt(object x,object y) {
+  switch (type_of(y)) {
+  case t_fixnum:
+    { 
+      fixnum fy=fix(y);
+      if (fy>=0)
+	return number_ui_expt(x,fy);
+      if (fy==MOST_NEGATIVE_FIX)
+	return number_invert(x,y,number_ump_expt(x,number_negate(y)));
+      return number_invert(x,y,number_ui_expt(x,-fy));
+    }
+  case t_bignum:
+    return big_sign(y)<0 ? number_invert(x,y,number_ump_expt(x,number_negate(y))) : number_ump_expt(x,y);
+  case t_ratio:
+  case t_shortfloat:
+  case t_longfloat:
+  case t_complex:
+    return number_log_expt(x,y);
+  default:
+    FEwrong_type_argument(sLnumber,y);
+    return Cnil;
+  }
+}
+
 object
-number_expt(object x, object y)
-{
-	enum type tx, ty;
-	object z;
-	vs_mark;
+number_expt(object x, object y) {
 
-	tx = type_of(x);
-	ty = type_of(y);
-	if (ty == t_fixnum && fix(y) == 0)
-		switch (tx) {
-		case t_fixnum:  case t_bignum:  case t_ratio:
-			return(small_fixnum(1));
+  if (number_zerop(x)&&y!=small_fixnum(0)) {
+    if (!number_plusp(type_of(y)==t_complex?y->cmp.cmp_real:y))
+      FEerror("Cannot raise zero to the power ~S.", 1, y);
+    return(number_times(x, y));
+  }
 
-		case t_shortfloat:
-			return(make_shortfloat((shortfloat)1.0));
+  return number_si_expt(x,y);
 
-		case t_longfloat:
-			return(make_longfloat(1.0));
-
-		case t_complex:
-			z = number_expt(x->cmp.cmp_real, y);
-			vs_push(z);
-			z = make_complex(z, small_fixnum(0));
-			vs_reset;
-			return(z);
-
-		default:
-			FEwrong_type_argument(sLnumber, x);
-		}
-	if (number_zerop(x)) {
-		if (!number_plusp(ty==t_complex?y->cmp.cmp_real:y))
-			FEerror("Cannot raise zero to the power ~S.", 1, y);
-		return(number_times(x, y));
-	}
-	if (ty == t_fixnum || ty == t_bignum) {
-		if (number_minusp(y)) {
-			z = number_negate(y);
-			vs_push(z);
-			z = number_expt(x, z);
-			vs_push(z);
-			if ((type_of(z)==t_shortfloat && !ISNORMAL(z->SF.SFVAL)) ||
-			    (type_of(z)==t_longfloat && !ISNORMAL(z->LF.LFVAL))) {
-			  z = number_nlog(x);
-			  vs_push(z);
-			  z = number_times(z, y);
-			  vs_push(z);
-			  z = number_exp(z);
-			  vs_reset;
-			  return(z);
-			}
-			z = number_divide(small_fixnum(1), z);
-			vs_reset;
-			return(z);
-		}
-		if (tx==t_fixnum && fix(x)==2 && ty==t_fixnum) {
-		  object z1;
-		  if (fix(y)<CHAR_SIZE*sizeof(fixnum)-1)
-		    return make_fixnum((((fixnum)1)<<fix(y)));
-		  z=new_bignum();
-		  z1=new_bignum();
-		  mpz_set_ui(MP(z),1);
-		  mpz_mul_2exp(MP(z1),MP(z),fix(y));
-		  return normalize_big(z1);
-		}
-		z = small_fixnum(1);
-		vs_push(z);
-		vs_push(Cnil);
-		vs_push(Cnil);
-		while (number_plusp(y))
-			if (number_evenp(y)) {
-				x = number_times(x, x);
-				vs_top[-1] = x;
-				y = integer_divide1(y, small_fixnum(2),0);
-				vs_top[-2] = y;
-			} else {
-				z = number_times(z, x);
-				vs_top[-3] = z;
-				y = number_minus(y, small_fixnum(1));
-				vs_top[-2] = y;
-			}
-		vs_reset;
-		return(z);
-	}
-	if (!number_zerop(y)) {
-	  z = number_nlog(x);
-	  vs_push(z);
-	  z = number_times(z, y);
-	} else
-	  z=(type_of(x)==t_longfloat) ? make_longfloat(0.0) : y;/*FIXME*/
-	vs_push(z);
-	z = number_exp(z);
-	vs_reset;
-	return(z);
 }
 
 static object
