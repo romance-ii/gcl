@@ -343,8 +343,8 @@ setf(object place, object form)
 
 	    s=alloca(fun->s.s_fillp);
 	    s[0]='C';
-	    memcpy(s+1,fun->s.s_self+2,fun->s.s_fillp);
-	    s[fun->s.s_fillp]=0;
+	    memcpy(s+1,fun->s.s_self+2,fun->s.s_fillp-2);
+	    s[fun->s.s_fillp-1]=0;
 	    
 	    fun=sLcar;
 	    args=MMcons(MMcons(find_symbol(make_simple_string(s),p),MMcons(args->c.c_car,Cnil)),Cnil);
