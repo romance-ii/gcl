@@ -527,7 +527,7 @@ DEFUN("STAT",object,fSstat,SI,1,1,NONE,OO,OO,OO,OO,(object path),"") {
 #ifdef __MINGW32__
   {
     char *p=filename+strlen(filename)-1;
-    for (;p>=filename && *p=='/';p--)
+    for (;p>filename && *p=='/';p--)
       *p=0;
   }
 #endif
