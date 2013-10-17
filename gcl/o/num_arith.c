@@ -542,7 +542,7 @@ one_minus(object x)
 object
 number_negate(object x)
 {
-	object	z, z1;
+	object	z;
 
 	switch (type_of(x)) {
 
