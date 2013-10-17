@@ -1563,8 +1563,6 @@ DEFUN("ROOM-REPORT",object,fSroom_report,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
   object x=Cnil;
   int i;
   
-  check_arg(0);
-  
   x=make_cons(make_fixnum(real_maxpage-first_data_page),x);
   x=make_cons(make_fixnum(available_pages),x);
   x=make_cons(make_fixnum(ncbpage),x);
