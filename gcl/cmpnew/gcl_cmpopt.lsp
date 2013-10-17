@@ -1219,11 +1219,11 @@
 (push '((t t t) t #.(compiler::flags) "immnum_dpf(#0,#1,#2)") (get 'deposit-field 'compiler::inline-always))
 
 ;;MINUSP
-(push '((t) boolean #.(flags) "immnum_minusp(#0)");"number_compare(small_fixnum(0),#0)>0"
+(push '((t) boolean #.(flags) "immnum_minusp(#0)") (get 'minusp 'inline-always));"number_compare(small_fixnum(0),#0)>0"
 ;;PLUSP
-(push '((t) boolean #.(flags) "immnum_plusp(#0)");"number_compare(small_fixnum(0),#0)>0"
+(push '((t) boolean #.(flags) "immnum_plusp(#0)") (get 'plusp 'inline-always));"number_compare(small_fixnum(0),#0)>0"
 ;;ZEROP
-(push '((t) boolean #.(flags) "immnum_zerop(#0)");"number_compare(small_fixnum(0),#0)==0"
+(push '((t) boolean #.(flags) "immnum_zerop(#0)") (get 'zerop 'inline-always));"number_compare(small_fixnum(0),#0)==0"
 
 
 ;;EVENP
