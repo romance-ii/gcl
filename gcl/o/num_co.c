@@ -93,7 +93,7 @@ DEFUN("ISFINITE",object,fSisfinite,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
 }
 
-static void
+void
 integer_decode_double(double d, int *hp, int *lp, int *ep, int *sp)
 {
 	int h, l;
@@ -301,7 +301,7 @@ intdivrem(object x,object y,fixnum d,object *q,object *r) {
   object z,q2,q1;
 
   if (number_zerop(y)==TRUE)
-    zero_divisor();
+    DIVISION_BY_ZERO(sLtruncate,list(2,x,y));
 
   switch(tx) {
   case t_fixnum:
