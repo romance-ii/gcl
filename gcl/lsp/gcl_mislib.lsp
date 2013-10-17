@@ -185,9 +185,10 @@
 			((+ x (* 2 (1+ most-positive-fixnum))))))))))
 
 (defun room (&optional x)
-  (let ((l (multiple-value-list (si:room-report)))
-        maxpage leftpage ncbpage maxcbpage ncb cbgbccount npage maxnpage
-        rbused rbfree nrbpage maxrbpage
+
+  (let ((l (room-report));(multiple-value-list (si:room-report)))
+        maxpage holepage leftpage ncbpage maxcbpage ncb cbgbccount npage
+        rbused rbfree nrbpage rbgbccount maxrbpage maxnpage
         info-list link-alist)
     (setq maxpage (nth 0 l) leftpage (nth 1 l)
           ncbpage (nth 2 l) maxcbpage (nth 3 l) ncb (nth 4 l)
@@ -197,32 +198,34 @@
 	  maxrbpage (nth 10 l)
           rbgbccount (nth 11 l)
           l (nthcdr 12 l))
-    (do ((l l (nthcdr 5 l))
-         (tl *type-list* (cdr tl))
+    (do ((l l (nthcdr 7 l))
          (j 0 (+ j (if (nth 3 l) (nth 3 l) 0)))
-         (i 0 (+ i (if (nth 2 l) (nth 2 l) 0))))
+         (i 0 (+ i (if (nth 3 l) (nth 3 l) 0))))
         ((null l) (setq npage i maxnpage j))
-      (let ((typename (car tl))
-            (nused (nth 0 l))
-            (nfree (nth 1 l))
-            (npage (nth 2 l))
-            (maxpage (nth 3 l))
-            (gbccount (nth 4 l)))
+      (let ((typename (intern (nth 0 l)))
+            (nused (nth 1 l))
+            (nfree (nth 2 l))
+            (npage (nth 3 l))
+            (maxpage (nth 4 l))
+            (gbccount (nth 5 l))
+            (ws (nth 6 l)))
         (if nused
-            (push (list typename npage maxpage
+            (push (list typename ws npage maxpage
                         (if (zerop (+ nused nfree))
                             0
                             (/ nused 0.01 (+ nused nfree)))
                         (if (zerop gbccount) nil gbccount))
                   info-list)
-            (let ((a (assoc (nth nfree *type-list*) link-alist)))
+            (let* ((nfree (intern nfree))
+		   (a (assoc nfree link-alist)))
                  (if a
                      (nconc a (list typename))
-                     (push (list (nth nfree *type-list*) typename)
+                     (push (list nfree typename)
                            link-alist))))))
     (terpri)
+    (format t "~@[~2A~]~10@A/~A~21T~6@A%~@[~8@A~]~37T~{~A~^ ~}~%~%" "WS" "UP" "MP" "FI" "GC" '("TYPES"))
     (dolist (info (reverse info-list))
-      (apply #'format t "~8D/~D~19T~6,1F%~@[~8D~]~35T~{~A~^ ~}"
+      (apply #'format t "~@[~2D~]~10D/~D~21T~6,1F%~@[~8D~]~37T~{~A~^ ~}"
              (append (cdr info)
                      (if  (assoc (car info) link-alist)
                           (list (assoc (car info) link-alist))
@@ -230,28 +233,26 @@
       (terpri)
       )
     (terpri)
-    (format t "~8D/~D~26T~@[~8D~]~35Tcontiguous (~D blocks)~%"
+    (format t "~12D/~D~28T~@[~8D~]~37Tcontiguous (~D blocks)~%"
             ncbpage maxcbpage (if (zerop cbgbccount) nil cbgbccount) ncb)
-    (format t "~9T~D~35Thole~%" holepage)
-    (format t "~8D/~D~19T~6,1F%~@[~8D~]~35Trelocatable~%~%"
+    (format t "~13T~D~37Thole~%" holepage)
+    (format t "~12D/~D~21T~6,1F%~@[~8D~]~37Trelocatable~%~%"
             nrbpage maxrbpage (/ rbused 0.01 (+ rbused rbfree))
             (if (zerop rbgbccount) nil rbgbccount))
-    (format t "~10D pages for cells~%~%" npage)
-    (format t "~10D total pages in core~%" (+ npage ncbpage nrbpage))
-    (format t "~10D current core maximum pages~%" (+ maxnpage maxcbpage maxrbpage))
-    (format t "~10D pages reserved for gc~%" maxrbpage)
-    (format t "~10D pages available for adding to core~%" leftpage)
-    (format t "~10D pages reserved for core exhaustion~%~%" (- maxpage (+ maxnpage maxcbpage (ash maxrbpage 1) leftpage)))
-    (format t "~10D maximum pages~%" maxpage)
+    (format t "~12D pages for cells~%~%" npage)
+    (format t "~12D total pages in core~%" (+ npage ncbpage nrbpage))
+    (format t "~12D current core maximum pages~%" (+ maxnpage maxcbpage maxrbpage))
+    (format t "~12D pages reserved for gc~%" maxrbpage)
+    (format t "~12D pages available for adding to core~%" leftpage)
+    (format t "~12D pages reserved for core exhaustion~%~%" (- maxpage (+ maxnpage maxcbpage (ash maxrbpage 1) leftpage)))
+    (format t "~12D maximum pages~%" maxpage)
     (values)
     )
-
- (when x
-  (format t "~%~%")
-  (format t "Key:~%~%WS: words per struct~%UP: allocated pages~%MP: maximum pages~%FI: fraction of cells in use on allocated pages~%GC: number of gc triggers allocating this type~%~%")
-  (heaprep))
-
- (values))
+  (when x
+    (format t "~%~%")
+    (format t "Key:~%~%WS: words per struct~%UP: allocated pages~%MP: maximum pages~%FI: fraction of cells in use on allocated pages~%GC: number of gc triggers allocating this type~%~%")
+    (heaprep))
+  (values))
 
 
 (defvar *call-stack* nil)

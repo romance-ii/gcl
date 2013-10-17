@@ -1565,18 +1565,18 @@ DEFUN("ROOM-REPORT",object,fSroom_report,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
   
   check_arg(0);
   
-  vs_check_push(make_fixnum(real_maxpage-first_data_page));
-  vs_push(make_fixnum(available_pages));
-  vs_push(make_fixnum(ncbpage));
-  vs_push(make_fixnum(maxcbpage));
-  vs_push(make_fixnum(ncb));
-  vs_push(make_fixnum(cbgbccount));
-  vs_push(make_fixnum(holepage));
-  vs_push(make_fixnum(rb_pointer - rb_start));
-  vs_push(make_fixnum(rb_end - rb_pointer));
-  vs_push(make_fixnum(nrbpage));
-  vs_push(make_fixnum(maxrbpage));
-  vs_push(make_fixnum(rbgbccount));
+  x=make_cons(make_fixnum(real_maxpage-first_data_page),x);
+  x=make_cons(make_fixnum(available_pages),x);
+  x=make_cons(make_fixnum(ncbpage),x);
+  x=make_cons(make_fixnum(maxcbpage),x);
+  x=make_cons(make_fixnum(ncb),x);
+  x=make_cons(make_fixnum(cbgbccount),x);
+  x=make_cons(make_fixnum(holepage),x);
+  x=make_cons(make_fixnum(rb_pointer - rb_start),x);
+  x=make_cons(make_fixnum(rb_end - rb_pointer),x);
+  x=make_cons(make_fixnum(nrbpage),x);
+  x=make_cons(make_fixnum(maxrbpage),x);
+  x=make_cons(make_fixnum(rbgbccount),x);
   for (i = 0;  i < (int)t_end;  i++) {
     x=make_cons(make_simple_string(tm_table[i].tm_name+1),x);
     if (tm_table[i].tm_type == (enum type)i) {
