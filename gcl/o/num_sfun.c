@@ -163,12 +163,7 @@ number_ui_expt(object x,fixnum fy) {
   case t_bignum:
     MPOP(return,mpz_pow_ui,MP(x),fy);
   case t_ratio:
-    {
-      object n=number_ui_expt(x->rat.rat_num,fy),d=number_ui_expt(x->rat.rat_den,fy),z=alloc_object(t_ratio);
-      z->rat.rat_num=n;
-      z->rat.rat_den=d;/*No need to make_ratio as no common factors*/
-      return z;
-    }
+    return make_ratio(number_ui_expt(x->rat.rat_num,fy),number_ui_expt(x->rat.rat_den,fy),1);
 
   case t_shortfloat:
   case t_longfloat:
@@ -397,7 +392,7 @@ number_abs(object x) {
     return big_sign(x)<0 ? big_minus(x) : x;
 
   case t_ratio:
-    {object n=number_abs(x->rat.rat_num);return n==x ? x : make_ratio(n,x->rat.rat_den);}
+    {object n=number_abs(x->rat.rat_num);return n==x ? x : make_ratio(n,x->rat.rat_den,1);}
 
   case t_shortfloat:
     return sf(x)<0.0 ? make_shortfloat(-sf(x)) : x;

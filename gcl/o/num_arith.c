@@ -554,11 +554,7 @@ number_negate(object x)
 	case t_bignum:
 		return big_minus(x);
 	case t_ratio:
-		z1 = number_negate(x->rat.rat_num);
-		z = alloc_object(t_ratio);
-		z->rat.rat_num = z1;
-		z->rat.rat_den = x->rat.rat_den;
-		return(z);
+	  return make_ratio(number_negate(x->rat.rat_num),x->rat.rat_den,1);
 
 	case t_shortfloat:
 		z = alloc_object(t_shortfloat);
