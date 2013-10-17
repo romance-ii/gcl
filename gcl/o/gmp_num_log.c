@@ -57,30 +57,6 @@ log_op2(fixnum op,object x,object y) {
     return maybe_replace_big(integer_log_op2(op,x,tx,y,ty));
 }
 
-static object
-log_op(fixnum op) {
-
-  fixnum i,n=vs_top-vs_base,fx=0;
-  enum type tx,ty;
-  object x,y;
-  
-  if ((tx=type_of(x=vs_base[0]))==t_fixnum) {fx=fix(x);x=OBJNULL;}
-  for (i=1;i<n;i++) {
-    ty=type_of(y=vs_base[i]);
-    if (tx==t_fixnum&&ty==t_fixnum)
-      fx=fixnum_log_op2(op,fx,fix(y));
-    else {
-      x=normalize_big(integer_log_op2(op,x==OBJNULL ? make_fixnum(fx) : x,tx,y,ty));
-      if ((tx=type_of(x))==t_fixnum) {fx=fix(x);x=OBJNULL;}
-    }
-  }
-
-  return x==OBJNULL ? make_fixnum(fx) : maybe_replace_big(x);
-
-}
-
-
-
 
 static int
 big_bitp(object x, ufixnum p)

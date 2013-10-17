@@ -94,30 +94,33 @@ integer_count(object x) {
   return make_fixnum(type_of(x)==t_fixnum ? fixnum_count(fix(x)) : MP_BITCOUNT(MP(x)));
 }
 
-#define DEFLOG(a_,b_,c_) \
-  LFD(a_)(void) {				\
-	 object x;				\
-	 int narg, i;				\
-	 					\
-	 narg = vs_top - vs_base;		\
-	 for (i = 0; i < narg; i++)			\
-	   check_type_integer(&vs_base[i]);		\
-	 if (narg == 0) {				\
-	 vs_top = vs_base;				\
-	 vs_push(c_);					\
-	 return;					\
-	 }						\
-	 if (narg == 1)					\
-	   return;					\
-	 x = log_op(b_);				\
-	 vs_top = vs_base;				\
-	 vs_push(x);					\
-  }
+#define DEFLOG(n_,a_,b_,c_)						\
+DEFUN(n_,object,Join(fL,a_),LISP,0,63,NONE,OO,OO,OO,OO,(object first,...),"") { \
+  fixnum nargs=INIT_NARGS(0),fx=0;					\
+  object l=Cnil,x,y;							\
+  enum type tx,ty;							\
+  va_list ap;								\
+									\
+  va_start(ap,first);							\
+  x=NEXT_ARG(nargs,ap,l,first,c_);					\
+  if ((tx=type_of(x))==t_fixnum) {fx=fix(x);x=OBJNULL;}			\
+  for (;(y=NEXT_ARG(nargs,ap,l,first,OBJNULL))!=OBJNULL;) {		\
+    ty=type_of(y);							\
+    if (tx==t_fixnum&&ty==t_fixnum)					\
+      fx=fixnum_log_op2(b_,fx,fix(y));					\
+    else {								\
+      x=normalize_big(integer_log_op2(b_,x==OBJNULL ? make_fixnum(fx) : x,tx,y,ty)); \
+      if ((tx=type_of(x))==t_fixnum) {fx=fix(x);x=OBJNULL;}		\
+    }									\
+  }									\
+  va_end(ap);								\
+  return x==OBJNULL ? make_fixnum(fx) : maybe_replace_big(x);		\
+}									\
 
-DEFLOG(Llogior,BOOLIOR,small_fixnum(0));
-DEFLOG(Llogxor,BOOLXOR,small_fixnum(0));
-DEFLOG(Llogand,BOOLAND,small_fixnum(-1));
-DEFLOG(Llogeqv,BOOLEQV,small_fixnum(-1));
+DEFLOG("LOGIOR",logior,BOOLIOR,small_fixnum(0));
+DEFLOG("LOGXOR",logxor,BOOLXOR,small_fixnum(0));
+DEFLOG("LOGAND",logand,BOOLAND,small_fixnum(-1));
+DEFLOG("LOGEQV",logeqv,BOOLEQV,small_fixnum(-1));
 
 
 
@@ -231,10 +234,10 @@ B2OP(IOR,ior)
 B2OP(XOR,xor)
 
 
-DEFUN("BOOLE",object,fLboole,LISP,3,3,NONE,OO,OO,OO,OO,(object x,object y,object z),"") {
+DEFUN("BOOLE",object,fLboole,LISP,3,3,NONE,OO,OO,OO,OO,(object o,object x,object y),"") {
+  check_type_integer(&o);
   check_type_integer(&x);
   check_type_integer(&y);
-  check_type_integer(&z);
   RETURN1(log_op2(fixint(o),x,y));
 }
 
