@@ -717,7 +717,7 @@ mark_object(object x) {
       unsigned char * s_type = &SLOT_TYPE(def,0);
       unsigned short *s_pos= & SLOT_POS(def,0);
       for (i = 0, j = S_DATA(def)->length;  i < j;  i++)
-	if (s_type[i]==0) mark_object(STREF(object,x,s_pos[i]));
+	if (s_type[i]==aet_object) mark_object(STREF(object,x,s_pos[i]));
       if (inheap(x->str.str_self)) {
 	if (what_to_collect == t_contiguous)
 	  mark_contblock((char *)p,S_DATA(def)->size);
@@ -839,7 +839,7 @@ mark_object(object x) {
     mark_object(x->fun.fun_plist);
     if (x->fun.fun_env != def_env && x->fun.fun_env != src_env) {
       mark_object(x->fun.fun_env[0]);
-      if (what_to_collect >= t_contiguous) {
+      if (COLLECT_RELBLOCK_P) {
 	object *p=x->fun.fun_env-1;
 	ufixnum n=*(ufixnum *)p;
 	p=copy_relblock((char *)p,n*sizeof(object));
@@ -1560,6 +1560,7 @@ FFN(siLheap_report)(void) {
 
 DEFUN("ROOM-REPORT",object,fSroom_report,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
 
+  object x=Cnil;
   int i;
   
   check_arg(0);
@@ -1616,7 +1617,7 @@ FFN(siLreset_gbc_count)(void) {
 */
 
 
-DEFUN("GBC",object,fSgbc,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"")
+DEFUN("GBC",object,fSgbc,SI,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
 
   /* 1 args */
   

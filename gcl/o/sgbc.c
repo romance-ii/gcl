@@ -489,7 +489,7 @@ sgc_mark_object1(object x) {
     sgc_mark_object(x->fun.fun_plist);
     if (x->fun.fun_env != def_env && x->fun.fun_env != src_env) {
       sgc_mark_object(x->fun.fun_env[0]);
-      if (what_to_collect >= t_contiguous) {
+      if (COLLECT_RELBLOCK_P) {
 	object *p=x->fun.fun_env-1;
 	if(SGC_RELBLOCK_P(p)) {
 	  ufixnum n=*(ufixnum *)p;

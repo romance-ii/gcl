@@ -992,10 +992,6 @@ DEFUN("NUMBER-DIVIDE",object,fSnumber_divide,SI
 }
 
 
-=======
-}
-
->>>>>>> a5468a4... inlines for gcd and lcm
 LFD(Lplus)(void)
 {
         int i, j;

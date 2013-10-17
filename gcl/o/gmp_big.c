@@ -507,7 +507,7 @@ maybe_replace_big(object x)
 
 
 object
-bignum2( int h,  int l)
+bignum2( unsigned int h,  unsigned int l)
 {
   object x = new_bignum();
   mpz_set_si(MP(x),h);

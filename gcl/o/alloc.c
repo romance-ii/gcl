@@ -1432,7 +1432,9 @@ DEFUN("SET-STARTING-RELBLOCK-HEAP-MULTIPLE",fixnum,fSset_starting_relb_heap_mult
   return starting_relb_heap_mult;
 }
   
-DEFUN("SET-HOLE-SIZE",object,fSset_hole_size,SI,1,2,NONE,OI,IO,OO,OO,(fixnum npages,...),"") {
+DEFUNM("SET-HOLE-SIZE",object,fSset_hole_size,SI,1,2,NONE,OI,IO,OO,OO,(fixnum npages,...),"") {
+  fixnum vals=(fixnum)fcall.valp;
+  object *base=vs_top;
 
   printf("This function is obsolete -- use SET-STARTING-HOLE-DIVISOR instead\n");
 
