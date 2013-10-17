@@ -412,15 +412,15 @@ gethash(object key, object hashtable) {
     break;
   case htt_eql:
     i = hash_eql(key);
-    f=eql1;
+    f=oeql;
     break;
   case htt_equal:
     i = ihash_equal(key,0);
-    f=equal1;
+    f=oequal;
     break;
   case htt_equalp:
     i = ihash_equalp(key,0);
-    f=equalp1;
+    f=oequalp;
     break;
   default:
     FEerror( "gethash:  Hash table not of type EQ, EQL, or EQUAL." ,0);
