@@ -259,14 +259,11 @@ object_to_char(object x)
 	case t_fixnum:
 		c = fix(x);  break;
 	case t_bignum:
-	  {object *to = vs_top;
-	  vs_push(x);
-	  vs_push(small_fixnum(0xff));
-	  Llogand();
-	  x = vs_base[0];
-	  vs_top = to;
-	  c = (char) fix(x);
-	  break;
+	  {
+	    fixnum fx;
+	    fx=mpz_get_si(MP(x));
+	    c=fx&0xff;
+	    break;
 	  }
 	case t_character:
 		c = char_code(x);  break;
