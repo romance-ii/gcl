@@ -1048,6 +1048,7 @@ EXTER struct contblock *old_cb_pointer;	/*  old contblock pointer when in SGC  *
 EXTER fixnum ncb;   /*  number of contblocks  */
 #define ncbpage    tm_table[t_contiguous].tm_npage
 #define maxcbpage  tm_table[t_contiguous].tm_maxpage
+#define maxrbpage  tm_table[t_relocatable].tm_maxpage
 #define cbgbccount tm_table[t_contiguous].tm_gbccount  
   
 
@@ -1225,6 +1226,7 @@ EXTER struct call_data fcall;
 
 #define  VFUN_NARGS fcall.argd
 #define  FUN_VALP   fcall.valp
+#define RETURN4(x,y,z,w)  RETURN(3,object,x,(RV(y),RV(z),RV(w)))
 #define RETURN3(x,y,z)  RETURN(3,object,x,(RV(y),RV(z)))
 #define RETURN2(x,y)    RETURN(2,object,x,(RV(y)))
 #define RETURN3I(x,y,z) RETURN(3,fixnum,x,(RV(y),RV(z)))
@@ -1391,7 +1393,7 @@ extern void *stack_alloc_start,*stack_alloc_end;
                                             _x->sm.sm_fd=fd_;\
                                             _x;})
 
-#define writable_ptr(a_) (((unsigned long)(a_)>=DBEGIN && (void *)(a_)<(void *)heap_end) || is_imm_fixnum(a_))
+#define writable_ptr(a_) (((unsigned long)(a_)>=(unsigned long)data_start && (void *)(a_)<(void *)heap_end) || is_imm_fixnum(a_))
 
 #define write_pointer_object(a_,b_) fSwrite_pointer_object(a_,b_)
 

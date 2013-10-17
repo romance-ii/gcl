@@ -29,6 +29,9 @@ License for more details.
 #include <sys/sockio.h>
 #endif
 
+#include "page.h"
+
+
 #ifdef RUN_PROCESS
 
 void setup_stream_buffer(object);

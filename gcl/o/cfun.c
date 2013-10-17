@@ -123,7 +123,7 @@ DEFUN("DLADDR",object,fSdladdr,SI,1,1,NONE,OI,OO,OO,OO,(fixnum ad),"") {
     FEerror("dladdr lookup failure on ~s",1,make_fixnum(ad));
   u=(unsigned long)info.dli_fbase;
   c=info.dli_fname;
-  if (u>=DBEGIN && u<(unsigned long)core_end)
+  if (u>=(ufixnum)data_start && u<(unsigned long)core_end)
     c="";
 
   RETURN1(coerce_to_pathname(make_simple_string(c)));
