@@ -745,8 +745,8 @@ initlisp(void) {
 	sLlambda_block_closure = make_si_ordinary("LAMBDA-BLOCK-CLOSURE");
 	sLspecial = make_ordinary("SPECIAL");
 
-	init_boot();
 	NewInit();
+	init_boot();
 
 	dlopen("libboot",RTLD_LAZY|RTLD_GLOBAL);
 	gcl_init_typespec();
