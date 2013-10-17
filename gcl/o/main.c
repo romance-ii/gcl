@@ -165,7 +165,7 @@ mbrk(void *v) {
 int
 update_real_maxpage(void) {
 
-  ufixnum i,j;
+  ufixnum i,j,k;
   void *end,*cur;
 #ifdef __MINGW32__
   static fixnum n;
@@ -194,7 +194,7 @@ update_real_maxpage(void) {
 
   available_pages=real_maxpage-first_data_page;
   for (i=t_start,j=0;i<t_other;i++) {
-    long k=tm_table[i].tm_maxpage;
+    k=tm_table[i].tm_maxpage;
     if (tm_table[i].tm_type==t_relocatable)
       k*=2;
     else
