@@ -7622,7 +7622,6 @@ else
 
 		#include <stdio.h>
 		#include <stdlib.h>
-		int *cs_org=0;
 		void gprof_cleanup() {};
 		int main(int argc,char **argv,char **envp) {
 		#include "h/unrandomize.h"
@@ -7657,7 +7656,6 @@ else
 
             #include <stdio.h>
 	    #include <stdlib.h>
-	    int *cs_org=0;
             void gprof_cleanup() {};
 	    int main(int argc,char **argv,char **envp) {
 		FILE *f;
@@ -7691,7 +7689,6 @@ else
 
             #include <stdio.h>
 	    #include <stdlib.h>
-	    int *cs_org=0;
             void gprof_cleanup() {};
 	    int main(int argc,char **argv,char **envp) {
 		FILE *f;
@@ -8033,7 +8030,6 @@ else
   #include <stdlib.h>
   #include <unistd.h>
   #include <stdlib.h>
-  int *cs_org=0;
   void gprof_cleanup() {};
 
   int main(int argc,char **argv,char **envp) {
@@ -8194,7 +8190,6 @@ else
         }
 
 	void gprof_cleanup() {};
-	int *cs_org;
 	int main(int argc,char **argv,char **envp) {
 	void *v ;
 	FILE *fp = fopen("conftest1","w");

@@ -1383,7 +1383,6 @@ if test "$HAVE_SBRK" = "1" ; then
 	AC_LANG_SOURCE([[
 		#include <stdio.h>
 		#include <stdlib.h>
-		int *cs_org=0;
 		void gprof_cleanup() {};
 		int main(int argc,char **argv,char **envp) {
 		#include "h/unrandomize.h"
@@ -1397,7 +1396,6 @@ if test "$HAVE_SBRK" = "1" ; then
 	AC_LANG_SOURCE([[
             #include <stdio.h>
 	    #include <stdlib.h>
-	    int *cs_org=0;
             void gprof_cleanup() {};
 	    int main(int argc,char **argv,char **envp) {
 		FILE *f;
@@ -1415,7 +1413,6 @@ if test "$HAVE_SBRK" = "1" ; then
 	AC_LANG_SOURCE([[
             #include <stdio.h>
 	    #include <stdlib.h>
-	    int *cs_org=0;
             void gprof_cleanup() {};
 	    int main(int argc,char **argv,char **envp) {
 		FILE *f;
@@ -1565,7 +1562,6 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
   #include <stdlib.h>
   #include <unistd.h>
   #include <stdlib.h>
-  int *cs_org=0;
   void gprof_cleanup() {};
 
   int main(int argc,char **argv,char **envp) {
@@ -1649,7 +1645,6 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
         }
 
 	void gprof_cleanup() {};
-	int *cs_org;
 	int main(int argc,char **argv,char **envp) {
 	void *v ;
 	FILE *fp = fopen("conftest1","w");
