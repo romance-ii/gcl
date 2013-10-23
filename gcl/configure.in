@@ -546,10 +546,12 @@ esac
 
 # Work around system/gprof mips hang
 case $use in
-  mips*) enable_gprof="no" ; enable_pic="yes" ;; #FIXME actually -mshared might suffice, at least for locbfd
-  hppa*) enable_gprof="no" ; enable_pic="yes" ;;
-  powerpc*) enable_gprof="no";;
-  sparc*) enable_debug="yes";;
+  sh4*)  enable_gprof="no";;
+  ia64*)  enable_gprof="no";;
+#  mips*) enable_gprof="no";;
+  hppa*) enable_gprof="no";;
+  arm*)  enable_gprof="no";;#FIXME mcount compiled as a 24/22 bit reloc even with -mlong-calls, marginally accessible
+  *gnu)  enable_gprof="no";;
 esac		     
 
 #case $use in
