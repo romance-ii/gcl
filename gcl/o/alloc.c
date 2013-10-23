@@ -273,6 +273,7 @@ set_tm_maxpage(struct typemanager *tm,fixnum n) {
   
   fixnum r=tm->tm_type==t_relocatable,j=tm->tm_maxpage,z=(n-j)*(r ? 2 : 1);
   if (z>available_pages) return 0;
+  if (r && 2*n+page(REAL_RB_START)>real_maxpage) return 0;
   available_pages-=z;
   tm->tm_adjgbccnt*=((double)j)/n;
   tm->tm_maxpage=n;

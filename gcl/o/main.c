@@ -209,7 +209,7 @@ update_real_maxpage(void) {
   j*=starting_relb_heap_mult;
   j=j<k ? j : k;
   if (maxrbpage<j)
-    massert(set_tm_maxpage(tm_table+t_relocatable,j));
+    set_tm_maxpage(tm_table+t_relocatable,j);
 
   return 0;
 
