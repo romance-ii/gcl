@@ -286,8 +286,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	  
 	  (unwind-protect
 	      (do ((form (read *compiler-input* nil eof) (read *compiler-input* nil eof))
-		   (load-flag (or (eq :defaults *eval-when-defaults*)
-				  (list-split '(load :load-toplevel) *eval-when-defaults*))))
+		   (load-flag (if *eval-when-defaults* (list-split '(load :load-toplevel) *eval-when-defaults*) t)))
 		  (nil)
 		  
 		  (unless (eq form eof)

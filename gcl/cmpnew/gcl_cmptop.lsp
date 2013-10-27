@@ -407,30 +407,24 @@
 ;; as I can make it.   Valid values of *eval-when-defaults* are
 ;; a sublist of '(compile eval load)
 
-(defvar *eval-when-defaults* :defaults)
+(defvar *eval-when-defaults* nil);:defaults
 
-(defun maybe-eval (default-action form)
-  (or default-action (and (symbolp (car form))
-			    (setq default-action (get (car form) 'eval-at-compile))))
-  (cond ((or (and default-action (eq :defaults *eval-when-defaults*))
-	     (and (consp *eval-when-defaults*)
-		  (or (member 'compile *eval-when-defaults* )
-		      (member :compile-toplevel *eval-when-defaults* ))))
-	  (when form
-	    (cmp-eval form))
-	  t)))
+(defun maybe-eval (def form &aux (c (car form)) (def (or def (when (symbolp c) (get c 'eval-at-compile)))))
+  (when (if *eval-when-defaults* (list-split '(compile :compile-toplevel) *eval-when-defaults*) def)
+    (when form
+      (cmp-eval form))
+    t))
 
 
 (defun t1eval-when (args &aux load-flag compile-flag)
   (when (endp args) (too-few-args 'eval-when 1 0))
-  (dolist** (situation (car args))
+  (dolist (situation (car args))
     (case situation
           ((load :load-toplevel) (setq load-flag t))
           ((compile :compile-toplevel) (setq compile-flag t))
           ((eval :execute))
-          (otherwise (cmperr "The EVAL-WHEN situation ~s is illegal."
-                             situation))))
-  (let ((*eval-when-defaults* (car args)))
+          (otherwise (cmperr "The EVAL-WHEN situation ~s is illegal." situation))))
+  (let ((*eval-when-defaults* (or *eval-when-defaults* (car args))))
     (cond (load-flag (t1progn (cdr args)))
 	  (compile-flag (cmp-eval (cons 'progn (cdr args)))))))
 
