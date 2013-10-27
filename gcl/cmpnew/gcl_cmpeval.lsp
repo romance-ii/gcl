@@ -1148,7 +1148,7 @@
    (parse-body-header src)
    (let* ((aux (member '&aux ll));FIXME centralize with new-defun-args
 	  (ll (ldiff ll aux))
-	  (regs (mapcar (lambda (x) (cond ((symbolp x) x) ((symbolp (car x)) (car x)) ((cadar x)))) ll))
+	  (regs (mapcan (lambda (x) (if (symbolp x) (list x) (cons (if (symbolp (car x)) (car x) (cadar x)) (cddr x)))) ll))
 	  (regs (set-difference regs '(&optional &rest &key &allow-other-keys)))
 	  (od (split-decls regs decls))
 	  (rd (cons `(declare (optimize (safety ,(decl-safety decls)))) (pop od)))
