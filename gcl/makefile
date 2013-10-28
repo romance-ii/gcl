@@ -166,7 +166,7 @@ pargcl_all: $(BUILD_BFD) $(PORTDIR)/$(FLISP) command cmpnew/gcl_collectfn.o \
 	  && cp ${PARGCLDIR}/src/saved_pargcl unixport/ \
 	  && cd unixport \
 	  && mv saved_pargcl temp$(EXE) \
-	  && echo '(reset-sys-paths "$(GCLDIR)/")(si::save-system "saved_pargcl")' | ./temp$(EXE) \
+	  && echo '(si::reset-sys-paths "$(GCLDIR)/")(si::save-system "saved_pargcl")' | ./temp$(EXE) \
 	  && echo '#' \
 	  && echo '#' \
 	  && echo '# ParGCL built.  To test it:  cd bin; ./pargcl ' \
