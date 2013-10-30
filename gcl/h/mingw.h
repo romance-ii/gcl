@@ -226,3 +226,5 @@ extern int mingwlisten(FILE *);
 
 #undef DBEGIN
 #define DBEGIN _dbegin
+
+#define NOFREE_ERR

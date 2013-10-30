@@ -352,13 +352,13 @@ $(HDIR)new_decl.h:
 	(cd o && $(MAKE) ../$@)
 
 $(HDIR)cmpinclude.h: $(CMPINCLUDE_FILES) $(HDIR)config.h
-	cat $(HDIR)config.h | sed -e "1,/Begin for cmpincl/d" \
-		-e "/End for cmpinclude/,50000d" > tmpx.c
-	echo '#include "h/config.h"\n#ifdef SGC\n"#define SGC"\n#else\n"#undef SGC"\n#endif' | $(CPP) 2>/dev/null| grep -v '^ *$$' | tail -1l | tr -d '"' >>tmpx.c
-	cat $(CMPINCLUDE_FILES) >> tmpx.c
-	$(CPP) -Ih -P -dD tmpx.c | grep -v "#define *__STDC_" | grep -v "#define  *__GNUC_PATCHLEVEL__ " | grep -v "#define  *__VERSION__ ">tmpx1 && mv tmpx1 tmpx.c
-	./xbin/move-if-changed mv tmpx.c h/cmpinclude.h
-	./xbin/move-if-changed cp h/cmpinclude.h o/cmpinclude.h
+	cat $(HDIR)config.h | sed -e "1,/Begin for cmpincl/d" -e "/End for cmpinclude/,50000d" > $(@F)
+	cd h && cpp tsgc.h 2>/dev/null| grep -v '^ *$$' | tail -1l | tr -d '"' >>../$(@F)
+	cat $(CMPINCLUDE_FILES)  >> $(@F)
+	$(CC) -E -I./$(HDIR)  -dD $(@F) | \
+	awk '/#define  *(__STDC_(_|HOSTED__) |(pu|ge)tc|__GCC_ATOMIC_|__GNU_PATCHLEVEL__ |__VERSION__ )/ {next}{print}' >tmpx1 && mv tmpx1 $(@F)
+	./xbin/move-if-changed mv $(@F) $@
+	./xbin/move-if-changed cp $@ o/$(@F)
 
 go:
 	mkdir go
