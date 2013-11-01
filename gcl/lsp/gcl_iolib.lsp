@@ -374,29 +374,6 @@
              (format t "~&Starts dribbling to ~A (~d/~d/~d, ~d:~d:~d)."
                      namestring year month day hour min sec))))))
 
-;;; ensure-directories-exist 
-
-(defun ensure-directories-exist (pathspec &key verbose)
-  (declare (optimize (safety 2)))
-  (let* ((path (pathname pathspec))
-	 (dir (make-pathname :host (pathname-host path)
-			     :device (pathname-device path)
-			     :directory (pathname-directory path)))
-	 (created nil)
-	 trans walk newdir)
-    (when (pathname-directory dir)
-      (unless (directory dir)
-	(setq trans (pathname-directory (translate-logical-pathname dir)))
-	(setq walk (list (car trans)))
-	(dolist (step (cdr trans))
-	  (nconc walk (list step))
-	  (setq newdir (make-pathname :directory walk))
-	  (unless (directory newdir)
-	    (si:mkdir newdir)
-	    (when verbose (format t "~&Directory ~A created.~%" newdir))))
-	(setq created t)))
-    (values pathspec created)))
-
 ;;; new logical pathname translation
 ;
 ;;; examples :
@@ -742,3 +719,28 @@
 (defun load (f &rest args)
   (values (apply 'load1 f args)))
 
+(defun ensure-directories-exist (ps &key verbose &aux created)
+  (when (wild-pathname-p ps)
+    (error 'file-error :pathname ps :format-control "Pathname is wild"))
+  (labels ((d (x y &aux (z (ldiff x y)) (p (make-pathname :directory z)))
+	      (when (when z (stringp (car (last z))))
+		(unless (eq :directory (car (stat p)))
+		  (mkdir (namestring p))
+		  (setq created t)
+		  (when verbose (format *standard-output* "Creating directory ~s~%" p))))
+	      (when y (d x (cdr y)))))
+    (let ((pd (pathname-directory ps)))
+      (d pd (cdr pd)))
+    (values ps created)))
+
+#.(let ((g '(:host :device :directory :name :type :version)))
+     `(defun wild-pathname-p (pd &optional f &aux (p (pathname pd)))
+       (declare (optimize (safety 1)))
+       (check-type f (or null (member ,@g)))
+       (labels ((w-f (x)
+		     (case x
+		       ,@(mapcar (lambda (x &aux (f (intern (concatenate 'string "PATHNAME-" (string-upcase x)))))
+				   `(,x ,(if (eq x :directory) `(when (member :wild (,f p)) t) `(eq :wild (,f p))))) g))))
+	 (if f 
+	     (w-f f)
+	   (reduce (lambda (z x) (or z (w-f x))) ',g :initial-value nil)))))

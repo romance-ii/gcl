@@ -610,6 +610,10 @@ DEFKTFUN("SUBLIS",fLsublis,LISP,({\
   }
   sublis(y);}))
 
+DEFUN("WILD-PATHNAME-P",object,fLwild_pathname_p,LISP,1,2,NONE,OO,OO,OO,OO,(object x,...),"") {
+  return Cnil;
+}
+
 #ifndef NO_BOOT_H
 #include "boot.h"
 #endif

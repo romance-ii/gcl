@@ -248,6 +248,7 @@ FFN(Fthe)(object args)
 	}
 }
 
+DEF_ORDINARY("WILD-PATHNAME-P",sLwild_pathname_p,LISP,"");
 DEF_ORDINARY("LDB",sLldb,LISP,"");
 DEF_ORDINARY("LDB-TEST",sLldb_test,LISP,"");
 DEF_ORDINARY("DPB",sLdpb,LISP,"");

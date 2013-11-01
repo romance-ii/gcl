@@ -1730,61 +1730,6 @@ object o;
 	return 0;
 }
 
-object wild_pathname_p(x,totest)
-object x,totest;
-{
-	int is_wild = 0;
-	vs_mark;
-
-	check_type_or_pathname_string_symbol_stream(&x);
-	x = coerce_to_pathname(x);
-	vs_push(x);
-
-	if (totest != Cnil) {
-	    if (totest == sKdirectory) {
-	        if (wild_component_p(x->pn.pn_directory)) is_wild++;
-	    } else
-	    if (totest == sKname) {
-	        if (wild_component_p(x->pn.pn_name)) is_wild++;
-	    } else
-	    if (totest == sKtype) {
-	        if (wild_component_p(x->pn.pn_type)) is_wild++;
-	    } else
-	    if (totest == sKdevice) {
-	        if (wild_component_p(x->pn.pn_device)) is_wild++;
-	    } else
-	    if (totest == sKhost) {
-	        if (wild_component_p(x->pn.pn_host)) is_wild++;
-	    } else
-	    if (totest == sKversion) {
-	        if (wild_component_p(x->pn.pn_version)) is_wild++;
-	    } else
-	        return(file_error("Invalid key for wild-pathname-p ~S.",totest));
-	} else {
-	    if (wild_component_p(x->pn.pn_directory)) is_wild++;
-	    else
-	    if (wild_component_p(x->pn.pn_name)) is_wild++;
-	    else
-	    if (wild_component_p(x->pn.pn_type)) is_wild++;
-	    else
-	    if (wild_component_p(x->pn.pn_device)) is_wild++;
-	    else
-	    if (wild_component_p(x->pn.pn_host)) is_wild++;
-	    else
-	    if (wild_component_p(x->pn.pn_version)) is_wild++;
-	}
-	vs_reset;
-	return is_wild ? Ct : Cnil;
-}
-
-@(defun wild_pathname_p (pathname &o
-	(totest `Cnil`)
-	&aux x)
-@
-	x = wild_pathname_p(pathname,totest);
-	@(return x)
-@)
-
 /*
  * pathstring_match_add
  *   add a match to the list of matches
@@ -2533,7 +2478,6 @@ gcl_init_pathname_function()
 	make_function("DIRECTORY-NAMESTRING", Ldirectory_namestring);
 	make_function("HOST-NAMESTRING", Lhost_namestring);
 	make_function("ENOUGH-NAMESTRING", Lenough_namestring);
-	make_function("WILD-PATHNAME-P", Lwild_pathname_p);
 	make_function("PATHNAME-MATCH-P", Lpathname_match_p);
 	make_function("TRANSLATE-PATHNAME", Ltranslate_pathname);
 	make_function("TRANSLATE-LOGICAL-PATHNAME", Ltranslate_logical_pathname);

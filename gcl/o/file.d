@@ -2465,7 +2465,7 @@ DEFUN("OPEN-INT",object,fSopen_int,SI,8,8,NONE,OO,OO,OO,OO,
   if ((type_of(filename) != t_string) ||
       (filename->st.st_self[0] != '|')) {
     check_type_or_pathname_string_symbol_stream(&filename);
-    if (wild_pathname_p(filename,Cnil) == Ct) {
+    if (ifuncall2(sLwild_pathname_p,filename,Cnil) == Ct) {
       WILD_PATH(filename);
       RETURN1(Cnil);
     }
@@ -2605,7 +2605,7 @@ DEFVAR("*DISABLE-RECOMPILE*",sSAdisable_recompile,SI,Ct,"");
 	defaults = coerce_to_pathname(defaults);
 	pathname = merge_pathnames(pathname, defaults, sKnewest);
 	pntype = pathname->pn.pn_type;
-	if (wild_pathname_p(pathname,Cnil) == Ct) {
+        if (ifuncall2(sLwild_pathname_p,pathname,Cnil) == Ct) {
 	    WILD_PATH(pathname);
 	    @(return Cnil)
 	}

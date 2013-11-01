@@ -238,7 +238,7 @@ truename(object pathname)
 	vs_mark;
 	vs_push(pathname);
 
-	if (wild_pathname_p(pathname,Cnil) == Ct)
+	if (ifuncall2(sLwild_pathname_p,pathname,Cnil) == Ct)
 	    return(WILD_PATH(pathname));
 
 	coerce_to_local_filename(pathname, filename);
@@ -450,7 +450,7 @@ LFD(Ltruename)(void)
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 	vs_base[0]=coerce_to_pathname(vs_base[0]);
 
-	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
+	if (ifuncall2(sLwild_pathname_p,vs_base[0],Cnil) == Ct) {
 	    WILD_PATH(vs_base[0]);
 	    vs_base[0] = Cnil;
 	    return;
@@ -479,7 +479,7 @@ LFD(Lrename_file)(void)
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 	check_type_or_Pathname_string_symbol(&vs_base[1]);
 
-	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
+	if (ifuncall2(sLwild_pathname_p,vs_base[0],Cnil) == Ct) {
 	    WILD_PATH(vs_base[0]);
 	    vs_base[0] = Cnil;
 	    return;
@@ -490,7 +490,7 @@ LFD(Lrename_file)(void)
 	vs_base[1] = coerce_to_pathname(vs_base[1]);
 	vs_base[1] = merge_pathnames(vs_base[1], vs_base[0], Cnil);
 
-	if (wild_pathname_p(vs_base[1],Cnil) == Ct) {
+	if (ifuncall2(sLwild_pathname_p,vs_base[1],Cnil) == Ct) {
 	    WILD_PATH(vs_base[1]);
 	    vs_base[0] = Cnil;
 	    return;
@@ -573,7 +573,7 @@ DEFUN("DELETE-FILE",object,fLdelete_file,LISP,1,1,NONE,OO,OO,OO,OO,(object path)
   
   check_type_or_pathname_string_symbol_stream(&path);
   
-  if (wild_pathname_p(path,Cnil) == Ct)
+  if (ifuncall2(sLwild_pathname_p,path,Cnil) == Ct)
     RETURN1(WILD_PATH(path));
   
   coerce_to_local_filename(path, filename);
@@ -596,7 +596,7 @@ LFD(Lprobe_file)(void)
 
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 
-	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
+	if (ifuncall2(sLwild_pathname_p,vs_base[0],Cnil) == Ct) {
 	    WILD_PATH(vs_base[0]);
 	    vs_base[0] = Cnil;
 	    return;
@@ -616,7 +616,7 @@ LFD(Lfile_write_date)(void)
 	check_arg(1);
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 
-	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
+	if (ifuncall2(sLwild_pathname_p,vs_base[0],Cnil) == Ct) {
 	    WILD_PATH(vs_base[0]);
 	    vs_base[0] = Cnil;
 	    return;
@@ -642,7 +642,7 @@ LFD(Lfile_author)(void)
 	check_arg(1);
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 
-	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
+	if (ifuncall2(sLwild_pathname_p,vs_base[0],Cnil) == Ct) {
 	    WILD_PATH(vs_base[0]);
 	    vs_base[0] = Cnil;
 	    return;
@@ -859,7 +859,7 @@ FFN(siLchdir)(void)
 	check_arg(1);
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 
-	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
+	if (ifuncall2(sLwild_pathname_p,vs_base[0],Cnil) == Ct) {
 	    WILD_PATH(vs_base[0]);
 	    vs_base[0] = Cnil;
 	    return;
@@ -879,7 +879,7 @@ FFN(siLmkdir)(void)
 	check_arg(1);
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 
-	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
+	if (ifuncall2(sLwild_pathname_p,vs_base[0],Cnil) == Ct) {
 	    WILD_PATH(vs_base[0]);
 	    vs_base[0] = Cnil;
 	    return;
@@ -903,7 +903,7 @@ FFN(siLrmdir)(void)
 	check_arg(1);
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 
-	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
+	if (ifuncall2(sLwild_pathname_p,vs_base[0],Cnil) == Ct) {
 	    WILD_PATH(vs_base[0]);
 	    vs_base[0] = Cnil;
 	    return;
