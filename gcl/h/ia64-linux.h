@@ -23,7 +23,7 @@
 #define GET_FAULT_ADDR(sig,code,scp,addr) \
   ((siginfo_t *)code )->si_addr
 #endif
-#define SGC
+/* #define SGC *//*FIXME ia64 specific fread/getc restart failure and hang*/
 
 #define STATIC_FUNCTION_POINTERS
 #define BRK_DOES_NOT_GUARANTEE_ALLOCATION
