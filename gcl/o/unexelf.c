@@ -1244,7 +1244,7 @@ unexec (char *new_name, char *old_name, unsigned int data_start, unsigned int bs
 	  /* This code handles two different size structs, but there should
 	     be no harm in that provided that r_offset is always the first
 	     member.  */
-	  nn = section.sh_info;
+	  if (!(nn = section.sh_info)) break;
 	  if (!strcmp (old_section_names + NEW_SECTION_H (nn).sh_name, ".data")
 	      || !strcmp ((old_section_names + NEW_SECTION_H (nn).sh_name),
 			  ".sdata")
