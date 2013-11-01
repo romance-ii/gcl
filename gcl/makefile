@@ -256,7 +256,7 @@ install_unix:
 	$(TCL_EXES)  |  (cd $(DESTDIR)$(INSTALL_LIB_DIR) ;tar xf -)
 	cd $(DESTDIR)$(INSTALL_LIB_DIR)/$(PORTDIR) && \
 		mv $(FLISP)$(EXE) temp$(EXE) && \
-		echo '(reset-sys-paths "$(INSTALL_LIB_DIR)/")(si::save-system "$(FLISP)$(EXE)")' | ./temp$(EXE) && \
+		echo '(si::reset-sys-paths "$(INSTALL_LIB_DIR)/")(si::save-system "$(FLISP)$(EXE)")' | ./temp$(EXE) && \
 		rm -f temp$(EXE)
 	if [ -e "unixport/rsym$(EXE)" ] ; then cp unixport/rsym$(EXE) $(DESTDIR)$(INSTALL_LIB_DIR)/unixport/ ; fi
 #	ln $(SYMB) $(INSTALL_LIB_DIR)/$(PORTDIR)/$(FLISP)$(EXE) \
@@ -287,7 +287,7 @@ install_windows:
 	if test -f /mingw/bin/libgmp.dll ; then cp /mingw/bin/libgmp.dll $(DESTDIR)$(INSTALL_LIB_DIR)/$(PORTDIR); fi
 	cd $(DESTDIR)$(INSTALL_LIB_DIR)/$(PORTDIR) && \
 		mv $(FLISP)$(EXE) temp$(EXE) && \
-		echo '(reset-sys-paths "$(INSTALL_LIB_DIR)/")(si::save-system "$(FLISP)$(EXE)")' | ./temp$(EXE) $(LISPFLAGS) && \
+		echo '(si::reset-sys-paths "$(INSTALL_LIB_DIR)/")(si::save-system "$(FLISP)$(EXE)")' | ./temp$(EXE) $(LISPFLAGS) && \
 		rm -f temp$(EXE)
 	if [ -e "unixport/rsym$(EXE)" ] ; then cp unixport/rsym$(EXE) $(DESTDIR)$(INSTALL_LIB_DIR)/unixport/ ; fi
 	if [ -d "$(TK_CONFIG_PREFIX)" ] ; then  \
