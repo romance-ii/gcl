@@ -465,7 +465,7 @@ object_to_string(object x) {
   if (leng > 0 && leng < x->st.st_dim && x->st.st_self[leng]==0)
     return x->st.st_self;
 
-  if (x->st.st_dim == leng && leng % sizeof(object)) {
+  if (x->st.st_dim == leng && leng % sizeof(object) && MAYBE_DATA_P(x->st.st_self)) {
     x->st.st_self[leng] = 0;
     return x->st.st_self;
   }  
