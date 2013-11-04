@@ -238,7 +238,9 @@
 	   (in (list (inline-type (car types)) (flags) s (inline-args forms types))))
       (unwind-exit in nil (cons 'values (length forms)))
       (close-inline-blocks))
-   (c2expr (car forms))))
+   (prog1 (c2expr (or (car forms) (c1nil)))
+	  (let ((*value-to-go* 'trash))
+	    (dolist (f (cdr forms)) (c2expr f))))))
 
 ;; (defun c2values (forms)
 ;;   (if *mv-var*
