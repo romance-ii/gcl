@@ -1779,7 +1779,9 @@
 	((setq fd (c1local-fun fn))
 	 (add-info info (cadr fd))
 	 (setf (info-type info) (if (eq (info-type (cadr fd)) 'boolean) #tboolean (info-type (cadr fd))));FIXME
-	 `(call-local ,info ,(nconc (caddr fd) ll) ,(cadddr fd) ,(fifth fd) ,fms));FIXME
+	 (let ((fm (fifth fd)))
+	   (when fm (or-ccb-assignments (list fm)))
+	   `(call-local ,info ,(nconc (caddr fd) ll) ,(cadddr fd) ,fm ,fms)));FIXME
 	(`(call-global ,info ,fn ,fms nil ,@ll))))
 
 ;; (defun mi5 (fn info fms la &aux (ll (when la (list (length fms)))) fd)
