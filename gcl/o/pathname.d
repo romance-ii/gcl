@@ -1268,13 +1268,15 @@ object
 coerce_to_local_namestring(pathname)
 object pathname;
 {
-    object namestring,*vs_ret;
+    object namestr,*vs_ret;
     vs_mark; /* wash my fur, but dont make me wet */
 
-    namestring=Cnil;
-    vs_push(namestring);
+    namestr=Cnil;
+    vs_push(namestr);
     vs_ret=vs_top-1;
     check_type_or_pathname_string_symbol_stream(&pathname);
+    if (type_of(pathname)==t_pathname)
+      pathname=namestring(pathname);
     pathname = coerce_to_pathname(pathname);
     vs_push(pathname);
     pathname = make_pathname(
@@ -1304,10 +1306,10 @@ object pathname;
 	    vs_push(pathname);
     }
     wrap_pathname(pathname);
-    namestring = coerce_to_namestring(pathname);
-    *vs_ret = namestring;
+    namestr = coerce_to_namestring(pathname);
+    *vs_ret = namestr;
     vs_reset;
-    return namestring;
+    return namestr;
 }
 
 LFD(Lpathname)(void)
