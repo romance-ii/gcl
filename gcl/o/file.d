@@ -2454,23 +2454,23 @@ LFD(Lstream_element_type)()
 @)
 
 DEFUN("OPEN-INT",object,fSopen_int,SI,8,8,NONE,OO,OO,OO,OO,
-	  (object filename,object direction,object element_type,object if_exists,
+	  (object fn,object direction,object element_type,object if_exists,
 	   object iesp,object if_does_not_exist,object idnesp,
 	   object external_format),"") {
 
   enum smmode smm=0;
   vs_mark;
-  object strm;
+  object strm,filename;
   
-  if ((type_of(filename) != t_string) ||
-      (filename->st.st_self[0] != '|')) {
-    check_type_or_pathname_string_symbol_stream(&filename);
-    if (ifuncall2(sLwild_pathname_p,filename,Cnil) == Ct) {
-      WILD_PATH(filename);
+  if ((type_of(fn) != t_string) || (fn->st.st_self[0] != '|')) {
+    check_type_or_pathname_string_symbol_stream(&fn);
+    if (ifuncall2(sLwild_pathname_p,fn,Cnil) == Ct) {
+      WILD_PATH(fn);
       RETURN1(Cnil);
     }
-    filename = coerce_to_local_namestring(filename);
-  }
+    filename = coerce_to_local_namestring(fn);
+  } else
+    filename=fn;
   if (direction == sKinput) {
     smm = smm_input;
     if (idnesp==Cnil)
@@ -2505,8 +2505,10 @@ DEFUN("OPEN-INT",object,fSopen_int,SI,8,8,NONE,OO,OO,OO,OO,
     FEerror("~S is an illegal DIRECTION for OPEN.",
 	    1, direction);
   strm = open_stream(filename, smm, if_exists, if_does_not_exist);
-  if (type_of(strm) == t_stream)
+  if (type_of(strm) == t_stream) {
     strm->sm.sm_object0 = element_type;
+    strm->sm.sm_object1 = fn;
+  }
   vs_reset;
   RETURN1(strm);
 }
@@ -2590,7 +2592,7 @@ DEFVAR("*DISABLE-RECOMPILE*",sSAdisable_recompile,SI,Ct,"");
 @(static defun load1 (pathname
 	      &key (verbose `symbol_value(sLAload_verboseA)`)
 		   (print `symbol_value(sLAload_printA)`)
-		    (if_does_not_exist sKerror)
+		    (if_does_not_exist sKerror) (external_format Cnil)
 	      &aux pntype fasl_filename lsp_filename filename
 		   defaults strm stdoutput x
 		   package readtable)
