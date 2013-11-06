@@ -269,7 +269,7 @@
 ;  (fill-pointer-internal x)
 
 (defun make-array (dimensions
-		   &key element-type
+		   &key (element-type t)
 			initial-element
 			(initial-contents nil icsp)
 			adjustable fill-pointer
