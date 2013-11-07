@@ -1191,10 +1191,8 @@
 
 ;; ARRAY TYPES
 
-(defconstant +array-types-but-t+ (lremove t +array-types+))
-
 (defun expand-array-element-type (type)
-   (or (car (member type +array-types-but-t+ :test 'subtypep)) t))
+   (or (car (member type +array-types+ :test (lambda (x y) (unless (eq y t) (subtypep x y))))) t))
 
 #.`(defun upgraded-array-element-type (type &optional environment)
      (declare (ignore environment) (optimize (safety 1)))
