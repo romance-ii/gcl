@@ -578,7 +578,7 @@ DEFUN("DELETE-FILE",object,fLdelete_file,LISP,1,1,NONE,OO,OO,OO,OO,(object path)
   
   coerce_to_local_filename(path, filename);
   if (unlink(filename) < 0 && rmdir(filename) < 0)
-    FEerror("Cannot delete the file ~S: ~s.", 2, path, make_simple_string(strerror(errno)));
+    FILE_ERROR(path,"Cannot delete file");
   path = Ct;
   RETURN1(path);
 
