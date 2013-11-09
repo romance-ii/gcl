@@ -863,12 +863,29 @@ DEFUN("OPENDIR",fixnum,fSopendir,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {
   d=opendir(filename);
   return (fixnum)d;
 }
-  
-DEFUN("READDIR",object,fSreaddir,SI,1,1,NONE,OI,OO,OO,OO,(fixnum x),"") {
+
+DEFUN("D-TYPE-LIST",object,fSd_type_list,SI,0,0,NONE,OI,OO,OO,OO,(void),"") {
+  RETURN1(list(8,
+	       MMcons(make_fixnum(DT_BLK),make_keyword("BLOCK")),
+	       MMcons(make_fixnum(DT_CHR),make_keyword("CHAR")),
+	       MMcons(make_fixnum(DT_DIR),make_keyword("DIRECTORY")),
+	       MMcons(make_fixnum(DT_FIFO),make_keyword("FIFO")),
+	       MMcons(make_fixnum(DT_LNK),make_keyword("LINK")),
+	       MMcons(make_fixnum(DT_REG),make_keyword("FILE")),
+	       MMcons(make_fixnum(DT_SOCK),make_keyword("SOCKET")),
+	       MMcons(make_fixnum(DT_UNKNOWN),make_keyword("UNKNOWN"))
+	       ));
+}
+
+DEFUN("READDIR",object,fSreaddir,SI,2,2,NONE,OI,IO,OO,OO,(fixnum x,fixnum y),"") {
   struct dirent *e;
+  object z;
   if (!x) RETURN1(Cnil);
-  e=readdir((DIR *)x);
-  RETURN1(e ? make_simple_string(e->d_name) : Cnil);
+  for (;(e=readdir((DIR *)x)) && y!=DT_UNKNOWN && e->d_type!=y;);
+  if (!e) RETURN1(Cnil);
+  z=make_simple_string(e->d_name);
+  if (y==DT_UNKNOWN) z=MMcons(z,make_fixnum(e->d_type));
+  RETURN1(z);
 }
 
 DEFUN("CLOSEDIR",object,fSclosedir,SI,1,1,NONE,OI,OO,OO,OO,(fixnum x),"") {
