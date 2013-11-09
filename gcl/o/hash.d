@@ -396,70 +396,48 @@ gethash(object key, object hashtable) {
 
   enum httest htest;
   long hsize,j,s,q;
-  struct cons *e,*first_objnull;
+  struct cons *e,*first_objnull=NULL;
   object hkey;
-  unsigned long i=0;
-  bool (*f)(object,object)=NULL;
   static struct cons dummy={OBJNULL,OBJNULL};
   
   if (!hashtable->ht.ht_size)
     return &dummy;
+
   htest = (enum httest)hashtable->ht.ht_test;
   hsize = hashtable->ht.ht_size;
+
+#define eq(x,y) x==y
+#define hash_loop(t_,i_)						\
+  for (s=i_%hsize,q=hsize,e=first_objnull;s>=0;q=s,s=s?0:-1)		\
+    for (j=s;j<q;j++) {							\
+      e = &hashtable->ht.ht_self[j];					\
+      hkey = e->c_cdr;							\
+      if (hkey==OBJNULL) {						\
+	if (e->c_car==OBJNULL) return first_objnull ? first_objnull : e; \
+	if (!first_objnull) first_objnull=e;				\
+      } else if (t_(key,hkey)) return e;				\
+    }
+
   switch (htest) {
   case htt_eq:
-    i = MHSH((long)key>>3);
+    hash_loop(eq,MHSH((long)key>>3));
     break;
   case htt_eql:
-    i = hash_eql(key);
-    f=oeql;
+    hash_loop(eql,hash_eql(key));
     break;
   case htt_equal:
-    i = ihash_equal(key,0);
-    f=oequal;
+    hash_loop(equal,ihash_equal(key,0));
     break;
   case htt_equalp:
-    i = ihash_equalp(key,0);
-    f=oequalp;
+    hash_loop(equalp,ihash_equalp(key,0));
     break;
   default:
     FEerror( "gethash:  Hash table not of type EQ, EQL, or EQUAL." ,0);
-    return hashtable->ht.ht_self;  /* Nonsense default pointer */
+    return &dummy;
     break;
   }
   
-  s=i%hsize;
-  q=hsize;
-  e=first_objnull=NULL;
- SEARCH:
-  for (j=s;j<q;j++) {
-    e = &hashtable->ht.ht_self[j];
-    hkey = e->c_cdr;
-    if (hkey==OBJNULL) {
-      if (e->c_car==OBJNULL) return first_objnull ? first_objnull : e;
-      if (!first_objnull) first_objnull=e;
-    } else
-      if (key == hkey || (f && f(key,hkey))) return e;
-  }
-  if (s) {
-    q=s;
-    s=0;
-    goto SEARCH;
-  }
-
-  /* No entry for key was found, and all the open slots are
-     non-initial.  We must have passed an open slot somewhere, so we
-     do not need this next test, but do it anyway.  How could this
-     occur?  By adding and removing (REMHASH) elements, we could
-     even create a hash table that has no initially open positions.
-     At this point, this hashtable should probably be rehashed. */
-
-  if (!first_objnull) {
-    FEerror("No free spot in hashtable ~S.", 1, hashtable);
-    return hashtable->ht.ht_self;  /* Nonsense default pointer */
-  }
-
-  return first_objnull;
+  return first_objnull ? first_objnull : (FEerror("No free spot in hashtable ~S.", 1, hashtable),&dummy);
 
 }
 
