@@ -57,7 +57,7 @@ object sKsize;
 object sKrehash_size;
 object sKrehash_threshold;
 
-#define MHSH(a_) ((a_) & ~(((unsigned long)1)<<(sizeof(a_)*CHAR_SIZE-1)))
+#define MHSH(a_) ((a_) & ~(1UL<<(sizeof(a_)*CHAR_SIZE-1)))
 
 typedef union {/*FIXME size checks*/
   float f;
@@ -100,6 +100,9 @@ uarrhash(void *v,void *ve,uchar off,uchar bits) {
   return h;
 
 }
+
+#define hash_eq1(x) ufixhash((ufixnum)x/sizeof(x))
+#define hash_eq(x)  MHSH(hash_eq1(x))
 
 
 static ufixnum
@@ -151,7 +154,7 @@ hash_eql(object x) {
     break;
 
   default:
-    h=((unsigned long)x / sizeof(x));
+    h=hash_eq1(x);
     break;
 
   }
@@ -420,7 +423,7 @@ gethash(object key, object hashtable) {
 
   switch (htest) {
   case htt_eq:
-    hash_loop(eq,MHSH((long)key>>3));
+    hash_loop(eq,hash_eq(key));
     break;
   case htt_eql:
     hash_loop(eql,hash_eql(key));

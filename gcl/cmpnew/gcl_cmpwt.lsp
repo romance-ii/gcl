@@ -171,9 +171,10 @@
       (setf (gethash x *hash-eq*)
 	    (if (> depth 3) 0
 	      (if (typep x 'cons)
-		  (logxor (setq depth (the fixnum (1+ depth)))
-			  (memoized-hash-equal (car x) depth) 
-			  (memoized-hash-equal (cdr x) depth))
+		  (logxor (setq depth (the fixnum (1+ depth)));FIXME?
+			  (logxor 
+			   (memoized-hash-equal (car x) depth) 
+			   (memoized-hash-equal (cdr x) depth)))
 	      (si::hash-equal x depth))))))
 
 (defun push-data-incf (x)
