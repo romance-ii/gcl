@@ -615,22 +615,6 @@
 ;; (si:putprop 'shift>> "Lash" 'lfun)
 ;; (si:putprop 'shift<< "Lash" 'lfun)
 
-(si::putprop 'ldb 'co1ldb 'co1)		    
-
-(defun co1ldb (f args &aux tem (len (integer-length most-positive-fixnum)))
-  (declare (ignore f))
-  (let ((specs
-	 (cond ((and (consp (setq tem (first args)))
-		     (eq 'byte (car tem))
-		     (cons (second tem) (third tem)))))))
-    (cond ((and (integerp (cdr specs))
-		(integerp (car specs))
-		(< (+ (car specs)(cdr specs))
-		   len)
-		(type>= #tfixnum (result-type (second args))))
-	   (c1expr `(the fixnum (si::ldb1 ,(car specs) ,(cdr specs) ,(second args))))))))
-
-	  
 ;; (si:putprop 'length 'c1length 'c1)
 
 ;; (defun c1length (args &aux (info (make-info)))

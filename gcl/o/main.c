@@ -1099,10 +1099,6 @@ DEFUN("GCL-COMPILE-TIME",object,fSgcl_compile_time,SI,0,0,NONE,OO,OO,OO,OO,(void
   RETURN1 (make_simple_string(__DATE__ " " __TIME__));
 }
 
-DEFUN("LDB1",object,fSldb1,SI,3,3,NONE,OI,II,OO,OO,(fixnum a,fixnum b, fixnum c),"") {
-  RETURN1 (make_fixnum(((((~(-1 << (a))) << (b)) & (c)) >> (b))));
-}
-
 DEFUN("LISP-IMPLEMENTATION-VERSION",object,fLlisp_implementation_version,LISP,0,0,NONE,OO,OO,OO,OO,(void),"") {
   RETURN1((make_simple_string(LISP_IMPLEMENTATION_VERSION)));
 }
