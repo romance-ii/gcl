@@ -509,9 +509,8 @@
 	 (v1 (c1arg n))
 	 (v1 (when (eq (car v1) 'var) (caaddr v1)))
 	 (v1 (unless (eq x v1) v1))
-	 (res (with-restore-vars
-	       (do-setq-tp x nil tp)
-	       (c1expr (if v1 `(infer-tp ,v1 ,tp ,(car args)) (car args)))))
+	 (res (progn (do-setq-tp x nil tp)
+		     (c1expr (if v1 `(infer-tp ,v1 ,tp ,(car args)) (car args)))))
 	 (ri (cadr res)))
     (add-info info ri)
     (setf (info-type info) (info-type ri))

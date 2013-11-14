@@ -1198,7 +1198,7 @@
 	 (case (car form)
 	       (LOCATION (c2location (caddr form)))
 	       (otherwise (unwind-exit vref))))
-	((c2expr* form))))
+	((c2expr form))))
 
 ;; (defun c2setq (vref form &aux (v (car vref)))
 ;;   (cond ((or (eq t (var-ref v)) (consp (var-ref v)) (var-cb v) (eq (var-kind v) 'global));FIXME
