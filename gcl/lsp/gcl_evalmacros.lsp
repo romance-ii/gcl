@@ -94,7 +94,7 @@
    (parse-body-header body)
    `(let (,@(mapcan (lambda (x &aux (z (pop x))(z (if (eq z 'type) (pop x) z)))
 		      (case z
-			    ((ftype inline notinline optimize) nil)
+			    ((ftype inline notinline optimize special) nil)
 			    (otherwise (mapcar (lambda (x) (list x x)) x))))
 		   (apply 'append (mapcar 'cdr decls))))
       ,@(when doc (list doc))
