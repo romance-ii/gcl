@@ -16,15 +16,15 @@
 
 (defun db (o tp)
   (let* ((b (car tp))(i -1))
-    (cond ((not b))
+    (cond ((not tp))
 	  ((eq b '*))
 	  ((not (listp b)) (eql (c-array-rank o) b))
-	  ((eql (length b) (c-array-rank o))(not (member-if-not (lambda (x) (incf i) (or (eq x '*) (eql x (array-dims o i)))) b))))))
+	  ((eql (length b) (c-array-rank o)) (not (member-if-not (lambda (x) (incf i) (or (eq x '*) (eql x (array-dims o i)))) b))))))
 	 
 
 (defun dbv (o tp)
   (let* ((b (car tp))(b (if (listp b) (car b) b)))
-     (cond ((not b))
+     (cond ((not tp))
 	   ((eq b '*))
 	   ((eql (c-array-dim o) b)))))
 (setf (get 'db 'compiler::cmp-inline) t)

@@ -40,7 +40,6 @@
   (let ((e (gethash-int x y)))
     (unless (eql +objnull+ (htent-key e))
       (set-htent-key e +objnull+)
-      (set-htent-value e (nani +objnull+))
       (c-set-hashtable-nent y (1- (c-hashtable-nent y)))
       t)))
 
