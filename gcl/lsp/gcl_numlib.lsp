@@ -99,12 +99,18 @@
   (check-type integer integer)
   (logior (logandc2 integer z) (logand newbyte z)))
 
+(defun mask-field (bytespec integer)
+  (declare (optmize (safety 1)))
+  (check-type bytespec bytespec)
+  (check-type integer integer)
+  (logand integer (ash (1- (ash 1 (byte-size bytespec))) (byte-position bytespec))))
+
 
 (defun phase (x)
   (declare (optimize (safety 1)))
-  (check-type x complex)
+  (check-type x number)
   (if (= 0 x) 0.0
-       (atan (imagpart x) (realpart x))))
+    (atan (imagpart x) (realpart x))))
 
 (defun signum (x) 
   (declare (optimize (safety 1)))
