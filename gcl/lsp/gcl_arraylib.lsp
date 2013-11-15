@@ -50,7 +50,7 @@
 
  (defun af (x) (cdr (assoc x '((character . *char) (bit . *char) (non-negative-char . *char);fixme
 			       (unsigned-char . *uchar) (signed-char . *char)
-			       #+64bit (non-negative-int . *int) #+64bit (unsigned-int . *int) #+64bit (signed-int . *int)
+			       #+64bit (non-negative-int . *int) #+64bit (unsigned-int . *uint) #+64bit (signed-int . *int)
 			       (non-negative-short . *short) (unsigned-short . *ushort)
 			       (signed-short . *short) (short-float . *float) (long-float . *double)
 			       (t . *object) (non-negative-fixnum . *fixnum) (fixnum . *fixnum)))))
