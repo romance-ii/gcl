@@ -271,7 +271,7 @@
 		   (non-standard-generic-function (function eq))
 		   (standard-generic-function (set-d-tt 1 (lambda nil nil)))
 		   ,@(mapcar (lambda (x) `(,(cadr x) (make-vector ',(car x) 1 nil nil nil 0 nil nil))) +vtps+)
-		   ,@(mapcar (lambda (x) `(,(cadr x) (make-array1 ',(car x) nil nil nil 0 '(1 1)))) +atps+)
+		   ,@(mapcar (lambda (x) `(,(cadr x) (make-array1 ',(car x) nil nil nil 0 '(1 1) nil))) +atps+)
                    (spice (alloc-spice))
 		   (cons '(1))
 		   (keyword :a)

@@ -489,7 +489,7 @@ DEFUN("BIT-ARRAY-OP",object,fSbit_array_op,SI,4,4,NONE,OO,OO,OO,OO,
 		  } else
 		    b=Cnil;
 
-		  r = fSmake_array1(sLbit,Cnil,small_fixnum(0),Cnil,0,b);
+		  r = fSmake_array1(sLbit,Cnil,small_fixnum(0),Cnil,0,b,Cnil);
 
 		  /* 		  object b[F_ARG_LIMIT]; */
 		  /* 		  b[0]=Cnil; */

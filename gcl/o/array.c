@@ -402,7 +402,7 @@ DEFUN("MAKE-VECTOR",object,fSmake_vector,SI,8,8,NONE,OO,IO,OO,IO,
   x->v.v_eltsize=elt_size(elt_type);
   x->v.v_mode=elt_mode(elt_type);
   x->v.v_defrank=1;
-  x->v.v_adjustable=1;
+  x->v.v_adjustable=adjp!=Cnil;
   x->v.v_dim = n;
   x->v.v_self = 0;
   x->v.v_displaced = Cnil;
@@ -622,9 +622,9 @@ fSget_aelttype(object x) {
   (declare (fixnum n elt-type displaced-index-offset))
 */
 
-DEFUN("MAKE-ARRAY1",object,fSmake_array1,SI,6,6,NONE,OO,OO,OI,OO,
+DEFUN("MAKE-ARRAY1",object,fSmake_array1,SI,7,7,NONE,OO,OO,OI,OO,
 	  (object x0,object staticp,object initial_element,object displaced_to,fixnum displaced_index_offset,
-       object dimensions),"") {   
+	   object dimensions,object adjp),"") {   
 
   int rank = length(dimensions);
   fixnum elt_type=fix(fSget_aelttype(x0));
@@ -652,7 +652,7 @@ DEFUN("MAKE-ARRAY1",object,fSmake_array1,SI,6,6,NONE,OO,OO,OI,OO,
 	dim *= x->a.a_dims[i++];
 	v = Mcdr(v);}
     x->a.a_dim = dim;
-    x->a.a_adjustable = 1;
+    x->a.a_adjustable = adjp!=Cnil;
     { if (displaced_to == Cnil)
 	array_allocself(x,staticp!=Cnil,initial_element);
     else { displace(x,displaced_to,displaced_index_offset);}
@@ -663,9 +663,9 @@ DEFUN("MAKE-ARRAY1",object,fSmake_array1,SI,6,6,NONE,OO,OO,OI,OO,
 #ifdef STATIC_FUNCTION_POINTERS
 object
 fSmake_array1(fixnum elt_type,object staticp,object initial_element,object displaced_to,
-	      fixnum displaced_index_offset,object dimensions) {
+	      fixnum displaced_index_offset,object dimensions,object adjustable) {
   return FFN(fSmake_array1)(elt_type,staticp,initial_element,
-			    displaced_to,displaced_index_offset,dimensions);
+			    displaced_to,displaced_index_offset,dimensions,adjustable);
 }
 #endif
 

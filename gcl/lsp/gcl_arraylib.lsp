@@ -286,7 +286,7 @@
    dimensions
    (list
     (let ((dimensions (dolist (d dimensions dimensions) (check-type d integer)))
-	  (x (make-array1 element-type static initial-element displaced-to displaced-index-offset dimensions)))
+	  (x (make-array1 element-type static initial-element displaced-to displaced-index-offset dimensions adjustable)))
       (assert (not fill-pointer))
       (unless (member 0 dimensions)
 	(when icsp
