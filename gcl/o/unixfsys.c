@@ -269,10 +269,10 @@ truename(object pathname)
 #ifdef __MINGW32__
         DWORD current_directory_length = GetCurrentDirectory ( MAXPATHLEN, current_directory );
         if ( MAXPATHLEN < current_directory_length ) {
-            FEerror ( "truename got a current directory name larger than MAXPATHLEN", 1, "" );
+	  FILE_ERROR(pathname,"truename got a current directory name larger than MAXPATHLEN");
         }
         if ( 0 == current_directory_length ) {
-            FEerror ( "truename could not determine the current directory.", 1, "" );
+	  FILE_ERROR(pathname,"truename could not determine the current directory.");
         }
         {
             object x;
@@ -300,13 +300,13 @@ truename(object pathname)
 	    int current = (q++, q[0]);
 	    q[0]=0;
 	    if (chdir(filename) < 0)
-	      FEerror("Cannot get the truename of ~S.", 1, pathname);
+	      FILE_ERROR(pathname,"Cannot change directories to parent");
             current_directory_length = GetCurrentDirectory ( MAXPATHLEN, directory );
             if ( MAXPATHLEN < current_directory_length ) {
-                FEerror ( "truename got a current directory name larger than MAXPATHLEN", 1, "" );
+	      FILE_ERROR(pathname,"truename got a current directory name larger than MAXPATHLEN");
             }
             if ( 0 == current_directory_length ) {
-                FEerror ( "truename could not determine the current directory.", 1, "" );
+	      FILE_ERROR(pathname,"truename could not determine the current directory");
             }
 	    p = directory;
 	    if ( p[1]==':' && ( p[2]=='\\' || p[2]=='/' ) && p[3]==0 ) p[2]=0;
@@ -321,14 +321,14 @@ truename(object pathname)
 		getwd(current_directory);
 #endif
 		if (chdir(filename) < 0)
-		    FEerror("Cannot get the truename of ~S.", 1, pathname);
+		  FILE_ERROR(pathname,"Cannot change directories to parent");
 #ifdef __MINGW32__
                 current_directory_length = GetCurrentDirectory ( MAXPATHLEN, directory );
                 if ( MAXPATHLEN < current_directory_length ) {
-                    FEerror ( "truename got a current directory name larger than MAXPATHLEN", 1, "" );
+		  FILE_ERROR(pathname,"truename got a current directory name larger than MAXPATHLEN");
                 }
                 if ( 0 == current_directory_length ) {
-                    FEerror ( "truename could not determine the current directory.", 1, "" );
+		  FILE_ERROR(pathname,"truename could not determine the current directory");
                 }
                 p = directory;
                 {
