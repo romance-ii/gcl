@@ -28,11 +28,14 @@
 
 (defun processed-error-p (x) (or (stringp x) (conditionp x)))
 (defun process-error (datum args function-name &optional (default-type 'conditions::simple-error))
-  (when (symbolp datum)
-    (setq datum (if (conditions::simple-condition-class-p datum) 
-		    (conditions::symcat "INTERNAL-" datum) 
-		  (conditions::symcat "INTERNAL-SIMPLE-" datum))
-	  args `(,@args :function-name ,(ihs-fname *current-ihs*))))
+  (let ((internal (when (symbolp datum)
+		    (find-class 
+		     (conditions::symcat
+		      (if (conditions::simple-condition-class-p datum) "INTERNAL-" "INTERNAL-SIMPLE-") 
+		      datum) 
+		     nil))))
+    (when internal
+	(setq datum (class-name internal) args `(,@args :function-name ,(ihs-fname *current-ihs*)))))
   (or (conditions::coerce-to-condition datum args default-type function-name)
       (coerce-to-string datum args)))
 (defun process-warning (datum args function-name &optional (default-type 'conditions::simple-warning))
