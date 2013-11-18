@@ -184,6 +184,7 @@
                            #+aosvs (ob-file nil)
                            (system-p *default-system-p*)
 			   (print *compile-print*)
+			   (external-format :default)
 			   (verbose *compile-verbose*)
                            (load nil)
                       &aux (*standard-output* *standard-output*)
@@ -197,6 +198,7 @@
 			   (*data* (list (make-array 50 :fill-pointer 0 :adjustable t) nil nil nil))
 			   (*fasd-data* *fasd-data*)
                            (*error-count* 0))
+  (declare (ignore external-format))
 ;  (declare (special *c-debug* system-p))
 
   (when input-pathname
