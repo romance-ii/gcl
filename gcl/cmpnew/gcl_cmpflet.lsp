@@ -1024,10 +1024,11 @@
 		(push (strcat "#" (write-to-string i)) inl)))
 	 (inl (if va (cons "#?" inl) inl))
 	 (inl (nreverse inl)))
-    (apply 'strcat (mapcon 
-		    (lambda (x) 
-		      (if (and (cdr x) (not (equal (cadr x) "#?")))
-			  (list (car x) ",") (list (car x)))) inl))))
+    (reduce 'strcat (mapcon 
+		     (lambda (x) 
+		       (if (and (cdr x) (not (equal (cadr x) "#?")))
+			   (list (car x) ",") (list (car x)))) inl)
+	    :initial-value "")))
 
 (defun vfun-wrap (x sig clp &optional ap &aux (ap (when ap (1- ap))))
   (let* ((mv (not (single-type-p (cadr sig))))
