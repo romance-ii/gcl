@@ -270,61 +270,36 @@
 
 (defun make-array (dimensions
 		   &key (element-type t)
-			initial-element
-			(initial-contents nil icsp)
-			adjustable fill-pointer
-			displaced-to (displaced-index-offset 0)
-			static
+		   initial-element
+		   (initial-contents nil icsp)
+		   adjustable fill-pointer
+		   displaced-to (displaced-index-offset 0)
+		   static
 		   &aux
-			(dimensions (if (and (listp dimensions) (not (cdr dimensions))) (car dimensions) dimensions))
-			(element-type (upgraded-array-element-type element-type)))
+		   (dimensions (if (and (listp dimensions) (not (cdr dimensions))) (car dimensions) dimensions))
+		   (element-type (upgraded-array-element-type element-type)))
   (declare (optimize (safety 1)))
   (check-type fill-pointer (or boolean integer))
   (check-type displaced-to (or null array))
   (check-type displaced-index-offset integer)
   (etypecase 
-   dimensions
-   (list
-    (let ((dimensions (dolist (d dimensions dimensions) (check-type d integer)))
-	  (x (make-array1 element-type static initial-element displaced-to displaced-index-offset dimensions adjustable)))
-      (assert (not fill-pointer))
-      (unless (member 0 dimensions)
-	(when icsp
-	  (do ((j nil t)(cursor (make-list (length dimensions) :initial-element 0)))
-	      ((when j (increment-cursor cursor dimensions)))
-	      (declare (:dynamic-extent cursor))
-	      (aset-by-cursor x (sequence-cursor initial-contents cursor) cursor))))
-      x))
+      dimensions
+    (list
+     (assert (not fill-pointer))
+     (dolist (d dimensions) (check-type d integer))
+     (let ((x (make-array1 element-type static initial-element displaced-to displaced-index-offset dimensions adjustable)))
+       (when (unless (member 0 dimensions) icsp)
+	 (let ((i -1))
+	   (labels ((set (d c) (cond (d (assert (eql (car d) (length c))) (map nil (lambda (z) (set (cdr d) z)) c))
+				     ((row-major-aset c x (incf i))))))
+	     (set dimensions initial-contents))))
+       x))
     (integer
      (let ((x (make-vector element-type dimensions adjustable (when fill-pointer dimensions)
 			   displaced-to displaced-index-offset static initial-element)))
        (when icsp (replace x initial-contents))
        (when (and fill-pointer (not (eq t fill-pointer))) (setf (fill-pointer x) fill-pointer))
        x))))
-
-
-(defun increment-cursor (cursor dimensions)
-  (if (null cursor)
-      t
-      (let ((carry (increment-cursor (cdr cursor) (cdr dimensions))))
-	(if carry
-	    (cond ((>= (the fixnum (1+ (the fixnum (car cursor))))
-	               (the fixnum (car dimensions)))
-		   (rplaca cursor 0)
-		   t)
-		  (t
-		   (rplaca cursor
-		           (the fixnum (1+ (the fixnum (car cursor)))))
-		   nil))
-	    nil))))
-
-
-(defun sequence-cursor (sequence cursor)
-  (if (null cursor)
-      sequence
-      (sequence-cursor (elt sequence (the fixnum (car cursor)))
-                       (cdr cursor))))
-
 
 (defun vector (&rest objects)
   (declare (:dynamic-extent objects))
@@ -454,20 +429,18 @@
     (unless (or displaced-to initial-contents-supplied-p)
 
       (cond ((or (seqindp new-dimensions)
-		 (and (equal (cdr new-dimensions)
-			     (cdr (array-dimensions array)))
+		 (and (equal (cdr new-dimensions) (cdr (array-dimensions array)))
 		      (or (not (eq element-type 'bit))
 			  (when new-dimensions (= 0 (mod (the seqind (car (last new-dimensions))) char-length))))))
-	     (copy-array-portion
-	      array x 0 0 (min (array-total-size x)
-			       (array-total-size array))))
-	    ((do ((cursor (make-list (length new-dimensions) :initial-element 0)))
-		 (nil)
-	       (declare (:dynamic-extent cursor))
-	       (when (apply 'array-in-bounds-p array cursor)
-		 (aset-by-cursor x (apply 'aref array cursor) cursor))
-	       (when (increment-cursor cursor new-dimensions)
-		 (return nil))))))
+	     (copy-array-portion array x 0 0 (min (array-total-size x) (array-total-size array))))
+	    ((let ((i -1))
+	       (labels ((set (dim &optional (cur (make-list (length new-dimensions) :initial-element 0)) (ind cur))
+			     (declare (:dynamic-extent cur))
+			     (cond (dim (dotimes (i (pop dim)) (setf (car cur) i) (set dim (cdr cur) ind)))
+				   ((incf i)
+				    (when (apply 'array-in-bounds-p array ind) 
+				      (row-major-aset (apply 'aref array ind) x i))))))
+		 (set new-dimensions))))))
 
     (replace-array array x)
 
