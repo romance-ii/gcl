@@ -995,7 +995,7 @@
 	   (assert st)
 ;	   (assert (info-type (cadr form1)))
 	   (setq type (info-type (cadr form1)))
-	   (setf (get st 'ccb-tp) (type-or1 (get st 'ccb-tp) (info-type (cadr form1)))))
+	   (unless (eq st +opaque+) (setf (get st 'ccb-tp) (type-or1 (get st 'ccb-tp) (info-type (cadr form1))))))
 	  (t 
 	   (do-setq-tp v (list form form1) (info-type (cadr form1)))
 	   (setq type (var-type (car name1)))
