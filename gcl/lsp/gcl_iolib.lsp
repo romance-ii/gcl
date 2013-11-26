@@ -707,15 +707,16 @@
 	((check-type tp (member character integer)))))
 
 (defun open (f &key (direction :input)
-	       (element-type 'character etp)
+	       (element-type 'character)
 	       (if-exists nil iesp)
 	       (if-does-not-exist nil idnesp)
 	       (external-format :default))
+  (let* ((f (pathname f))
+	 (f1 (if (typep f 'logical-pathname) (translate-logical-pathname f) f))
+	 (s (open-int f1 direction (restrict-stream-element-type element-type)
+		      if-exists iesp if-does-not-exist idnesp external-format)))
+    (when (typep s 'stream) (c-set-stream-object1 s f) s)))
 
-  (declare (optimize (safety 2)))
-  
-  (when etp (setq element-type (restrict-stream-element-type element-type)))
-  (open-int f direction element-type if-exists iesp if-does-not-exist idnesp external-format))
 (defun load (f &rest args)
   (values (apply 'load1 f args)))
 
