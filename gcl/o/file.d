@@ -2502,8 +2502,7 @@ DEFUN("OPEN-INT",object,fSopen_int,SI,8,8,NONE,OO,OO,OO,OO,
     if (idnesp==Cnil)
       if_does_not_exist = Cnil;
   } else
-    FEerror("~S is an illegal DIRECTION for OPEN.",
-	    1, direction);
+    FEerror("~S is an illegal DIRECTION for OPEN.", 1, direction);
   strm = open_stream(filename, smm, if_exists, if_does_not_exist);
   if (type_of(strm) == t_stream) {
     strm->sm.sm_object0 = element_type;

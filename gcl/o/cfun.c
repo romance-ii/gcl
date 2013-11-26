@@ -45,22 +45,6 @@ make_cfun(void (*self)(), object name, object data, char *start, int size) {
    return fSinit_function(list(6,Cnil,Cnil,make_fixnum((fixnum)self),Cnil,Cnil,name),
 			  (void *)fSeval_src,data,Cnil,-1,0,(((1<<6)-1)<<6)|(((1<<5)-1)<<12)|(1<<17)); 
 
-   /* object cf;  */
-
-   /* printf("%-*.*s\n",name->s.s_fillp,name->s.s_fillp,name->s.s_self);  */
-
-
-   /* cf = alloc_object(t_cfun);  */
-   /* cf->cf.cf_self = self;  */
-   /* cf->cf.cf_name = name;  */
-   /* cf->cf.cf_call = Cnil;  */
-   /* cf->cf.cf_data = data;  */
-   /* if(data && type_of(data)==t_cfdata)  */
-   /*   { data->cfd.cfd_start=start;   */
-   /*     data->cfd.cfd_size=size;}  */
-   /*   else if(size) FEerror("Bad call to make_cfun",0);  */
-   /* return(cf);  */
-
 }
 
 DEFUN("CFDL",object,fScfdl,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
