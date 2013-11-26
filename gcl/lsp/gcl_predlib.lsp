@@ -26,6 +26,10 @@
 
 (export '(int void static 
 	      non-standard-generic-function
+	      non-standard-generic-compiled-function
+	      non-standard-generic-interpreted-function
+	      standard-generic-compiled-function
+	      standard-generic-interpreted-function
 	      non-logical-pathname
 	      non-standard-base-char true gsym
 	      std-instance
@@ -433,10 +437,11 @@
 (deftype real (&optional (low '*) (high '*)) `(or (rational ,low ,high) (float ,low ,high)))
 (deftype number () `(or real complex))
 (deftype atom () `(not cons))
-(deftype function (&rest r) (declare (ignore r)) `(or standard-generic-function non-standard-generic-function))
-;; (defun compiled-function-p (fun) (when (typep fun 'function) (typep (caddr (c-function-plist fun)) 'string)))
-;; (deftype compiled-function nil `(and function (satisfies compiled-function-p)))
-(deftype compiled-function nil 'function);FIXME
+(deftype compiled-function nil `(or standard-generic-compiled-function non-standard-generic-compiled-function))
+(deftype interpreted-function nil `(or standard-generic-interpreted-function non-standard-generic-interpreted-function))
+(deftype function (&rest r) (declare (ignore r)) `(or compiled-function interpreted-function))
+(deftype standard-generic-function nil `(or standard-generic-compiled-function standard-generic-interpreted-function))
+(deftype non-standard-generic-function nil `(and function (not standard-generic-function)))
 
 ;(deftype integer (&optional (low '*) (high '*)) `(integer ,low ,high))
 (deftype ratio (&optional (low '*) (high '*)) `(ratio ,low ,high))
@@ -619,8 +624,11 @@
 				      readtable 
 				      hash-table-eq hash-table-eql hash-table-equal hash-table-equalp
 				      random-state std-instance structure 
-				      non-standard-generic-function
-				      standard-generic-function spice
+				      non-standard-generic-interpreted-function
+				      non-standard-generic-compiled-function
+				      standard-generic-interpreted-function
+				      standard-generic-compiled-function
+				      spice
 				      ))
 
 
@@ -648,7 +656,8 @@
 					  (cons . cons-op)
 ;					  (standard-object . standard-op)
 					  (std-instance . standard-op)
-					  (standard-generic-function . standard-op)
+					  (standard-generic-compiled-function . standard-op)
+					  (standard-generic-interpreted-function . standard-op)
 					  (structure . structure-op)
 					  ,@(mapcar (lambda (x) `(,(cdr x) . complex-op)) +complex-type-alist+)
 					  ,@(mapcar (lambda (x) `(,(cdr x) . array-op)) +array-type-alist+)
@@ -658,7 +667,8 @@
 					  (cons . cons-recon)
 ;					  (standard-object . standard-recon)
 					  (std-instance . standard-recon)
-					  (standard-generic-function . standard-recon)
+					  (standard-generic-compiled-function . standard-recon)
+					  (standard-generic-interpreted-function . standard-recon)
 					  (structure . structure-recon)
 					  ,@(mapcar (lambda (x) `(,(cdr x) . complex-recon)) +complex-type-alist+)
 					  ,@(mapcar (lambda (x) `(,(cdr x) . array-recon)) +array-type-alist+)
@@ -669,7 +679,8 @@
 					 (cons . cons-load)
 ;					 (standard-object . standard-load)
 					 (std-instance . standard-load)
-					 (standard-generic-function . standard-load)
+					 (standard-generic-compiled-function . standard-load)
+					 (standard-generic-interpreted-function . standard-load)
 					 (structure . structure-load)
 					 (array . array-load)
 ;					 (simple-array . array-load)
@@ -1521,9 +1532,12 @@
 	  ((setq tem (coerce-to-standard-class (car type)))
 	   (let ((s (load-time-value nil))(q (load-time-value nil)))
 	     (setq s (or s (coerce-to-standard-class 'generic-function)) q (or q (si-class-precedence-list s)))
-	     (cond  ((member s (si-class-precedence-list tem)) (ntp-ld ntp (list 'standard-generic-function (if (eq s tem) t tem))))
+	     (cond  ((member s (si-class-precedence-list tem)) 
+		     (ntp-ld ntp (list 'standard-generic-compiled-function (if (eq s tem) t tem)))
+		     (ntp-ld ntp (list 'standard-generic-interpreted-function (if (eq s tem) t tem))))
 		    ((member tem q) 
-		     (ntp-ld ntp (list 'standard-generic-function t))
+		     (ntp-ld ntp (list 'standard-generic-interpreted-function t))
+		     (ntp-ld ntp (list 'standard-generic-compiled-function t))
 		     (ntp-ld ntp (list 'std-instance t)))
 		    ((ntp-ld ntp (list 'std-instance tem))))))
 	  ((and (symbolp (car type)) (setq tem (get (car type) 's-data)))

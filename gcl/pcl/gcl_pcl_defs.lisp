@@ -425,8 +425,7 @@
   ;; better.  Note that for most ports, providing this definition
   ;; should just speed up class definition.  It shouldn't have an
   ;; effect on performance of most user code.
-  (progn ;(break "foo ~a ~a~%" name predicate)
-  (eval `(deftype ,name () '(satisfies ,predicate)))))
+  (unless (get name 'si::deftype-definition) (eval `(deftype ,name () '(satisfies ,predicate)))))
 
 (defun make-type-predicate-name (name &optional kind)
   (if (symbol-package name)

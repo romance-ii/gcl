@@ -39,9 +39,6 @@ object
 make_fun(void *addr,object data,object call,object env,ufixnum argd,ufixnum sizes) {
   
   object x;
-  /* ufixnum n; */
-
-  /* for (n=0,x=env;x!=Cnil;x=x->c.c_cdr,n++); */
 
   x=alloc_object(t_function);
   x->fun.fun_self=addr;
@@ -54,25 +51,10 @@ make_fun(void *addr,object data,object call,object env,ufixnum argd,ufixnum size
   x->fun.fun_vv    =POP_BITS(sizes,1);
   x->fun.fun_env=def_env;
 
+  if ((void *)x->fun.fun_self==(void *)FFN(fSeval_src))
+    x->d.tt=2;
+
   FFN(fSset_function_environment)(x,env);
-
-  /* if (n++) { */
-
-  /*   object *p; */
-
-  /*   { */
-  /*     BEGIN_NO_INTERRUPT;  */
-  /*     p=(object *)alloc_relblock(n*sizeof(object)); */
-  /*     END_NO_INTERRUPT; */
-  /*   } */
-
-  /*   *p++=(object)n; */
-  /*   x->fun.fun_env=p; */
-    
-  /*   for (;env!=Cnil;env=env->c.c_cdr) */
-  /*     *p++=env; */
-
-  /* } */
 
   return x;
 

@@ -423,8 +423,8 @@
 (defun functionp (x)
   (typecase x (function t)))
 
-(defun compiled-function-p (x)
-  (typecase x (function (typep (caddr (c-function-plist x)) 'string))))
+(defun compiled-function-p (x) 
+  (typecase x (compiled-function t)))
 
 (defun stringp (x)
   (typecase

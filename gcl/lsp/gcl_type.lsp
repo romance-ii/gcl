@@ -268,8 +268,10 @@
 		   (string-output-stream (make-string-output-stream));FIXME user defined, socket
 		   (random-state (make-random-state)) 
 		   (readtable (standard-readtable)) 
-		   (non-standard-generic-function (function eq))
-		   (standard-generic-function (set-d-tt 1 (lambda nil nil)))
+		   (non-standard-generic-compiled-function (function eq))
+		   (non-standard-generic-interpreted-function (set-d-tt 2 (lambda nil nil)))
+		   (standard-generic-compiled-function (set-d-tt 1 (lambda nil nil)))
+		   (standard-generic-interpreted-function (set-d-tt 3 (lambda nil nil)))
 		   ,@(mapcar (lambda (x) `(,(cadr x) (make-vector ',(car x) 1 nil nil nil 0 nil nil))) +vtps+)
 		   ,@(mapcar (lambda (x) `(,(cadr x) (make-array1 ',(car x) nil nil nil 0 '(1 1) nil))) +atps+)
                    (spice (alloc-spice))

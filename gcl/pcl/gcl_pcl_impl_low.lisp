@@ -10,7 +10,7 @@
 
 (defun %%allocate-instance--class (&aux wrapper slots)
   (let ((i (system:make-structure 'std-instance wrapper slots)))
-    (c-set-t-tt i 1)
+    (c-set-t-tt i (logior 1 (c-t-tt i)))
     i))
 
 (import '(si::memq) 'pcl)
@@ -61,7 +61,7 @@
   (let ((fin (allocate-funcallable-instance-2))
 	(env (make-list funcallable-instance-closure-size :initial-element nil)))
     (si::set-function-environment fin env)
-    (c-set-t-tt fin 1)
+    (c-set-t-tt fin (logior 1 (c-t-tt fin)))
     fin))
 
 (defun funcallable-instance-p (x) (typep x 'standard-generic-function))
