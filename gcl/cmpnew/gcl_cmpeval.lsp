@@ -1739,12 +1739,9 @@
 
 (defun or-ccb-assignments (fms)
   (mapc (lambda (x &aux (i (cadr x))) 
-	  (mapc (lambda (v)
-		  (when (var-p v) 
-		    (let ((tp (get (var-store v) 'ccb-tp)));FIXME setq tp nil?
-		      (when tp
-			(do-setq-tp v '(ccb-ref) (type-or1 (var-type v) (get (var-store v) 'ccb-tp)))
-			(setf (var-store v) +opaque+))))) (append (info-ref-ccb i) (info-ref-clb i)))) fms))
+	  (mapc (lambda (x &aux (v (pop x)))
+		  (do-setq-tp v '(ccb-ref) (type-or1 (var-type v) x))
+		  (setf (var-store v) +opaque+)) (info-ch-ccb i))) fms))
 
 (defun mi6 (fn fms)
   (or-ccb-assignments fms)

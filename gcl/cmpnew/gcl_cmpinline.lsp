@@ -57,6 +57,7 @@
   (ref-ccb nil   :type list)
   (ref-clb nil   :type list)
   (ref     nil   :type list)
+  (ch-ccb  nil   :type list)
   )
 
 (si::freeze-defstruct 'info)
@@ -183,6 +184,12 @@
 	    (mrg info-ref))
   (when (/= (info-sp-change from-info) 0) (setf (info-sp-change to-info) 1))
   (setf (info-flags to-info) (logior (info-flags to-info) (info-flags from-info)))
+  (setf (info-ch-ccb to-info) 
+	(reduce (lambda (y x &aux (v (car x))(z (assoc v y)))
+		  (cond (z (setf (cdr z) (type-or1 (cdr z) (cdr x))) y)
+			((member v (info-ch to-info)) (cons x y))
+			(y))) (info-ch-ccb from-info)
+		    :initial-value (remove-if-not (lambda (x) (member (car x) (info-ch to-info))) (info-ch-ccb to-info))))
   to-info)
 
 ;; (defun add-info (to-info from-info)

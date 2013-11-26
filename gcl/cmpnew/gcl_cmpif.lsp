@@ -105,7 +105,8 @@
 	      (<= (cmp-norm-tp `(real * ,(or (caddr t2) '*))))))))
 
 (defmacro vl-name (x) `(var-name (car (third ,x))))
-(defmacro vl-type (x) `(var-type (car (third ,x))))
+;(defmacro vl-type (x) `(var-type (car (third ,x))))  ; Won't work, ref might be across a function boundary
+(defmacro vl-type (x) `(itp ,x))
 (defmacro itp (x) `(info-type (second ,x)))
 (defmacro vlp (x) `(and (eq 'var (car ,x)) (member (car (third ,x)) *vars*)))
 ;(defmacro vlp (x) `(and (eq 'var (car ,x)) (eq (var-kind (car (third ,x))) 'lexical)))
