@@ -576,7 +576,7 @@ StdinProc(clientData, mask)
 	      *p++ = (code ? '1' : '0');
 	      bcopy(msg->msg_id,p,3);
 	      /* end header */
-	      string = INTERP_RESULT(interp);
+	      string = (char *)INTERP_RESULT(interp);
 	      if(sock_write_str2(dsfd, m_reply, buf, 4, string, strlen(string))
 		 < 0)
 		{		/* what do we want to do if the write failed */}
