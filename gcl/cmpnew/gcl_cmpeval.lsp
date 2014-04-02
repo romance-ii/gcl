@@ -2852,7 +2852,7 @@
 	  (let ((nval
 		 (cond ((not (isfinite val)) `(symbol-value ',(infinite-val-symbol val)))
 		       ((> (abs val) (/ most-positive-long-float 2)) (scl val 'most-positive-long-float))
-		       ((< 0.0 (abs val) (* least-positive-long-float 1.0d20)) (scl val 'least-positive-long-float)))))
+		       ((< 0.0 (abs val) (* least-positive-normalized-long-float 1.0d20)) (scl val 'least-positive-normalized-long-float)))))
 	    (add-object (if nval (cons '|#,| nval) val)))))
   
 
