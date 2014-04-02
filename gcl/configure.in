@@ -614,7 +614,9 @@ case $use in
 #		m68k*)
 #			TCFLAGS="$TCFLAGS -ffloat-store";;
 		hppa*)
-#			TCFLAGS="$TCFLAGS -ffunction-sections -march=2.0 " #FIXME
+			TCFLAGS="$TCFLAGS -mlong-calls "
+			TLIBS="$TLIBS -lgcc_s" # workaround hppa __moddi3 local func symbols with default linker flags
+#			TCFLAGS="$TCFLAGS -ffunction-sections"
 #			if test "$enable_debug" != "yes" ; then TO3FLAGS="-O $TFPFLAG" ; fi
 #			if test "$enable_debug" != "yes" ; then TO2FLAGS="-O" ; fi
 			;;
