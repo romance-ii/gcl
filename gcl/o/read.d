@@ -49,8 +49,143 @@ DEFVAR("NEW-CONTEXT",sSnew_context,SI,sLnil,"");
 static object
 patch_sharp(object x) {return ifuncall1(sSpatch_sharp,x);}
 
-static object
-parse_number(char *,int,int *,int);
+
+#define digitp digitp1
+
+static inline int
+digitp(int i,int r) {
+  
+  if ( r<=10 || i<='9' )
+    i-='0';
+  else {
+    i=tolower(i)-'a';
+    i=i<0 ? i : i+10;
+  }
+
+  return i<r ? i : -1;
+
+}
+
+static inline object
+parse_unsigned_integer_negate(char *s1,char **ep,int radix,int neg) {
+
+  fixnum f,o,u,l=MOST_POSITIVE_FIX/radix-1;
+  int r,d;
+  char ch,*s;
+
+  if (radix==10)
+    for (o=u=1,f=0,s=s1;*s && *s<='9' && (d=*s-'0')>=0;u=0,o=o && f<l,f=f*10+d,s++);
+  else
+    for (o=u=1,f=0,s=s1;*s && (d=digitp(*s,radix))>=0;u=0,o=o && f<l,f=f*radix+d,s++);
+
+  *ep=s;
+
+  if (u) return OBJNULL;
+  if (o && !*s) return make_fixnum(neg ? -f : f);
+
+  ch=*s;
+  *s=0;
+  r=mpz_set_str(MP(big_fixnum1),s1,radix);
+  *s=ch;
+
+  if (r) return OBJNULL;
+
+  if (neg) set_big_sign(big_fixnum1,-1);
+
+  return normalize_big_to_object(big_fixnum1);
+
+}
+
+static inline object
+parse_unsigned_integer(char *s,char **ep,int radix) {
+
+  return parse_unsigned_integer_negate(s,ep,radix,0);
+
+}
+
+
+static inline object
+parse_integer(char *s,char **ep,int radix) {
+
+  int negate=0;
+
+  switch (*s) {
+  case '-':
+    negate=1;
+  case '+':
+    s++;
+  default:
+    break;
+  }
+
+  return parse_unsigned_integer_negate(s,ep,radix,negate);
+
+}
+
+
+static inline object
+parse_number(char *s,int radix) {
+
+  object x,y;
+  char *q,ch;
+  int n,m;
+  double f;
+
+  x=parse_integer(s,&q,radix);
+
+  switch (*q) {
+  case 0:
+    return x;
+  case '/':
+    y=parse_unsigned_integer(q+1,&q,radix);
+    return (x==OBJNULL || y==OBJNULL || *q) ? OBJNULL : make_ratio(x,y,0);
+  default:
+    if (radix!=10)
+      x=parse_integer(s,&q,10);
+    if (*q=='.')
+      if (parse_unsigned_integer(q+1,&q,10)==OBJNULL)
+	return x;
+
+    if ((ch=*q)) *q='E';
+    n=sscanf(s,"%lf%n",&f,&m);
+    *q=ch;
+    if (n!=1||s[m]) return OBJNULL;
+
+    switch (ch=='e' || ch=='E' || !ch ? READdefault_float_format : ch) {
+    case 's':case 'S':
+      return make_shortfloat((float)f);
+    case 'f':case 'F':case 'd':case 'D':case 'l':case 'L':
+      return make_longfloat(f);
+    default:
+      return OBJNULL;
+    }
+  }
+}
+
+static inline void
+too_long_token(void) {
+  char *q;
+  int i;
+  
+  BEGIN_NO_INTERRUPT;
+  q = alloc_contblock(token->st.st_dim*2);
+  for (i = 0;  i < token->st.st_dim;  i++)
+    q[i] = token->st.st_self[i];
+  token->st.st_self = q;
+  token->st.st_dim *= 2;
+  END_NO_INTERRUPT;
+
+}
+
+static inline void
+null_terminate_token(void) {
+
+  if (token->st.st_fillp==token->st.st_dim)
+    too_long_token();
+  token->st.st_self[token->st.st_fillp]=0;
+
+}
+
 
 #define	token_buffer	token->st.st_self
 /* the active length of the token */
@@ -538,8 +673,9 @@ N:
 	token->st.st_fillp = length;
 	if (escape_flag || (READbase<=10 && token_buffer[0]>'9'))
 		goto SYMBOL;
-	x = parse_number(token_buffer, length, &i, READbase);
-	if (x != OBJNULL && length == i) {
+	null_terminate_token();
+	x = parse_number(token_buffer, READbase);
+	if (x != OBJNULL) {
 		vs_reset;
 		return(x);
 	}
@@ -662,345 +798,6 @@ ENDUP:
 	return;
 }
 
-#define	is_exponent_marker(i)	\
-	((i) == 'e' || (i) == 'E' ||	\
-	 (i) == 's' || (i) == 'S' || (i) == 'f' || (i) == 'F' || \
-	 (i) == 'd' || (i) == 'D' || (i) == 'l' || (i) == 'L' || \
-	 (i) == 'b' || (i) == 'B')
-
-double pow();
-
-static double
-new_fraction(char *s,int end,int exp_pos) {
-
-  char ch,ch1=0;
-  double fraction;
-
-  ch=s[end];
-  s[end]=0;
-  if (exp_pos>=0) {ch1=s[exp_pos];s[exp_pos]='E';}
-  sscanf(s,"%lf",&fraction);
-  s[end]=ch;
-  if (exp_pos>=0) s[exp_pos]=ch1;
-
-  return fraction;
-
-}
-
-
-/*
-	Parse_number(s, end, ep, radix) parses C string s up to (but
-	not including) s[end] using radix as the radix for the
-	rational number.  (For floating numbers, radix should be 10.)
-	When parsing has been succeeded, the index of the next
-	character is assigned to *ep, and the number is returned as a
-	lisp data object.  If not, OBJNULL is returned.
-*/
-static object
-parse_number(char *s, int end, int *ep, int radix) {
-
-  object x=Cnil;
-  fixnum sign;
-  object integer_part;
-  double fraction, fraction_unit;
-  char exponent_marker;
-  int exponent,exp_pos=-1;
-  int i, j, k;
-  int d;
-  vs_mark;
-  
- BEGIN:
-  exponent_marker = 'E';
-  i = 0;
-  sign = 1;
-  if (s[i] == '+')
-    i++;
-  else if (s[i] == '-') {
-    sign = -1;
-    i++;
-  }
-  integer_part = (object)  big_register_0;
-  zero_big(big_register_0);
-  vs_push((object)integer_part);
-  if (i >= end)
-    goto NO_NUMBER;
-
-  j=i;
-
-/* #define MOST_POSITIVE_FIX (((unsigned int) (~0) ) /2) */
-/*FIXME 64!!!*/
-#define TEN_EXPT_9 1000000000
-  
-  if (radix == 10 && TEN_EXPT_9 <MOST_POSITIVE_FIX ) {
-    
-    int chunk = 0;
-    int sum = 0;
-    
-    while (i < end && (d = digitp(s[i], radix)) >= 0) {    
-      sum = 10*sum+d;
-      chunk++;
-      if (chunk == 9) {
-	mul_int_big(1000000000, integer_part);
-	add_int_big(sum, integer_part);
-	chunk=0; sum=0;
-      } 
-      i++;
-    }
-    
-    if (chunk) {
-      
-      int fac=10;
-      
-      while(--chunk> 0) 
-	fac *=10;
-      
-      mul_int_big(fac,integer_part);
-      add_int_big(sum,integer_part);
-      
-    }
-    
-  } else 
-    
-    while (i < end && (d = digitp(s[i], radix)) >= 0) {
-      mul_int_big(radix, integer_part);
-      add_int_big(d, integer_part);
-      i++;
-    }
-  
-  if (i >= end)
-    goto MAKE_INTEGER;
-  if (s[i] == '/') {
-    if (i==j || ++i >= end || (d = digitp(s[i], radix)) < 0)
-      goto NO_NUMBER;
-    goto DENOMINATOR;
-  }
-
-  if (radix!=10) 
-    for (j=i;j<end;j++)
-      if (s[j]=='.'|| is_exponent_marker(s[j])) {
-	radix=10;
-	goto BEGIN;
-      }
-  
-  if (s[i] == '.') {
-    if (++i >= end)
-      goto MAKE_INTEGER;
-    else if ((d=digitp(s[i], radix)) >= 0)
-      goto FRACTION;
-    else if (is_exponent_marker(s[i])) {
-      fraction
-	= (double)sign * big_to_double(integer_part);
-      goto EXPONENT;
-    } else
-      goto MAKE_INTEGER;
-  }
-  if (is_exponent_marker(s[i])) {
-    fraction = (double)sign * big_to_double(integer_part);
-    goto EXPONENT;
-  }
-  
-  /*
-    goto NO_NUMBER;
-  */
-  
- MAKE_INTEGER:
-  if (sign < 0 && signe(MP(integer_part)))
-    set_big_sign(integer_part,-1);
-  x = normalize_big_to_object(integer_part);
-  if (x == big_register_0)
-    big_register_0 = alloc_object(t_bignum);
-  zero_big(big_register_0);
-  
-  goto END;
-  
- FRACTION:
-  if (radix!=10)
-    FEerror("Parse_number radix error", 0);
-/*   if ((d = digitp(s[i], radix)) < 0) */
-/*     goto NO_NUMBER; */
-  fraction = 0.0;
-  fraction_unit = 1000000000.0;
-  for (;;) {
-    k = j = 0;
-    do {
-      j = 10*j + d;
-      i++;
-      k++;
-      if (i < end)
-	d = digitp(s[i], radix);
-      else
-	break;
-    } while (k < 9 && d >= 0);
-    while (k++ < 9)
-      j *= 10;
-    fraction += ((double)j /fraction_unit);
-    if (i >= end || d < 0)
-      break;
-    fraction_unit *= 1000000000.0;
-  }
-  fraction += big_to_double(integer_part);
-  fraction *= (double)sign;
-  if (i >= end)
-    goto MAKE_FLOAT;
-  if (is_exponent_marker(s[i]))
-    goto EXPONENT;
-  goto MAKE_FLOAT;
-  
- EXPONENT:
-  if (radix!=10)
-    FEerror("Parse_number radix error", 0);
-  exponent_marker = s[i];
-  exp_pos=i;
-  i++;
-  if (i >= end)
-    goto NO_NUMBER;
-  sign = 1;
-  if (s[i] == '+')
-    i++;
-  else if (s[i] == '-') {
-    sign = -1;
-    i++;
-  }
-  if (i >= end)
-    goto NO_NUMBER;
-  if ((d = digitp(s[i], radix)) < 0)
-    goto NO_NUMBER;
-  exponent = 0;
-  do {
-    exponent = 10 * exponent + d;
-    i++;
-  } while (i < end && (d = digitp(s[i], radix)) >= 0);
-  d = exponent;
-  /* Use pow because it is more accurate */
-  { double po = pow(10.0,(double)(sign * d));
-  if (po == 0.0)
-    { fraction = fraction *pow(10.0,(double)(sign * (d-1)));
-    fraction /= 10.0;}  
-  else     
-    fraction = fraction * po;}
-  
- MAKE_FLOAT:
-#ifdef IEEEFLOAT
-  if (!ISFINITE(fraction))
-    FEerror("Floating-point overflow.", 0);
-#endif
-  switch (exponent_marker) {
-    
-  case 'e':  case 'E':
-    exponent_marker = READdefault_float_format;
-    goto MAKE_FLOAT;
-    
-  case 's':  case 'S':
-    x = make_shortfloat((shortfloat)new_fraction(s,end,exp_pos));/*FIXME code above cannot re-read denormalized numbers accurately*/
-    break;
-    
-  case 'f':  case 'F':  case 'd':  case 'D':  case 'l':  case 'L':
-    x = make_longfloat((longfloat)new_fraction(s,end,exp_pos));
-    break;
-    
-  case 'b':  case 'B':
-    goto NO_NUMBER;
-  }
-
-  zero_big(big_register_0);
-  
-  goto END;
-  
- DENOMINATOR:
-  if (sign < 0)
-    set_big_sign(integer_part,-1);
-  vs_push(normalize_big_to_object(integer_part));
-
-  if (vs_head == big_register_0)
-    big_register_0 = new_bignum();
-  zero_big(big_register_0);
-  
-/*   if ((d = digitp(s[i], radix)) < 0) */
-/*     goto NO_NUMBER; */
-  integer_part = big_register_0;
-  /*	zero_big(integer_part); */
-  do {
-    mul_int_big(radix, integer_part);
-    add_int_big(d, integer_part);
-    i++;
-  } while (i < end && (d = digitp(s[i], radix)) >= 0);
-  vs_push(normalize_big_to_object(integer_part));
-  x = make_ratio(vs_top[-2], vs_top[-1],0);
-  goto END;
-  
- END:
-  *ep = i;
-  vs_reset;
-  return(x);
-  
- NO_NUMBER:
-  *ep = i;
-  vs_reset;
-  zero_big(big_register_0);
-  
-  return(OBJNULL);
-
-}
-
-static object
-parse_integer(s, end, ep, radix)
-char *s;
-int end, *ep, radix;
-{
-	object x;
-	fixnum sign;
-	object integer_part;
-	int i, d;
-	vs_mark;
-
-	i = 0;
-	sign = 1;
-	if (s[i] == '+')
-		i++;
-	else if (s[i] == '-') {
-		sign = -1;
-		i++;
-	}
-	integer_part = big_register_0;
-	vs_push((object)integer_part);
-	if (i >= end)
-		goto NO_NUMBER;
-	if ((d = digitp(s[i], radix)) < 0)
-		goto NO_NUMBER;
-        
-	do {
-		mul_int_big(radix, integer_part);
-		add_int_big(d, integer_part);
-		i++;
-	} while (i < end && (d = digitp(s[i], radix)) >= 0);
-
-
-	if (sign < 0)
-		set_big_sign(integer_part,-1);
-	x = normalize_big_to_object(integer_part);
-/**/
-	if (x == big_register_0)
-		big_register_0 = alloc_object(t_bignum);
-	zero_big(big_register_0);
-	
-/**/
-	*ep = i;
-	vs_reset;
-	return(x);
-
-NO_NUMBER:
-	*ep = i;
-	vs_reset;
-/**/
-	zero_big(big_register_0);
-/**/
-	return(OBJNULL);
-}
-
-
-static void
-too_long_string(void);
-
 /*
 	Read_string(delim, in) reads
 	a simple string	terminated by character code delim
@@ -1023,7 +820,7 @@ object in;
 		else if (cat(c) == cat_single_escape)
 			c = read_char(in);
 		if (i >= token->st.st_dim)
-			too_long_string();
+			too_long_token();
 		token_buffer[i++] = char_code(c);
 	}
 	token->st.st_fillp = i;
@@ -1103,8 +900,9 @@ Ldispatch_reader()
 	  FEerror("Dispatch number too long", 0);
 	if (i) {
 	  token->st.st_fillp=i;
-	  x=parse_number(token->st.st_self,token->st.st_fillp, &i, 10);
-	  if (x == OBJNULL || i != token->st.st_fillp)
+	  null_terminate_token();
+	  x=parse_number(token->st.st_self, 10);
+	  if (x == OBJNULL)
 	    FEerror("Cannot parse the dispatch macro number.", 0);
 	} else
 	  x=Cnil;
@@ -1729,8 +1527,6 @@ Lsharp_exclamation_reader()
 static void
 Lsharp_B_reader()
 {
-	int i;
-
 	if(vs_base[2] != Cnil && !READsuppress)
 		extra_argument('B');
 	vs_popp;
@@ -1740,9 +1536,10 @@ Lsharp_B_reader()
 		vs_base[0] = Cnil;
 		return;
 	}
+	null_terminate_token();
 	vs_base[0]
-	= parse_number(token_buffer, token->st.st_fillp, &i, 2);
-	if (vs_base[0] == OBJNULL || i != token->st.st_fillp)
+	= parse_number(token_buffer, 2);
+	if (vs_base[0] == OBJNULL)
 		FEerror("Cannot parse the #B readmacro.", 0);
 	if (type_of(vs_base[0]) == t_shortfloat ||
 	    type_of(vs_base[0]) == t_longfloat)
@@ -1753,8 +1550,6 @@ Lsharp_B_reader()
 static void
 Lsharp_O_reader()
 {
-	int i;
-
 	if(vs_base[2] != Cnil && !READsuppress)
 		extra_argument('O');
 	vs_popp;
@@ -1764,9 +1559,10 @@ Lsharp_O_reader()
 		vs_base[0] = Cnil;
 		return;
 	}
+	null_terminate_token();
 	vs_base[0]
-	= parse_number(token_buffer, token->st.st_fillp, &i, 8);
-	if (vs_base[0] == OBJNULL || i != token->st.st_fillp)
+	= parse_number(token_buffer, 8);
+	if (vs_base[0] == OBJNULL)
 		FEerror("Cannot parse the #O readmacro.", 0);
 	if (type_of(vs_base[0]) == t_shortfloat ||
 	    type_of(vs_base[0]) == t_longfloat)
@@ -1777,8 +1573,6 @@ Lsharp_O_reader()
 static void
 Lsharp_X_reader()
 {
-	int i;
-
 	if(vs_base[2] != Cnil && !READsuppress)
 		extra_argument('X');
 	vs_popp;
@@ -1788,9 +1582,10 @@ Lsharp_X_reader()
 		vs_base[0] = Cnil;
 		return;
 	}
+	null_terminate_token();
 	vs_base[0]
-	= parse_number(token_buffer, token->st.st_fillp, &i, 16);
-	if (vs_base[0] == OBJNULL || i != token->st.st_fillp)
+	= parse_number(token_buffer, 16);
+	if (vs_base[0] == OBJNULL)
 		FEerror("Cannot parse the #X readmacro.", 0);
 	if (type_of(vs_base[0]) == t_shortfloat ||
 	    type_of(vs_base[0]) == t_longfloat)
@@ -1801,7 +1596,7 @@ Lsharp_X_reader()
 static void
 Lsharp_R_reader()
 {
-	int radix=0, i;
+	int radix=0;
 
 	check_arg(3);
 	if (READsuppress)
@@ -1815,13 +1610,14 @@ Lsharp_R_reader()
 	vs_popp;
 	vs_popp;
 	read_constituent(vs_base[0]);
+	null_terminate_token();
 	vs_base[0]
-	= parse_number(token_buffer, token->st.st_fillp, &i, radix);
+	= parse_number(token_buffer, radix);
 	if (READsuppress) {
 		vs_base[0] = Cnil;
 		return;
 	}
-	if (vs_base[0] == OBJNULL || i != token->st.st_fillp)
+	if (vs_base[0] == OBJNULL)
 		FEerror("Cannot parse the #R readmacro.", 0);
 	if (type_of(vs_base[0]) == t_shortfloat ||
 	    type_of(vs_base[0]) == t_longfloat)
@@ -2170,7 +1966,7 @@ DEFUNM("READ-LINE",object,fLread_line,LISP,0,4,NONE,OO,OO,OO,OO,(object f,...),"
       break;
     }
     if (i >= token->st.st_dim)
-      too_long_string();
+      too_long_token();
     token->st.st_self[i++] = char_code(c);
   }
  FINISH:
@@ -2375,10 +2171,15 @@ DEFUNM("PARSE-INTEGER-INT",object,fSparse_integer_int,SI,5,5,NONE,OO,OO,IO,OO,
     else
       goto CANNOT_PARSE;
   }
-  {char *tmp = OUR_ALLOCA(e-s);
-    bcopy( strng->st.st_self+s,tmp,e-s);
-    x = parse_integer(tmp, e-s, &ep, radix);
-    ALLOCA_FREE(tmp);
+  {
+    char *q;
+    while (token->st.st_dim<e-s)
+      too_long_token();
+    memcpy(token->st.st_self,strng->st.st_self+s,e-s);
+    token->st.st_fillp=e-s;
+    null_terminate_token();
+    x = parse_integer(token->st.st_self, &q, radix);
+    ep=q-token->st.st_self;
   }
   if (x == OBJNULL) {
     if (junk_allowed != Cnil)
@@ -2638,43 +2439,6 @@ FFN(siLstandard_readtable)()
 	check_arg(0);
 
 	vs_push(standard_readtable);
-}
-
-static void
-too_long_token(void)
-{
-	char *q;
-	int i;
-
-	{BEGIN_NO_INTERRUPT;
-	q = alloc_contblock(token->st.st_dim*2);
-	for (i = 0;  i < token->st.st_dim;  i++)
-		q[i] = token->st.st_self[i];
-	token->st.st_self = q;
-	token->st.st_dim *= 2;
-	END_NO_INTERRUPT;}
-/*
-	token->st.st_fillp = token->st.st_dim;
-	FEerror("Too long a token: ~A.", 1, token);
-*/
-}
-
-static void
-too_long_string(void)
-{
-	char *q;
-	int i;
-	{BEGIN_NO_INTERRUPT;
-	q = alloc_contblock(token->st.st_dim*2);
-	for (i = 0;  i < token->st.st_dim;  i++)
-		q[i] = token->st.st_self[i];
-	token->st.st_self = q;
-	token->st.st_dim *= 2;
-	END_NO_INTERRUPT;}
-/*
-	token->st.st_fillp = token->st.st_dim;
-	FEerror("Too long a string: ~S.", 1, token);
-*/
 }
 
 static void
