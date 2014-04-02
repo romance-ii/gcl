@@ -142,6 +142,7 @@ parse_number(char *s,int radix) {
   default:
     if (radix!=10)
       x=parse_integer(s,&q,10);
+    if (!*q) return OBJNULL;
     if (*q=='.')
       if (parse_unsigned_integer(q+1,&q,10)==OBJNULL)
 	return x;
