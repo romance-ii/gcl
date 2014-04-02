@@ -240,7 +240,7 @@ EXPORT_GMP_CALL(2,void,set_si,1,mpz_t,gmp_lint)
 EXPORT_GMP_CALL(1,gmp_lint,get_si,0,mpz_t)
 EXPORT_GMP_CALL(1,gmp_lint,get_ui,0,mpz_t)
 MEM_GMP_CALL(3,gmp_char_star,mpz_get_str,0,gmp_char_star,int,mpz_t)
-MEM_GMP_CALL(3,int,mpz_set_str,0,mpz_t,char *,int)/*arg set, but 0 for check as moot*/
+MEM_GMP_CALL(3,int,mpz_set_str,0,mpz_t,gmp_char_star,int)/*arg set, but 0 for check as moot*/
 EXPORT_GMP_CALL(1,int,fits_sint_p,0,mpz_t)
 EXPORT_GMP_CALL(1,int,fits_slong_p,0,mpz_t)
 EXPORT_GMP_CALL(1,int,fits_sshort_p,0,mpz_t)
