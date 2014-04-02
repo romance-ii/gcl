@@ -127,7 +127,7 @@ static inline object
 parse_number(char *s,int radix) {
 
   object x,y;
-  char *q,ch;
+  char *q,ch,c;
   int n,m;
   double f;
 
@@ -142,17 +142,19 @@ parse_number(char *s,int radix) {
   default:
     if (radix!=10)
       x=parse_integer(s,&q,10);
-    if (!*q) return OBJNULL;
-    if (*q=='.')
-      if (parse_unsigned_integer(q+1,&q,10)==OBJNULL)
-	return x;
 
-    if ((ch=*q)) *q='E';
+    if ((ch=*q)=='.') {
+      if (!*++q) return x;
+      parse_unsigned_integer(q,&q,10);
+      ch=*q ? *q : 'E';
+    }
+
+    if ((c=*q)) *q='E';
     n=sscanf(s,"%lf%n",&f,&m);
-    *q=ch;
+    *q=c;
     if (n!=1||s[m]) return OBJNULL;
 
-    switch (ch=='e' || ch=='E' || !ch ? READdefault_float_format : ch) {
+    switch (ch=='e' || ch=='E' ? READdefault_float_format : ch) {
     case 's':case 'S':
       return make_shortfloat((float)f);
     case 'f':case 'F':case 'd':case 'D':case 'l':case 'L':
