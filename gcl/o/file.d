@@ -365,38 +365,38 @@ BEGIN:
 	}
 }
 
-#ifndef NO_SETBUF
 void
-setup_stream_buffer(x)
-     object x;
-{char *buf=alloc_contblock(BUFSIZ);
-  	x->sm.sm_buffer = buf;
-	setbuf(x->sm.sm_fp, buf);
+setup_stream_buffer(object x) {
+#ifndef NO_SETBUF
+  char *buf=alloc_contblock(BUFSIZ);
+  x->sm.sm_buffer = buf;
+  setbuf(x->sm.sm_fp, buf);
+#else
+  setvbuf(x->sm.sm_fp,NULL,_IONBF,0);
+  x->sm.sm_buffer=0;
+#endif
 }	
 
 static void
-deallocate_stream_buffer(strm)
-object strm;
-{
+deallocate_stream_buffer(object strm) {
 
 /* SGC contblock pages: Its possible this is on an old page CM 20030827 */
-  if (strm->sm.sm_buffer) 
-    {
+  if (strm->sm.sm_buffer) {
 #ifdef SGC
-      insert_maybe_sgc_contblock(strm->sm.sm_buffer, BUFSIZ); 
+    insert_maybe_sgc_contblock(strm->sm.sm_buffer, BUFSIZ); 
 #else
-      insert_contblock(strm->sm.sm_buffer, BUFSIZ); 
+    insert_contblock(strm->sm.sm_buffer, BUFSIZ); 
 #endif
-    strm->sm.sm_buffer = 0;} 
-/*   else  */
-/*     printf("no buffer? %p  \n",strm->sm.sm_fp);  */
+    if (strm->sm.sm_fp)
+      setvbuf(strm->sm.sm_fp,NULL,_IONBF,0);
+    strm->sm.sm_buffer = 0;
+  } 
 
 #ifndef FCLOSE_SETBUF_OK
   strm->sm.sm_fp->_base = NULL;
 #endif
+
 }
-/* end ifndef NO_SETBUF */
-#endif
 
 DEFVAR("*ALLOW-GZIPPED-FILE*",sSAallow_gzipped_fileA,SI,sLnil,"");
 

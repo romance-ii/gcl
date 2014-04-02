@@ -1278,19 +1278,21 @@ sgc_start(void) {
     writable_pages=0;
 
     for (pi=cell_list_head;pi;pi=pi->next) {
-      void *v,*ve;
       if (pi->sgc_flags&SGC_WRITABLE)
 	SET_WRITABLE(page(pi));
       else
 	tm_of(pi->type)->tm_alt_npage++;
 #ifndef NO_SETBUF /*FIXME, implement restartable getc with read in readc_stream*/
-      if (pi->type!=(tm=tm_of(t_stream))->tm_type) continue;
-      for (v=pagetochar(page(pi)),ve=v+tm->tm_nppage*tm->tm_size;v<ve;v+=tm->tm_size) {
-	object x=v;
-	if (type_of(x)!=t_stream || is_free(x)) continue;
-	if (x->sm.sm_buffer) 
-	  for (i=page(x->sm.sm_buffer);i<=page(x->sm.sm_buffer+BUFSIZ-1);i++)
-	    SET_WRITABLE(i);
+      {
+	void *v,*ve;
+	if (pi->type!=(tm=tm_of(t_stream))->tm_type) continue;
+	for (v=pagetochar(page(pi)),ve=v+tm->tm_nppage*tm->tm_size;v<ve;v+=tm->tm_size) {
+	  object x=v;
+	  if (type_of(x)!=t_stream || is_free(x)) continue;
+	  if (x->sm.sm_buffer) 
+	    for (i=page(x->sm.sm_buffer);i<=page(x->sm.sm_buffer+BUFSIZ-1);i++)
+	      SET_WRITABLE(i);
+	}
       }
 #endif
     }
