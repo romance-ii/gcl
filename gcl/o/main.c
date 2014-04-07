@@ -92,6 +92,9 @@ static object stack_space;
 #ifdef _WIN32
 unsigned int _dbegin = 0x10100000;
 #endif
+#ifdef __CYGWIN__
+unsigned long _dbegin = 0;
+#endif
 
 fixnum cssize;
 

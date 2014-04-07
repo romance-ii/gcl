@@ -1623,7 +1623,7 @@ BEGIN:
 
 #ifdef HAVE_READLINE
 	  if (readline_on && strm->sm.sm_fp==rl_instream)
-	    return *rl_line_buffer ? TRUE : FALSE;
+	    if (rl_line_buffer) return *rl_line_buffer ? TRUE : FALSE;
 #endif
 
 		if (strm->sm.sm_fp == NULL)

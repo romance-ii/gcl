@@ -1546,6 +1546,9 @@ AC_RUN_IFELSE([
 	AC_LANG_PROGRAM([[
 	    #include <stdio.h>
             #include <unistd.h>
+            #ifdef __CYGWIN__
+            #define getpagesize() 4096
+            #endif
 	    ]],[[
 	    size_t i=getpagesize(),j; 
 	    FILE *fp=fopen("conftest1","w");

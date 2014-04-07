@@ -74,6 +74,10 @@ struct rlimit data_rlimit;
 #endif
 #endif
 
+#ifdef __CYGWIN__
+void recreate_heap1(void);
+#endif
+
 inline void
 add_page_to_contblock_list(void *p,fixnum m) {
  
@@ -1546,6 +1550,9 @@ malloc(size_t size) {
     return baby_malloc(size);
 #else	
 
+#ifdef __CYGWIN__
+    recreate_heap1();
+#endif
     if (!initflag)
       gcl_init_alloc();
 #ifdef RECREATE_HEAP

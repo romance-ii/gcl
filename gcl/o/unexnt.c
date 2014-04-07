@@ -970,11 +970,16 @@ allocate_heap (void)
      the region below the 256MB line for our malloc arena - 229MB is
      still a pretty decent arena to play in!  */
 
+#ifdef __CYGWIN__
+  void *base = 0, *ptr;
+  reserved_heap_size = 512*1024*1024;
+#else
   void *base = (void *)0x20000000,*ptr;/*FIXME, someday figure out how to let the heap start address default *//*(void *)0x10100000*/
 
   reserved_heap_size=probe_heap_size(base,PAGESIZE,(1UL<<31),-1);
+#endif
   ptr = VirtualAlloc ((void *) base,get_reserved_heap_size (),MEM_RESERVE,PAGE_NOACCESS);
-  printf("probe results: %lu at %p\n",reserved_heap_size,ptr);
+  /* printf("probe results: %lu at %p\n",reserved_heap_size,ptr); */
 
   DBEGIN = (DBEGIN_TY) ptr;
 
@@ -983,7 +988,7 @@ allocate_heap (void)
 
 /* Emulate Unix sbrk.  */
 void *
-sbrk (unsigned long increment)
+sbrk (ptrdiff_t increment)
 {
   void *result;
   long size = (long) increment;
@@ -1061,6 +1066,11 @@ sbrk (unsigned long increment)
   return result;
 }
 
+#ifdef __CYGWIN__
+/* Emulate Unix getpagesize.  */
+int getpagesize (void) { return 4096; }
+#endif
+
 /* Recreate the heap from the data that was dumped to the executable.
    EXECUTABLE_PATH tells us where to find the executable.  */
 void
@@ -1083,6 +1093,9 @@ recreate_heap (char *executable_path)
      any funny interactions between file I/O and file mapping.  */
 
   read_in_bss (executable_path);
+#ifdef __CYGWIN__
+  cs_org = 0;
+#endif
 
   map_in_heap (executable_path);
 

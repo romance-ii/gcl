@@ -7985,6 +7985,9 @@ else
 
 	    #include <stdio.h>
             #include <unistd.h>
+            #ifdef __CYGWIN__
+            #define getpagesize() 4096
+            #endif
 
 int
 main ()

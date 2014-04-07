@@ -8,23 +8,26 @@ SHELL=bash
 
 LBINDIR=/usr/local/bin
 
-OFLAG	=  -O 
+#OFLAG	=  -O 
 #LIBS	= -lm 
-LIBC 	=
+#LIBC 	=
 
-ODIR_DEBUG= -O4
-ODIR_DEBUG= 
+#ODIR_DEBUG= -O4
+#ODIR_DEBUG= 
 
 # This CC string will be used for compilation of the system,
 # and also in the compiler::*cc* variable for later compilation of
 # lisp files.
-CC = gcc  -fwritable-strings  -DVOL=volatile  -I$(GCLDIR)/o -fsigned-char
-AS= as	
-AR= ar q
-RANLIB= ranlib
+#CC = gcc  -fwritable-strings  -DVOL=volatile  -I$(GCLDIR)/o -fsigned-char
+#AS= as	
+#AR= ar q
+#RANLIB= ranlib
 
 
 LDCC=${CC}
+
+# Unexec dependency
+UNIX_SAVE_DEP = unexnt.c
 
 # Enable the fastloading mechanism which does not use ld -A
 # requires c/rel_.. machine dependent code.
@@ -34,8 +37,8 @@ SFASL	= $(ODIR)/sfasl.o
 
 
 
-MPFILES= $(MPDIR)/mpi-386-winnt.o   $(MPDIR)/libmport.a
-MPFILES= $(MPDIR)/mpi.o   $(MPDIR)/libmport.a
+#MPFILES= $(MPDIR)/mpi-386-winnt.o   $(MPDIR)/libmport.a
+#MPFILES= $(MPDIR)/mpi.o   $(MPDIR)/libmport.a
 FIRST_FILE=$(ODIR)/firstfile.o
 LAST_FILE=$(ODIR)/lastfile.o
 
@@ -55,4 +58,4 @@ LIBFILES=bsearch.o
 KCP=kcp-bsd
 
 # using gcc so dont need
-GNULIB1=
+#GNULIB1=

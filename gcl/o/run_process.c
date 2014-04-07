@@ -396,7 +396,11 @@ int	server;
 		FEerror("Connection Failed.",0);
 	}
 	pid = getpid();
+#ifdef __CYGWIN__
+	if(fcntl(sock, F_SETOWN, pid) < 0)
+#else
 	if(ioctl(sock, SIOCSPGRP, (char *)&pid) < 0 )
+#endif
 	{
 		FEerror("Could not set process group of socket.",0);
 	}

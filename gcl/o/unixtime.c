@@ -269,6 +269,12 @@ DEFUN("CURRENT-TIMEZONE",fixnum,fScurrent_timezone,SI,0,0,NONE,IO,OO,OO,OO,(void
   
 #elif defined NO_SYSTEM_TIME_ZONE
   return 0;
+#elif defined __CYGWIN__
+  struct tm gt,lt;
+  fixnum _t=0;
+  gmtime_r(&_t, &gt);
+  localtime_r(&_t, &lt);
+  return (lt.tm_mday == gt.tm_mday) ? -(lt.tm_hour) : (24 - lt.tm_hour);
 #else
   fixnum _t=time(0);
   return -localtime(&_t)->tm_gmtoff/3600;

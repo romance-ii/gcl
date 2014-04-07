@@ -60,7 +60,7 @@ enum {
 extern int os_subtype;
 
 /* Emulation of Unix sbrk().  */
-extern void *sbrk (unsigned long size);
+extern void *sbrk (ptrdiff_t size);
 
 /* Recreate the heap created during dumping.  */
 extern void recreate_heap (char *executable_path);

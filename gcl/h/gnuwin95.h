@@ -3,9 +3,9 @@
 /* #include "386.h" */
 /* #include "fcntl.h" */
 
-#undef DBEGIN
-/* we want finer than config.h */
-#define DBEGIN 0x1a000000
+#define DBEGIN _dbegin
+#define DBEGIN_TY unsigned long
+extern DBEGIN_TY _dbegin;
 
 
 
@@ -20,7 +20,7 @@
 /* #define BABY_MALLOC_SIZE 0x5000 */
 
 /* #define RECREATE_HEAP if (initflag) recreate_heap(argv[0]); */
-#define RECREATE_HEAP if (initflag) recreate_heap1();
+/* #define RECREATE_HEAP if (initflag) recreate_heap1(); */
 
 #ifdef IN_UNIXTIME
 #undef ATT
@@ -35,12 +35,6 @@
 #define BSD
 #endif
 
-#define NEED_TO_REINSTALL_SIGNALS 
-
-#ifndef SIGIO
-#define SIGIO 23
-#endif
-
 /* on most machines this will test in one instruction
    if the pointe/r is on the C stack or the 0 pointer
    in winnt our heap starts at DBEGIN
@@ -48,7 +42,7 @@
 /*  #define NULL_OR_ON_C_STACK(y)\ */
 /*      (((unsigned int)(y)) == 0 ||  \ */
 /*       (((unsigned int)(y)) < DBEGIN && ((unsigned int)(y)) &0xf000000)) */
-#define NULL_OR_ON_C_STACK(y) (((void *)(y)) < ((void *)0x400000))
+/* #define NULL_OR_ON_C_STACK(y) (((void *)(y)) < ((void *)0x400000)) */
      
       
 
@@ -58,16 +52,15 @@
 #define HAVE_SIGACTION
 /* a noop */
 #define SETUP_SIG_STACK
-#define SV_ONSTACK 0
-#if 0  /* Different definition in <sys/signal.h> - 2001-12-18 */
-#define SA_RESTART 0
-#endif
+#define SA_ONSTACK 0
 
 #define brk(x) printf("not doing break\n");
 #include <stdarg.h>     
 #include <stdio.h>
 #define UNIXSAVE "unexnt.c"
 
+#define MAXPATHLEN 260
+#define SEPARATE_SFASL_FILE "sfaslcoff.c"
 #define SPECIAL_RSYM "rsym_nt.c"
 
 #define HAVE_AOUT "wincoff.h"
@@ -92,6 +85,7 @@
 		
 #define FCLOSE_SETBUF_OK 
 
+#define RUN_PROCESS
 
 #define	IEEEFLOAT
   
@@ -99,10 +93,6 @@
 
 #define ADDITIONAL_FEATURES \
 		     ADD_FEATURE("I386"); ADD_FEATURE("WINNT")
-  
-#undef SET_REAL_MAXPAGE  
-#define SET_REAL_MAXPAGE \
-	real_maxpage=MAXPAGE;
 
 
 /* include some low level routines for maxima */
@@ -110,8 +100,12 @@
 
 #define RELOC_FILE "rel_coff.c"
 
-/*  FIONREAD not supported */
 #undef  LISTEN_FOR_INPUT
+#define LISTEN_FOR_INPUT(fp) do { \
+  int c = 0; \
+  if (((fp)->_r <= 0) && (ioctl((fp)->_file, FIONREAD, &c), c<=0)) \
+    return 0; \
+} while (0)
 
 /* adjust the start to the offset */
 #define ADJUST_RELOC_START(j) \
@@ -133,11 +127,22 @@
         error("Someone allocated my memory!");} \
 	if (core_end != (sbrk(PAGESIZE*(n - m))))
 
-  /* allow things like //c at beginning of pathnames, and c:/ */
-#define ALLOW_DRIVE_PATH
-
-
-#define USE_INTERNAL_REAL_TIME_FOR_RUNTIME     
+#include <limits.h>
+#include <sys/stat.h>
+#define GET_FULL_PATH_SELF(a_) do {\
+  char b[20];\
+  static char q[PATH_MAX];\
+  struct stat ss;\
+  if (snprintf(b,sizeof(b),"/proc/%d/exe",getpid())<=0)\
+    error("Cannot write proc exe pathname");\
+  if (stat(b,&ss)) \
+    (a_)=argv[0];\
+  else {\
+    if (!realpath(b,q)) \
+      error("realpath error");\
+    (a_)=q;\
+  }\
+} while(0)
 
 /* Begin for cmpinclude */
 
