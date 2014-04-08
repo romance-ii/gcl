@@ -74,7 +74,6 @@ char stdin_buf[BUFSIZ + EXTRA_BUFSIZE];
 char stdout_buf[BUFSIZ + EXTRA_BUFSIZE];
 
 int debug;			/* debug switch */
-/* int initflag = FALSE;		/\* initialized flag *\/ */
 int raw_image = TRUE;		/* raw or saved image */
 
 long real_maxpage;
@@ -350,7 +349,7 @@ main(int argc, char **argv, char **envp) {
     set_maxpage();
 
 #ifdef RECREATE_HEAP
-    RECREATE_HEAP
+    if (!raw_image) RECREATE_HEAP
 #endif
 
     setbuf(stdin, stdin_buf); 
@@ -535,7 +534,6 @@ main(int argc, char **argv, char **envp) {
 	    alloc_page(-(holepage + nrbpage));
 	  }
 	  
-	  /* initflag = FALSE; */
 	  GBC_enable = TRUE;
 	  vs_base = vs_top;
 	  ihs_push(Cnil);
@@ -548,7 +546,6 @@ main(int argc, char **argv, char **envp) {
 	  install_default_signals();
 	  
 	  sSAlisp_maxpagesA->s.s_dbind = make_fixnum(real_maxpage);
-	  /* initflag = TRUE; */
 #ifdef KCLOVM
 	  ovm_user_context_change = change_contexts;
 	  ovm_user_context_initialize = initialize_process;
@@ -607,11 +604,8 @@ main(int argc, char **argv, char **envp) {
 
 	lex_new();
 	vs_base = vs_top;
-	/* initflag = TRUE; */
 
 	interrupt_enable = TRUE;
-
-	raw_image=TRUE;
 
 	super_funcall(sStop_level);
 

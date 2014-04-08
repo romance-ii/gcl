@@ -19,8 +19,7 @@ extern DBEGIN_TY _dbegin;
 /* size to use for mallocs done  */
 /* #define BABY_MALLOC_SIZE 0x5000 */
 
-/* #define RECREATE_HEAP if (initflag) recreate_heap(argv[0]); */
-/* #define RECREATE_HEAP if (initflag) recreate_heap1(); */
+#define RECREATE_HEAP recreate_heap1();
 
 #ifdef IN_UNIXTIME
 #undef ATT

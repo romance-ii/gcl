@@ -19,7 +19,7 @@ EXTER int GBC_enable;
 EXTER object sSAnotify_gbcA;
 
 /* symbols which are not needed in compiled lisp code */
-EXTER int interrupt_flag,initflag,interrupt_enable;
+EXTER int interrupt_flag,interrupt_enable;
 void install_default_signals();
 /* void sigint(),sigalrm(); */
 void segmentation_catcher();

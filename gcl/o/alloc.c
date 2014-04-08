@@ -74,10 +74,6 @@ struct rlimit data_rlimit;
 #endif
 #endif
 
-#ifdef __CYGWIN__
-void recreate_heap1(void);
-#endif
-
 inline void
 add_page_to_contblock_list(void *p,fixnum m) {
  

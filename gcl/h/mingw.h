@@ -124,7 +124,7 @@ extern DBEGIN_TY _stacktop, _stackbottom, _dbegin;
 /* use the slightly older unexec */
 #define UNIXSAVE "unexnt.c"
     
-#define RECREATE_HEAP if (initflag) { recreate_heap1(); \
+#define RECREATE_HEAP { recreate_heap1(); \
      terminal_io->sm.sm_object1->sm.sm_fp=stdout; \
      terminal_io->sm.sm_object0->sm.sm_fp=stdin; \
      init_shared_memory();}

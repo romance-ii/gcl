@@ -110,7 +110,6 @@ void recreate_heap1()
       printf ("Failed to find path for executable.\n");
       exit (1);
     }
-
     recreate_heap (executable_path);
   }
   heap_state = HEAP_LOADED;

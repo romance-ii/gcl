@@ -289,7 +289,7 @@ EXTER object sSAsystem_directoryA;
 EXTER char *kcl_self;
 #endif
 #if !defined(IN_MAIN) || !defined(ATT)
-EXTER bool initflag,raw_image;
+EXTER bool raw_image;
 #endif
 char *merge_system_directory();
 
