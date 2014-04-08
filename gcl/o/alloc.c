@@ -1550,10 +1550,7 @@ malloc(size_t size) {
     return baby_malloc(size);
 #else	
 
-#ifdef __CYGWIN__
-    recreate_heap1();
-#endif
-    if (!initflag)
+    if (raw_image)
       gcl_init_alloc();
 #ifdef RECREATE_HEAP
     else RECREATE_HEAP
@@ -1576,7 +1573,7 @@ malloc(size_t size) {
      startup.  In saved images, monstartup memory is only
      allocated with gprof-start. 20040804 CM*/
 #ifdef GCL_GPROF
-  if (!initflag && size>(textend-textstart) && !initial_monstartup_pointer) 
+  if (raw_image && size>(textend-textstart) && !initial_monstartup_pointer) 
     initial_monstartup_pointer=malloc_list->c.c_car->st.st_self;
   if (gprof_array==Cnil && capture_gprof_array && size>(textend-textstart)) {
     gprof_array=malloc_list->c.c_car;

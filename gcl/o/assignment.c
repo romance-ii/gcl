@@ -171,7 +171,7 @@ DEFUN("FSET",object,fSfset,SI,2,2,NONE,OO,OO,OO,OO,(object sym,object function),
 	      1, sym);
   }
   if (sym->s.s_hpack == lisp_package &&
-      sym->s.s_gfdef != OBJNULL && initflag && sLwarn->s.s_gfdef)
+      sym->s.s_gfdef != OBJNULL && !raw_image && sLwarn->s.s_gfdef)
     ifuncall2(sLwarn,make_simple_string("~S is being redefined."),
 	      sym);
   sym = clear_compiler_properties(sym,function);
@@ -255,7 +255,7 @@ DEFUN("FMAKUNBOUND",object,fLfmakunbound,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),
   remf(&(rsym->s.s_plist),sStraced);
   clear_compiler_properties(rsym,Cnil);
   if (rsym->s.s_hpack == lisp_package &&
-      rsym->s.s_gfdef != OBJNULL && initflag) {
+      rsym->s.s_gfdef != OBJNULL && !raw_image) {
     ifuncall2(sLwarn, make_simple_string("~S is being redefined."), rsym);
   }
 

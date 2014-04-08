@@ -58,7 +58,7 @@ object st;
 	x->s.s_stype = (short)stp_ordinary;
 	x->s.s_mflag = FALSE;
 	vs_push(x);
-	if (initflag==0 && st->st.st_self < heap_end)
+	if (raw_image && st->st.st_self < heap_end)
 		x->s.s_self = st->st.st_self;		
 	else {
 		x->s.s_self = alloc_relblock(x->s.s_fillp);
