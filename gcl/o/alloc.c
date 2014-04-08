@@ -1077,7 +1077,7 @@ gcl_init_alloc(void) {
   
   ncb = 0;
   ncbpage = 0;
-  set_tm_maxpage(tm_table+t_contiguous,19);
+  set_tm_maxpage(tm_table+t_contiguous,100);
 #ifdef GCL_GPROF
   if (maxcbpage<textpage)
     set_tm_maxpage(tm_table+t_contiguous,textpage);
