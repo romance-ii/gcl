@@ -5164,7 +5164,7 @@ if test "$GCC" = "yes" ; then
 
    TCFLAGS="$TCFLAGS -pipe -Wall "
    case $use in
-        *mingw*||*gnuwin*)
+        *mingw*|*gnuwin*)
 	        echo "WARNING: Remove -fno-zero-initialized-in-bss from makedefs if gcc less than 3.3.1."
 	        echo "         It is ptherwise needed for the Unexec stuff to work."
 		TCFLAGS="$TCFLAGS -fno-zero-initialized-in-bss -mms-bitfields $win_flags";;
