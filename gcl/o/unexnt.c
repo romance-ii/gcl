@@ -1077,8 +1077,8 @@ int getpagesize (void) { return 4096; }
 /* Recreate the heap from the data that was dumped to the executable.
    EXECUTABLE_PATH tells us where to find the executable.  */
 void
-recreate_heap (char *executable_path)
-{
+recreate_heap (char *executable_path) {
+
   unsigned char *tmp;
 
   /* First reserve the upper part of our heap.  (We reserve first
@@ -1096,14 +1096,12 @@ recreate_heap (char *executable_path)
      any funny interactions between file I/O and file mapping.  */
 
   read_in_bss (executable_path);
-#ifdef __CYGWIN__
-  cs_org = 0;
-#endif
 
   map_in_heap (executable_path);
 
   /* Update system version information to match current system.  */
   cache_system_info ();
+
 }
 
 /* Round the heap up to the given alignment.  */

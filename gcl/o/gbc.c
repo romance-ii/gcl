@@ -1280,11 +1280,7 @@ GBC(enum type t) {
     (*GBC_enter_hook)();
   
   if (!GBC_enable)
-#ifdef __CYGWIN__
-    return;
-#else
     error("GBC is not enabled");
-#endif
   interrupt_enable = FALSE;
   
   if (saving_system)
