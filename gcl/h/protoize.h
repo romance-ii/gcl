@@ -1680,7 +1680,7 @@ void recreate_heap1 ( void );
 void gcl_init_shared_memory ( void );
 void fix_filename ( object pathname, char *filename1 );
 void alarm ( int n );
-void *sbrk ( unsigned long increment );
+void *sbrk ( ptrdiff_t increment );
 void sigemptyset( sigset_t *set);
 void sigaddset ( sigset_t *set, int n);
 int sigismember ( sigset_t *set, int n );
