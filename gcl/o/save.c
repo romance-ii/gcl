@@ -16,38 +16,31 @@ memory_save(char *original_file, char *save_file)
 extern void _cleanup();
 #endif
 
-LFD(Lsave)(void)
-{
-	char filename[256];
-        extern char *kcl_self ;
-	check_arg(1);
-	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
-	coerce_to_filename(vs_base[0], filename);
+LFD(Lsave)(void) {
+
+  char filename[256];
+  extern char *kcl_self;
+
+  check_arg(1);
+  check_type_or_pathname_string_symbol_stream(&vs_base[0]);
+  coerce_to_filename(vs_base[0], filename);
+
 #ifdef CLEANUP_CODE
-	CLEANUP_CODE
-#else
-#ifdef USE_CLEANUP
-	_cleanup();
-#endif	
+  CLEANUP_CODE
+#elif defined(USE_CLEANUP)
+    _cleanup();
 #endif
+  
+  raw_image=FALSE;
+  cs_org=0;
 
-	if (raw_image) {
-
-	  raw_image=FALSE;
 #ifdef MEMORY_SAVE
-	  MEMORY_SAVE(kcl_self,filename);
+    MEMORY_SAVE(kcl_self,filename);
 #else	  
-	  memory_save(kcl_self, filename);
+    memory_save(kcl_self, filename);
 #endif	
-	  raw_image=TRUE;
 
-	} else {
-#ifdef MEMORY_SAVE
-	  MEMORY_SAVE(kcl_self,filename);
-#else	  
-	  memory_save(kcl_self, filename);
-#endif	
-	}
-	exit(0);
-	/*  no return  */
+  /*  no return  */
+  exit(0);
+
 }
