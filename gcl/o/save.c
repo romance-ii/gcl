@@ -35,9 +35,9 @@ LFD(Lsave)(void) {
   cs_org=0;
 
 #ifdef MEMORY_SAVE
-    MEMORY_SAVE(kcl_self,filename);
+  MEMORY_SAVE(kcl_self,filename);
 #else	  
-    memory_save(kcl_self, filename);
+  memory_save(kcl_self, filename);
 #endif	
 
   /*  no return  */
