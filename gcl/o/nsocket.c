@@ -334,7 +334,7 @@ DEFUN("GETPEERNAME",object,fSgetpeername,SI,1,1,NONE,OO,OO,OO,OO,(object sock),
  "Return a list of three elements: the address, the hostname and the port for the other end of the socket.  If hostname is not available it will be equal to the address.  Invalid on server sockets. Return NIL on failure.")
 {
  struct sockaddr_in peername;
- unsigned size = sizeof(struct sockaddr_in);
+ socklen_t size = sizeof(struct sockaddr_in);
  struct hostent *hostEntPtr;
  object address,host;
  check_socket(sock);
@@ -361,7 +361,7 @@ DEFUN("GETPEERNAME",object,fSgetpeername,SI,1,1,NONE,OO,OO,OO,OO,(object sock),
 DEFUN("GETSOCKNAME",object,fSgetsockname,SI,1,1,NONE,OO,OO,OO,OO,(object sock),
  "Return a list of three elements: the address, the hostname and the port for the socket.  If hostname is not available it will be equal to the address. Return NIL on failure. ")
 { struct sockaddr_in sockname;
- unsigned size = sizeof(struct sockaddr_in);
+ socklen_t size = sizeof(struct sockaddr_in);
  struct hostent *hostEntPtr;
  object address,host;
 
