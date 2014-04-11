@@ -406,7 +406,6 @@ main(int argc, char **argv, char **envp) {
         strncpy(system_directory, argv[1] ,sizeof(system_directory));
     }
 #endif /* UNIX */
-    GBC_enable = FALSE;
 
     /* if stack_space not zero we have grown the stack space */
     if ( stack_space == 0 ) {

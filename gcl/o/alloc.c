@@ -563,7 +563,7 @@ too_full_p(struct typemanager *tm) {
 inline void *
 alloc_after_gc(struct typemanager *tm,fixnum n) {
 
-  if (tm->tm_npage+tpage(tm,n)>=tm->tm_maxpage) {
+  if (tm->tm_npage+tpage(tm,n)>=tm->tm_maxpage && GBC_enable) {
 
     switch (jmp_gmp) {
     case 0: /* not in gmp call*/
@@ -1077,13 +1077,13 @@ gcl_init_alloc(void) {
   
   ncb = 0;
   ncbpage = 0;
-  set_tm_maxpage(tm_table+t_contiguous,100);
+  set_tm_maxpage(tm_table+t_contiguous,1);
 #ifdef GCL_GPROF
   if (maxcbpage<textpage)
     set_tm_maxpage(tm_table+t_contiguous,textpage);
 #endif
 
-  set_tm_maxpage(tm_table+t_relocatable,19);
+  set_tm_maxpage(tm_table+t_relocatable,1);
   nrbpage=0;
 
 #ifdef __linux__
