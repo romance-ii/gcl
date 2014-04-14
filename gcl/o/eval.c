@@ -997,7 +997,7 @@ DEFUNM("EVAL-SRC",object,fSeval_src,SI,0,63,NONE,OO,OO,OO,OO,(object first,...),
 
 }
 
-void *feval_src=(void *)FFN(eval_src);
+void *feval_src=(void *)FFN(fSeval_src);
 
 DEFUN("FSET-IN",object,fSfset_in,SI,2,2,NONE,OO,OO,OO,OO,(object sym,object src),"") {
   
