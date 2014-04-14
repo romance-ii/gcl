@@ -907,6 +907,12 @@ DEFUNM("EVAL",object,fLeval,LISP,1,1,NONE,OO,OO,OO,OO,(object x0),"") {
   return unwind_vals(vals,base);
 
 }
+#ifdef STATIC_FUNCTION_POINTERS
+object
+fLeval(object x) {
+  RETURN1(FFN(fLeval)(x));
+}
+#endif
 
 /* DEFUN("EVAL-SRC",object,fSeval_src,SI,0,63,NONE,OO,OO,OO,OO,(object first,...),"") { */
 
@@ -1003,7 +1009,7 @@ DEFUN("FSET-IN",object,fSfset_in,SI,2,2,NONE,OO,OO,OO,OO,(object sym,object src)
   
   object x;
 
-  x=fSinit_function(list(6,Cnil,Cnil,src,Cnil,Cnil,sym),(void *)fSeval_src,Cnil,Cnil,-1,0,(((1<<6)-1)<<6)|(((1<<5)-1)<<12)|(1<<17));
+  x=fSinit_function(list(6,Cnil,Cnil,src,Cnil,Cnil,sym),FFN(fSeval_src),Cnil,Cnil,-1,0,(((1<<6)-1)<<6)|(((1<<5)-1)<<12)|(1<<17));
   x->fun.fun_env=src_env;
   if (sym!=Cnil) fSfset(sym,x);
   RETURN1(x);
