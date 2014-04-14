@@ -968,6 +968,7 @@ set_maxpage(void) {
   if (gcl_alloc_initialized) {
     extern long maxpage;
     maxpage=page(heap_end);
+    memprotect_test_reset();
     memory_protect(sgc_enabled ? 1 : 0);
   }
 #endif
@@ -1044,8 +1045,7 @@ gcl_init_alloc(void) {
      course changeable by allocate-sgc.  CM 20030827 */
 
   init_tm(t_cons, ".CONS", sizeof(struct cons), 65536 ,50,0 );
-  init_tm(t_fixnum, "NFIXNUM",
-	  sizeof(struct fixnum_struct), 8192,20,0);
+  init_tm(t_fixnum, "NFIXNUM",sizeof(struct fixnum_struct), 8192,20,0);
   init_tm(t_structure, "SSTRUCTURE", sizeof(struct structure), 5461,1,0 );
   /* init_tm(t_ifun, "iIFUN", sizeof(struct ifun), 4096,1,0  ); */
   /* init_tm(t_cfun, "fCFUN", sizeof(struct cfun), 4096,1,0  ); */
@@ -1054,10 +1054,8 @@ gcl_init_alloc(void) {
   init_tm(t_symbol, "|SYMBOL", sizeof(struct symbol), 3640,1,0 );
   init_tm(t_bignum, "BBIGNUM", sizeof(struct bignum), 2730,1,0 );
   init_tm(t_ratio, "RRATIONAL", sizeof(struct ratio), 170,1,0 );
-  init_tm(t_shortfloat, "FSHORT-FLOAT",
-	  sizeof(struct shortfloat_struct), 256 ,1,0);
-  init_tm(t_longfloat, "LLONG-FLOAT",
-	  sizeof(struct longfloat_struct), 170 ,1,0);
+  init_tm(t_shortfloat, "FSHORT-FLOAT",sizeof(struct shortfloat_struct), 256 ,1,0);
+  init_tm(t_longfloat, "LLONG-FLOAT",sizeof(struct longfloat_struct), 170 ,1,0);
   init_tm(t_complex, "CCOMPLEX", sizeof(struct ocomplex), 170 ,1,0);
   init_tm(t_character,"#CHARACTER",sizeof(struct character), 256 ,1,0);
   init_tm(t_package, ":PACKAGE", sizeof(struct package), 2*PAGESIZE / sizeof(struct package),1,0);
@@ -1086,22 +1084,6 @@ gcl_init_alloc(void) {
   set_tm_maxpage(tm_table+t_relocatable,1);
   nrbpage=0;
 
-#ifdef __linux__
-  /* Some versions of the Linux startup code are broken.
-     For these, the first call to sbrk() fails, but
-     subsequent calls are o.k.
-  */
-  if ( (long)sbrk(0) == -1 )
-    {
-      if ( (long)sbrk(0) == -1 )
-	{
-	  fputs("FATAL Linux sbrk() error\n", stderr);
-	  exit(1);
-	}
-      fputs("WARNING: Non-fatal Linux sbrk() error\n", stderr);
-    }
-#endif
-
   alloc_page(-(holepage + nrbpage));
   
   rb_start = rb_pointer = heap_end + PAGESIZE*holepage;
@@ -1111,14 +1093,11 @@ gcl_init_alloc(void) {
   tm_table[(int)t_relocatable].tm_sgc = 50;
 #endif
   
-#ifndef DONT_NEED_MALLOC	
-  
   {
     extern object malloc_list;
     malloc_list = Cnil;
     enter_mark_origin(&malloc_list);
   }
-#endif	
   
   gcl_alloc_initialized=1;
   
@@ -1533,31 +1512,25 @@ static char *baby_malloc(n)
 void *
 malloc(size_t size) {
 
-  static int in_malloc;
+  static bool notfirst,in_malloc;
 
   if (in_malloc)
     return NULL;
   in_malloc=1;
 
-  if (!GBC_enable) {
-
-#ifdef BABY_MALLOC_SIZE
-    in_malloc=0;
-    return baby_malloc(size);
-#else	
-
+  if (!notfirst) {
+    notfirst=1;
     if (raw_image)
       gcl_init_alloc();
 #ifdef RECREATE_HEAP
-    else RECREATE_HEAP
+    else 
+      RECREATE_HEAP;
 #endif
+  }
 
-#endif	
-
-  }      
-
+  
   CHECK_INTERRUPT;
-
+  
   malloc_list = make_cons(Cnil, malloc_list);
   
   malloc_list->c.c_car = alloc_simple_string(size);
@@ -1579,60 +1552,50 @@ malloc(size_t size) {
   
   in_malloc=0;
   return(malloc_list->c.c_car->st.st_self);
-
+  
 }
 
 
 void
-free(void *ptr)
-#ifndef NO_VOID_STAR
-      
-#else
-      
-#endif  
-      
-{
+free(void *ptr) {
+
   object *p,pp;
-	if (ptr == 0)
-	  return;
-#ifdef BABY_MALLOC_SIZE
-	if ((void *)ptr < (void *) &baby_malloc_data[sizeof(baby_malloc_data)])
-	  return;
-#endif	
-	for (p = &malloc_list,pp=*p; pp && !endp(pp);  p = &((pp)->c.c_cdr),pp=Scdr(pp))
-		if ((pp)->c.c_car->st.st_self == ptr) {
-/* SGC contblock pages: Its possible this is on an old page CM 20030827 */
+  
+  if (ptr == 0)
+    return;
+  
+  for (p = &malloc_list,pp=*p; pp && !endp(pp);  p = &((pp)->c.c_cdr),pp=Scdr(pp))
+    if ((pp)->c.c_car->st.st_self == ptr) {
+      /* SGC contblock pages: Its possible this is on an old page CM 20030827 */
 #ifdef SGC
- 			insert_maybe_sgc_contblock((pp)->c.c_car->st.st_self,
-						   (pp)->c.c_car->st.st_dim);
+      insert_maybe_sgc_contblock((pp)->c.c_car->st.st_self,(pp)->c.c_car->st.st_dim);
 #else
- 			insert_contblock((pp)->c.c_car->st.st_self,
-					 (pp)->c.c_car->st.st_dim);
+      insert_contblock((pp)->c.c_car->st.st_self,(pp)->c.c_car->st.st_dim);
 #endif
-			(pp)->c.c_car->st.st_self = NULL;
-			*p = Scdr(pp);
+      (pp)->c.c_car->st.st_self = NULL;
+      *p = Scdr(pp);
 #ifdef GCL_GPROF
-			if (initial_monstartup_pointer==ptr) {
-			  initial_monstartup_pointer=NULL;
-			  if (core_end-heap_end>=sizeof(ptr))
-			    *(void **)heap_end=ptr;
-			}
+      if (initial_monstartup_pointer==ptr) {
+	initial_monstartup_pointer=NULL;
+	if (core_end-heap_end>=sizeof(ptr))
+	  *(void **)heap_end=ptr;
+      }
 #endif
-			return ;
-		}
+      return;
+    }
 #ifdef NOFREE_ERR
-	return ;
+  return;
 #else	
-	if (!saving_system || core_end-heap_end<sizeof(ptr) || ptr!=*(void **)heap_end) {
-	  static void *old_ptr;
-	  if (old_ptr==ptr) return;
-	  old_ptr=ptr;
-	  FEerror("free(3) error.",0);
-	}
-	return;
+  if (!saving_system || core_end-heap_end<sizeof(ptr) || ptr!=*(void **)heap_end) {
+    static void *old_ptr;
+    if (old_ptr==ptr) return;
+    old_ptr=ptr;
+    FEerror("free(3) error.",0);
+  }
+  return;
 #endif	
 }
-
+ 
 void *
 realloc(void *ptr, size_t size) {
 

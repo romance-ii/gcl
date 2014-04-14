@@ -669,12 +669,6 @@ EXTER object TSor_pathname_string_symbol_stream;
 EXTER int interrupt_flag;		/* console interupt flag */
 EXTER int interrupt_enable;		/* console interupt enable */
 
-/*  CMPtemp  */
-EXTER object CMPtemp;
-EXTER object CMPtemp1;
-EXTER object CMPtemp2;
-EXTER object CMPtemp3;
-
 EXTER object sLAlink_arrayA;
 
 /* nfunlink.c */

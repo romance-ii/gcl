@@ -106,7 +106,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "../h/vs.h"
 #include "../h/bds.h"
 #include "../h/frame.h"
-#include "../h/stacks.h"
 #include "../h/lex.h"
 #include "../h/eval.h"
 

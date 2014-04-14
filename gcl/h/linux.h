@@ -145,8 +145,6 @@ do { int c = 0; \
   setbuf(stdin,0); \
    setbuf(stdout,0);
 
-#define INIT_CORE_END terminal_io->sm.sm_object0->sm.sm_fp = stdin;terminal_io->sm.sm_object1->sm.sm_fp = stdout;
-
 #include <limits.h>
 #include <sys/stat.h>
 #define GET_FULL_PATH_SELF(a_) do {\

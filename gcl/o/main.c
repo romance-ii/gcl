@@ -43,9 +43,7 @@ void initialize_process();
 #endif
 
 #include "include.h"
-#ifdef UNIX
 #include <signal.h>
-#endif
 #include "page.h"
 
 bool saving_system ;
@@ -73,8 +71,11 @@ char system_directory[PATH_MAX];
 char stdin_buf[BUFSIZ + EXTRA_BUFSIZE];
 char stdout_buf[BUFSIZ + EXTRA_BUFSIZE];
 
+#include "stacks.h"
+
 int debug;			/* debug switch */
-int raw_image = TRUE;		/* raw or saved image */
+int raw_image = TRUE;		/* raw or saved image -- CYGWIN will only place this in .data and not in .bss if initialized to non-zero */
+bool GBC_enable=FALSE;
 
 long real_maxpage;
 object sSAlisp_maxpagesA;
@@ -291,324 +292,191 @@ DEFUN("SET-LOG-MAXPAGE-BOUND",fixnum,fSset_log_maxpage_bound,SI,1,1,NONE,II,OO,O
 
 }
 
-int pre_gcl=0;
-
 int
 main(int argc, char **argv, char **envp) {
 
-#if defined ( BSD ) && defined ( RLIMIT_STACK )
-    struct rlimit rl;
+#ifdef RECREATE_HEAP
+  if (!raw_image) RECREATE_HEAP
 #endif
-
-#ifdef GET_FULL_PATH_SELF
-	GET_FULL_PATH_SELF(kcl_self);
-#else
-	kcl_self = argv[0];
-#endif
-
-#ifdef FIX_FILENAME
-    {
-        int n = strlen ( kcl_self );
-        FIX_FILENAME ( Cnil, kcl_self );
-        if ( strlen ( kcl_self ) > n ) {
-            error ( "name grew" );
-        }
-    }
-#endif	
-
-    *argv=kcl_self;
-
+		    
 #ifdef CAN_UNRANDOMIZE_SBRK
 #include <stdio.h>
 #include <stdlib.h>
 #include "unrandomize.h"
 #endif
-
+  
 #ifdef LD_BIND_NOW
 #include <stdio.h>
 #include <stdlib.h>
 #include "ld_bind_now.h"
 #endif
-
-
+  
+  
 #if defined(DARWIN)
-	{
-	  extern void init_darwin_zone_compat ();
-	  init_darwin_zone_compat ();
-	}
+  {
+    extern void init_darwin_zone_compat ();
+    init_darwin_zone_compat ();
+  }
 #endif
-
-#ifdef GCL_GPROF
-	{
-	  extern void *old_monstartup_pointer;
-	  old_monstartup_pointer=NULL;
-	}
-#endif
-
-    install_segmentation_catcher();
-    set_maxpage();
-
-#ifdef RECREATE_HEAP
-    if (!raw_image) RECREATE_HEAP
-#endif
-
-    setbuf(stdin, stdin_buf); 
-    setbuf(stdout, stdout_buf);
-
+  
+  setbuf(stdin, stdin_buf); 
+  setbuf(stdout, stdout_buf);
 #ifdef _WIN32
-
-    _fmode = _O_BINARY;
-    _setmode ( _fileno ( stdin ),  _O_BINARY );
-    _setmode ( _fileno ( stdout ), _O_BINARY );
-    _setmode ( _fileno ( stderr ), _O_BINARY );
-    
-    /* Don't initialise shared memory until after the Heap is recreated.*/
-    init_shared_memory();
-
+  _fmode = _O_BINARY;
+  _setmode( _fileno( stdin ), _O_BINARY );
+  _setmode( _fileno( stdout ), _O_BINARY );
+  _setmode( _fileno( stderr ), _O_BINARY );
 #endif
-
-    ARGC = argc;
-    ARGV = argv;
-#ifdef UNIX
-    ENVP = envp;
-
-    if (raw_image) {
-        /* An uninitialised system eg raw_gcl */
-
-      bzero(system_directory,sizeof(system_directory));
-
-      if (argc<2)
-	strncpy(system_directory,"./",sizeof(system_directory));
-
-      else {
-
-	int lastchar=strlen(argv[1])-1;
-
-/* 	strncpy(system_directory,argv[1],sizeof(system_directory)); */
-/* 	if (system_directory[0]!='/') { */
-/* 	  strncpy(system_directory,"./",sizeof(system_directory)); */
-/* 	} else { */
-/* 	  int j; */
-/* 	  for (j=strlen(system_directory);system_directory[j-1]!='/';--j); */
-/* 	  system_directory[j]='\0'; */
-/* 	} */
-            
-	if (argv[1][lastchar]!='/') {
-	  error ( "Can't get the system directory." );
-	}
-	strncpy (system_directory,argv[1],sizeof(system_directory));
-
-      }
-    }
-#else  /* UNIX */
-    if (raw_image && argc > 1) {
-        error("can't get the system directory");
-        strncpy(system_directory, argv[1] ,sizeof(system_directory));
-    }
-#endif /* UNIX */
-
-    /* if stack_space not zero we have grown the stack space */
-    if ( stack_space == 0 ) {
-        vs_org = value_stack;
-        vs_limit = &vs_org[VSSIZE];
-        frs_org = frame_stack;
-        frs_limit = &frs_org[FRSSIZE];
-        bds_org = bind_stack;
-        bds_limit = &bds_org[BDSSIZE];
-#ifdef KCLOVM
-        bds_save_org = save_bind_stack;
-        bds_save_top = bds_save_org - 1;
-        bds_save_limit = &bds_save_org[BDSSIZE];
-#endif
-        ihs_org = ihs_stack;
-        ihs_limit = &ihs_org[IHSSIZE];
-    }
-
-    vs_top = vs_base = vs_org;
-    clear_stack ( vs_top, vs_limit );
-    ihs_top = ihs_org-1;
-    bds_top = bds_org-1;
-    frs_top = frs_org-1;
-    cs_org = cs_base = &argc;
-#ifdef __ia64__
- {
-   extern void * __libc_ia64_register_backing_store_base;
-   cs_org2=cs_base2=__libc_ia64_register_backing_store_base;
- }
-#endif
-    /* CSSIZE in bytes, cssize for pointer arithmetic. */ 
-    cssize = CSSIZE;
-
-#ifdef BSD
-#  ifdef RLIMIT_STACK
-    {
-      /* unsigned long mss; */
-/*       mss=16*sizeof(short)*MAXPAGE; */ /* i.e. short foo[MAXPAGE] on stack in sgc_start */
-      if (getrlimit(RLIMIT_STACK, &rl))
-	error("Cannot get stack rlimit\n");
-      if (rl.rlim_max != RLIM_INFINITY && rl.rlim_max < cssize)
-	cssize=rl.rlim_max;
-      if (rl.rlim_cur == RLIM_INFINITY || 
-	  rl.rlim_cur != cssize) {
-	rl.rlim_cur=cssize;
-	if (setrlimit(RLIMIT_STACK,&rl))
-	  error("Cannot set stack rlimit\n");
-      }
-      cssize = rl.rlim_cur;
-    }
-
-    /* Maybe the soft limit for data segment size is lower than the
-     * hard limit.  In that case, we want as much as possible.
-     */
-    if (getrlimit(RLIMIT_DATA, &rl))
-      error("Cannot get data rlimit\n");
-    if (rl.rlim_cur != RLIM_INFINITY &&
-	(rl.rlim_max == RLIM_INFINITY ||
-	 rl.rlim_max > rl.rlim_cur)) {
-      rl.rlim_cur = rl.rlim_max;
-      if (setrlimit(RLIMIT_DATA, &rl))
-	error("Cannot set data rlimit\n");
-    }
-
-#endif	
-#endif /* BSD */
-
-#ifdef AV
-    
-    cs_limit = (void *)CSTACK_ADDRESS + cstack_dir * cssize + 1;
-#endif
-
-    cstack_dir=get_cstack_dir(0);
-
-
-#ifdef SETUP_SIG_STACK
-    SETUP_SIG_STACK
+  ARGC = argc;
+  ARGV = argv;
+  ENVP = envp;
+  
+#ifdef GET_FULL_PATH_SELF
+  GET_FULL_PATH_SELF(kcl_self);
 #else
+  kcl_self = argv[0];
+#endif
+#ifdef __MINGW32__
+  {
+    char *s=kcl_self;
+    for (;*s;s++) if (*s=='\\') *s='/';
+  }
+#endif	
+  *argv=kcl_self;
+  
+  if (raw_image && argc > 1) {
+    massert(argv[1][strlen(argv[1])-1]=='/');
+    system_directory= (char *) malloc(strlen(argv[1])+3);
+    strcpy(system_directory, argv[1]);
+  }
+  
+  vs_top = vs_base = vs_org;
+  ihs_top = ihs_org-1;
+  bds_top = bds_org-1;
+  frs_top = frs_org-1;
 
-#  if defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC)
+  cs_org = cs_base = &argc;
+#ifdef __ia64__
+  {
+    extern void * __libc_ia64_register_backing_store_base;
+    cs_org2=cs_base2=__libc_ia64_register_backing_store_base;
+  }
+#endif
+  cssize = (1L<<23);
+  install_segmentation_catcher();
+  set_maxpage();
+  
+#if defined(BSD) && defined(RLIMIT_STACK)
+  {
+    struct rlimit rl;
+    unsigned long mss=(real_maxpage/64)<<PAGEWIDTH;
+  
+    massert(!getrlimit(RLIMIT_STACK, &rl));
+    if (rl.rlim_max != RLIM_INFINITY && rl.rlim_max < mss)
+      mss=rl.rlim_max;
+    if (rl.rlim_cur == RLIM_INFINITY || rl.rlim_cur != mss) {
+      rl.rlim_cur=mss;
+#ifdef __MIPS__
+      if (setrlimit(RLIMIT_STACK,&rl))
+	fprintf(stderr,"Cannot set stack rlimit\n");/*FIXME work around make bug on mips*/
+#else
+      massert(!setrlimit(RLIMIT_STACK,&rl));
+#endif
+    }
+    cssize = rl.rlim_cur/sizeof(*cs_org) - sizeof(*cs_org)*CSGETA;
+  
+  /* Maybe the soft limit for data segment size is lower than the
+   * hard limit.  In that case, we want as much as possible.
+   */
+    massert(!getrlimit(RLIMIT_DATA, &rl));
+    if (rl.rlim_cur != RLIM_INFINITY &&	(rl.rlim_max == RLIM_INFINITY || rl.rlim_max > rl.rlim_cur)) {
+      rl.rlim_cur = rl.rlim_max;
+      massert(!setrlimit(RLIMIT_DATA, &rl));
+    }
+  }
+#endif
+  
+  cs_limit = cs_org - cssize;
+  
+#ifdef SETUP_SIG_STACK
+  SETUP_SIG_STACK
+#else
+#if defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC)
     {
+      /* make sure the stack is 8 byte aligned */
       static double estack_buf[32*SIGSTKSZ];
       static struct sigaltstack estack;
-	    
+      
       bzero(estack_buf,sizeof(estack_buf));
       estack.ss_sp = estack_buf;
       estack.ss_flags = 0;                                   
       estack.ss_size = sizeof(estack_buf);                             
-      if (sigaltstack(&estack, 0) < 0)                       
-	error("sigaltstack");                             
-
+      massert(sigaltstack(&estack, 0)>=0);
+      
     }
-#  endif /* defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC) */
-
-#endif /* SETUP_SIG_STACK */	
-	
-#ifdef SGC
-    memprotect_test_reset();
-#endif
+#endif	
+#endif	
+  
 #ifdef GCL_GPROF
-	if (atexit(gprof_cleanup))
-	  error("Cannot setup gprof_cleanup on exit");
+  if (atexit(gprof_cleanup))
+    error("Cannot setup gprof_cleanup on exit");
 #endif
+  
+  if (raw_image) {
 
-	if (!raw_image) {
+    printf("GCL (GNU Common Lisp)  %s  %ld pages\n",LISP_IMPLEMENTATION_VERSION,real_maxpage);
+    fflush(stdout);
+    
+    initlisp();
+    lex_new();
+    
+    GBC_enable = TRUE;
+    
+    gcl_init_init();
+  
+    sLApackageA->s.s_dbind = user_package;
+    
+    def_env1[0]=(object)1;/*FIXME better place*/
+    def_env1[1]=Cnil;
+    def_env=def_env1+1;
+    
+    src_env1[0]=(object)1;/*FIXME better place*/
+    src_env1[1]=Cnil;
+    src_env=src_env1+1;
+    
+  }
 
 #ifdef _WIN32
-	  detect_wine();
+  detect_wine();
 #endif
-
-#ifdef LD_BIND_NOW /*FIXME currently mips only, verify that these two
-		     requirements are the same*/
-	  reinit_gmp();
+  
+  if (saving_system) {
+    
+    saving_system = FALSE;
+    terminal_io->sm.sm_object0->sm.sm_fp = stdin;
+    terminal_io->sm.sm_object1->sm.sm_fp = stdout;
+#ifdef LD_BIND_NOW /*FIXME currently mips only, verify that these two requirements are the same*/
+    reinit_gmp();
 #endif
-	  if (saving_system) {
-	    
-	    saving_system = FALSE;
-	    terminal_io->sm.sm_object0->sm.sm_fp = stdin;
-	    terminal_io->sm.sm_object1->sm.sm_fp = stdout;
-	    gcl_init_big1();
-
-#ifdef INIT_CORE_END
-	    INIT_CORE_END;
-#endif			  
-	    alloc_page(-(holepage + nrbpage));
-	  }
-	  
-	  GBC_enable = TRUE;
-	  vs_base = vs_top;
-	  ihs_push(Cnil);
-	  lex_new();
-	  vs_base = vs_top;
-	  
-	  if (pre_gcl) init_boot();
-	  
-	  interrupt_enable = TRUE;
-	  install_default_signals();
-	  
-	  sSAlisp_maxpagesA->s.s_dbind = make_fixnum(real_maxpage);
-#ifdef KCLOVM
-	  ovm_user_context_change = change_contexts;
-	  ovm_user_context_initialize = initialize_process;
-	  
-	  v_init_processes();
-	  ovm_process_created = 1;
-#endif
+    gcl_init_big1();
+  }
+    
+  ihs_push(Cnil);
+  lex_new();
+  vs_base = vs_top;
+  
+  interrupt_enable = TRUE;
+  install_default_signals();
+    
+  sSAlisp_maxpagesA->s.s_dbind = make_fixnum(real_maxpage);
 #ifdef HAVE_READLINE
-	  gcl_init_readline_function();
+  gcl_init_readline_function();
 #endif
-	again:
-	  super_funcall(sStop_level);
-	  if (type_of(sSAmultiply_stacksA->s.s_dbind)==t_fixnum) {
-	    multiply_stacks(fix(sSAmultiply_stacksA->s.s_dbind));
-	    goto  again;
-	  }
-          
-#ifdef USE_DLOPEN
-	  unlink_loaded_files();
-#endif			
-	  exit(0);
-	}
-	
-	printf("GCL (GNU Common Lisp)  %s  %ld pages\n",
-	       LISP_IMPLEMENTATION_VERSION,
-	       real_maxpage);
-	fflush(stdout);
-
-	def_env1[0]=(object)1;/*FIXME better place*/
-	def_env1[1]=Cnil;
-	def_env=def_env1+1;
-	
-	src_env1[0]=(object)1;/*FIXME better place*/
-	src_env1[1]=Cnil;
-	src_env=src_env1+1;
-	
-	initlisp();
-#ifdef _WIN32
-	detect_wine();
-#endif
-
-	vs_base = vs_top;
-	ihs_push(Cnil);
-	lex_new();
-
-	GBC_enable = TRUE;
-
-	CMPtemp = CMPtemp1 = CMPtemp2 = CMPtemp3 = OBJNULL;
-
-#ifdef HAVE_LIBBFD
-	parse_plt();
-#endif
-	gcl_init_init();
-
-	sLApackageA->s.s_dbind = user_package;
-
-	lex_new();
-	vs_base = vs_top;
-
-	interrupt_enable = TRUE;
-
-	super_funcall(sStop_level);
-
-	return 0;
+  do 
+    super_funcall(sStop_level);
+  while (type_of(sSAmultiply_stacksA->s.s_dbind)==t_fixnum && multiply_stacks(fix(sSAmultiply_stacksA->s.s_dbind)));
+    
+  return 0;
 
 }
 
@@ -757,13 +625,9 @@ initlisp(void) {
 	gcl_init_print();
 	gcl_init_GBC();
 
-#if defined ( UNIX ) || defined ( __MINGW32__ )
-#ifndef DGUX
 	gcl_init_unixfasl();
 	gcl_init_unixsys();
 	gcl_init_unixsave();
-#  endif
-#endif /* defined ( UNIX ) || defined ( __MINGW32__ ) */
 
 	gcl_init_alloc_function();
 	gcl_init_array_function();
@@ -786,10 +650,8 @@ initlisp(void) {
 	gcl_init_hash();
 	gcl_init_cfun();
 
-#ifdef UNIX
 	gcl_init_unixfsys();
 	gcl_init_unixtime();
-#endif
 	gcl_init_eval();
 	gcl_init_lex();
 	gcl_init_prog();
@@ -914,7 +776,6 @@ FFN(siLargv)(void) {
   vs_base[0] = make_simple_string(ARGV[i]);
 }
 
-#ifdef UNIX
 static void
 FFN(siLgetenv)(void) {
 
@@ -1142,9 +1003,7 @@ init_main(void) {
   make_si_function("ARGC", siLargc);
   make_si_function("ARGV", siLargv);
   
-#ifdef UNIX
   make_si_function("GETENV", siLgetenv);
-#endif
   
   make_si_function("MARK-VS", siLmark_vs);
   make_si_function("CHECK-VS", siLcheck_vs);

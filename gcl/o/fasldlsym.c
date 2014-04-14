@@ -42,6 +42,16 @@ struct name_list {
 };
 static struct name_list *loaded_files;
 
+static void
+unlink_loaded_files(void) { 
+
+  while(loaded_files) { 
+    unlink(loaded_files->name);
+    loaded_files= loaded_files->next;
+  }
+
+}
+
 int
 fasload(object faslfile) {
 
@@ -66,6 +76,7 @@ fasload(object faslfile) {
   massert(mkstemp(buf)>=0);
 
   massert((nl=(void *) malloc(strlen(buf)+1+sizeof(nl))));
+  massert(loaded_files || !atexit(unlink_loaded_files));
   nl->next = loaded_files;
   loaded_files = nl;
   strcpy(nl->name,buf);
@@ -111,14 +122,4 @@ fasload(object faslfile) {
 
 }
 
-void
-unlink_loaded_files(void) { 
-
-  while(loaded_files) { 
-    unlink(loaded_files->name);
-    loaded_files= loaded_files->next;
-  }
-
-}
-  
 #include "sfasli.c"
