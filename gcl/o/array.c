@@ -662,7 +662,7 @@ DEFUN("MAKE-ARRAY1",object,fSmake_array1,SI,7,7,NONE,OO,OO,OI,OO,
  }}
 #ifdef STATIC_FUNCTION_POINTERS
 object
-fSmake_array1(fixnum elt_type,object staticp,object initial_element,object displaced_to,
+fSmake_array1(object elt_type,object staticp,object initial_element,object displaced_to,
 	      fixnum displaced_index_offset,object dimensions,object adjustable) {
   return FFN(fSmake_array1)(elt_type,staticp,initial_element,
 			    displaced_to,displaced_index_offset,dimensions,adjustable);
