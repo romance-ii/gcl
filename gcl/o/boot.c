@@ -414,7 +414,7 @@ DEFUN("BUTLAST",object,fLbutlast,LISP,1,2,NONE,OO,OO,OO,OO,(object lis,...),"") 
   va_start(ap,lis);
   nn=NEXT_ARG(n,ap,l,f,make_fixnum(1));
 
-  RETURN1(fLldiff(lis,(VFUN_NARGS=2,fLlast(lis,nn))));
+  RETURN1(fLldiff(lis,(VFUN_NARGS=2,FFN(fLlast)(lis,nn))));
 
 }
 
@@ -431,7 +431,7 @@ DEFUN("APPEND",object,fSappend,LISP,0,63,NONE,OO,OO,OO,OO,(object first,...),"")
       r=rp=y;
     else
       rp->c.c_cdr=y;
-    rp=(VFUN_NARGS=1,fLlast(rp));
+    rp=(VFUN_NARGS=1,FFN(fLlast)(rp));
     y=z;
   }
   va_end(ap);
@@ -510,7 +510,7 @@ DEFUN("NCONC",object,fSnconc,LISP,0,63,NONE,OO,OO,OO,OO,(object first,...),"") {
       r=rp=y;
     else
       rp->c.c_cdr=y;
-    rp=(VFUN_NARGS=1,fLlast(rp));
+    rp=(VFUN_NARGS=1,FFN(fLlast)(rp));
     y=z;
   }
   va_end(ap);
