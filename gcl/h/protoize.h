@@ -1834,3 +1834,5 @@ object
 number_dpb(object,object,object);
 object
 number_dpf(object,object,object);
+
+extern void *feval_src;

@@ -39,7 +39,6 @@ object
 make_fun(void *addr,object data,object call,object env,ufixnum argd,ufixnum sizes) {
   
   object x;
-  extern void *feval_src;
 
   x=alloc_object(t_function);
   x->fun.fun_self=addr;
@@ -119,7 +118,7 @@ fSinit_function(object x,object y,object z,object w,fixnum a,fixnum b,fixnum c) 
 
 DEFUN("MAKE-ANONYMOUS-CLOSURE",object,fSmake_anonymous_closure,SI,0,0,NONE,OO,OO,OO,OO,(),"") {
   
-  RETURN1(FFN(fSinit_function)(list(5,Cnil,Cnil,Cnil,Cnil,Cnil),(void *)fSanonymous_closure,Cnil,MMcons(MMcons(Cnil,Cnil),Cnil),-1,0,0));
+  RETURN1(FFN(fSinit_function)(list(5,Cnil,Cnil,Cnil,Cnil,Cnil),(void *)FFN(fSanonymous_closure),Cnil,MMcons(MMcons(Cnil,Cnil),Cnil),-1,0,0));
 
 }
 

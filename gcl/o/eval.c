@@ -1009,7 +1009,12 @@ DEFUN("FSET-IN",object,fSfset_in,SI,2,2,NONE,OO,OO,OO,OO,(object sym,object src)
   RETURN1(x);
 
 }
-
+#ifdef STATIC_FUNCTION_POINTERS
+object
+fSfset_in(object sym,object src) {
+  RETURN1 FFN(fSfset_in)(sym,src);
+}
+#endif
 
 LFD(siLevalhook)(void)
 {
