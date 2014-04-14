@@ -1344,7 +1344,7 @@ DEFUN("ARRAY-TOTAL-SIZE",fixnum,fLarray_total_size,LISP,1,1,NONE,IO,OO,OO,OO,(ob
 
 DEFUN("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,NONE,OO,OO,OO,OO,(object array,object val,object cursor),"") {
 
-  object x=(VFUN_NARGS=-3,FFN(fSaset(val,array,cursor)));
+  object x=(VFUN_NARGS=-3,FFN(fSaset)(val,array,cursor));
   RETURN1(x);
 
 }

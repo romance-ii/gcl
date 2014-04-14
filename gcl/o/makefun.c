@@ -39,6 +39,7 @@ object
 make_fun(void *addr,object data,object call,object env,ufixnum argd,ufixnum sizes) {
   
   object x;
+  extern void *feval_src;
 
   x=alloc_object(t_function);
   x->fun.fun_self=addr;
@@ -51,7 +52,7 @@ make_fun(void *addr,object data,object call,object env,ufixnum argd,ufixnum size
   x->fun.fun_vv    =POP_BITS(sizes,1);
   x->fun.fun_env=def_env;
 
-  if ((void *)x->fun.fun_self==(void *)FFN(fSeval_src))
+  if ((void *)x->fun.fun_self==feval_src)
     x->d.tt=2;
 
   FFN(fSset_function_environment)(x,env);
@@ -65,12 +66,6 @@ make_fun(void *addr,object data,object call,object env,ufixnum argd,ufixnum size
 DEFUN("ANONYMOUS-CLOSURE",object,fSanonymous_closure,SI,0,0,NONE,OO,OO,OO,OO,(),"") {
   object f=fcall.fun;
   RETURN1(f->fun.fun_env[0]->c.c_car);
-}
-
-DEFUN("MAKE-ANONYMOUS-CLOSURE",object,fSmake_anonymous_closure,SI,0,0,NONE,OO,OO,OO,OO,(),"") {
-  
-  RETURN1(FFN(fSinit_function)(list(5,Cnil,Cnil,Cnil,Cnil,Cnil),(void *)fSanonymous_closure,Cnil,MMcons(MMcons(Cnil,Cnil),Cnil),-1,0,0));
-
 }
 
 DEFUN("FUNCTION-ENVIRONMENT",object,fSfunction_environment,SI,1,1,NONE,OO,OO,OO,OO,(object f),"") {
@@ -121,6 +116,12 @@ fSinit_function(object x,object y,object z,object w,fixnum a,fixnum b,fixnum c) 
   return FFN(fSinit_function)(x,y,z,w,a,b,c);
 }
 #endif
+
+DEFUN("MAKE-ANONYMOUS-CLOSURE",object,fSmake_anonymous_closure,SI,0,0,NONE,OO,OO,OO,OO,(),"") {
+  
+  RETURN1(FFN(fSinit_function)(list(5,Cnil,Cnil,Cnil,Cnil,Cnil),(void *)fSanonymous_closure,Cnil,MMcons(MMcons(Cnil,Cnil),Cnil),-1,0,0));
+
+}
 
 DEFUN("SET-KEY-STRUCT",object,fSset_key_struct,SI,1,1,NONE,OO,OO,OO,OO,(object key_struct_ind),
       "Called inside the loader.  The keystruct is set up in the file with \

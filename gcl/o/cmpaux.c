@@ -309,7 +309,7 @@ object_to_fixnum(object x)
 	case t_fixnum:
 	  i = fix(x);  break;
 	case t_bignum:
-	  i = FFN(fSmpz_get_si(x)); break;
+	  i = FFN(fSmpz_get_si)(x); break;
 	  break;
 	case t_ratio:
 	  i = number_to_double(x);  break;
