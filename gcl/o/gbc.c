@@ -304,7 +304,7 @@ struct apage {
   char apage_self[PAGESIZE];
 };
 
-long maxpage;
+/* long maxpage; */
 
 object sSAnotify_gbcA;
 
@@ -1325,7 +1325,7 @@ GBC(enum type t) {
 #endif
   if (gc_time >=0 && !gc_recursive++) {gc_start=runtime();}
   
-  maxpage = page(heap_end);
+  /* maxpage = page(heap_end); */
   
   if (COLLECT_RELBLOCK_P) {
 

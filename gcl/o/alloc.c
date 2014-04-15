@@ -956,26 +956,6 @@ init_tm(enum type t, char *name, int elsize, int nelts, int sgc,int distinct) {
    call is too fragile.  20050115 CM*/
 static int gcl_alloc_initialized;
 
-void
-set_maxpage(void) {
-
-  /* This is run in init.  Various initializations including getting
-     maxpage are here */ 
-#ifdef SGC
-
-  massert(getpagesize()<=PAGESIZE);
-
-  if (gcl_alloc_initialized) {
-    extern long maxpage;
-    maxpage=page(heap_end);
-    memprotect_test_reset();
-    memory_protect(sgc_enabled ? 1 : 0);
-  }
-#endif
-  
-  update_real_maxpage();
-
-}
 
 #ifdef GCL_GPROF
 static unsigned long textstart,textend,textpage;
@@ -994,42 +974,107 @@ static void init_textpage() {
 }
 #endif
 
-void
-gcl_init_alloc(void) {
+object malloc_list=Cnil;
 
+void
+gcl_init_alloc(void *cs_start) {
+
+  fixnum cssize=(1L<<23);
+
+#ifdef RECREATE_HEAP
+  if (!raw_image) RECREATE_HEAP;
+#endif
+		    
+#if defined(DARWIN)
+  init_darwin_zone_compat ();
+#endif
+  
 #ifdef GCL_GPROF
   init_textpage();
 #endif
   
-  if (gcl_alloc_initialized) return;
+#if defined(BSD) && defined(RLIMIT_STACK)
+  {
+    struct rlimit rl;
+    unsigned long mss;
   
+  /* Maybe the soft limit for data segment size is lower than the
+   * hard limit.  In that case, we want as much as possible.
+   */
+    massert(!getrlimit(RLIMIT_DATA, &rl));
+    if (rl.rlim_cur != RLIM_INFINITY &&	(rl.rlim_max == RLIM_INFINITY || rl.rlim_max > rl.rlim_cur)) {
+      rl.rlim_cur = rl.rlim_max;
+      massert(!setrlimit(RLIMIT_DATA, &rl));
+    }
+
+    mss=rl.rlim_cur/64;
+    massert(!getrlimit(RLIMIT_STACK, &rl));
+    if (rl.rlim_max != RLIM_INFINITY && rl.rlim_max < mss)
+      mss=rl.rlim_max;
+    if (rl.rlim_cur == RLIM_INFINITY || rl.rlim_cur != mss) {
+      rl.rlim_cur=mss;
+#ifdef __MIPS__
+      if (setrlimit(RLIMIT_STACK,&rl))
+	fprintf(stderr,"Cannot set stack rlimit\n");/*FIXME work around make bug on mips*/
+#else
+      massert(!setrlimit(RLIMIT_STACK,&rl));
+#endif
+    }
+    cssize = rl.rlim_cur/sizeof(*cs_org) - sizeof(*cs_org)*CSGETA;
   
-#ifdef BSD
-#ifdef RLIMIT_STACK
- {
+  }
+#endif
+  
+  cs_org = cs_base = cs_start;
+  cs_limit = cs_org + CSTACK_DIRECTION*cssize;
 
-   struct rlimit rl;
-
-   getrlimit(RLIMIT_DATA, &rl);
-   if (rl.rlim_cur != RLIM_INFINITY &&
-       (rl.rlim_max == RLIM_INFINITY ||
-	rl.rlim_max > rl.rlim_cur)) {
-     rl.rlim_cur = rl.rlim_max;
-    setrlimit(RLIMIT_DATA, &rl);
-   }
-
- }
-#endif	
+#ifdef __ia64__
+    {
+      extern void * __libc_ia64_register_backing_store_base;
+      cs_org2=cs_base2=__libc_ia64_register_backing_store_base;
+    }
 #endif
 
+#ifdef SETUP_SIG_STACK
+  SETUP_SIG_STACK
+#else
+#if defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC)
+#include <signal.h>
+    {
+      /* make sure the stack is 8 byte aligned */
+      static double estack_buf[32*SIGSTKSZ];
+      static struct sigaltstack estack;
+      
+      bzero(estack_buf,sizeof(estack_buf));
+      estack.ss_sp = estack_buf;
+      estack.ss_flags = 0;                                   
+      estack.ss_size = sizeof(estack_buf);                             
+      massert(sigaltstack(&estack, 0)>=0);
+      
+    }
+#endif	
+#endif	
+
+  install_segmentation_catcher();
+
+#ifdef SGC
+
+  massert(getpagesize()<=PAGESIZE);
+  memprotect_test_reset();
+  memory_protect(sgc_enabled ? 1 : 0);
+
+#endif
+
+  update_real_maxpage();
+
+  if (gcl_alloc_initialized) return;
+  
 #ifdef INIT_ALLOC  
   INIT_ALLOC;
 #endif  
 
   data_start=heap_end;
   first_data_page=page(data_start);
-  
-  set_maxpage();
   
   holepage=new_holepage;
 
@@ -1092,12 +1137,6 @@ gcl_init_alloc(void) {
 #ifdef SGC	
   tm_table[(int)t_relocatable].tm_sgc = 50;
 #endif
-  
-  {
-    extern object malloc_list;
-    malloc_list = Cnil;
-    enter_mark_origin(&malloc_list);
-  }
   
   gcl_alloc_initialized=1;
   
@@ -1425,9 +1464,11 @@ DEFUNM("SET-HOLE-SIZE",object,fSset_hole_size,SI,1,2,NONE,OI,IO,OO,OO,(fixnum np
 
 void
 gcl_init_alloc_function(void) {
+
+  enter_mark_origin(&malloc_list);
+  
 }
 
-object malloc_list;
 
 #ifndef DONT_NEED_MALLOC
 
@@ -1512,29 +1553,19 @@ static char *baby_malloc(n)
 void *
 malloc(size_t size) {
 
-  static bool notfirst,in_malloc;
+  static bool in_malloc;
 
   if (in_malloc)
     return NULL;
   in_malloc=1;
 
-  if (!notfirst) {
-    notfirst=1;
-    if (raw_image)
-      gcl_init_alloc();
-#ifdef RECREATE_HEAP
-    else 
-      RECREATE_HEAP;
-#endif
-  }
-
+  if (!gcl_alloc_initialized)
+    gcl_init_alloc(&size);
   
   CHECK_INTERRUPT;
   
   malloc_list = make_cons(Cnil, malloc_list);
-  
   malloc_list->c.c_car = alloc_simple_string(size);
-  
   malloc_list->c.c_car->st.st_self = alloc_contblock(size);
   
   /* FIXME: this is just to handle clean freeing of the
@@ -1542,8 +1573,10 @@ malloc(size_t size) {
      startup.  In saved images, monstartup memory is only
      allocated with gprof-start. 20040804 CM*/
 #ifdef GCL_GPROF
-  if (raw_image && size>(textend-textstart) && !initial_monstartup_pointer) 
+  if (raw_image && size>(textend-textstart) && !initial_monstartup_pointer) {
+    massert(!atexit(gprof_cleanup));
     initial_monstartup_pointer=malloc_list->c.c_car->st.st_self;
+  }
   if (gprof_array==Cnil && capture_gprof_array && size>(textend-textstart)) {
     gprof_array=malloc_list->c.c_car;
     capture_gprof_array=0;

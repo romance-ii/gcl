@@ -96,8 +96,6 @@ unsigned int _dbegin = 0x10100000;
 unsigned long _dbegin = 0;
 #endif
 
-fixnum cssize;
-
 #ifdef SGC
 int sgc_enabled;
 #endif
@@ -295,10 +293,8 @@ DEFUN("SET-LOG-MAXPAGE-BOUND",fixnum,fSset_log_maxpage_bound,SI,1,1,NONE,II,OO,O
 int
 main(int argc, char **argv, char **envp) {
 
-#ifdef RECREATE_HEAP
-  if (!raw_image) RECREATE_HEAP
-#endif
-		    
+  gcl_init_alloc(&argc);
+
 #ifdef CAN_UNRANDOMIZE_SBRK
 #include <stdio.h>
 #include <stdlib.h>
@@ -311,13 +307,6 @@ main(int argc, char **argv, char **envp) {
 #include "ld_bind_now.h"
 #endif
   
-  
-#if defined(DARWIN)
-  {
-    extern void init_darwin_zone_compat ();
-    init_darwin_zone_compat ();
-  }
-#endif
   
   setbuf(stdin, stdin_buf); 
   setbuf(stdout, stdout_buf);
@@ -344,89 +333,22 @@ main(int argc, char **argv, char **envp) {
 #endif	
   *argv=kcl_self;
   
-  if (raw_image && argc > 1) {
-    massert(argv[1][strlen(argv[1])-1]=='/');
-    system_directory= (char *) malloc(strlen(argv[1])+3);
-    strcpy(system_directory, argv[1]);
-  }
-  
   vs_top = vs_base = vs_org;
   ihs_top = ihs_org-1;
   bds_top = bds_org-1;
   frs_top = frs_org-1;
 
-  cs_org = cs_base = &argc;
-#ifdef __ia64__
-  {
-    extern void * __libc_ia64_register_backing_store_base;
-    cs_org2=cs_base2=__libc_ia64_register_backing_store_base;
-  }
-#endif
-  cssize = (1L<<23);
-  install_segmentation_catcher();
-  set_maxpage();
-  
-#if defined(BSD) && defined(RLIMIT_STACK)
-  {
-    struct rlimit rl;
-    unsigned long mss=(real_maxpage/64)<<PAGEWIDTH;
-  
-    massert(!getrlimit(RLIMIT_STACK, &rl));
-    if (rl.rlim_max != RLIM_INFINITY && rl.rlim_max < mss)
-      mss=rl.rlim_max;
-    if (rl.rlim_cur == RLIM_INFINITY || rl.rlim_cur != mss) {
-      rl.rlim_cur=mss;
-#ifdef __MIPS__
-      if (setrlimit(RLIMIT_STACK,&rl))
-	fprintf(stderr,"Cannot set stack rlimit\n");/*FIXME work around make bug on mips*/
-#else
-      massert(!setrlimit(RLIMIT_STACK,&rl));
-#endif
-    }
-    cssize = rl.rlim_cur/sizeof(*cs_org) - sizeof(*cs_org)*CSGETA;
-  
-  /* Maybe the soft limit for data segment size is lower than the
-   * hard limit.  In that case, we want as much as possible.
-   */
-    massert(!getrlimit(RLIMIT_DATA, &rl));
-    if (rl.rlim_cur != RLIM_INFINITY &&	(rl.rlim_max == RLIM_INFINITY || rl.rlim_max > rl.rlim_cur)) {
-      rl.rlim_cur = rl.rlim_max;
-      massert(!setrlimit(RLIMIT_DATA, &rl));
-    }
-  }
-#endif
-  
-  cs_limit = cs_org - cssize;
-  
-#ifdef SETUP_SIG_STACK
-  SETUP_SIG_STACK
-#else
-#if defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC)
-    {
-      /* make sure the stack is 8 byte aligned */
-      static double estack_buf[32*SIGSTKSZ];
-      static struct sigaltstack estack;
-      
-      bzero(estack_buf,sizeof(estack_buf));
-      estack.ss_sp = estack_buf;
-      estack.ss_flags = 0;                                   
-      estack.ss_size = sizeof(estack_buf);                             
-      massert(sigaltstack(&estack, 0)>=0);
-      
-    }
-#endif	
-#endif	
-  
-#ifdef GCL_GPROF
-  if (atexit(gprof_cleanup))
-    error("Cannot setup gprof_cleanup on exit");
-#endif
-  
   if (raw_image) {
 
     printf("GCL (GNU Common Lisp)  %s  %ld pages\n",LISP_IMPLEMENTATION_VERSION,real_maxpage);
     fflush(stdout);
     
+    if (argc>1) {
+      massert(argv[1][strlen(argv[1])-1]=='/');
+      system_directory= (char *) malloc(strlen(argv[1])+3);
+      strcpy(system_directory, argv[1]);
+    }
+
     initlisp();
     lex_new();
     
@@ -444,14 +366,8 @@ main(int argc, char **argv, char **envp) {
     src_env1[1]=Cnil;
     src_env=src_env1+1;
     
-  }
+  } else {
 
-#ifdef _WIN32
-  detect_wine();
-#endif
-  
-  if (saving_system) {
-    
     saving_system = FALSE;
     terminal_io->sm.sm_object0->sm.sm_fp = stdin;
     terminal_io->sm.sm_object1->sm.sm_fp = stdout;
@@ -459,8 +375,15 @@ main(int argc, char **argv, char **envp) {
     reinit_gmp();
 #endif
     gcl_init_big1();
+
   }
-    
+
+#ifdef _WIN32
+  detect_wine();
+#endif
+  
+  sSAlisp_maxpagesA->s.s_dbind = make_fixnum(real_maxpage);
+
   ihs_push(Cnil);
   lex_new();
   vs_base = vs_top;
@@ -468,10 +391,6 @@ main(int argc, char **argv, char **envp) {
   interrupt_enable = TRUE;
   install_default_signals();
     
-  sSAlisp_maxpagesA->s.s_dbind = make_fixnum(real_maxpage);
-#ifdef HAVE_READLINE
-  gcl_init_readline_function();
-#endif
   do 
     super_funcall(sStop_level);
   while (type_of(sSAmultiply_stacksA->s.s_dbind)==t_fixnum && multiply_stacks(fix(sSAmultiply_stacksA->s.s_dbind)));
@@ -532,8 +451,6 @@ initlisp(void) {
 	a=Ct;
 	if (NOT_OBJECT_ALIGNED(a))
 	  error("Ct is not properly aligned");
-
-        gcl_init_alloc();
 
 	if (NULL_OR_ON_C_STACK(v) == 0
 #if defined(IM_FIX_BASE)
@@ -680,6 +597,9 @@ initlisp(void) {
 #ifdef CMAC
 	gcl_init_cmac();
 #endif	
+#ifdef HAVE_READLINE
+        gcl_init_readline_function();
+#endif
 
 }
 object
