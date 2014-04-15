@@ -8,11 +8,9 @@
 #  define SEPARATE_SFASL_FILE "sfaslbfd.c"
 #else
 #  define SEPARATE_SFASL_FILE "sfaslcoff.c"
-/*
 #  define SPECIAL_RSYM "rsym_nt.c"
 #  define RSYM_COMMAND(command,system_directory,kcl_self,tmpfile1) \
       sprintf(command,"rsym %s %s",kcl_self,tmpfile1);
-*/
 #endif
 
 /* Stratified garbage collection - need mprotect() (at least) */
