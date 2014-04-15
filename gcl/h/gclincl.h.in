@@ -96,6 +96,12 @@
 /* have readline completion matches */
 #undef HAVE_DECL_RL_COMPLETION_MATCHES
 
+/* Define to 1 if you have the <dirent.h> header file. */
+#undef HAVE_DIRENT_H
+
+/* have struct dirent d_type field */
+#undef HAVE_D_TYPE
+
 /* Define to 1 if you have the <elf_abi.h> header file. */
 #undef HAVE_ELF_ABI_H
 

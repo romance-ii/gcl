@@ -515,7 +515,7 @@ if test "$GCC" = "yes" ; then
    AC_MSG_CHECKING([for CFLAG $TMPF])
    CFLAGS_ORI=$CFLAGS
    CFLAGS="$CFLAGS $TMPF"
-   AC_TRY_RUN([int main() {return 0;}],TCFLAGS="$TCFLAGS $TMPF";AC_MSG_RESULT(yes),AC_MSG_RESULT(no))
+   AC_TRY_RUN([int main() {return 0;}],TCFLAGS="$TCFLAGS $TMPF";AC_MSG_RESULT(yes),AC_MSG_RESULT(no),AC_MSG_RESULT(no))
    CFLAGS=$CFLAGS_ORI
 
 fi
@@ -1949,6 +1949,18 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[
     [AC_MSG_RESULT(no)])
 
 AC_SUBST(HAVE_LONG_LONG)
+
+
+AC_CHECK_HEADERS(dirent.h,
+	AC_MSG_CHECKING([for d_type])
+	AC_RUN_IFELSE([AC_LANG_PROGRAM([[
+		#include <dirent.h>
+			]],[[
+		struct dirent d;
+		return d.d_type=0;
+		]])],
+		[AC_MSG_RESULT([yes]) AC_DEFINE(HAVE_D_TYPE,1,[have struct dirent d_type field])],
+		AC_MSG_RESULT([no]),AC_MSG_RESULT([no])))
 
 # readline
 AC_ARG_ENABLE(readline,
