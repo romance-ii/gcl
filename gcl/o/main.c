@@ -101,15 +101,6 @@ int sgc_enabled;
 #endif
 void install_segmentation_catcher(void);
 
-#ifndef SIG_STACK_SIZE
-#define SIG_STACK_SIZE 1000
-#endif
-#ifndef SETUP_SIG_STACK
-#if defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC)
-        struct sigstack estack;
-#endif
-#endif
-
 int cstack_dir=0;
 
 static int

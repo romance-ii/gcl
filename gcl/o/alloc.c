@@ -1048,6 +1048,9 @@ gcl_init_alloc(void *cs_start) {
       
       bzero(estack_buf,sizeof(estack_buf));
       estack.ss_sp = estack_buf;
+#ifdef ADVANCE_ESTACK_POINTER
+      estack.ss_sp+=sizeof(estack_buf)-sizeof(*estack_buf);
+#endif
       estack.ss_flags = 0;                                   
       estack.ss_size = sizeof(estack_buf);                             
       massert(sigaltstack(&estack, 0)>=0);
