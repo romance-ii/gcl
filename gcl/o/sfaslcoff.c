@@ -59,7 +59,8 @@ struct reloc {
 } __attribute__ ((packed));
 #define R_ABS         0x0000  /* absolute, no relocation is necessary */
 #define R_DIR32       0x0006  /* Direct 32-bit reference to the symbols virtual address */
-#define R_PCRLONG     0x0014  /* 32-bit reference pc relative  to the symbols virtual address */
+#define R_SECREL32    0x000B  /* Currently ignored, used only for debugging strings FIXME */
+#define R_PCRLONG     0x0014  /* 32-bit reference pc relative to the symbols virtual address */
 
 struct syment {
   union {
@@ -113,6 +114,7 @@ relocate(struct scnhdr *sec,struct reloc *rel,struct syment *sym) {
   switch(rel->r_type) {
 
   case R_ABS:
+  case R_SECREL32:
     break;
 
   case R_DIR32:
