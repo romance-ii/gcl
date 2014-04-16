@@ -235,10 +235,6 @@ for the kernel.   See aix3_mprotect directory.
 #define VSSIZE 81520
 
 
-#define INSTALL_SEGMENTATION_CATCHER \
-        sigstack(&estack,0); \
-        (void) gcl_signal(SIGSEGV,segmentation_catcher);
-
 #if defined(IN_SOCKETS) || defined(IN_GUIS)
 #include <sys/select.h>
 #undef bzero

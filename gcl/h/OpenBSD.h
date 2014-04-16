@@ -59,21 +59,6 @@
 #define PAGEWIDTH 12		/* i386 sees 4096 byte pages */
 /* end for GC */
 
-#define SIG_STACK_SIZE (SIGSTKSZ/sizeof(double))
-#define SETUP_SIG_STACK \
-{ \
-	static struct sigaltstack estack; \
-	estack.ss_sp = estack_buf; \
-	estack.ss_size = SIGSTKSZ; \
-	estack.ss_flags = 0; \
-	if (sigaltstack(&estack, 0) < 0) \
-	  perror("sigaltstack"); \
-}
-
-#define INSTALL_SEGMENTATION_CATCHER \
-  	 (void) gcl_signal(SIGSEGV, segmentation_catcher); \
-  	 (void) gcl_signal(SIGBUS, segmentation_catcher)
-
 /*
  * The next two defines are for SGC,
  *	one of which needs to go in cmpinclude.h.

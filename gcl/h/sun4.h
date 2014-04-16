@@ -22,14 +22,6 @@
 #define GET_FAULT_ADDR(sig,code,scp,addr) \
   (code ? ((siginfo_t *)code )->si_addr : error("no address info"))
 
-#define SETUP_SIG_STACK \
-{ static stack_t estack ; \
-  estack.ss_size = sizeof(estack_buf) ; \
-  estack.ss_flags = 0; \
-  estack.ss_sp = (char *) &estack_buf[SIG_STACK_SIZE-1]; \
-  if (sigaltstack(&estack, (stack_t *)0) < 0) \
-               perror("sigaltstack");} \
-  
 #undef HAVE_AOUT
 #define HAVE_AOUT <elf.h>
 #define HAVE_ELF

@@ -102,7 +102,6 @@ extern DBEGIN_TY _stacktop, _stackbottom, _dbegin;
 #define NEED_TO_REINSTALL_SIGNALS
 
 /*#define HAVE_SIGACTION*/
-#define SETUP_SIG_STACK
 #define SV_ONSTACK 0
 #define SA_RESTART 0
 

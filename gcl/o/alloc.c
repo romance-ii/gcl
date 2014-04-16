@@ -1031,36 +1031,27 @@ gcl_init_alloc(void *cs_start) {
   cs_limit = cs_org + CSTACK_DIRECTION*cssize;
 
 #ifdef __ia64__
-    {
-      extern void * __libc_ia64_register_backing_store_base;
-      cs_org2=cs_base2=__libc_ia64_register_backing_store_base;
-    }
+  {
+    extern void * __libc_ia64_register_backing_store_base;
+    cs_org2=cs_base2=__libc_ia64_register_backing_store_base;
+  }
 #endif
-
-#ifdef SETUP_SIG_STACK
-  SETUP_SIG_STACK
-#else
+  
 #if defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC)
-    {
-      /* make sure the stack is 8 byte aligned */
-      static double estack_buf[32*SIGSTKSZ];
-      static struct sigaltstack estack;
-      
-      bzero(estack_buf,sizeof(estack_buf));
-      estack.ss_sp = estack_buf;
-#ifdef ADVANCE_ESTACK_POINTER
-      estack.ss_sp+=sizeof(estack_buf)-sizeof(*estack_buf);
-#endif
-      estack.ss_flags = 0;                                   
-      estack.ss_size = sizeof(estack_buf);                             
-      massert(sigaltstack(&estack, 0)>=0);
-      
-    }
+  {
+    /* make sure the stack is 8 byte aligned */
+    static double estack_buf[32*SIGSTKSZ];
+    static stack_t estack;
+    
+    estack.ss_sp = estack_buf;
+    estack.ss_flags = 0;                                   
+    estack.ss_size = sizeof(estack_buf);                             
+    massert(sigaltstack(&estack, 0)>=0);
+  }
 #endif	
-#endif	
-
+  
   install_segmentation_catcher();
-
+  
 #ifdef SGC
 
   massert(getpagesize()<=PAGESIZE);

@@ -76,18 +76,6 @@
 
 /* end stuff for dumping and reloading */
 
-/* begin setup alternate signal stack */
-#define SIG_STACK_SIZE SIGSTKSZ
-#define SETUP_SIG_STACK \
-{ static struct sigaltstack estack ; \
-  estack.ss_size = sizeof(estack_buf) ; \
-  estack.ss_flags = 0; \
-  estack.ss_base = (char *) &estack_buf[SIG_STACK_SIZE-1]; \
-  if (sigaltstack(&estack, (struct sigaltstack *)0) < 0) \
-               perror("sigaltstack");} \
-
-/* end setup signal stack  */
-
 #define HZ		60
 
 /* begin  for GC */
@@ -114,13 +102,3 @@
 	fflush(save);
 
 /* end read header */
-
-#define INSTALL_SEGMENTATION_CATCHER \
-  	 (void) signal(SIGSEGV,segmentation_catcher); \
-  	 (void) signal(SIGBUS,segmentation_catcher)
-
-
-
-
-
-

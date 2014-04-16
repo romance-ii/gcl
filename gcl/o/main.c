@@ -393,13 +393,8 @@ main(int argc, char **argv, char **envp) {
 /* catch certain signals */
 void install_segmentation_catcher(void)
 {
-#ifdef INSTALL_SEGMENTATION_CATCHER
-  INSTALL_SEGMENTATION_CATCHER;
-#else
-#ifdef SIGSEGV
-       (void) gcl_signal(SIGSEGV,segmentation_catcher);
-#endif
-#endif
+  (void) gcl_signal(SIGSEGV,segmentation_catcher);
+  (void) gcl_signal(SIGBUS,segmentation_catcher);
 }
 
 int catch_fatal=1;

@@ -81,10 +81,6 @@
 #define DONT_NEED_MALLOC
 #endif
 
-#define INSTALL_SEGMENTATION_CATCHER \
-  	 (void) signal(SIGSEGV,segmentation_catcher); \
-  	 (void) signal(SIGBUS,segmentation_catcher)
-
 /* Begin for cmpinclude */
 
 #define WANT_SGC

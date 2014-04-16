@@ -47,13 +47,6 @@
  */
 #define GET_FAULT_ADDR(sig,code,sv,a) ((char *) code)
 
-#define INSTALL_SEGMENTATION_CATCHER \
-  	 (void) signal(SIGSEGV,segmentation_catcher); \
-  	 (void) signal(SIGBUS,segmentation_catcher)
-
-
-
-
 /* Begin for cmpinclude */
 
 

@@ -79,23 +79,6 @@ do {								\
 #define HAVE_SIGPROCMASK
 #define SIG_STACK_SIZE (SIGSTKSZ/sizeof(double))
 
-#undef SETUP_SIG_STACK
-#define SETUP_SIG_STACK {					\
-	static struct sigaltstack estack;			\
-	if (estack.ss_sp == NULL &&				\
-	    (estack.ss_sp = malloc(SIGSTKSZ)) == NULL)		\
-		perror("malloc");				\
-	estack.ss_size = SIGSTKSZ;				\
-	estack.ss_flags = 0;					\
-	if (sigaltstack(&estack, 0) < 0)			\
-		perror("sigaltstack");				\
-}
-
-#undef INSTALL_SEGMENTATION_CATCHER
-#define INSTALL_SEGMENTATION_CATCHER				\
-  	 (void) gcl_signal(SIGSEGV, segmentation_catcher);	\
-  	 (void) gcl_signal(SIGBUS, segmentation_catcher)
-
 /*
  * The next two defines are for SGC,
  *	one of which needs to go in cmpinclude.h.

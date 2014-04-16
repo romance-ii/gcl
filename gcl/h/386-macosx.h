@@ -113,21 +113,6 @@ extern int seek_to_end_ofile (FILE *);
 /* Copied from {Net,Free,Open}BSD.h  */
 /* Modified according to Camm's instructions on April 15, 2004.  */
 #define HAVE_SIGPROCMASK
-/* #define SIG_STACK_SIZE (SIGSTKSZ/sizeof(double)) */
-/* #define SIG_STACK_SIZE 1000 */
-/* #define SETUP_SIG_STACK                                \ */
-/* {                                                      \ */
-/* static stack_t estack;                                 \ */
-/* static double estack_buf [SIG_STACK_SIZE];             \ */
-/* bzero(estack_buf, sizeof(estack_buf));                 \ */
-/* estack.ss_sp = (char *) &estack_buf[SIG_STACK_SIZE-1]; \ */
-/* estack.ss_flags = 0;                                   \ */
-/* estack.ss_size = SIGSTKSZ;                             \ */
-/* if (sigaltstack(&estack, 0) < 0)                       \ */
-/*     perror("sigaltstack");                             \ */
-/* } */
-
-#define ADVANCE_ESTACK_POINTER
 
 /* until the sgc/save problem can be fixed.  20050114 CM*/
 /* #define SGC */
@@ -143,10 +128,6 @@ do {                                                    \
   sigaction (SIGBUS, &sact, 0);                         \
   sigaction (SIGSEGV, &sact, 0);                        \
 } while (0);
-
-#define INSTALL_SEGMENTATION_CATCHER                \
-  (void) signal (SIGSEGV, segmentation_catcher);    \
-  (void) signal (SIGBUS, segmentation_catcher)
 
 /* si_addr not containing the faulting address is a bug in Darwin.
    Work around this by looking at the dar field of the exception state.  */

@@ -1836,3 +1836,6 @@ object
 number_dpf(object,object,object);
 
 extern void *feval_src;
+#if defined(DARWIN)
+void init_darwin_zone_compat ();
+#endif
