@@ -9994,6 +9994,16 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
+for ac_func in sigaltstack
+do :
+  ac_fn_c_check_func "$LINENO" "sigaltstack" "ac_cv_func_sigaltstack"
+if test "x$ac_cv_func_sigaltstack" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_SIGALTSTACK 1
+_ACEOF
+
+fi
+done
 
 
 #if test $use = "386-linux" ; then

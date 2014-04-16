@@ -1037,7 +1037,7 @@ gcl_init_alloc(void *cs_start) {
   }
 #endif
   
-#if defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC)
+#ifdef HAVE_SIGALTSTACK
   {
     /* make sure the stack is 8 byte aligned */
     static double estack_buf[32*SIGSTKSZ];

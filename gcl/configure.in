@@ -2406,8 +2406,7 @@ int joe=SIGEMT;
  AC_MSG_RESULT(yes)],
 AC_MSG_RESULT(no))
 
-
-
+AC_CHECK_FUNCS(sigaltstack)
 
 #if test $use = "386-linux" ; then
 	AC_CHECK_HEADERS(asm/sigcontext.h)

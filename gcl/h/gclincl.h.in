@@ -180,6 +180,9 @@
 /* have setenv call */
 #undef HAVE_SETENV
 
+/* Define to 1 if you have the `sigaltstack' function. */
+#undef HAVE_SIGALTSTACK
+
 /* have sigcontext */
 #undef HAVE_SIGCONTEXT
 
