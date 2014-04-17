@@ -995,6 +995,8 @@ gcl_init_alloc(void *cs_start) {
   init_textpage();
 #endif
   
+  malloc_list=Cnil;
+
 #if defined(BSD) && defined(RLIMIT_STACK)
   {
     struct rlimit rl;
@@ -1545,6 +1547,8 @@ static char *baby_malloc(n)
 /*  } */
 /*  #endif */
 
+bool writable_malloc=0;
+
 void *
 malloc(size_t size) {
 
@@ -1562,7 +1566,8 @@ malloc(size_t size) {
   malloc_list = make_cons(Cnil, malloc_list);
   malloc_list->c.c_car = alloc_simple_string(size);
   malloc_list->c.c_car->st.st_self = alloc_contblock(size);
-  
+  malloc_list->c.c_car->st.st_adjustable=writable_malloc;
+
   /* FIXME: this is just to handle clean freeing of the
      monstartup memory allocated automatically on raw image
      startup.  In saved images, monstartup memory is only

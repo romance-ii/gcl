@@ -1282,19 +1282,6 @@ sgc_start(void) {
 	SET_WRITABLE(page(pi));
       else
 	tm_of(pi->type)->tm_alt_npage++;
-#ifndef NO_SETBUF /*FIXME, implement restartable getc with read in readc_stream*/
-      {
-	void *v,*ve;
-	if (pi->type!=(tm=tm_of(t_stream))->tm_type) continue;
-	for (v=pagetochar(page(pi)),ve=v+tm->tm_nppage*tm->tm_size;v<ve;v+=tm->tm_size) {
-	  object x=v;
-	  if (type_of(x)!=t_stream || is_free(x)) continue;
-	  if (x->sm.sm_buffer) 
-	    for (i=page(x->sm.sm_buffer);i<=page(x->sm.sm_buffer+BUFSIZ-1);i++)
-	      SET_WRITABLE(i);
-	}
-      }
-#endif
     }
     for (pi=contblock_list_head;pi;pi=pi->next)/*FIXME*/
       if (pi->sgc_flags&SGC_WRITABLE)
@@ -1302,14 +1289,16 @@ sgc_start(void) {
 	  SET_WRITABLE(page(pi)+i);
       else
 	tm_of(t_contiguous)->tm_alt_npage+=pi->in_use;
-#ifdef GCL_GPROF
     {
-      extern object gprof_array;
-      if (gprof_array!=Cnil)
-	for (i=0;i<(gprof_array->st.st_fillp +PAGESIZE-1)/PAGESIZE;i++)
-	  SET_WRITABLE(page(gprof_array->st.st_self)+i);
+      extern object malloc_list;
+      object x;
+
+      for (x=malloc_list;x!=Cnil;x=x->c.c_cdr)
+	if (x->c.c_car->st.st_adjustable)
+	  for (i=page(x->c.c_car->st.st_self);i<=page(x->c.c_car->st.st_self+x->c.c_car->st.st_fillp-1);i++)
+	    SET_WRITABLE(i);
     }
-#endif
+
     for (i=page(heap_end);i<page(old_rb_start);i++)
 	SET_WRITABLE(i);
     tm_of(t_relocatable)->tm_alt_npage=page(rb_start)-page(old_rb_start);

@@ -18,5 +18,3 @@
 
 #define RELOC_H "elf32_hppa_reloc.h"
 #define SPECIAL_RELOC_H "elf32_hppa_reloc_special.h"
-
-#define NO_SETBUF /* FIXME, sgc setbuf instability */

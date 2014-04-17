@@ -370,7 +370,7 @@ setup_stream_buffer(object x) {
 #ifdef NO_SETBUF
   massert(!setvbuf(x->sm.sm_fp,x->sm.sm_buffer=NULL,_IONBF,0));
 #else
-  massert(!setvbuf(x->sm.sm_fp,x->sm.sm_buffer=alloc_contblock(BUFSIZ),_IOFBF,BUFSIZ));
+  massert(!setvbuf(x->sm.sm_fp,x->sm.sm_buffer=writable_malloc_wrap(malloc,void *,BUFSIZ),_IOFBF,BUFSIZ));
 #endif
 }	
 
