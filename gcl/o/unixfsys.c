@@ -411,7 +411,7 @@ fopen_not_dir(char *filename,char * option) {
   if (!stat(filename,&ss) && S_ISDIR(ss.st_mode))
     return NULL;
   else
-    return writable_malloc_wrap(fopen,FILE *,filename,option);
+    return fopen(filename,option);
 
 }
 

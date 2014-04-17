@@ -995,8 +995,6 @@ gcl_init_alloc(void *cs_start) {
   init_textpage();
 #endif
   
-  malloc_list=Cnil;
-
 #if defined(BSD) && defined(RLIMIT_STACK)
   {
     struct rlimit rl;

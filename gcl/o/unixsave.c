@@ -140,33 +140,19 @@ char *original_file, *save_file;
 
 extern void _cleanup();
 
-LFD(Lsave)()
-{
-	char filename[256];
-
-	check_arg(1);
-	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
-	coerce_to_filename(vs_base[0], filename);
-
-	_cleanup();
-/*
-	{
-		FILE *p;
-		int nfile;
-
-
-		nfile = NUMBER_OPEN_FILES;
-
-		for (p = &_iob[3];  p < &_iob[nfile];  p++)
-			fclose(p);
-	}
-*/
-	memory_save(kcl_self, filename);
-/*
-	_exit(0);
-*/
-	exit(0);
-	/*  no return  */
+LFD(Lsave)() {
+  char filename[256];
+  
+  check_arg(1);
+  check_type_or_pathname_string_symbol_stream(&vs_base[0]);
+  coerce_to_filename(vs_base[0], filename);
+  malloc_list=Cnil;
+  
+  _cleanup();
+  
+  memory_save(kcl_self, filename);
+  exit(0);
+  /*  no return  */
 }
 
 #endif /* UNIXSAVE include */
