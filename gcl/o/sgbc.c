@@ -392,7 +392,7 @@ sgc_mark_object1(object x) {
       sgc_mark_object(x->sm.sm_object1);
       if (saving_system) {
 	FILE *fp = x->sm.sm_fp;
-	if (fp != 0 && fp != stdin && fp !=stdout) {
+	if (fp != 0 /* && fp != stdin && fp !=stdout */) {
 	  fclose(fp);
 	  x->sm.sm_fp=0;
 	}

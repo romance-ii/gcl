@@ -367,34 +367,27 @@ BEGIN:
 
 void
 setup_stream_buffer(object x) {
-#ifndef NO_SETBUF
-  char *buf=alloc_contblock(BUFSIZ);
-  x->sm.sm_buffer = buf;
-  setbuf(x->sm.sm_fp, buf);
+#ifdef NO_SETBUF
+  massert(!setvbuf(x->sm.sm_fp,x->sm.sm_buffer=NULL,_IONBF,0));
 #else
-  setvbuf(x->sm.sm_fp,NULL,_IONBF,0);
-  x->sm.sm_buffer=0;
+  massert(!setvbuf(x->sm.sm_fp,x->sm.sm_buffer=alloc_contblock(BUFSIZ),_IOFBF,BUFSIZ));
 #endif
 }	
 
 static void
 deallocate_stream_buffer(object strm) {
 
-/* SGC contblock pages: Its possible this is on an old page CM 20030827 */
-  if (strm->sm.sm_buffer) {
-#ifdef SGC
-    insert_maybe_sgc_contblock(strm->sm.sm_buffer, BUFSIZ); 
-#else
-    insert_contblock(strm->sm.sm_buffer, BUFSIZ); 
-#endif
-    if (strm->sm.sm_fp)
-      setvbuf(strm->sm.sm_fp,NULL,_IONBF,0);
-    strm->sm.sm_buffer = 0;
-  } 
+  if (strm->sm.sm_buffer==NULL)
+    return;
 
-#ifndef FCLOSE_SETBUF_OK
-  strm->sm.sm_fp->_base = NULL;
+/* SGC contblock pages: Its possible this is on an old page CM 20030827 */
+#ifdef SGC
+  insert_maybe_sgc_contblock(strm->sm.sm_buffer,BUFSIZ); 
+#else
+  insert_contblock(strm->sm.sm_buffer,BUFSIZ); 
 #endif
+
+  massert(!setvbuf(strm->sm.sm_fp,strm->sm.sm_buffer=NULL,_IONBF,0));
 
 }
 

@@ -158,9 +158,6 @@ do {int c=0;                                                            \
         return(FALSE);                                                  \
 } while (0)
 
-/* We (hopefully) dont need to worry about zeroing fp->_base.  */
-#define FCLOSE_SETBUF_OK 
-
 #define GET_FULL_PATH_SELF(a_)                              \
 do {                                                        \
 extern int _NSGetExecutablePath (char *, unsigned long *);  \

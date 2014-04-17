@@ -81,8 +81,6 @@ extern DBEGIN_TY _dbegin;
 	ungetc(i, fp); \
     } while (0)
 		
-#define FCLOSE_SETBUF_OK 
-
 #define RUN_PROCESS
 
 #define	IEEEFLOAT

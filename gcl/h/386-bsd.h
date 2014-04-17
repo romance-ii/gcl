@@ -50,9 +50,6 @@
 #endif
 /* end listen for input */
 
-/* we dont need to worry about zeroing fp->_base , to prevent  */
-#define FCLOSE_SETBUF_OK 
-
 #define DATA_BEGIN (char *)N_DATADDR(header);
 #define UNIXSAVE "unexlin.c"
 

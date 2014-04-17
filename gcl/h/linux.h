@@ -109,9 +109,6 @@ do { int c = 0; \
      && (ioctl((fp)->_fileno, FIONREAD, &c),c<=0)) \
      return 0;} while (0)
 
-/* we dont need to worry about zeroing fp->_base , to prevent  */
-#define FCLOSE_SETBUF_OK 
-
 /* #define DATA_BEGIN((TXTRELOC+header.a_text+(SEGSIZ-1)) & ~(SEGSIZ-1)); */
 #define DATA_BEGIN (char *)(char *)N_DATADDR(header);
 
