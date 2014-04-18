@@ -55,6 +55,8 @@
 #include <signal.h>
 #include <errno.h>
 
+int writable_malloc=0; /*FIXME, don't wrap fopen here, exclude notcomp.h or equivalent */
+
 #include "guis.h"
 
 #ifdef __MINGW32__
