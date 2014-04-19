@@ -1594,7 +1594,7 @@ free(void *ptr) {
   if (ptr == 0)
     return;
   
-  for (p = &malloc_list,pp=*p; pp && !endp(pp);  p = &((pp)->c.c_cdr),pp=Scdr(pp))
+  for (p = &malloc_list,pp=*p; pp && !endp(pp);  p = &((pp)->c.c_cdr),pp=pp->c.c_cdr)
     if ((pp)->c.c_car->st.st_self == ptr) {
       /* SGC contblock pages: Its possible this is on an old page CM 20030827 */
 #ifdef SGC
@@ -1603,7 +1603,7 @@ free(void *ptr) {
       insert_contblock((pp)->c.c_car->st.st_self,(pp)->c.c_car->st.st_dim);
 #endif
       (pp)->c.c_car->st.st_self = NULL;
-      *p = Scdr(pp);
+      *p = pp->c.c_cdr;
 #ifdef GCL_GPROF
       if (initial_monstartup_pointer==ptr) {
 	initial_monstartup_pointer=NULL;
