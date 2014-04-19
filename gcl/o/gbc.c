@@ -735,18 +735,10 @@ mark_object(object x) {
     case smm_probe:
       mark_object(x->sm.sm_object0);
       mark_object(x->sm.sm_object1);
-      if (saving_system)
-	{FILE *fp = x->sm.sm_fp;
-	if (fp != 0 /* && fp != stdin && fp !=stdout */
-	    )
-	  {fclose(fp);
-	  x->sm.sm_fp=0;
-	  }}
-      else
-	if (what_to_collect == t_contiguous &&
-	    x->sm.sm_fp &&
-	    x->sm.sm_buffer)
-	  mark_contblock(x->sm.sm_buffer, BUFSIZ);
+      if (what_to_collect == t_contiguous &&
+	  x->sm.sm_fp &&
+	  x->sm.sm_buffer)
+	mark_contblock(x->sm.sm_buffer, BUFSIZ);
       break;
       
     case smm_synonym:
@@ -1283,8 +1275,22 @@ GBC(enum type t) {
       error("GBC is not enabled");
   interrupt_enable = FALSE;
   
-  if (saving_system)
-    {t = t_relocatable; gc_time = -1;
+  if (saving_system) {
+
+    struct pageinfo *v;
+    void *x;
+    struct typemanager *tm=tm_of(t_stream);
+    unsigned j;
+
+    for (v=cell_list_head;v;v=v->next) 
+      if (tm->tm_type==v->type)
+	for (x=pagetochar(page(v)),j=tm->tm_nppage;j--;x+=tm->tm_size) {
+	  object o=x;
+	  if (type_of(o)==t_stream && !is_free(o) && o->sm.sm_fp && o->sm.sm_fp!=stdin && o->sm.sm_fp!=stdout)
+	    close_stream(o);
+	}
+
+    t = t_relocatable; gc_time = -1;
 #ifdef SGC
     if(sgc_enabled) sgc_quit();
 #endif    

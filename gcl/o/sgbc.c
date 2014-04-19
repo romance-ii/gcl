@@ -390,18 +390,10 @@ sgc_mark_object1(object x) {
     case smm_probe:
       sgc_mark_object(x->sm.sm_object0);
       sgc_mark_object(x->sm.sm_object1);
-      if (saving_system) {
-	FILE *fp = x->sm.sm_fp;
-	if (fp != 0 /* && fp != stdin && fp !=stdout */) {
-	  fclose(fp);
-	  x->sm.sm_fp=0;
-	}
-      }
-      else
-	if (what_to_collect == t_contiguous &&
-	    x->sm.sm_fp &&
-	    x->sm.sm_buffer)
-	  mark_contblock(x->sm.sm_buffer, BUFSIZ);
+      if (what_to_collect == t_contiguous &&
+	  x->sm.sm_fp &&
+	  x->sm.sm_buffer)
+	mark_contblock(x->sm.sm_buffer, BUFSIZ);
       break;
       
     case smm_synonym:
