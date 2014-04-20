@@ -78,7 +78,7 @@ parse_unsigned_integer_negate(char *s1,char **ep,int radix,int neg) {
   else
     for (o=u=1,f=0,s=s1;*s && (d=digitp(*s,radix))>=0;u=0,o=o && f<l,f=f*radix+d,s++);
 
-  *ep=s;
+  if (ep) *ep=s;
 
   if (u) return OBJNULL;
   if (o && !*s) return make_fixnum(neg ? -f : f);
@@ -149,7 +149,11 @@ parse_number(char *s,int radix) {
       ch=*q ? *q : 'E';
     }
 
-    if ((c=*q)) *q='E';
+    if ((c=*q)) {
+      if (parse_integer(q+1,NULL,10)==OBJNULL)
+      	return OBJNULL;
+      *q='E';
+    }
     n=sscanf(s,"%lf%n",&f,&m);
     *q=c;
     if (n!=1||s[m]) return OBJNULL;
