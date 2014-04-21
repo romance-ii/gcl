@@ -953,6 +953,7 @@ if test "$enable_dlopen" = "yes" ; then
 
    AC_CHECK_LIB(dl,dlopen,have_dl=1,AC_MSG_ERROR([Cannot find dlopen in -dl]))
    TLIBS="$TLIBS -ldl -rdynamic"
+   TCFLAGS="-fPIC $TCFLAGS"
    AC_DEFINE(USE_DLOPEN,1,[link compiled objects via libdl])
 
 fi

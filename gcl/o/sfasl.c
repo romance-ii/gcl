@@ -37,7 +37,7 @@ via #include "../c/sfasl.c"
 /*  #endif */
 
 
-#ifdef SPECIAL_RSYM
+#if defined(SPECIAL_RSYM) && !defined(USE_DLOPEN)
 
 #include <string.h>
 
