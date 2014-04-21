@@ -55,7 +55,7 @@ object small_fixnum ( int i ) {
 }
 #endif
 
-#if !defined(IM_FIX_BASE)
+#if !defined(IM_FIX_BASE) || defined(USE_SAFE_CDR)
 
 #define BIGGER_FIXNUM_RANGE
 
@@ -285,7 +285,7 @@ number_to_double(object x)
 void
 gcl_init_number(void) {
 
-#if !defined(IM_FIX_BASE) || !defined(USE_SAFE_CDR)
+#if !defined(IM_FIX_BASE) || defined(USE_SAFE_CDR)
   FFN(fSallocate_bigger_fixnum_range)(-1024,1023);
 #endif
 

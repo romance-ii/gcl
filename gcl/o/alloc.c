@@ -981,6 +981,7 @@ object malloc_list=Cnil;
 void
 gcl_init_alloc(void *cs_start) {
 
+  extern int cstack_dir;
   fixnum cssize=(1L<<23);
 
 #ifdef RECREATE_HEAP
@@ -1022,13 +1023,14 @@ gcl_init_alloc(void *cs_start) {
       massert(!setrlimit(RLIMIT_STACK,&rl));
 #endif
     }
-    cssize = rl.rlim_cur/sizeof(*cs_org) - sizeof(*cs_org)*CSGETA;
+    cssize = rl.rlim_cur/sizeof(*cs_org);
   
   }
 #endif
   
   cs_org = cs_base = cs_start;
   cs_limit = cs_org + CSTACK_DIRECTION*cssize;
+  cstack_dir=get_cstack_dir(0);
 
 #ifdef __ia64__
   {

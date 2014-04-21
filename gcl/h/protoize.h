@@ -8,7 +8,7 @@
 /* alloc.c:480:OF */ extern void insert_contblock (char *p, int s); /* (p, s) char *p; int s; */
 /* alloc.c:480:OF */ extern void insert_maybe_sgc_contblock (char *p, int s); /* (p, s) char *p; int s; */
 /* alloc.c:611:OF */ extern void set_maxpage (void); /* () */
-/* alloc.c:635:OF */ extern void gcl_init_alloc (void); /* () */
+/* alloc.c:635:OF */ extern void gcl_init_alloc (void *); /* () */
 /* alloc.c:1000:OF */ extern void gcl_init_alloc_function (void); /* () */
 /* alloc.c:1126:OF */ extern void free (void *ptr); /* (ptr) void *ptr; */
 /* array.c:57:OF */ extern void Laref (void); /* () */
@@ -1836,3 +1836,6 @@ extern void *feval_src;
 #if defined(DARWIN)
 void init_darwin_zone_compat ();
 #endif
+
+int
+get_cstack_dir(VOL fixnum);

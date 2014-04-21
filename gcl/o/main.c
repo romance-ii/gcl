@@ -65,7 +65,7 @@ bool saving_system ;
 
 #define LISP_IMPLEMENTATION_VERSION "April 1994"
 
-char system_directory[PATH_MAX];
+char *system_directory;
 
 #define EXTRA_BUFSIZE 8
 char stdin_buf[BUFSIZ + EXTRA_BUFSIZE];
@@ -103,7 +103,7 @@ void install_segmentation_catcher(void);
 
 int cstack_dir=0;
 
-static int
+int
 get_cstack_dir(VOL fixnum j) {
   static fixnum n;
   fixnum q=n;
@@ -281,6 +281,10 @@ DEFUN("SET-LOG-MAXPAGE-BOUND",fixnum,fSset_log_maxpage_bound,SI,1,1,NONE,II,OO,O
 
 }
 
+int pre_gcl=0;
+object def_env1[2]={(object)1,Cnil},*def_env=def_env1+1;
+object src_env1[2]={(object)1,Cnil},*src_env=src_env1+1;
+
 int
 main(int argc, char **argv, char **envp) {
 
@@ -349,14 +353,6 @@ main(int argc, char **argv, char **envp) {
   
     sLApackageA->s.s_dbind = user_package;
     
-    def_env1[0]=(object)1;/*FIXME better place*/
-    def_env1[1]=Cnil;
-    def_env=def_env1+1;
-    
-    src_env1[0]=(object)1;/*FIXME better place*/
-    src_env1[1]=Cnil;
-    src_env=src_env1+1;
-    
   } else {
 
     saving_system = FALSE;
@@ -366,6 +362,8 @@ main(int argc, char **argv, char **envp) {
     reinit_gmp();
 #endif
     gcl_init_big1();
+
+    if (pre_gcl) init_boot();
 
   }
 
@@ -711,7 +709,6 @@ FFN(siLgetenv)(void) {
     vs_base[0] = Cnil;
 
 }
-#endif /* UNIX */
 
 object *vs_marker;
 

@@ -1,4 +1,4 @@
-(in-package "TK" :use '("LISP" "SLOOP"))
+(in-package "TK" :use '(#+ansi-cl "CL" #-ansi-cl "LISP" "SLOOP"))
 (in-package "SI")
 (import '(
 string begin end header name

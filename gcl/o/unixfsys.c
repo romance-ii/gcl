@@ -866,7 +866,7 @@ DEFUN("OPENDIR",fixnum,fSopendir,SI,1,1,NONE,IO,OO,OO,OO,(object x),"") {
 
 #ifdef HAVE_D_TYPE
   
-DEFUN_NEW("D-TYPE-LIST",object,fSd_type_list,SI,0,0,NONE,OI,OO,OO,OO,(void),"") {
+DEFUN("D-TYPE-LIST",object,fSd_type_list,SI,0,0,NONE,OI,OO,OO,OO,(void),"") {
   RETURN1(list(8,
 	       MMcons(make_fixnum(DT_BLK),make_keyword("BLOCK")),
 	       MMcons(make_fixnum(DT_CHR),make_keyword("CHAR")),

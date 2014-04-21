@@ -275,7 +275,7 @@ EXTER object sSdefmacroA;
 object macro_expand();
 
 /*  main.c  */
-EXTER char system_directory[];
+EXTER char * system_directory;
 EXTER int ARGC;
 EXTER char **ARGV;
 void error();
