@@ -146,7 +146,6 @@ LFD(Lsave)() {
   check_arg(1);
   check_type_or_pathname_string_symbol_stream(&vs_base[0]);
   coerce_to_filename(vs_base[0], filename);
-  malloc_list=Cnil;
   
   _cleanup();
   

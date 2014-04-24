@@ -380,12 +380,7 @@ deallocate_stream_buffer(object strm) {
   if (strm->sm.sm_buffer==NULL)
     return;
 
-/* SGC contblock pages: Its possible this is on an old page CM 20030827 */
-#ifdef SGC
-  insert_maybe_sgc_contblock(strm->sm.sm_buffer,BUFSIZ); 
-#else
-  insert_contblock(strm->sm.sm_buffer,BUFSIZ); 
-#endif
+  free(strm->sm.sm_buffer);
 
   massert(!setvbuf(strm->sm.sm_fp,strm->sm.sm_buffer=NULL,_IONBF,0));
 
