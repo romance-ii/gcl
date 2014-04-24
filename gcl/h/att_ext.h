@@ -682,7 +682,6 @@ object list_vector_new();
 object Iapply_ap();
 object IisFboundp();
 object IapplyVector();
-object c_apply_n();
 EXTER object sSPmemory;
 EXTER object sSPinit;
 object sLfset();

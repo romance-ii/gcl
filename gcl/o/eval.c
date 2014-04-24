@@ -55,27 +55,6 @@ warn_avma()
 object sSAbreak_pointsA;
 object sSAbreak_stepA;
 
-
-#define SET_TO_APPLY(res,f,n,x) \
- switch(n) {\
- case 0:  res=f(); break;\
- case 1:  res=f(x[0]); break;	  \
- case 2:  res=f(x[0],x[1]);break;       \
- case 3:  res=f(x[0],x[1],x[2]);break;	    \
- case 4:  res=f(x[0],x[1],x[2],x[3]);break;	 \
- case 5:  res=f(x[0],x[1],x[2],x[3],x[4]);break;		\
- case 6:  res=f(x[0],x[1],x[2],x[3],x[4],x[5]);  break;		\
- case 7:  res=f(x[0],x[1],x[2],x[3],x[4],x[5], x[6]); break;	\
- case 8:  res=f(x[0],x[1],x[2],x[3],x[4],x[5], x[6],x[7]); break; \
- case 9:  res=f(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8]);break; \
- case 10: res=f(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8],x[9]);break; \
- default: res=c_apply_n(*f,n,x); break;}
-
-/*
-#undef SET_TO_APPLY
-#define SET_TO_APPLY(res,f,n,x)  res=c_apply_n(f,n,x);
-*/
-
 /* for t_sfun,t_gfun with args on vs stack */
 
 #define POP_BITS(x_,y_) ({ufixnum _t=x_&((1<<y_)-1);x_>>=y_;_t;})
@@ -86,14 +65,12 @@ object sSAbreak_stepA;
   ({enum ftype _t=type;\
      _t==f_object ? a : (_t==f_fixnum ? make_fixnum((fixnum)a) : make_integer((GEN)a));})
 
+#include "apply_n.h"
+
 static object
 quick_call_function_vec(object fun,ufixnum n,object *b) {
 
-  register object res;
-
-  SET_TO_APPLY(res,fun->fun.fun_self,n,b);
-
-  return res;
+  return c_apply_n_fun(fun,n,b);
 
 }
 

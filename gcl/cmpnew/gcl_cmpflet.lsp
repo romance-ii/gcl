@@ -1022,11 +1022,11 @@
 	 (va (member '* (car sig)))
 	 (inl (dotimes (i (- (length (car sig)) (if va 1 0)) inl) 
 		(push (strcat "#" (write-to-string i)) inl)))
-	 (inl (if va (cons "#?" inl) inl))
+	 (inl (if va (cons (if (eq va (car sig)) "#?" "#*") inl) inl))
 	 (inl (nreverse inl)))
     (reduce 'strcat (mapcon 
 		     (lambda (x) 
-		       (if (and (cdr x) (not (equal (cadr x) "#?")))
+		       (if (and (cdr x) (not (member (cadr x) '("#*" "#?") :test 'equal)))
 			   (list (car x) ",") (list (car x)))) inl)
 	    :initial-value "")))
 
