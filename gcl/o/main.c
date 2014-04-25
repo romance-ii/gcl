@@ -251,9 +251,9 @@ init_boot(void) {
 
   void *v,*q;
   char *z,*s="libboot.so";
-  size_t n=strlen(system_directory)+strlen(s)+1;
+  size_t m=sSAsystem_directoryA->s.s_dbind->st.st_fillp,n=m+strlen(s)+1;
   z=alloca(n);
-  snprintf(z,n,"%s%s",system_directory,s);
+  snprintf(z,n,"%-*.*s%s",(int)m,(int)m,sSAsystem_directoryA->s.s_dbind->st.st_self,s);
   if (!(v=dlopen(z,RTLD_LAZY|RTLD_GLOBAL)))
     printf("%s\n",dlerror());
   if (!(q=dlsym(v,"gcl_init_boot")))

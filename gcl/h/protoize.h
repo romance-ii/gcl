@@ -389,6 +389,8 @@ object funcall_vec(object,ufixnum,object *);
 extern int readline_on;
 void
 gcl_init_readline_function(void);
+void
+gcl_init_readline(void);
 
 /*  sys_gcl.c */
 void
