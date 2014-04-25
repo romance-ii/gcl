@@ -325,6 +325,9 @@ case $canonical in
           else  use=gnuwin95
         fi;;
 
+     *gnuwin*)
+ 	TLDFLAGS="$TLDFLAGS -Wl,--stack,8000000";;
+
      *openbsd*)
 	# 'ld -Z' means disable W^X
 	TLDFLAGS="$TLDFLAGS -Z"
