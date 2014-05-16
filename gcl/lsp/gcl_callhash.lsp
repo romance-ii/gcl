@@ -38,8 +38,9 @@
 (defun symbol-function-plist (sym &aux (fun (symbol-to-function sym)))
   (when fun (c-function-plist fun)))
 
-(defun sym-plist (sym)
-  (or (cdr (assoc sym *sig-discovery-props*)) (symbol-function-plist sym)))
+(defun sym-plist (sym &aux (pl (symbol-function-plist sym)))
+  (when pl
+    (or (cdr (assoc sym *sig-discovery-props*)) pl)))
 				  
 (defun needs-recompile (sym)
   (let* ((plist (sym-plist sym))
@@ -248,18 +249,35 @@
 	      (unless (get s 'callers)
 		(push s r))))))))))
 
+(defun do-pcl (x &aux (*sig-discovery-props* x))
+  (break)
+  (si::chdir "../pcl")
+  (mapc (lambda (x) (when (find-package x) (delete-package x))) '(:pcl :slot-accessor-name :iterate :walker))
+  (mapc 'delete-file (directory "*.o"))
+  (mapc 'load '("../clcs/package.lisp" "../clcs/myload1.lisp" "sys-package.lisp"))
+  (let ((*features* (remove :kcl *features*))) (load "../pcl/defsys.lisp"))
+  (setf (symbol-value (find-symbol "*DEFAULT-PATHNAME-EXTENSIONS*" (find-package :pcl))) (cons "lisp" "o")
+	(symbol-value (find-symbol "*PATHNAME-EXTENSIONS*" (find-package :pcl))) (cons "lisp" "o"))
+					;(load "sys-proclaim.lisp")
+  (setq compiler::*keep-gaz* t compiler::*tmp-dir* "" si::*disable-recompile* t)
+  (si::chdir "../pcl")
+  (funcall (find-symbol "COMPILE-PCL" :pcl) t))
 
 (defun do-recomp (&rest excl &aux r *sig-discovery-props* *compile-verbose*)
-  (labels ((d (&aux (*sig-discovery* t)(q (remove-duplicates (mapcar 'car (mapcan 'needs-recompile r))) ))
+  (labels ((d (&aux (*sig-discovery* t)(q (remove-duplicates (mapcar 'car (mapcan 'needs-recompile r)))))
 	      (when q
 		(format t "~%Pass 1 signature discovery on ~s functions ..." (length q))
 		(mapc (lambda (x) (format t "~s " x) (compile x)) q) (d))))
 	  (do-all-symbols (s) (push s r))(d)
-	  (let* ((fl (remove-duplicates (mapcar (lambda (x) (file (car x))) *sig-discovery-props*) :test 'string=))
-		 (fl (set-difference fl excl :test (lambda (x y) (search y x)))))
+	  (let* ((fl (mapcar 'car *sig-discovery-props*))
+		 (pclp (member-if (lambda (x) (eq (symbol-package x) (find-package :pcl))) fl))
+		 (fl (remove-duplicates (mapcar (lambda (x) (file x)) fl) :test 'string=))
+		 (fl (set-difference fl (cons "pcl_" excl) :test (lambda (x y) (search y x)))))
 	    (compiler::cdebug)
-	    (format t "~%Recompiling original source files ...")
-	    (mapc (lambda (x) (format t "~s~%" x) (compile-file x)) (remove nil fl)))))
+;	    (format t "~%Recompiling original source files ...")
+;	    (mapc (lambda (x) (format t "~s~%" x) (compile-file x)) (remove nil fl))
+	    (when pclp
+	      (do-pcl *sig-discovery-props*)))))
 
 (defun do-recompile (&optional (pn nil pnp))
 
