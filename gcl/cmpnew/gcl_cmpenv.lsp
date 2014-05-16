@@ -54,7 +54,6 @@
   (setq *undefined-vars* nil)
   (setq *reservations* nil)
   (setq *top-level-forms* nil)
-  (setq *non-package-operation* nil)
   (setq *function-declarations* nil)
   (setq *inline-functions* nil)
   (setq *function-links* nil)

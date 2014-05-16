@@ -244,15 +244,11 @@
              (cond ((eq fun 'si:|#,|)
                     (cmperr "Sharp-comma-macro is in a bad place."))
                    ((get fun 'package-operation)
-;                    (when *non-package-operation*
-;                      (cmpwarn "The package operation ~s was in a bad place."
-;                               form))
 		    (let ((res (if (setq fd (macro-function fun))
 				   (cmp-expand-macro fd fun (copy-list (cdr form)))
 				 form)))
 		      (maybe-eval t res) 
-		      (t1ordinary form)
-		      (when (member fun '(mdlsym make-package defpackage)) (wt-data-package-operation form))));FIXME
+		      (t1ordinary form)))
                    ((setq fd (get fun 't1))
                     (when *compile-print* (print-current-form))
                     (values (funcall fd args)))
@@ -1303,7 +1299,6 @@
   (when (or (endp args) (endp (cdr args)))
     (too-few-args 'defun 2 (length args)))
   (maybe-eval nil (cons 'defun args))
-  (setq *non-package-operation* t)
 
   (let* ((fname (car args))
 	 (fname (or (function-symbol fname) (cmperr "The function name ~s is not valid." fname)))
@@ -1349,7 +1344,6 @@
 ;;   (when (or (endp args) (endp (cdr args)))
 ;;     (too-few-args 'defun 2 (length args)))
 ;;   (maybe-eval nil (cons 'defun args))
-;;   (setq *non-package-operation* t)
 
 ;;   (let* ((fname (car args))
 ;; 	 (fname (or (function-symbol fname) (cmperr "The function name ~s is not valid." fname)))
@@ -2250,9 +2244,15 @@
 ;	((member (car form) '(si::define-macro si::fset)))
 	((or (tlclp (car form)) (tlclp (cdr form))))))
 
+(defun contains-package-operation-p (form)
+  (cond ((atom form) nil)
+	((eq (car form) 'quote) nil)
+	((member (car form) '(mdlsym make-package defpackage)))
+	((or (contains-package-operation-p (car form)) (contains-package-operation-p (cdr form))))))
+
 (defun t1ordinary (form)
-  (setq *non-package-operation* t)
   ;; check for top level functions
+  (when (contains-package-operation-p form) (wt-data-package-operation form))
   (cond ((or *compile-ordinaries* (tlclp (portable-source form)))
 	 (maybe-eval nil form)
 	 (let ((gen (gensym "progncompile")))
