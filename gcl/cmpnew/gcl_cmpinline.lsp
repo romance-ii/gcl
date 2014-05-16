@@ -184,6 +184,7 @@
 	    (mrg info-ref))
   (when (/= (info-sp-change from-info) 0) (setf (info-sp-change to-info) 1))
   (setf (info-flags to-info) (logior (info-flags to-info) (info-flags from-info)))
+  (setf (info-ref to-info) (nunion (info-ref to-info) (remove-if-not 'symbolp (info-ref from-info))))
   (setf (info-ch-ccb to-info) 
 	(reduce (lambda (y x &aux (v (car x))(z (assoc v y)))
 		  (cond (z (setf (cdr z) (type-or1 (cdr z) (cdr x))) y)

@@ -1778,7 +1778,7 @@
 	 (let ((fm (fifth fd)))
 	   (when fm (or-ccb-assignments (list fm)))
 	   `(call-local ,info ,(nconc (caddr fd) ll) ,(cadddr fd) ,fm ,fms)));FIXME
-	(`(call-global ,info ,fn ,fms nil ,@ll))))
+	(t (push fn (info-ref info)) `(call-global ,info ,fn ,fms nil ,@ll))))
 
 ;; (defun mi5 (fn info fms la &aux (ll (when la (list (length fms)))) fd)
 ;;   (mi6 fn fms)

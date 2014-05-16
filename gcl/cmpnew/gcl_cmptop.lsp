@@ -59,7 +59,6 @@
 
 (defvar *local-funs* nil)
 (defvar *top-level-forms* nil)
-(defvar *non-package-operation* nil)
 
 ;;; *top-level-forms* holds ( { top-level-form }* ).
 ;;;
@@ -1227,6 +1226,7 @@
 	 (l (do-l1-fun name (cdr (new-defun-args src tag)) e b))
 	 (clv (get-clv l)))
     (setf (car e) (export-sig (car e))
+	  (second e) (mapcar (lambda (x) (cons x (get-sig x))) (info-ref (cadr l)))
 	  (third e) (list src clv name)
 	  (fourth e) (unless *compiler-compile* (namestring (truename (pathname *compiler-input*))))
 	  (fifth e) (if (= (length clv) 0) 1 0)

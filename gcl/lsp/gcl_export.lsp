@@ -537,9 +537,9 @@
 (*make-constant '+array-types+ (si::aelttype-list))
 (*make-constant '+sfix+ (eql (truncate fixnum-length char-length) 4))
 
-(*make-special '*uniq-sigs*)
-(setq *uniq-sigs* (make-hash-table :test 'equal))
-(defun uniq-sig (sig) (or (gethash sig *uniq-sigs*) (setf (gethash sig *uniq-sigs*) sig)))
+(*make-special '*uniq-list*)
+(setq *uniq-list* (make-hash-table :test 'equal))
+(defun uniq-list (list) (or (gethash list *uniq-list*) (setf (gethash list *uniq-list*) list)))
 
 (defun num-comp (x y tp) 
   (if (c-fixnum-== tp 1) (c-fixnum-== x y)
@@ -554,9 +554,9 @@
 
 (defun normalize-function-plist (plist)
   (labels ((mn (tp &aux (n (cmp-norm-tp tp))) (if (unless (eq tp n) (eq n '*)) (return-from normalize-function-plist nil) n))
-	   (norm-sig (sig) (uniq-sig (list (mapcar #'mn (car sig)) (mn (cadr sig))))))
+	   (norm-sig (sig) (uniq-list (list (mapcar #'mn (car sig)) (mn (cadr sig))))))
   (setf (car plist) (norm-sig (car plist)))
-  (mapc #'(lambda (x) (setf (cdr x) (norm-sig (cdr x)))) (cadr plist))
+  (setf (cadr plist ) (mapcar #'(lambda (x) (uniq-list (cons (car x) (norm-sig (cdr x))))) (cadr plist)))
   plist))
 
 
@@ -576,7 +576,7 @@
     (or (when b (normalize-function-plist args)) (car (push args lists)))))
 
 (in-package :s)
-(si::import-internal 'si::(\| & ^ ~ c+ c* << >> 
+(si::import-internal 'si::(\| & ^ ~ c+ c* << >>
 			   c-object-== c-fixnum-== c-float-== c-double-== c-fcomplex-== c-dcomplex-== fcomplex dcomplex
 			   string-concatenate strcat lit seqind fixnum-length char-length cref address short int
 			   package-internal package-external array-dims cmp-norm-tp tp0 tp1 tp2 tp3 tp4 tp5 tp6 tp7 tp8))
