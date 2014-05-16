@@ -7729,6 +7729,34 @@ $as_echo "no" >&6; }
    fi
 fi
 
+# Should really find a way to check for prototypes, but this
+# basically works for now.  CM
+#
+for ac_header in math.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "math.h" "ac_cv_header_math_h" "$ac_includes_default"
+if test "x$ac_cv_header_math_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_MATH_H 1
+_ACEOF
+
+fi
+
+done
+
+for ac_header in complex.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "complex.h" "ac_cv_header_complex_h" "$ac_includes_default"
+if test "x$ac_cv_header_complex_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_COMPLEX_H 1
+_ACEOF
+
+fi
+
+done
+
+
 ####  Memory areas and alignment
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for required object alignment" >&5
@@ -7743,10 +7771,11 @@ else
 /* end confdefs.h.  */
 
         #include <stdio.h>
+        #include <complex.h>
 	#define EXTER
 	#include "$MP_INCLUDE"
-	#include "./h/enum.h"
-	#include "./h/bits.h"
+	#include "./h/type.h"
+	#include "./h/lu.h"
 	#define OBJ_ALIGN
 	#include "./h/object.h"
 
@@ -7822,58 +7851,7 @@ _ACEOF
 
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking TYPE_BITS macro" >&5
-$as_echo_n "checking TYPE_BITS macro... " >&6; }
-if test "$cross_compiling" = yes; then :
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "cannot run test program while cross compiling
-See \`config.log' for more details" "$LINENO" 5; }
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
 
-        #include <stdio.h>
-	#define EXTER
-	#include "$MP_INCLUDE"
-	#include "./h/enum.h"
-	#include "./h/bits.h"
-	#include "./h/object.h"
-
-
-int
-main ()
-{
-
-
-	FILE *f=fopen("conftest1","w");
-	union lispunion g={.fw=0};
-	g.d.e=-1;
-	g.d.t=-1;
-	g.d.s=-1;
-	fprintf(f,"0x%x",g.fw);
-	fclose(f);
-	return 0;
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_run "$LINENO"; then :
-  type_bits=`cat conftest1`
-else
-  as_fn_error $? "Cannot find type_bits" "$LINENO" 5
-fi
-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
-  conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $type_bits" >&5
-$as_echo "$type_bits" >&6; }
-
-cat >>confdefs.h <<_ACEOF
-#define TYPE_BITS $type_bits
-_ACEOF
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking sizeof struct contblock" >&5
@@ -7891,10 +7869,11 @@ else
 /* end confdefs.h.  */
 
         #include <stdio.h>
+        #include <complex.h>
 	#define EXTER
 	#include "$MP_INCLUDE"
-	#include "h/enum.h"
-	#include "./h/bits.h"
+	#include "h/type.h"
+	#include "h/lu.h"
 	#include "h/object.h"
 
 
@@ -7932,11 +7911,12 @@ else
 /* end confdefs.h.  */
 
         #include <stdio.h>
+        #include <complex.h>
 	#define EXTER
 	#include "$MP_INCLUDE"
-	#include "./h/enum.h"
-	#include "./h/bits.h"
-	#include "./h/object.h"
+	#include "h/type.h"
+	#include "h/lu.h"
+	#include "h/object.h"
 
 
 int
@@ -8791,11 +8771,11 @@ else
 /* end confdefs.h.  */
 
         #include <stdio.h>
+        #include <complex.h>
 	#define EXTER
 	#include "$MP_INCLUDE"
 	#include "./h/enum.h"
-	#include "./h/bits.h"
-	#include "./h/object.h"
+	#include "./h/lu.h"
 
 	int foo(object wrd) {
 
@@ -9211,38 +9191,6 @@ done
 
  fi
 fi
-
-# Should really find a way to check for prototypes, but this
-# basically works for now.  CM
-#
-for ac_header in math.h
-do :
-  ac_fn_c_check_header_mongrel "$LINENO" "math.h" "ac_cv_header_math_h" "$ac_includes_default"
-if test "x$ac_cv_header_math_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_MATH_H 1
-_ACEOF
-
-$as_echo "#define HAVE_MATH_H 1" >>confdefs.h
-
-fi
-
-done
-
-for ac_header in complex.h
-do :
-  ac_fn_c_check_header_mongrel "$LINENO" "complex.h" "ac_cv_header_complex_h" "$ac_includes_default"
-if test "x$ac_cv_header_complex_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_COMPLEX_H 1
-_ACEOF
-
-$as_echo "#define HAVE_COMPLEX_H 1" >>confdefs.h
-
-fi
-
-done
-
 
 #
 # For DBL_MAX et. al. on (only) certain Linux arches, apparently CM
@@ -10052,6 +10000,297 @@ if test "x$ac_cv_func_sigaltstack" = xyes; then :
 _ACEOF
 
 fi
+done
+
+for ac_func in feenableexcept
+do :
+  ac_fn_c_check_func "$LINENO" "feenableexcept" "ac_cv_func_feenableexcept"
+if test "x$ac_cv_func_feenableexcept" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_FEENABLEEXCEPT 1
+_ACEOF
+
+fi
+done
+
+
+for ac_header in dis-asm.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "dis-asm.h" "ac_cv_header_dis_asm_h" "$ac_includes_default"
+if test "x$ac_cv_header_dis_asm_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_DIS_ASM_H 1
+_ACEOF
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for init_disassemble_info in -lopcodes" >&5
+$as_echo_n "checking for init_disassemble_info in -lopcodes... " >&6; }
+if ${ac_cv_lib_opcodes_init_disassemble_info+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lopcodes  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char init_disassemble_info ();
+int
+main ()
+{
+return init_disassemble_info ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_opcodes_init_disassemble_info=yes
+else
+  ac_cv_lib_opcodes_init_disassemble_info=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_opcodes_init_disassemble_info" >&5
+$as_echo "$ac_cv_lib_opcodes_init_disassemble_info" >&6; }
+if test "x$ac_cv_lib_opcodes_init_disassemble_info" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBOPCODES 1
+_ACEOF
+
+  LIBS="-lopcodes $LIBS"
+
+fi
+
+	for ac_func in print_insn_alpha
+do :
+  ac_fn_c_check_func "$LINENO" "print_insn_alpha" "ac_cv_func_print_insn_alpha"
+if test "x$ac_cv_func_print_insn_alpha" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PRINT_INSN_ALPHA 1
+_ACEOF
+
+$as_echo "#define PRINT_INSN print_insn_alpha" >>confdefs.h
+
+else
+  for ac_func in print_insn_avr
+do :
+  ac_fn_c_check_func "$LINENO" "print_insn_avr" "ac_cv_func_print_insn_avr"
+if test "x$ac_cv_func_print_insn_avr" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PRINT_INSN_AVR 1
+_ACEOF
+
+$as_echo "#define PRINT_INSN print_insn_avr" >>confdefs.h
+
+else
+  for ac_func in print_insn_big_arm
+do :
+  ac_fn_c_check_func "$LINENO" "print_insn_big_arm" "ac_cv_func_print_insn_big_arm"
+if test "x$ac_cv_func_print_insn_big_arm" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PRINT_INSN_BIG_ARM 1
+_ACEOF
+
+$as_echo "#define PRINT_INSN insn_big_arm" >>confdefs.h
+
+else
+  for ac_func in print_insn_big_mips
+do :
+  ac_fn_c_check_func "$LINENO" "print_insn_big_mips" "ac_cv_func_print_insn_big_mips"
+if test "x$ac_cv_func_print_insn_big_mips" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PRINT_INSN_BIG_MIPS 1
+_ACEOF
+
+$as_echo "#define PRINT_INSN insn_big_mips" >>confdefs.h
+
+else
+  for ac_func in print_insn_big_powerpc
+do :
+  ac_fn_c_check_func "$LINENO" "print_insn_big_powerpc" "ac_cv_func_print_insn_big_powerpc"
+if test "x$ac_cv_func_print_insn_big_powerpc" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PRINT_INSN_BIG_POWERPC 1
+_ACEOF
+
+$as_echo "#define PRINT_INSN insn_big_powerpc" >>confdefs.h
+
+else
+  for ac_func in print_insn_hppa
+do :
+  ac_fn_c_check_func "$LINENO" "print_insn_hppa" "ac_cv_func_print_insn_hppa"
+if test "x$ac_cv_func_print_insn_hppa" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PRINT_INSN_HPPA 1
+_ACEOF
+
+$as_echo "#define PRINT_INSN print_insn_hppa" >>confdefs.h
+
+else
+  for ac_func in print_insn_i386
+do :
+  ac_fn_c_check_func "$LINENO" "print_insn_i386" "ac_cv_func_print_insn_i386"
+if test "x$ac_cv_func_print_insn_i386" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PRINT_INSN_I386 1
+_ACEOF
+
+$as_echo "#define PRINT_INSN print_insn_i386" >>confdefs.h
+
+else
+  for ac_func in print_insn_ia64
+do :
+  ac_fn_c_check_func "$LINENO" "print_insn_ia64" "ac_cv_func_print_insn_ia64"
+if test "x$ac_cv_func_print_insn_ia64" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PRINT_INSN_IA64 1
+_ACEOF
+
+$as_echo "#define PRINT_INSN print_insn_ia64" >>confdefs.h
+
+else
+  for ac_func in print_insn_little_arm
+do :
+  ac_fn_c_check_func "$LINENO" "print_insn_little_arm" "ac_cv_func_print_insn_little_arm"
+if test "x$ac_cv_func_print_insn_little_arm" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PRINT_INSN_LITTLE_ARM 1
+_ACEOF
+
+$as_echo "#define PRINT_INSN insn_little_arm" >>confdefs.h
+
+else
+  for ac_func in print_insn_little_mips
+do :
+  ac_fn_c_check_func "$LINENO" "print_insn_little_mips" "ac_cv_func_print_insn_little_mips"
+if test "x$ac_cv_func_print_insn_little_mips" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PRINT_INSN_LITTLE_MIPS 1
+_ACEOF
+
+$as_echo "#define PRINT_INSN insn_little_mips" >>confdefs.h
+
+else
+  for ac_func in print_insn_little_powerpc
+do :
+  ac_fn_c_check_func "$LINENO" "print_insn_little_powerpc" "ac_cv_func_print_insn_little_powerpc"
+if test "x$ac_cv_func_print_insn_little_powerpc" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PRINT_INSN_LITTLE_POWERPC 1
+_ACEOF
+
+$as_echo "#define PRINT_INSN insn_little_powerpc" >>confdefs.h
+
+else
+  for ac_func in print_insn_m68k
+do :
+  ac_fn_c_check_func "$LINENO" "print_insn_m68k" "ac_cv_func_print_insn_m68k"
+if test "x$ac_cv_func_print_insn_m68k" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PRINT_INSN_M68K 1
+_ACEOF
+
+$as_echo "#define PRINT_INSN print_insn_m68k" >>confdefs.h
+
+else
+  for ac_func in print_insn_s390
+do :
+  ac_fn_c_check_func "$LINENO" "print_insn_s390" "ac_cv_func_print_insn_s390"
+if test "x$ac_cv_func_print_insn_s390" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PRINT_INSN_S390 1
+_ACEOF
+
+$as_echo "#define PRINT_INSN print_insn_s390" >>confdefs.h
+
+else
+  for ac_func in print_insn_sh64
+do :
+  ac_fn_c_check_func "$LINENO" "print_insn_sh64" "ac_cv_func_print_insn_sh64"
+if test "x$ac_cv_func_print_insn_sh64" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PRINT_INSN_SH64 1
+_ACEOF
+
+$as_echo "#define PRINT_INSN print_insn_sh64" >>confdefs.h
+
+else
+  for ac_func in print_insn_sh
+do :
+  ac_fn_c_check_func "$LINENO" "print_insn_sh" "ac_cv_func_print_insn_sh"
+if test "x$ac_cv_func_print_insn_sh" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PRINT_INSN_SH 1
+_ACEOF
+
+$as_echo "#define PRINT_INSN print_insn_sh" >>confdefs.h
+
+else
+  for ac_func in print_insn_sparc
+do :
+  ac_fn_c_check_func "$LINENO" "print_insn_sparc" "ac_cv_func_print_insn_sparc"
+if test "x$ac_cv_func_print_insn_sparc" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PRINT_INSN_SPARC 1
+_ACEOF
+
+$as_echo "#define PRINT_INSN print_insn_sparc" >>confdefs.h
+
+fi
+done
+
+fi
+done
+
+fi
+done
+
+fi
+done
+
+fi
+done
+
+fi
+done
+
+fi
+done
+
+fi
+done
+
+fi
+done
+
+fi
+done
+
+fi
+done
+
+fi
+done
+
+fi
+done
+
+fi
+done
+
+fi
+done
+
+fi
+done
+
+fi
+
 done
 
 

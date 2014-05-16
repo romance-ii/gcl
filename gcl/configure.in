@@ -1445,15 +1445,22 @@ if test "$HAVE_SBRK" = "1" ; then
    fi
 fi
 
+# Should really find a way to check for prototypes, but this 
+# basically works for now.  CM
+#
+AC_CHECK_HEADERS(math.h)
+AC_CHECK_HEADERS(complex.h)
+
 ####  Memory areas and alignment
 
 AC_MSG_CHECKING([for required object alignment])
 AC_RUN_IFELSE([AC_LANG_PROGRAM([[
         #include <stdio.h>
+        #include <complex.h>
 	#define EXTER
 	#include "$MP_INCLUDE"
-	#include "./h/enum.h"
-	#include "./h/bits.h"
+	#include "./h/type.h"
+	#include "./h/lu.h"
 	#define OBJ_ALIGN
 	#include "./h/object.h"
 	]],[[
@@ -1478,29 +1485,29 @@ AC_MSG_RESULT($obj_align)
 AC_DEFINE_UNQUOTED(OBJ_ALIGN,$obj_align,[can use C extension for object alignment])
 
 
-AC_MSG_CHECKING(TYPE_BITS macro)
-AC_RUN_IFELSE([AC_LANG_PROGRAM([[
-        #include <stdio.h>
-	#define EXTER
-	#include "$MP_INCLUDE"
-	#include "./h/enum.h"
-	#include "./h/bits.h"
-	#include "./h/object.h"
+dnl AC_MSG_CHECKING(TYPE_BITS macro)
+dnl AC_RUN_IFELSE([AC_LANG_PROGRAM([[
+dnl         #include <stdio.h>
+dnl         #include <complex.h>
+dnl 	#define EXTER
+dnl 	#include "$MP_INCLUDE"
+dnl 	#include "./h/enum.h"
+dnl 	#include "./h/lu.h"
 
-	]],[[
+dnl 	]],[[
 
-	FILE *f=fopen("conftest1","w");
-	union lispunion g={.fw=0};
-	g.d.e=-1;
-	g.d.t=-1;
-	g.d.s=-1;
-	fprintf(f,"0x%x",g.fw);
-	fclose(f);
-	return 0;
-	]])],[type_bits=`cat conftest1`],
-            [AC_MSG_ERROR([Cannot find type_bits])])
-AC_MSG_RESULT($type_bits)
-AC_DEFINE_UNQUOTED(TYPE_BITS,$type_bits,[bit mask for type flags in objects])
+dnl 	FILE *f=fopen("conftest1","w");
+dnl 	union lispunion g={.fw=0};
+dnl 	g.d.e=-1;
+dnl 	g.d.t=-1;
+dnl 	g.d.s=-1;
+dnl 	fprintf(f,"0x%x",g.fw);
+dnl 	fclose(f);
+dnl 	return 0;
+dnl 	]])],[type_bits=`cat conftest1`],
+dnl             [AC_MSG_ERROR([Cannot find type_bits])])
+dnl AC_MSG_RESULT($type_bits)
+dnl AC_DEFINE_UNQUOTED(TYPE_BITS,$type_bits,[bit mask for type flags in objects])
 
 AC_MSG_CHECKING(sizeof struct contblock)
 
@@ -1508,10 +1515,11 @@ AC_MSG_CHECKING(sizeof struct contblock)
 if test "$use" = "mingw" ; then
 AC_RUN_IFELSE([AC_LANG_PROGRAM([[
         #include <stdio.h>
+        #include <complex.h>
 	#define EXTER
 	#include "$MP_INCLUDE"
-	#include "h/enum.h"
-	#include "./h/bits.h"
+	#include "h/type.h"
+	#include "h/lu.h"
 	#include "h/object.h"
 
 	]],[[
@@ -1525,11 +1533,12 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[
 else
 AC_RUN_IFELSE([AC_LANG_PROGRAM([[
         #include <stdio.h>
+        #include <complex.h>
 	#define EXTER
 	#include "$MP_INCLUDE"
-	#include "./h/enum.h"
-	#include "./h/bits.h"
-	#include "./h/object.h"
+	#include "h/type.h"
+	#include "h/lu.h"
+	#include "h/object.h"
 
 	]],[[
 
@@ -1984,11 +1993,11 @@ CFLAGS="$CFLAGS $TO3FLAGS"
 AC_MSG_CHECKING([for pathname gcc compilation bug])
 AC_RUN_IFELSE([AC_LANG_SOURCE([[
         #include <stdio.h>
+        #include <complex.h>
 	#define EXTER
 	#include "$MP_INCLUDE"
 	#include "./h/enum.h"
-	#include "./h/bits.h"
-	#include "./h/object.h"
+	#include "./h/lu.h"
 
 	int foo(object wrd) {
 
@@ -2157,12 +2166,6 @@ else
 			 	 LIBS="${LIBS} -lrpc"] )
  fi
 fi
-
-# Should really find a way to check for prototypes, but this 
-# basically works for now.  CM
-#
-AC_CHECK_HEADERS(math.h,AC_DEFINE(HAVE_MATH_H,1,[have math.h]))
-AC_CHECK_HEADERS(complex.h,AC_DEFINE(HAVE_COMPLEX_H,1,[have complex.h]))
 
 #
 # For DBL_MAX et. al. on (only) certain Linux arches, apparently CM
@@ -2411,6 +2414,26 @@ int joe=SIGEMT;
 AC_MSG_RESULT(no))
 
 AC_CHECK_FUNCS(sigaltstack)
+AC_CHECK_FUNCS(feenableexcept)
+
+AC_CHECK_HEADERS(dis-asm.h,
+	AC_CHECK_LIB(opcodes,init_disassemble_info)
+	AC_CHECK_FUNCS(print_insn_alpha,AC_DEFINE([PRINT_INSN],[print_insn_alpha],[instruction disassemble routine]),
+	AC_CHECK_FUNCS(print_insn_avr,AC_DEFINE([PRINT_INSN],[print_insn_avr],[instruction disassemble routine]),
+	AC_CHECK_FUNCS(print_insn_big_arm,AC_DEFINE([PRINT_INSN],[insn_big_arm],[instruction disassemble routine]),
+	AC_CHECK_FUNCS(print_insn_big_mips,AC_DEFINE([PRINT_INSN],[insn_big_mips],[instruction disassemble routine]),
+	AC_CHECK_FUNCS(print_insn_big_powerpc,AC_DEFINE([PRINT_INSN],[insn_big_powerpc],[instruction disassemble routine]),
+	AC_CHECK_FUNCS(print_insn_hppa,AC_DEFINE([PRINT_INSN],[print_insn_hppa],[instruction disassemble routine]),
+	AC_CHECK_FUNCS(print_insn_i386,AC_DEFINE([PRINT_INSN],[print_insn_i386],[instruction disassemble routine]),
+	AC_CHECK_FUNCS(print_insn_ia64,AC_DEFINE([PRINT_INSN],[print_insn_ia64],[instruction disassemble routine]),
+	AC_CHECK_FUNCS(print_insn_little_arm,AC_DEFINE([PRINT_INSN],[insn_little_arm],[instruction disassemble routine]),
+	AC_CHECK_FUNCS(print_insn_little_mips,AC_DEFINE([PRINT_INSN],[insn_little_mips],[instruction disassemble routine]),
+	AC_CHECK_FUNCS(print_insn_little_powerpc,AC_DEFINE([PRINT_INSN],[insn_little_powerpc],[instruction disassemble routine]),
+	AC_CHECK_FUNCS(print_insn_m68k,AC_DEFINE([PRINT_INSN],[print_insn_m68k],[instruction disassemble routine]),
+	AC_CHECK_FUNCS(print_insn_s390,AC_DEFINE([PRINT_INSN],[print_insn_s390],[instruction disassemble routine]),
+	AC_CHECK_FUNCS(print_insn_sh64,AC_DEFINE([PRINT_INSN],[print_insn_sh64],[instruction disassemble routine]),
+	AC_CHECK_FUNCS(print_insn_sh,AC_DEFINE([PRINT_INSN],[print_insn_sh],[instruction disassemble routine]),
+	AC_CHECK_FUNCS(print_insn_sparc,AC_DEFINE([PRINT_INSN],[print_insn_sparc],[instruction disassemble routine]))))))))))))))))))
 
 #if test $use = "386-linux" ; then
 	AC_CHECK_HEADERS(asm/sigcontext.h)

@@ -174,15 +174,15 @@ fixnum_rem(fixnum x,fixnum y,fixnum d) {
   return z;
 }
 EXTER inline object
-immnum_truncate(object x,object y) {return iif2(x,y)&&y!=make_fixnum(0) ? mif(fixnum_div(fif(x),fif(y),0)) : (intdivrem(x,y,0,&x,NULL),x);}
+immnum_truncate(object x,object y) {return iif2(x,y)&&y!=make_fixnum(0) ? mif(fixnum_div(fif(x),fif(y),0)) : (intdivrem(x,y,0,&x,0),x);}
 EXTER inline object
-immnum_floor(object x,object y) {return iif2(x,y)&&y!=make_fixnum(0) ? mif(fixnum_div(fif(x),fif(y),-1)) : (intdivrem(x,y,-1,&x,NULL),x);}
+immnum_floor(object x,object y) {return iif2(x,y)&&y!=make_fixnum(0) ? mif(fixnum_div(fif(x),fif(y),-1)) : (intdivrem(x,y,-1,&x,0),x);}
 EXTER inline object
-immnum_ceiling(object x,object y) {return iif2(x,y)&&y!=make_fixnum(0) ? mif(fixnum_div(fif(x),fif(y),1)) : (intdivrem(x,y,1,&x,NULL),x);}
+immnum_ceiling(object x,object y) {return iif2(x,y)&&y!=make_fixnum(0) ? mif(fixnum_div(fif(x),fif(y),1)) : (intdivrem(x,y,1,&x,0),x);}
 EXTER inline object
-immnum_mod(object x,object y) {return iif2(x,y)&&y!=make_fixnum(0) ? mif(fixnum_rem(fif(x),fif(y),-1)) : (intdivrem(x,y,-1,NULL,&y),y);}
+immnum_mod(object x,object y) {return iif2(x,y)&&y!=make_fixnum(0) ? mif(fixnum_rem(fif(x),fif(y),-1)) : (intdivrem(x,y,-1,0,&y),y);}
 EXTER inline object
-immnum_rem(object x,object y) {return iif2(x,y)&&y!=make_fixnum(0) ? mif(fixnum_rem(fif(x),fif(y),0)) : (intdivrem(x,y,0,NULL,&y),y);}
+immnum_rem(object x,object y) {return iif2(x,y)&&y!=make_fixnum(0) ? mif(fixnum_rem(fif(x),fif(y),0)) : (intdivrem(x,y,0,0,&y),y);}
 
 EXTER inline fixnum
 fixnum_rshft(fixnum x,fixnum y) {

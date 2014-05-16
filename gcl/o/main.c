@@ -1064,7 +1064,7 @@ DEFUN("FUNCTION-BY-ADDRESS",object,fSfunction_by_address,SI,1,1,NONE,OI,OO,OO,OO
 }
 
 
-#ifdef I386
+#ifdef PRINT_INSN
 
 #include "dis-asm.h"
 
@@ -1103,7 +1103,7 @@ DEFUN("DISASSEMBLE-INSTRUCTION",object,fSdisassemble_instruction,SI,1,1,NONE,OI,
   i.print_address_func=my_pa;
   bp=b;
   
-  j=print_insn_i386(addr,&i);
+  j=PRINT_INSN(addr,&i);
   my_fprintf(NULL," ;");
   return MMcons(make_simple_string(b),make_fixnum(j));
 }
