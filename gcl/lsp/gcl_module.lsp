@@ -33,25 +33,22 @@
 
 (defvar *modules* nil)
 
+(defun module-string (module-name)
+  (string-downcase (string module-name)))
 
 (defun provide (module-name)
-  (setq *modules*
-        (adjoin (string module-name)
-                *modules*
-                :test #'string=)))
+  (pushnew (module-string module-name) *modules* :test 'string=))
 
+(defun default-module-pathlist (module-name)
+  (list (make-pathname :name (module-string module-name)
+		       :directory (append (pathname-directory (pathname *system-directory*))
+					  (list :up "modules")))))
 
-(defun require (module-name
-                &optional (pathname (string-downcase (string module-name))))
-  (let ((*default-pathname-defaults* #""))
-    (unless (member (string module-name)
-                    *modules*
-                    :test #'string=)
-            (if (atom pathname)
-                (load pathname)
-                (do ((p pathname (cdr p)))
-                    ((endp p))
-                  (load (car p)))))))
+(defun require (module-name &optional (pl (default-module-pathlist module-name))  &aux (*default-pathname-defaults* #""))
+  (unless (member (module-string module-name) *modules* :test 'string=)
+    (when pl
+      (load (pop pl))
+      (require module-name pl))))
           
 
 (defun documentation (object doc-type)
