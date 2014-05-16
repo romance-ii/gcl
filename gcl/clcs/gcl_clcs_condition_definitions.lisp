@@ -105,16 +105,12 @@
 	      :reader arithmetic-error-operation)
    (operands :initarg :operands
 	      :reader arithmetic-error-operands))
-    (:report ("Arithmetic error when performing ~s on ~s: " operation operands)))
+  (:report ("~%Arithmetic error when performing ~s on ~s: " operation operands)))
 
 (define-condition division-by-zero (arithmetic-error) ())
-
 (define-condition floating-point-overflow (arithmetic-error) ())
-
 (define-condition floating-point-invalid-operation (arithmetic-error) ())
-
 (define-condition floating-point-inexact (arithmetic-error) ())
-
 (define-condition floating-point-underflow (arithmetic-error) ())
 
 (define-condition pathname-error (file-error) ())
