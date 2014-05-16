@@ -28,8 +28,6 @@
 
 #define IN_GBC
 #define NEED_MP_H
-#include <string.h>
-#include <stdlib.h>
 #include "include.h"
 #include "page.h"
 

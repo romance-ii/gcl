@@ -1046,8 +1046,6 @@
         (ref-clb (vs-push)) ref-ccb)
     (wt-nl) (wt-vs ref-clb) (wt "=alloc_frame_id();")
     (wt-nl) 
-;    (wt-vs ref-clb) (wt "=MMcons(") (wt-vs ref-clb) (wt ",")
-;    (wt-clink) (wt ");")
     (clink ref-clb)
     (setq ref-ccb (ccb-vs-push))
     (add-libc "setjmp")

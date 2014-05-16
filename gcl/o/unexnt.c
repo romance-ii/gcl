@@ -26,14 +26,12 @@ Boston, MA 02111-1307, USA.
 #ifndef UNIXSAVE
 #include <config.h>
 #endif
-/* #include <stdlib.h> */ 	/* _fmode */
 /* in case the include of config.h defined it */
 #undef va_start
 #include <stdio.h>
 #include <fcntl.h>
 #include <time.h>
 #include <windows.h>
-#include <string.h>   /* strrchr */
 
 #ifdef _GNU_H_WINDOWS_H 
 #include "cyglacks.h"
@@ -52,7 +50,6 @@ PIMAGE_NT_HEADERS
 
 
 
-#include <stdlib.h>
 #include <stdio.h>
 
 #include "ntheap.h"

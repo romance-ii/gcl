@@ -25,7 +25,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #define NEED_ISFINITE
 #include "include.h"
-#include <string.h>
 #include "num_include.h"
 
 static object
@@ -1252,7 +1251,7 @@ Lsharp_left_parenthesis_reader()
 		vs_push(read_object(in));
 		a = backq_car(vs_base[1]);
 		if (a == APPEND || a == NCONC)
-		FEerror(",at or ,. has appeared in an illegal position.", 0);
+		  FEerror(",at or ,. has appeared in an illegal position.", 0);
 		if (a == QUOTE) {
 			vsp = vs_top;
 			dimcount = 0;

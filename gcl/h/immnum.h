@@ -1,6 +1,8 @@
 #ifndef IMMNUM_H
 #define IMMNUM_H
 
+#include "fixnum.h"
+
 #if defined (LOW_SHFT)
 #define is_imm_fixnum2(x_,y_) is_unmrkd_imm_fixnum(x_)&&is_unmrkd_imm_fixnum(y_)
 #define is_imm_fixnum3(x_,y_,z_) is_unmrkd_imm_fixnum(x_)&&is_unmrkd_imm_fixnum(y_)&&is_unmrkd_imm_fixnum(z_)
@@ -81,6 +83,7 @@ immnum_count(object x) {return iif(x) ? mif(fixnum_count(fif(x))) : integer_coun
   lb=bs-clz(labs(x));|x*y|=|x|*|y|<2^(lbx+lby)<2^(bs-1);
   0 bounded by 2^0, +-1 by 2^1,mpf by 2^(bs-1), which is sign bit
   protect labs from most negative fix, here all immfix ok*/
+long int labs(long int j);
 EXTER inline bool
 fixnum_mul_safe_abs(fixnum x,fixnum y) {return clz(x)+clz(y)>sizeof(x)*8+1;}
 EXTER inline object

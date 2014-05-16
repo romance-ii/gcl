@@ -25,8 +25,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	predicates
 */
 
-#include <stdlib.h>
-#include <string.h>
 #include "include.h"
 
 DEFUN("NULL",object,fLnull,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {

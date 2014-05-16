@@ -23,8 +23,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef IN_UNIXINT
 #define NEED_MP_H
 #include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
 #include "include.h"
 
 static void
@@ -284,7 +282,7 @@ before_interrupt(struct save_for_interrupt *p,int allowed) {
  if (p->token_st_dim<sizeof(p->token_buf))
    p->token_bufp=p->token_buf;
  else 
-   p->token_bufp=(void *)OUR_ALLOCA(p->token_st_dim);
+   p->token_bufp=(void *)ZALLOCA(p->token_st_dim);
 
  memcpy(p->token_bufp,token->st.st_self,p->token_st_dim);
   

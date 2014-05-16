@@ -105,8 +105,8 @@ do {static struct sigaction action; \
 #undef LISTEN_FOR_INPUT
 #define LISTEN_FOR_INPUT(fp) \
 do { int c = 0; \
-  if(((fp)->_IO_read_ptr >= (fp)->_IO_read_end) \
-     && (ioctl((fp)->_fileno, FIONREAD, &c),c<=0)) \
+  if((((FILE *)fp)->_IO_read_ptr >= ((FILE *)fp)->_IO_read_end)	\
+     && (ioctl(((FILE *)fp)->_fileno, FIONREAD, &c),c<=0))	\
      return 0;} while (0)
 
 /* #define DATA_BEGIN((TXTRELOC+header.a_text+(SEGSIZ-1)) & ~(SEGSIZ-1)); */

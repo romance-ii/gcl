@@ -19,8 +19,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#include <stdlib.h>
-#include <string.h>
 #include "include.h"
 
 static object Iname_t=Ct;

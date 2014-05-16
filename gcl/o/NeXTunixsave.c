@@ -16,7 +16,6 @@
 #undef __STRICT_BSD__
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <mach/mach.h>
 #include <mach-o/loader.h>
 #include <sys/file.h>

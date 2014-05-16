@@ -1,4 +1,5 @@
-
+#ifndef FUNLINK_H
+#define FUNLINK_H
 /* the link_desc, is an INT which carries the call information
    for all uses of that link.   It tells whether fcall.nargs is
    set before the call, whether the VFUN_FUN is set, (to pass in
@@ -19,6 +20,42 @@ A link arg descriptor:
     r = result type in F_arg_types
     ai = i'th arg type in F_arg_types
 */
+
+#define F_NARG_WIDTH 6
+#define F_START_TYPES_POS   (2* F_NARG_WIDTH + F_end )
+enum F_arg_flags
+{ F_requires_nargs, /* if set, then caller must store VFUN_NARGS with number
+		       of args passed.   F_ARGD is used to set up the argd,
+		       and it sets this if minargs < maxargs.   */
+  F_caller_sets_one_val, /* If set, then the CALLER will look after setting the
+		       fcall.nvalues to 1, if necessary (eg the call is at the
+		       end of a function, or if multiple-values-list invokes
+		       the function.)  If foo is proclaimed to return exactly
+		       one value, then the CALLER might set this flag in the
+		       link argd, or it might do it in the case we have (setq
+		       x (foo)) or (values (foo)).   
+		      
+		       If this flag is not set, then the CALLED function is
+		       responsible for setting the number of values in
+		       fcall.nvalues, and also for always returning as C value
+		       Cnil, in the case that it sets fcall.nvalues == 0.  */
+  F_requires_fun_passed, /* if set, the caller must set VFUN_FUN to the
+			    calling function.  This is used by closures, but
+			    could be used by other things i suppose. */
+  F_end               /* 1 bigger than the largest flag */
+  };
+enum F_arg_types
+{ F_object,
+  F_int,  
+  F_double_ptr,
+  F_shortfloat  
+  };
+
+/* Make a mask for bits i < j, masking j-i bits */
+#define MASK_RANGE(i,j)  ((~(~0 << (j-i)))<< i)
+
+#define F_PLAIN(x) (((x) & MASK_RANGE( F_START_TYPES_POS,31)) == 0)
+#define ARG_LIMIT 63
 
 /* We allow 2 bits for encoding arg types and return type */
 #define F_TYPE_WIDTH 2
@@ -78,3 +115,4 @@ A link arg descriptor:
 
 #define FUNCALL(n,form) (VFUN_NARGS=n,form)
  
+#endif

@@ -413,7 +413,6 @@ Filesz      Memsz       Flags       Align
 #include <stdio.h>
 #include <sys/stat.h>
 #include <memory.h>
-#include <string.h>
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>

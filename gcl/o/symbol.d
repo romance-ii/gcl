@@ -23,7 +23,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	symbol.d
 */
 
-#include <string.h>
 #include <ctype.h>
 #include "include.h"
 

@@ -5,7 +5,6 @@
 #include "windows.h"
 #include "errno.h"
 #include "signal.h"
-#include "stdlib.h"
 extern void sigint ( int );
 
 #ifdef DODEBUG

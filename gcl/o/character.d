@@ -27,6 +27,12 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 
+#define	CHFONTLIM	1	/*  character font limit  */
+#define	CHBITSLIM	1	/*  character bits limit  */
+#define	CHCODEFLEN	8	/*  character code field length  */
+#define	CHFONTFLEN	0	/*  character font field length  */
+#define	CHBITSFLEN      0	/*  character bits field length  */
+
 @(defun standard_char_p (c)
 	int i;
 @

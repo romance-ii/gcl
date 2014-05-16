@@ -43,7 +43,6 @@ read.d: normalize_big_to_object
  */
 
 
-#include <string.h>
 
 #define DEBUG_GMP
 #ifdef DEBUG_GMP

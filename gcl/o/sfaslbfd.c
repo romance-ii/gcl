@@ -38,7 +38,6 @@ License for more details.
 
 #include "ext_sym.h"
 #include "gclincl.h"
-#include <string.h>
 
 
 

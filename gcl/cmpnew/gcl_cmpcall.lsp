@@ -135,9 +135,9 @@
       (list (make-list (length all) :initial-element t)
 	    '* #.(flags ans set svt) 
 	    "({object _z;fixnum _v=(fixnum)#v;
-        fcall.fun=#0;FUN_VALP=_v;VFUN_NARGS=#n-1;
+        fcall.fun=#0;fcall.valp=_v;fcall.argd=#n-1;
         _z=Rset && !(#0)->fun.fun_argd && 
-        VFUN_NARGS>=(#0)->fun.fun_minarg && VFUN_NARGS<=((#0)->fun.fun_maxarg) ? 
+        fcall.argd>=(#0)->fun.fun_minarg && fcall.argd<=((#0)->fun.fun_maxarg) ? 
            (#0)->fun.fun_self(#*) : call_proc_cs2(#?);
            if (!(#0)->fun.fun_neval) vs_top=_v ? (object *)_v : sup;_z;})") all))
     (close-inline-blocks)))

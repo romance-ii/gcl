@@ -27,9 +27,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <sys/types.h>
 #include <sys/stat.h>
      
-#include <string.h>
 #include <signal.h>
-#include <stdlib.h>
 #define NEED_MP_H
 #include "include.h"
 #define dcheck_type(a,b) check_type(a,b)
@@ -628,7 +626,7 @@ gcl_init_or_load1(void (*fn)(void),const char *file)
  if (file[n-1]=='o')
    { object memory;
      object fasl_data;
-     file=FIX_PATH_STRING(file);
+     /* file=FIX_PATH_STRING(file); */
 
      memory=alloc_object(t_cfdata);
      memory->cfd.cfd_self=0;

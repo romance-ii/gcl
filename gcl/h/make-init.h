@@ -1,7 +1,6 @@
 #include "include.h"
 #include "num_include.h"
 #define IN_NEW_INIT
-#include "funlink.h"
 #define SI 0
 #define LISP 1
 #define KEYWORD 2
@@ -58,13 +57,6 @@
 
 #undef DO_INIT
 #define DO_INIT(x) x
-  
-  
 
-	   
-	   
-	   
-
-  
-
-  
+#include <fenv.h>
+#include <signal.h>

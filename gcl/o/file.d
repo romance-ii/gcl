@@ -30,8 +30,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	It also contains read_fasl_data.
 */
 
-#include <string.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>

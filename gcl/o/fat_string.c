@@ -2,9 +2,7 @@
 (c) Copyright W. Schelter 1988, All rights reserved.
 */
 
-#include <stdlib.h>
 #include <unistd.h>
-#include <string.h>
 
 #include "include.h"
 #include "page.h"

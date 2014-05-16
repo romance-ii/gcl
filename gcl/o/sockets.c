@@ -20,7 +20,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #define IN_SOCKETS
-#include <stdlib.h>
 #include "include.h"
 
 #ifdef HAVE_NSOCKET
@@ -38,7 +37,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 #ifdef __STDC__
-#include <string.h> 
 #endif
 
 #ifndef __MINGW32__

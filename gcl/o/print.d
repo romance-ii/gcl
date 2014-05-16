@@ -331,7 +331,6 @@ write_base(void)
 
 object sSAprint_nansA;
 
-#include <string.h>
 
 static int
 char_inc(char *b,char *p) {
@@ -1062,7 +1061,7 @@ int level;
 	  }
 	case t_array:
 	{
-		int subscripts[ARANKLIM];
+		int subscripts[ARRAY_RANK_LIMIT];
 		int n, m;
 
 		if (!PRINTarray) {

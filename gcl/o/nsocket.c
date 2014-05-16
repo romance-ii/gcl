@@ -1,7 +1,5 @@
 /* the following file compiles under win95 using cygwinb19 */ 
-#include <stdlib.h>
 #include "include.h"
-#include <string.h>
 
 #ifdef DODEBUG
 #define dprintf(s,arg) \

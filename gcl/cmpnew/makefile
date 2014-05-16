@@ -19,21 +19,13 @@ SRC:= $(addprefix gcl_,$(addsuffix .lsp,$(PREFS) $(NCPREFS)))
 OBJS:=$(addprefix gcl_,$(addsuffix .o,$(PREFS)))
 FNS:= $(OBJS:.o=.fn)
 
-COMPILE_FILE=$(PORTDIR)/saved_pre_gcl $(PORTDIR) $(LISPFLAGS) -system-p -c-file -data-file \
-	-o-file nil -h-file -compile
+LISP:=$(shell ls -1rt ../unixport/saved_pre_gcl ../unixport/saved_gcl|tail -n 1)
+
+COMPILE_FILE=$(LISP) $(PORTDIR) $(LISPFLAGS) -system-p -c-file -data-file -h-file -compile
 #CFLAGS	= -c -O -I../h 
 
-.lsp.c:
-	@ ../xbin/if-exists $(PORTDIR)/saved_pre_gcl \
-	"rm -f $*.c $*.h $*.data $*.o" \
-	"$(COMPILE_FILE) $* "
-
-.lsp.o:
-	@ ../xbin/if-exists $(PORTDIR)/saved_pre_gcl \
-	"rm -f $*.c $*.h $*.data $*.o" \
-	"$(COMPILE_FILE) $* " \
-	"$(CC) $(OFLAG) $(CFLAGS) -c $*.c" \
-	"${APPEND} ${NULLFILE} $*.data $*.o"
+%.o: %.lsp $(LISP) 
+	$(COMPILE_FILE) $<
 
 all:	$(OBJS)
 

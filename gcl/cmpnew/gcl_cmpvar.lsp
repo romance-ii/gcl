@@ -1241,13 +1241,13 @@
     
     (wt-nl "while(!endp(symbols)){")
     (when *safe-compile*
-      (wt-nl "if(type_of(MMcar(symbols))!=t_symbol)")
+      (wt-nl "if(type_of(symbols->c.c_car)!=t_symbol)")
       (wt-nl
-       "FEinvalid_variable(\"~s is not a symbol.\",MMcar(symbols));"))
-    (wt-nl "if(endp(values))bds_bind(MMcar(symbols),OBJNULL);")
-    (wt-nl "else{bds_bind(MMcar(symbols),MMcar(values));")
-    (wt-nl "values=MMcdr(values);}")
-    (wt-nl "symbols=MMcdr(symbols);}")
+       "FEinvalid_variable(\"~s is not a symbol.\",symbols->c.c_car);"))
+    (wt-nl "if(endp(values))bds_bind(symbols->c.c_car,OBJNULL);")
+    (wt-nl "else{bds_bind(symbols->c.c_car,values->c.c_car);")
+    (wt-nl "values=values->c.c_cdr;}")
+    (wt-nl "symbols=symbols->c.c_cdr;}")
     (setq *bds-used* t))
   (c2expr body)
   (wt "}"))

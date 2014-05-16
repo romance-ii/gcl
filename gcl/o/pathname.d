@@ -42,7 +42,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 #include <strings.h>
-#include <string.h>
 
 DEFVAR("*PATHNAME-RESOLVE*",sSApathname_resolveA,SI,Cnil,
 	"list of enableing keyword for pathname resolver");

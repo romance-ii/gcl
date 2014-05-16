@@ -23,7 +23,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	package.d
 */
 
-#include <string.h>
 #include "include.h"
 
 #define	HASHCOEF	12345		/*  hashing coefficient  */

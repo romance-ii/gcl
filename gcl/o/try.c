@@ -1,12 +1,10 @@
 #ifndef UNIXSAVE
 #include "config.h"
 #endif
-/* #include <stdlib.h> */ 	/* _fmode */
 #include <stdio.h>
 #include <fcntl.h>
 #include <time.h>
 #include <windows.h>
-#include <stdlib.h>
 #ifdef _GNU_H_WINDOWS_H 
 #include "cyglacks.h"
 #endif

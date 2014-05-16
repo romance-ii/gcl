@@ -41,9 +41,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define RL_COMPLETION
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
-#include <string.h>
 #if 1
 #include <readline/readline.h>
 #include <readline/history.h>

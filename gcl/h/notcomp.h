@@ -1,4 +1,5 @@
-
+#include <string.h>
+#include <stdlib.h>
 
 #define	CHAR_CODE_LIMIT	256	
 #define	READ_TABLE_SIZE CHAR_CODE_LIMIT
@@ -495,3 +496,34 @@ object ihs_top_function_name(ihs_ptr h);
 extern bool writable_malloc;
 #define writable_malloc_wrap(f_,rt_,a_...) ({rt_ v;bool w=writable_malloc;writable_malloc=1;v=f_(a_);writable_malloc=w;v;})
 #define fopen(a_,b_) writable_malloc_wrap(fopen,FILE *,a_,b_)
+
+#define Mcar(x)	(x)->c.c_car
+#define Mcdr(x)	(x)->c.c_cdr
+#define Mcaar(x)	(x)->c.c_car->c.c_car
+#define Mcadr(x)	(x)->c.c_cdr->c.c_car
+#define Mcdar(x)	(x)->c.c_car->c.c_cdr
+#define Mcddr(x)	(x)->c.c_cdr->c.c_cdr
+#define Mcaaar(x)	(x)->c.c_car->c.c_car->c.c_car
+#define Mcaadr(x)	(x)->c.c_cdr->c.c_car->c.c_car
+#define Mcadar(x)	(x)->c.c_car->c.c_cdr->c.c_car
+#define Mcaddr(x)	(x)->c.c_cdr->c.c_cdr->c.c_car
+#define Mcdaar(x)	(x)->c.c_car->c.c_car->c.c_cdr
+#define Mcdadr(x)	(x)->c.c_cdr->c.c_car->c.c_cdr
+#define Mcddar(x)	(x)->c.c_car->c.c_cdr->c.c_cdr
+#define Mcdddr(x)	(x)->c.c_cdr->c.c_cdr->c.c_cdr
+#define Mcaaaar(x)	(x)->c.c_car->c.c_car->c.c_car->c.c_car
+#define Mcaaadr(x)	(x)->c.c_cdr->c.c_car->c.c_car->c.c_car
+#define Mcaadar(x)	(x)->c.c_car->c.c_cdr->c.c_car->c.c_car
+#define Mcaaddr(x)	(x)->c.c_cdr->c.c_cdr->c.c_car->c.c_car
+#define Mcadaar(x)	(x)->c.c_car->c.c_car->c.c_cdr->c.c_car
+#define Mcadadr(x)	(x)->c.c_cdr->c.c_car->c.c_cdr->c.c_car
+#define Mcaddar(x)	(x)->c.c_car->c.c_cdr->c.c_cdr->c.c_car
+#define Mcadddr(x)	(x)->c.c_cdr->c.c_cdr->c.c_cdr->c.c_car
+#define Mcdaaar(x)	(x)->c.c_car->c.c_car->c.c_car->c.c_cdr
+#define Mcdaadr(x)	(x)->c.c_cdr->c.c_car->c.c_car->c.c_cdr
+#define Mcdadar(x)	(x)->c.c_car->c.c_cdr->c.c_car->c.c_cdr
+#define Mcdaddr(x)	(x)->c.c_cdr->c.c_cdr->c.c_car->c.c_cdr
+#define Mcddaar(x)	(x)->c.c_car->c.c_car->c.c_cdr->c.c_cdr
+#define Mcddadr(x)	(x)->c.c_cdr->c.c_car->c.c_cdr->c.c_cdr
+#define Mcdddar(x)	(x)->c.c_car->c.c_cdr->c.c_cdr->c.c_cdr
+#define Mcddddr(x)	(x)->c.c_cdr->c.c_cdr->c.c_cdr->c.c_cdr

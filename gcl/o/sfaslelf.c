@@ -16,13 +16,10 @@ License for more details.
 */
 
 
-#include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
-#include <string.h>
 #include <elf.h>
 
 #include "gclincl.h"

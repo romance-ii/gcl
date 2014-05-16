@@ -1,6 +1,4 @@
-#include <string.h>
 #include <stdarg.h>
-#include <stdlib.h>
 #include "include.h"
 
 /* The functions IisProp check the property holds, and return the

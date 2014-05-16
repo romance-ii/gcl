@@ -132,12 +132,25 @@ unblock_sigusr_sigio(void)
 }
 
 
+DEF_ORDINARY("FLOATING-POINT-ERROR",sSfloating_point_error,SI,"");
+
 static void
-sigfpe1(int s,siginfo_t *a,void *b)
-{
-	gcl_signal(SIGFPE, sigfpe1);
-	FEerror("Floating-point exception.", 0);
+sigfpe3(int sig,siginfo_t *i,void *p) {
+
+  ucontext_t *v=p;
+
+  ifuncall3(sSfloating_point_error,make_fixnum((fixnum)i->si_code),
+	    make_fixnum(v->uc_mcontext.fpregs->fop ? v->uc_mcontext.fpregs->rip : (fixnum)i->si_addr),
+	    make_fixnum((fixnum)v));
+
 }
+
+/* static void */
+/* sigfpe1(int s,siginfo_t *a,void *b) */
+/* { */
+/* 	gcl_signal(SIGFPE, sigfpe1); */
+/* 	FEerror("Floating-point exception.", 0); */
+/* } */
 
 static void
 sigpipe(int s,siginfo_t *a,void *b)
@@ -178,7 +191,7 @@ sigio(int s,siginfo_t *a,void *b)
 
 void
 install_default_signals(void)
-{	gcl_signal(SIGFPE, sigfpe1);
+{	gcl_signal(SIGFPE, sigfpe3);
 	gcl_signal(SIGPIPE, sigpipe);
 	gcl_signal(SIGINT, sigint);
 	gcl_signal(SIGUSR1, sigusr1);

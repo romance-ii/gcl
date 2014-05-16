@@ -25,7 +25,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #define NEED_MP_H
 #define EXPORT_GMP
-#include <stdlib.h>
 #include "include.h"
 #include "num_include.h"
 

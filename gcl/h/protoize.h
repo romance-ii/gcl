@@ -387,788 +387,529 @@ object funcall_vec(object,ufixnum,object *);
 
 /*  readline.d */
 extern int readline_on;
-void
-gcl_init_readline_function(void);
-void
-gcl_init_readline(void);
+void gcl_init_readline_function(void);
+void gcl_init_readline(void);
 
 /*  sys_gcl.c */
-void
-gcl_init_init(void);
+void gcl_init_init(void);
 
 /* misc */
-void
-gcl_init_symbol(void);
+void gcl_init_symbol(void);
 
-void
-gcl_init_package(void);
+void gcl_init_package(void);
 
-void
-gcl_init_character(void);
+void gcl_init_character(void);
 
-void
-gcl_init_read(void);
+void gcl_init_read(void);
 
-void
-gcl_init_pathname(void);
+void gcl_init_pathname(void);
 
-void
-gcl_init_print(void);
+void gcl_init_print(void);
 
-void
-gcl_init_character_function(void);
+void gcl_init_character_function(void);
 
-void
-gcl_init_file_function(void);
+void gcl_init_file_function(void);
 
-void
-gcl_init_list_function(void);
+void gcl_init_list_function(void);
 
-void
-gcl_init_package_function(void);
+void gcl_init_package_function(void);
 
-void
-gcl_init_pathname_function(void);
+void gcl_init_pathname_function(void);
 
-void
-gcl_init_print_function(void);
+void gcl_init_print_function(void);
 
-void
-gcl_init_read_function(void);
+void gcl_init_read_function(void);
 
-void
-gcl_init_sequence_function(void);
+void gcl_init_sequence_function(void);
 
-void
-gcl_init_string_function(void);
+void gcl_init_string_function(void);
 
-void
-gcl_init_symbol_function(void);
+void gcl_init_symbol_function(void);
 
-void
-gcl_init_socket_function(void);
+void gcl_init_socket_function(void);
 
-void
-gcl_init_hash(void);
+void gcl_init_hash(void);
 
-void
-import(object,object);
+void import(object,object);
 
-void
-export(object,object);
+void export(object,object);
 
-void
-NewInit(void);
+void NewInit(void);
 
-void
-gcl_init_system(object);
+void gcl_init_system(object);
 
-void
-set_up_string_register(char *);
+void set_up_string_register(char *);
 
-bool
-endp1(object);
+bool endp1(object);
 
-void
-stack_cons(void);
+void stack_cons(void);
 
-bool
-char_equal(object,object);
+bool char_equal(object,object);
 
-bool
-string_equal(object,object);
+bool string_equal(object,object);
 
-bool
-string_eq(object,object);
+bool string_eq(object,object);
 
-bool
-remf(object *,object);
+bool remf(object *,object);
 
-bool
-keywordp(object);
+bool keywordp(object);
 
-int
-pack_hash(object);
+int pack_hash(object);
 
-void
-load(const char *);
+void load(const char *);
 
-bool
-member_eq(object,object);
+bool member_eq(object,object);
 
-void
-delete_eq(object,object *);
+void delete_eq(object,object *);
 
-int
-length(object);
+int length(object);
 
-int
-rl_getc_em(FILE *);
+int rl_getc_em(FILE *);
 
-void
-setupPRINTdefault(object);
+void setupPRINTdefault(object);
 
-void
-write_str(char *);
+void write_str(char *);
 
-void
-write_object(object,int);
+void write_object(object,int);
 
-void
-cleanupPRINT(void);
+void cleanupPRINT(void);
 
-int
-fasload(object);
+int fasload(object);
 
-int
-readc_stream(object);
+int readc_stream(object);
 
-void
-unreadc_stream(int,object);
+void unreadc_stream(int,object);
 
-void
-end_of_stream(object);
+void end_of_stream(object);
 
-bool
-stream_at_end(object);
+bool stream_at_end(object);
 
-int
-digitp(int,int);
+int digitp(int,int);
 
-bool
-char_eq(object,object);
+bool char_eq(object,object);
 
-bool
-listen_stream(object);
+bool listen_stream(object);
 
-void
-get_string_start_end(object,object,object,int *,int *);
+void get_string_start_end(object,object,object,int *,int *);
 
-int
-file_column(object);
+int file_column(object);
 
-int
-writec_stream(int,object);
+int writec_stream(int,object);
 
-int
-digit_weight(int,int);
+int digit_weight(int,int);
 
-void
-flush_stream(object);
+void flush_stream(object);
 
-void
-writestr_stream(char *,object);
+void writestr_stream(char *,object);
 
-void
-write_string(object,object);
+void write_string(object,object);
 
-void
-edit_double(int, double, int *, char *, int *);
+void edit_double(int, double, int *, char *, int *);
 
-void
-sethash(object,object,object);
+void sethash(object,object,object);
 
-int
-file_position(object);
+int file_position(object);
 
-int
-file_position_set(object, int);
+int file_position_set(object, int);
 
-void
-princ_str(char *s, object);
+void princ_str(char *s, object);
 
-void
-close_stream(object);
+void close_stream(object);
 
-void
-build_symbol_table(void);
+void build_symbol_table(void);
 
-void
-gcl_init_file(void);
+void gcl_init_file(void);
 
-object
-aset1(object,fixnum,object);
+object aset1(object,fixnum,object);
 
-void
-dfprintf(FILE *,char *,...);
+void dfprintf(FILE *,char *,...);
 
-void
-Lmake_list(void);
+void Lmake_list(void);
 
-void
-Llast(void);
+void Llast(void);
 
-void
-Lgensym(void);
+void Lgensym(void);
 
-void
-Lldiff(void);
+void Lldiff(void);
 
-void
-Lintern(void);
+void Lintern(void);
 
-void
-Lgensym(void);
+void Lgensym(void);
 
-void
-Lldiff(void);
+void Lldiff(void);
 
-void
-Lgensym(void);
+void Lgensym(void);
 
-void
-Lintern(void);
+void Lintern(void);
 
-void
-Lintern(void);
+void Lintern(void);
 
-void
-Lreconc(void);
+void Lreconc(void);
 
-void
-Lmember(void);
+void Lmember(void);
 
-void
-Ladjoin(void);
+void Ladjoin(void);
 
-void
-Llist(void);
+void Llist(void);
 
-void
-Lappend(void);
+void Lappend(void);
 
-void
-Lread(void);
+void Lread(void);
 
-void
-Lread_char(void);
+void Lread_char(void);
 
-void
-Lchar_eq(void);
+void Lchar_eq(void);
 
-void
-Lwrite_char(void);
+void Lwrite_char(void);
 
-void
-Lforce_output(void);
+void Lforce_output(void);
 
-void
-Lchar_neq(void);
+void Lchar_neq(void);
 
-void
-Llist(void);
+void Llist(void);
 
-void
-Lwrite(void);
+void Lwrite(void);
 
-void
-Lfresh_line(void);
+void Lfresh_line(void);
 
-void
-Lsymbol_package(void);
+void Lsymbol_package(void);
 
-void
-Lfind_package(void);
+void Lfind_package(void);
 
-void
-Lfind_symbol(void);
+void Lfind_symbol(void);
 
-void
-Lpackage_name(void);
+void Lpackage_name(void);
 
-void
-Lsymbol_plist(void);
+void Lsymbol_plist(void);
 
-void
-Lpackage_nicknames(void);
+void Lpackage_nicknames(void);
 
-void
-Lpackage_use_list(void);
+void Lpackage_use_list(void);
 
-void
-Lpackage_used_by_list(void);
+void Lpackage_used_by_list(void);
 
-void
-Lstandard_char_p(void);
+void Lstandard_char_p(void);
 
-void
-Lstring_char_p(void);
+void Lstring_char_p(void);
 
-void
-Lchar_code(void);
+void Lchar_code(void);
 
-void
-Lchar_bits(void);
+void Lchar_bits(void);
 
-void
-Lchar_font(void);
+void Lchar_font(void);
 
-void
-Lread_line(void);
+void Lread_line(void);
 
-void
-siLpackage_internal(void);
+void siLpackage_internal(void);
 
-void
-siLpackage_external(void);
+void siLpackage_external(void);
 
-void
-Llist_all_packages(void);
+void Llist_all_packages(void);
 
-void
-Lgensym(void);
+void Lgensym(void);
 
-void
-Lread(void);
+void Lread(void);
 
-void
-Lwrite(void);
+void Lwrite(void);
 
-void
-Lstring_equal(void);
+void Lstring_equal(void);
 
-void
-Lclose(void);
+void Lclose(void);
 
-void
-Lnamestring(void);
+void Lnamestring(void);
 
-void
-Lmake_echo_stream(void);
+void Lmake_echo_stream(void);
 
-void
-Lmake_broadcast_stream(void);
+void Lmake_broadcast_stream(void);
 
-void
-Lmake_two_way_stream(void);
+void Lmake_two_way_stream(void);
 
-void
-Lbutlast(void);
+void Lbutlast(void);
 
-void
-Ladjoin(void);
+void Ladjoin(void);
 
-void
-Lstring_downcase(void);
+void Lstring_downcase(void);
 
-void
-Lmember(void);
+void Lmember(void);
 
-void
-Lgensym(void);
+void Lgensym(void);
 
-void
-Llist_all_packages(void);
+void Llist_all_packages(void);
 
-void
-Lfind_symbol(void);
+void Lfind_symbol(void);
 
-void
-Lstring_equal(void);
+void Lstring_equal(void);
 
-void
-Lfind_package(void);
+void Lfind_package(void);
 
-void
-siLpackage_internal(void);
+void siLpackage_internal(void);
 
-void
-siLpackage_external(void);
+void siLpackage_external(void);
 
-void
-Lpackage_use_list(void);
+void Lpackage_use_list(void);
 
-void
-Lreconc(void);
+void Lreconc(void);
 
-void
-Lstandard_char_p(void);
+void Lstandard_char_p(void);
 
-void
-Lstring_char_p(void);
+void Lstring_char_p(void);
 
-void
-Lcharacter(void);
+void Lcharacter(void);
 
-void
-Llength(void);
+void Llength(void);
 
-void
-Lreconc(void);
+void Lreconc(void);
 
-void
-Llength(void);
+void Llength(void);
 
-void
-Lgensym(void);
+void Lgensym(void);
 
-void
-Llist_length(void);
+void Llist_length(void);
 
-void
-Lgensym(void);
+void Lgensym(void);
 
-void
-Lbutlast(void);
+void Lbutlast(void);
 
-void
-Lnconc(void);
+void Lnconc(void);
 
-void
-Lfind_package(void);
+void Lfind_package(void);
 
-void
-Lpackage_name(void);
+void Lpackage_name(void);
 
-void
-Llist(void);
+void Llist(void);
 
-void
-Lfresh_line(void);
+void Lfresh_line(void);
 
-void
-Lread_char(void);
+void Lread_char(void);
 
-void
-Lunread_char(void);
+void Lunread_char(void);
 
-void
-Lread_line(void);
+void Lread_line(void);
 
-void
-Lread(void);
+void Lread(void);
 
-void
-Lforce_output(void);
+void Lforce_output(void);
 
-void
-Lwrite(void);
+void Lwrite(void);
 
-void
-Lmember(void);
+void Lmember(void);
 
-void
-siLpackage_internal(void);
+void siLpackage_internal(void);
 
-void
-siLpackage_external(void);
+void siLpackage_external(void);
 
-void
-Lmake_pathname(void);
+void Lmake_pathname(void);
 
-void
-Lnamestring(void);
+void Lnamestring(void);
 
-void
-Lclose(void);
+void Lclose(void);
 
-void
-Lgensym(void);
+void Lgensym(void);
 
-void
-Lfresh_line(void);
+void Lfresh_line(void);
 
-void
-Llist(void);
+void Llist(void);
 
-void
-Lread_char(void);
+void Lread_char(void);
 
-void
-Lchar_eq(void);
+void Lchar_eq(void);
 
-void
-Lfinish_output(void);
+void Lfinish_output(void);
 
-void
-Lchar_neq(void);
+void Lchar_neq(void);
 
-void
-Lwrite(void);
+void Lwrite(void);
 
-void
-Lgensym(void);
+void Lgensym(void);
 
-void
-Lmember(void);
+void Lmember(void);
 
-void
-Lappend(void);
+void Lappend(void);
 
-void
-Lcopy_tree(void);
+void Lcopy_tree(void);
 
-void
-Ladjoin(void);
+void Ladjoin(void);
 
-void
-Lgetf(void);
+void Lgetf(void);
 
-void
-Lsubst(void);
+void Lsubst(void);
 
-void
-Lsymbol_package(void);
+void Lsymbol_package(void);
 
-void
-Lcopy_list(void);
+void Lcopy_list(void);
 
-void
-Lintern(void);
+void Lintern(void);
 
-void
-Lfind_package(void);
+void Lfind_package(void);
 
-void
-LlistA(void);
+void LlistA(void);
 
-void
-Llist(void);
+void Llist(void);
 
-void
-Lgetf(void);
+void Lgetf(void);
 
-void
-Lstreamp(void);
+void Lstreamp(void);
 
-void
-Lpeek_char(void);
+void Lpeek_char(void);
 
-void
-Lread_char(void);
+void Lread_char(void);
 
-void
-Lread_line(void);
+void Lread_line(void);
 
-void
-Lset_macro_character(void);
+void Lset_macro_character(void);
 
-void
-Lclrhash(void);
+void Lclrhash(void);
 
-void
-siLhash_set(void);
+void siLhash_set(void);
 
-void
-Lgethash(void);
+void Lgethash(void);
 
-struct cons *
-gethash(object,object);
+struct cons * gethash(object,object);
 
-void
-Lremhash(void);
+void Lremhash(void);
 
-void
-Llist_all_packages(void);
+void Llist_all_packages(void);
 
-void
-Lintern(void);
+void Lintern(void);
 
-void
-Lunintern(void);
+void Lunintern(void);
 
-void
-Lsubseq(void);
+void Lsubseq(void);
 
-void
-Lsymbol_package(void);
+void Lsymbol_package(void);
 
-void
-Lfind_package(void);
+void Lfind_package(void);
 
-void
-siLpackage_internal(void);
+void siLpackage_internal(void);
 
-void
-siLpackage_external(void);
+void siLpackage_external(void);
 
-void
-Lread_char(void);
+void Lread_char(void);
 
-void
-Lfile_length(void);
+void Lfile_length(void);
 
-void
-Lfile_position(void);
+void Lfile_position(void);
 
-void
-Lclose(void);
+void Lclose(void);
 
-void
-Lsubseq(void);
+void Lsubseq(void);
 
-void
-Lnamestring(void);
+void Lnamestring(void);
 
-void
-Lmerge_pathnames(void);
+void Lmerge_pathnames(void);
 
-void
-Lcopy_list(void);
+void Lcopy_list(void);
 
-void
-Lread_line(void);
+void Lread_line(void);
 
-void
-Lgensym(void);
+void Lgensym(void);
 
-void
-Lcopy_list(void);
+void Lcopy_list(void);
 
-void
-Lintern(void);
+void Lintern(void);
 
-void
-Lappend(void);
+void Lappend(void);
 
-void
-Lgensym(void);
+void Lgensym(void);
 
-void
-Lcopy_list(void);
+void Lcopy_list(void);
 
-void
-Lmember(void);
+void Lmember(void);
 
-void
-Lintern(void);
+void Lintern(void);
 
-void
-Lappend(void);
+void Lappend(void);
 
-void
-Lfind_package(void);
+void Lfind_package(void);
 
-void
-Lpackage_name(void);
+void Lpackage_name(void);
 
-void
-Lpackage_nicknames(void);
+void Lpackage_nicknames(void);
 
-void
-Lpackage_use_list(void);
+void Lpackage_use_list(void);
 
-void
-siLpackage_external(void);
+void siLpackage_external(void);
 
-void
-siLpackage_internal(void);
+void siLpackage_internal(void);
 
-void
-Lsymbol_package(void);
+void Lsymbol_package(void);
 
-void
-Lappend(void);
+void Lappend(void);
 
-void
-Lgentemp(void);
+void Lgentemp(void);
 
-void
-Lgensym(void);
+void Lgensym(void);
 
-void
-Lassoc(void);
+void Lassoc(void);
 
-void
-Ladjoin(void);
+void Ladjoin(void);
 
-void
-Lstring_eq(void);
+void Lstring_eq(void);
 
-void
-Lmember(void);
+void Lmember(void);
 
-void
-Lgethash(void);
+void Lgethash(void);
 
-void
-Lfinish_output(void);
+void Lfinish_output(void);
 
-void
-Lread(void);
+void Lread(void);
 
-void
-Lmake_hash_table(void);
+void Lmake_hash_table(void);
 
-void
-siLhash_set(void);
+void siLhash_set(void);
 
-void
-Lrevappend(void);
+void Lrevappend(void);
 
-void
-Lreconc(void);
+void Lreconc(void);
 
-void
-Lcopy_list(void);
+void Lcopy_list(void);
 
-void
-LlistA(void);
+void LlistA(void);
 
-void
-Lfind_package(void);
+void Lfind_package(void);
 
-void
-siLpackage_internal(void);
+void siLpackage_internal(void);
 
-void
-siLpackage_external(void);
+void siLpackage_external(void);
 
-void
-princ_char(int,object);
+void princ_char(int,object);
 
-void
-Ldigit_char_p(void);
+void Ldigit_char_p(void);
 
-void
-Lwrite_byte(void);
+void Lwrite_byte(void);
 
 #ifdef SPECIAL_RSYM
-void
-read_special_symbols(char *);
+void read_special_symbols(char *);
 
 /* int */
 /* node_compare(const void *,const void *); */
 #endif
 
-void
-FEpackage_error(object,const char *s);
+void FEpackage_error(object,const char *s);
 
-void
-FEcannot_coerce(object, object);
+void FEcannot_coerce(object, object);
 
-int
-system_time_zone_helper(void);
+int system_time_zone_helper(void);
 
-object
-call_proc_new(object sym,ufixnum clp,ufixnum vald,void **link,ufixnum argd,object first,va_list ll);
+object call_proc_new(object sym,ufixnum clp,ufixnum vald,void **link,ufixnum argd,object first,va_list ll);
 
-object 
-call_vproc_new(object,int setf,int pop_one_arg,void *,object,va_list);
+object  call_vproc_new(object,int setf,int pop_one_arg,void *,object,va_list);
 
-void
-funcall_with_catcher(object, object);
+void funcall_with_catcher(object, object);
 
-void
-siLset_symbol_plist(void);
+void siLset_symbol_plist(void);
 
-void
-Lhash_table_p(void);
+void Lhash_table_p(void);
 
-void
-Lreadtablep(void);
+void Lreadtablep(void);
 
-int 
-fixnum_expt(int, int);
+int  fixnum_expt(int, int);
 
-void
-check_alist(object);
+void check_alist(object);
 
-void
-ck_larg_at_least(int,object);
+void ck_larg_at_least(int,object);
 
-void
-vfun_wrong_number_of_args(object);
+void vfun_wrong_number_of_args(object);
 
 /* FIXME from lfun_list.lsp -- should be automatically generated */
 void Lgensym(void);
@@ -1580,17 +1321,12 @@ void siLrem_f(void);
 void siLset_symbol_plist(void);
 void siLbit_array_op(void);
 
-object
-cmod(object);
-object
-ctimes(object,object);
-object
-cdifference(object,object);
-object
-cplus(object,object);
+object cmod(object);
+object ctimes(object,object);
+object cdifference(object,object);
+object cplus(object,object);
 
-object
-Icall_gen_error_handler(object,object,object,object,ufixnum,...);
+object Icall_gen_error_handler(object,object,object,object,ufixnum,...);
 
 #define Icall_error_handler(a_,b_,c_,d_...) \
   Icall_gen_error_handler(Cnil,null_string,a_,b_,c_,##d_)
@@ -1602,70 +1338,48 @@ Icall_gen_error_handler(object,object,object,object,ufixnum,...);
 /* object */
 /* Icall_continue_error_handler(object,object,object,int,...); */
 
-void *
-gcl_gmp_alloc(size_t);
+void * gcl_gmp_alloc(size_t);
 
-void
-init_gmp_rnd_state(__gmp_randstate_struct *);
+void init_gmp_rnd_state(__gmp_randstate_struct *);
 
-int
-my_plt(const char *,unsigned long *);
+int my_plt(const char *,unsigned long *);
 
-int
-my_pltp(const char *,unsigned long *);
+int my_pltp(const char *,unsigned long *);
 
-int
-parse_plt(void);
+int parse_plt(void);
 
-int
-sgc_count_read_only_type(int);
+int sgc_count_read_only_type(int);
 
-int 
-gcl_isnormal_double(double);
+int  gcl_isnormal_double(double);
 
-int 
-gcl_isnormal_float(float);
+int  gcl_isnormal_float(float);
 
-object
-powm_bbb(object,object,object);
-object
-powm_bfb(object,fixnum,object);
-object
-powm_fbb(fixnum,object,object);
-object
-powm_ffb(fixnum,fixnum,object);
-object
-powm_bbf(object,object,fixnum);
-object
-powm_bff(object,fixnum,fixnum);
-object
-powm_fbf(fixnum,object,fixnum);
-object
-powm_fff(fixnum,fixnum,fixnum);
+object powm_bbb(object,object,object);
+object powm_bfb(object,fixnum,object);
+object powm_fbb(fixnum,object,object);
+object powm_ffb(fixnum,fixnum,object);
+object powm_bbf(object,object,fixnum);
+object powm_bff(object,fixnum,fixnum);
+object powm_fbf(fixnum,object,fixnum);
+object powm_fff(fixnum,fixnum,fixnum);
 
-object
-find_init_name1(char *,unsigned);
+object find_init_name1(char *,unsigned);
 
 void wipe_stack   (VOL void *);
 void clear_c_stack(VOL unsigned);
 
-long
-opt_maxpage(struct typemanager *);
+long opt_maxpage(struct typemanager *);
 
 typedef MP_INT * GEN;
 
-MP_INT *
-otoi(object);
+MP_INT * otoi(object);
 
-MP_INT *
-stoi(fixnum);
+MP_INT * stoi(fixnum);
 
-object
-read_byte1(object,object);
+object read_byte1(object,object);
 
 #ifdef SGC
-void
-memprotect_test_reset(void);
+void memprotect_test_reset(void);
 #endif
 
 
@@ -1686,157 +1400,107 @@ int sigprocmask ( int how, const sigset_t *set, sigset_t *oldset );
 #endif
 
 #ifdef GCL_GPROF
-void
-gprof_cleanup(void);
+void gprof_cleanup(void);
 #endif
 
 
-unsigned long
-ihash_equal1(object,int);
+unsigned long ihash_equal1(object,int);
 
-object
-interactive_stream_p(object);
+object interactive_stream_p(object);
 
-void
-reinit_gmp(void);
+void reinit_gmp(void);
 
-object
-macro_def_int(object);
+object macro_def_int(object);
 
 /* void call_after_gbc_hook(int); */
 
-int
-reset_plt(void);
+int reset_plt(void);
 
-int
-msystem(const char *);
+int msystem(const char *);
 
-fcomplex
-object_to_fcomplex(object);
+fcomplex object_to_fcomplex(object);
 
-object
-make_fcomplex(fcomplex);
+object make_fcomplex(fcomplex);
 
-dcomplex
-object_to_dcomplex(object);
+dcomplex object_to_dcomplex(object);
 
-void
-assert_error(const char *,unsigned,const char *,const char *);
+void assert_error(const char *,unsigned,const char *,const char *);
 
 #ifdef _WIN32
-void
-detect_wine(void);
+void detect_wine(void);
 
-void
-init_shared_memory(void);
+void init_shared_memory(void);
 #endif
 
-void *
-object_to_pointer(object);
+void * object_to_pointer(object);
 
-void *
-alloca(size_t);
+void * alloca(size_t);
 
-object
-make_dcomplex(dcomplex);
+object make_dcomplex(dcomplex);
 
-object
-find_init_string(const char *);
+object find_init_string(const char *);
 
-object
-quick_call_function_cs(object,...);
+object quick_call_function_cs(object,...);
 
-object
-call_proc_cs(object,...);
+object call_proc_cs(object,...);
 
-void *
-get_mmap(FILE *,void **);
+void * get_mmap(FILE *,void **);
 
-object
-call_proc_cs1(object,...);
+object call_proc_cs1(object,...);
 
-int
-un_mmap(void *,void *);
+int un_mmap(void *,void *);
 
-object
-call_proc_cs2(object,...);
+object call_proc_cs2(object,...);
 
-void
-isetq_fix(MP_INT *,int);
-int
-mpz_to_mpz1(MP_INT *,MP_INT *,void *);
-int
-mpz_to_mpz(MP_INT *,MP_INT *);
-int
-obj_to_mpz1(object,MP_INT *,void *);
-int
-obj_to_mpz(object,MP_INT *);
+void isetq_fix(MP_INT *,int);
+int mpz_to_mpz1(MP_INT *,MP_INT *,void *);
+int mpz_to_mpz(MP_INT *,MP_INT *);
+int obj_to_mpz1(object,MP_INT *,void *);
+int obj_to_mpz(object,MP_INT *);
 
-int
-update_real_maxpage(void);
+int update_real_maxpage(void);
 
-fixnum
-set_tm_maxpage(struct typemanager *,fixnum);
+fixnum set_tm_maxpage(struct typemanager *,fixnum);
 
-fixnum
-elt_size(fixnum);
+fixnum elt_size(fixnum);
 
-void
-init_gmp_rnd_state(__gmp_randstate_struct *);
+void init_gmp_rnd_state(__gmp_randstate_struct *);
 
-inline void
-set_sgc_bit(struct pageinfo *,void *);
+inline void set_sgc_bit(struct pageinfo *,void *);
 
-void
-reinit_gmp(void);
+void reinit_gmp(void);
 
-object
-mod(object,object);
+object mod(object,object);
 
-inline void
-intdivrem(object,object,fixnum,object *,object *);
+inline void intdivrem(object,object,fixnum,object *,object *);
 
-inline object
-integer_count(object);
+inline object integer_count(object);
 
-inline object
-integer_length(object);
+inline object integer_length(object);
 
-inline bool
-integer_bitp(object,object);
+inline bool integer_bitp(object,object);
 
-inline object 
-fixnum_times(fixnum,fixnum);
+inline object  fixnum_times(fixnum,fixnum);
 
-inline object
-log_op2(fixnum,object,object);
+inline object log_op2(fixnum,object,object);
 
-inline object
-fixnum_big_shift(fixnum,fixnum);
+inline object fixnum_big_shift(fixnum,fixnum);
 
-inline object
-integer_shift(object,object);
+inline object integer_shift(object,object);
 
-object
-number_abs(object);
+object number_abs(object);
 
-object
-number_signum(object);
+object number_signum(object);
 
 
-object
-number_ldb(object,object);
-object
-number_ldbt(object,object);
-object
-number_dpb(object,object,object);
-object
-number_dpf(object,object,object);
+object number_ldb(object,object);
+object number_ldbt(object,object);
+object number_dpb(object,object,object);
+object number_dpf(object,object,object);
 
 extern void *feval_src;
 #if defined(DARWIN)
 void init_darwin_zone_compat ();
 #endif
 
-int
-get_cstack_dir(VOL fixnum);
+int get_cstack_dir(VOL fixnum);

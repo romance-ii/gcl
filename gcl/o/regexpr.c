@@ -19,7 +19,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#include <stdlib.h>
 #include "include.h"
 #include "page.h"
 

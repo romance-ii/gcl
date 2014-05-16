@@ -24,9 +24,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	IMPLEMENTATION-DEPENDENT
 */
 
-#include <stdlib.h>
 #include <unistd.h>
-#include <string.h>
 
 static void init_main(void);
 static void initlisp(void);
@@ -292,13 +290,11 @@ main(int argc, char **argv, char **envp) {
 
 #ifdef CAN_UNRANDOMIZE_SBRK
 #include <stdio.h>
-#include <stdlib.h>
 #include "unrandomize.h"
 #endif
   
 #ifdef LD_BIND_NOW
 #include <stdio.h>
-#include <stdlib.h>
 #include "ld_bind_now.h"
 #endif
   
@@ -1030,4 +1026,143 @@ init_main(void) {
 
 #ifdef SGC
 #include "writable.h"
+#endif
+
+/* #include \"page.h\" */
+
+typedef struct {
+  enum type tt;
+  struct typemanager *tp;
+} Tbl;
+
+#define Tblof(a_)       {(a_),tm_of(a_)}
+#define tblookup(a_,b_) ({Tbl *tb=tb1;(b_)=(a_);for (;tb->tt && tb->b_!=(b_);tb++);tb->tt;})
+#define mtm_of(a_)      (a_)>=t_other ? NULL : tm_of(a_)
+
+DEFUN("FUNCTION-BY-ADDRESS",object,fSfunction_by_address,SI,1,1,NONE,OI,OO,OO,OO,(fixnum ad),"") {
+
+  ufixnum m=-1,mm,j;
+  void *o;
+  object x,xx=Cnil;
+  Tbl tb1[]={Tblof(t_function),{0}};
+  struct typemanager *tp;
+  enum type tt;
+  struct pageinfo *v;
+
+  if (VALID_DATA_ADDRESS_P(ad))
+    for (v=cell_list_head;v;v=v->next)
+      if (tblookup(mtm_of(v->type),tp))
+	for (o=pagetochar(page(v)),j=tp->tm_nppage;j--;o+=tp->tm_size)
+	  if (tblookup(type_of((x=o)),tt))
+	    if (!is_free(x) && (mm=ad-(ufixnum)x->fun.fun_self)<m) {
+	      m=mm;
+	      xx=x;
+	    }
+  
+  return xx;
+
+}
+
+
+#ifdef I386
+
+#include "dis-asm.h"
+
+static char b[4096],*bp;
+
+static int
+my_fprintf(void *v,const char *f,...) {
+  va_list va;
+  int r;
+  va_start(va,f);
+  bp+=(r=vsnprintf(bp,sizeof(b)-(bp-b),f,va));
+  va_end(va);
+  return r;
+}
+
+static int
+my_read(bfd_vma memaddr, bfd_byte *myaddr, unsigned int length, struct disassemble_info *dinfo) {
+  memcpy(myaddr,(void *)memaddr,length);
+  return 0;
+}
+
+static void
+my_pa(bfd_vma addr,struct disassemble_info *dinfo) {
+  dinfo->fprintf_func(dinfo->stream,"%p",(void *)addr);
+}
+
+DEFUN("DISASSEMBLE-INSTRUCTION",object,fSdisassemble_instruction,SI,1,1,NONE,OI,OO,OO,OO,(fixnum addr),"") {
+  static disassemble_info i;
+  /* static int k; */
+  int j;
+
+  /* if (!k) {init_disassemble_info(&i,NULL,my_fprintf);k=1;} */
+  memset(&i,0,sizeof(i));
+  i.fprintf_func=my_fprintf;
+  i.read_memory_func=my_read;
+  i.print_address_func=my_pa;
+  bp=b;
+  
+  j=print_insn_i386(addr,&i);
+  my_fprintf(NULL," ;");
+  return MMcons(make_simple_string(b),make_fixnum(j));
+}
+
+
+#define MC(b_) v.uc_mcontext.b_
+#define REG_LIST(a_,b_) list(3,make_fixnum((void *)&(a_)-(void *)(b_)),make_fixnum(sizeof(a_)),make_fixnum(sizeof(*a_)))
+#define MCF(b_) (((struct _fpstate *)MC(fpregs))->b_)
+
+DEFCONST("+MC-CONTEXT-OFFSETS+",sSPmc_context_offsetsP,SI,
+	 ({ucontext_t v;list(4,REG_LIST(MC(gregs),&v),REG_LIST(MC(fpregs),&v),
+			     REG_LIST(MCF(_st),MC(fpregs)),REG_LIST(MCF(_xmm),MC(fpregs)));}),"");
+
+#define ASM __asm__ __volatile__
+
+DEFUN("FNSTSW",fixnum,fSfnstsw,SI,0,0,NONE,IO,OO,OO,OO,(void),"") {
+  unsigned short t;
+  ASM ("fnstsw %0" : "=m" (t));
+  RETURN1(t);
+}
+
+DEFUN("FNSTCW",fixnum,fSfnstcw,SI,0,0,NONE,IO,OO,OO,OO,(void),"") {
+  unsigned short t;
+  ASM ("fnstcw %0" : "=m" (t));
+  RETURN1(t);
+}
+DEFUN("STMXCSR",fixnum,fSstmxcsr,SI,0,0,NONE,IO,OO,OO,OO,(void),"") {
+  unsigned int t;
+  ASM ("stmxcsr %0" : "=m" (t));
+  RETURN1(t);
+}
+DEFUN("CPUID",fixnum,fScpuid,SI,0,0,NONE,IO,OO,OO,OO,(void),"") {
+  unsigned int t;
+  ASM ("movl $1,%%eax;cpuid;movl %%edx,%0":"=m"(t)::"eax","ebx","ecx","edx");
+  RETURN1(t);
+}
+DEFUN("FNCLEX",object,fSfnclex,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+  ASM ("fnclex");
+  RETURN1(Cnil);
+}
+DEFUN("LDMXCSR",fixnum,fSldmxcsr,SI,1,1,NONE,II,OO,OO,OO,(fixnum val),"") {
+  ASM ("ldmxcsr %0" :: "m" (val));
+  RETURN1(val);
+}
+DEFUN("FLDCW",fixnum,fSfldcw,SI,1,1,NONE,II,OO,OO,OO,(fixnum val),"") {
+  ASM ("fldcw %0" :: "m" (val));
+  RETURN1(val);
+}
+DEFUN("FLD",object,fSfld,SI,1,1,NONE,OI,OO,OO,OO,(fixnum val),"") {
+  double d;
+  ASM ("fldt %1;fstpl %0" : "=m" (d): "m" (*(char *)val));
+  RETURN1(make_longfloat(d));
+}
+
+DEFCONST("+FE-LIST+",sSPfe_listP,SI,list(5,
+					 list(3,sLdivision_by_zero,make_fixnum(FPE_FLTDIV),make_fixnum(FE_DIVBYZERO)),
+					 list(3,sLfloating_point_overflow,make_fixnum(FPE_FLTOVF),make_fixnum(FE_OVERFLOW)),
+					 list(3,sLfloating_point_underflow,make_fixnum(FPE_FLTUND),make_fixnum(FE_UNDERFLOW)),
+					 list(3,sLfloating_point_inexact,make_fixnum(FPE_FLTRES),make_fixnum(FE_INEXACT)),
+					 list(3,sLfloating_point_invalid_operation,make_fixnum(FPE_FLTINV),make_fixnum(FE_INVALID))),"");
+
 #endif

@@ -902,19 +902,13 @@
 
 (defun c1vfun-nargs (args)
   (declare (ignore args))
-  (list 'location (make-info :type #t(integer -63 63)) (list 'inline-fixnum 0 "VFUN_NARGS" nil)))
+  (list 'location (make-info :type #t(integer -63 63)) (list 'inline-fixnum 0 "fcall.argd" nil)))
 (setf (get 'vfun-nargs 'c1) 'c1vfun-nargs)
-;(defun c2vfun-nargs nil
-;  (unwind-exit (list 'inline-fixnum nil "VFUN_NARGS")));FIXME
-;(setf (get 'vfun-nargs 'c2) 'c2vfun-nargs)
 
 (defun c1fun-valp (args)
   (declare (ignore args))
-  (list 'location (make-info :type #tfixnum) (list 'inline-fixnum 0 "FUN_VALP" nil)))
+  (list 'location (make-info :type #tfixnum) (list 'inline-fixnum 0 "fcall.valp" nil)))
 (setf (get 'fun-valp 'c1) 'c1fun-valp)
-;(defun c2fun-valp nil
-;  (unwind-exit (list 'inline-fixnum nil "FUN_VALP")));FIXME
-;(setf (get 'fun-valp 'c2) 'c2fun-valp)
 
 (defun c1fun-fun (args)
   (declare (ignore args))

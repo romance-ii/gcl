@@ -196,14 +196,14 @@
         object _x4=Cnil,_x3=Cnil,_x2=Cnil,_x1=Cnil,_x0=Cnil;
         char _m=(#n-2),_q=_f->fun.fun_minarg>_m ? _f->fun.fun_minarg-_m : 0;
         char _n=Rset && !_f->fun.fun_argd ? _q : -1;
-        fcall.fun=_f;FUN_VALP=_v;VFUN_NARGS=-(#n-1);
+        fcall.fun=_f;fcall.valp=_v;fcall.argd=-(#n-1);
         switch (_n) {
           case 5: if (_l==Cnil) {_n=-1;break;} _x4=_l->c.c_car;_l=_l->c.c_cdr;
           case 4: if (_l==Cnil) {_n=-1;break;} _x3=_l->c.c_car;_l=_l->c.c_cdr;
           case 3: if (_l==Cnil) {_n=-1;break;} _x2=_l->c.c_car;_l=_l->c.c_cdr;
           case 2: if (_l==Cnil) {_n=-1;break;} _x1=_l->c.c_car;_l=_l->c.c_cdr;
           case 1: if (_l==Cnil) {_n=-1;break;} _x0=_l->c.c_car;_l=_l->c.c_cdr;
-          case 0: if (_n+_m==_f->fun.fun_maxarg && _l!=Cnil) _n=-1; else VFUN_NARGS-=_n;
+          case 0: if (_n+_m==_f->fun.fun_maxarg && _l!=Cnil) _n=-1; else fcall.argd-=_n;
           default: break;
         }
         switch (_n) {

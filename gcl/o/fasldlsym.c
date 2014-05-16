@@ -20,8 +20,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 
-#include <string.h>
-#include <stdlib.h>
 #include <dlfcn.h>
 #include <sys/param.h>
 #include <time.h>

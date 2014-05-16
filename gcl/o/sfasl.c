@@ -39,7 +39,6 @@ via #include "../c/sfasl.c"
 
 #if defined(SPECIAL_RSYM) && !defined(USE_DLOPEN)
 
-#include <string.h>
 
 #include "ptable.h"
 

@@ -201,8 +201,6 @@
   (setf (blk-var blk) (add-symbol (blk-name blk)))
   (wt-nl) (wt-vs (blk-ref-clb blk)) (wt "=alloc_frame_id();")
   (wt-nl)
-;  (wt-vs (blk-ref-clb blk))
-;  (wt "=MMcons(") (wt-vs (blk-ref-clb blk)) (wt ",") (wt-clink) (wt ");")
   (clink (blk-ref-clb blk))
   (setf (blk-ref-ccb blk) (ccb-vs-push))
   (add-libc "setjmp")

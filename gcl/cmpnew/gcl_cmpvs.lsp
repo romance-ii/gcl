@@ -81,7 +81,7 @@
 (defun clink (vs &optional (loc nil locp)) 
   (wt-nl)
   (wt-vs vs)
-  (wt "=MMcons(")
+  (wt "=make_cons(")
   (if locp (wt loc) (wt-vs vs))
   (wt ",")
   (wt-clink)
