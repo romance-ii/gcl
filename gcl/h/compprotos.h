@@ -82,3 +82,7 @@ void setq(object, object);
 void super_funcall_no_event(object);
 void system_error(void);
 void unwind(frame_ptr, object);
+int object_to_int(object);
+fixnum object_to_fixnum(object);
+dcomplex object_to_dcomplex(object);
+char object_to_char(object);
