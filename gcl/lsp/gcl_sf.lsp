@@ -1,5 +1,7 @@
 (in-package :s)
 
+ (defun strcat (&rest r) (declare (:dynamic-extent r)) (nstring-downcase (apply 'string-concatenate r)))
+
 (eval-when
  (eval compile) 
   
@@ -127,9 +129,7 @@
  
  (defun fnk (k) (intern (string-concatenate "*" (string k))))
  
- (defun mnn (r z f) (intern (string-upcase (string-concatenate r z "-" f))))
-
- (defun strcat (&rest r) (apply 'si::string-concatenate (mapcar 'string-downcase r)))
+ (defun mnn (r z f) (intern (nstring-upcase (string-concatenate r z "-" f))))
 
  (defun mn (z p f &aux (f (strcat f))) (list (mnn "C-" z f) (mnn "C-SET-" z f)))
  

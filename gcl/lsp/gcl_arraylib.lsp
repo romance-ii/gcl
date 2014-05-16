@@ -27,13 +27,13 @@
 
 (in-package :system)
 
-(use-package :s)
+;; (use-package :s)
 
-(export 'strcat)
+;; (export 'strcat)
 
-(defun strcat (&rest r)
-  (declare (:dynamic-extent r))
-  (apply 'string-concatenate (mapcar 'string-downcase r)))
+;; (defun strcat (&rest r)
+;;   (declare (:dynamic-extent r))
+;;   (apply 'string-concatenate (mapcar 'string-downcase r)))
 
 (eval-when 
  (compile eval)
