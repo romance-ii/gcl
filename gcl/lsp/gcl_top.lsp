@@ -27,7 +27,8 @@
 
 (in-package :system)
 
-(export '(loc *debug-print-level* *break-readtable* *break-enable* vs ihs-vs ihs-fun frs-vs frs-bds frs-ihs bds-var bds-val super-go))
+(export '(loc *tmp-dir* *error-p* *debug-print-level* *break-readtable* *break-enable*
+	      vs ihs-vs ihs-fun frs-vs frs-bds frs-ihs bds-var bds-val super-go))
 
 ;FIXME ?
 (eval-when 

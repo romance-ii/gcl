@@ -29,8 +29,6 @@
 
 
 (export '(*compile-print* *compile-verbose* *compile-file-truename* *compile-file-pathname*))
-(import 'si::*tmp-dir* 'compiler)
-(import 'si::*error-p* 'compiler)
 
 ;;; This had been true with Linux 1.2.13 a.out or even older
 ;;; #+linux   (push :ld-not-accept-data  *features*)
