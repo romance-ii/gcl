@@ -1243,7 +1243,7 @@
     (when *safe-compile*
       (wt-nl "if(type_of(symbols->c.c_car)!=t_symbol)")
       (wt-nl
-       "FEinvalid_variable(\"~s is not a symbol.\",symbols->c.c_car);"))
+       "not_a_symbol(symbols->c.c_car);"))
     (wt-nl "if(endp(values))bds_bind(symbols->c.c_car,OBJNULL);")
     (wt-nl "else{bds_bind(symbols->c.c_car,values->c.c_car);")
     (wt-nl "values=values->c.c_cdr;}")

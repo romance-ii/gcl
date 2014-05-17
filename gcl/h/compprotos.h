@@ -86,3 +86,4 @@ int object_to_int(object);
 fixnum object_to_fixnum(object);
 dcomplex object_to_dcomplex(object);
 char object_to_char(object);
+void not_a_symbol(object);
