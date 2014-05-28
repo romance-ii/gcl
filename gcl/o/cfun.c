@@ -23,6 +23,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	cfun.c
 */
 
+#define _GNU_SOURCE 1
 #include "include.h"
 #include <dlfcn.h>
 #include "page.h"

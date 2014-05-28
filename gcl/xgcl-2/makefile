@@ -2,6 +2,8 @@
 
 all: objects docs
 
+LISP?=../unixport/saved_gcl
+
 objects: $(LISP)
 	echo '(load "sysdef.lisp")(xlib::compile-xgcl)' | $(LISP)
 

@@ -1015,6 +1015,8 @@ init_main(void) {
 #if SIZEOF_LONG==8
   ADD_FEATURE("64BIT");
 #endif	 
+  ADD_FEATURE("INTDIV");
+  ADD_FEATURE("DYNAMIC-EXTENT");
 
   make_special("*FEATURES*",features);}
   

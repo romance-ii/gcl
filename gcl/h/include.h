@@ -123,7 +123,9 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "../h/notcomp.h"
 #include "../h/funlink.h"
 #include "../h/att_ext.h"
+#ifndef INICOMP
 #include "../h/new_decl.h"
+#endif
 #include "compbas2.h"
 #include "compat.h"
 

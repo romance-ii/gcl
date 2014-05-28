@@ -9689,7 +9689,7 @@ if test "x$ac_cv_lib_readline_main" = xyes; then :
 $as_echo "#define HAVE_READLINE 1" >>confdefs.h
 
 			TLIBS="$TLIBS -lreadline"
-			RL_OBJS=gcl_readline.o
+			RL_OBJS=gcl_readline
 # Readline support now initialized automatically when compiled in, this lisp
 # object no longer needed, 20040102 CM
 #			RL_LIB=mod/gcl_readline.o

@@ -87,3 +87,6 @@ fixnum object_to_fixnum(object);
 dcomplex object_to_dcomplex(object);
 char object_to_char(object);
 void not_a_symbol(object);
+object number_expt(object,object);
+object fLrow_major_aref(object,fixnum);
+void *alloca(unsigned long);

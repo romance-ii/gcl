@@ -2290,7 +2290,7 @@ if test "$enable_readline" = "yes" ; then
 		AC_CHECK_LIB(readline,main,
 			AC_DEFINE(HAVE_READLINE,1,[have readline library]) 
 			TLIBS="$TLIBS -lreadline"
-			RL_OBJS=gcl_readline.o
+			RL_OBJS=gcl_readline
 # Readline support now initialized automatically when compiled in, this lisp
 # object no longer needed, 20040102 CM
 #			RL_LIB=mod/gcl_readline.o

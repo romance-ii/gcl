@@ -79,3 +79,4 @@ FEerror(a,b,c)
 TRUE
 MULTIPLE_VALUES_LIMIT
 is_imm_fixnum(x)
+aref1

@@ -1,78 +1,37 @@
 # make .d more important by clearing suffixes.
 .SUFFIXES:
-.SUFFIXES: .d .o  .c .ini
+.SUFFIXES: .d .o .c .ini
 
 -include ../makedefs
 
-HDIR	= ../h
-CDIR	= ./
-MPDIR	= ../mp
-
-#OFLAG	= -O
-DEFS	= -I../h -I../gcl-tk
-ODIR	= .
-GCLIB  = ${ODIR}/gcllib.a
-RANLIB=ranlib
-AR = ar qc
-LIBFILES= bcmp.o bcopy.o bzero.o user_init.o user_match.o
-# compile main.c with -g, since signalling may not be ok on -O
-MAIN_DEBUG=
-DPP	= ../bin/dpp$(EXE)
-
-DECL := $(HDIR)/new_decl.h
-
-X11_INCLUDE=${TK_XINCLUDES} ${HAVE_X11}
-#CFLAGS	=  -I../gcl-tk -I$(HDIR) $(ODIR_DEBUG) 
+HDIR	 := ../h
+DEFS	 := -I../h -I../gcl-tk
+GCLIB    := gcllib.a
+RANLIB   := ranlib
+AR       := ar qc
+LIBFILES :=$(addsuffix .o,bcmp bcopy bzero user_init user_match)
+DPP	 := ../bin/dpp$(EXE)
+DECL     := $(HDIR)/new_decl.h
+ALIB     := ${LIBFILES} ${EXTRA_LIB}
 
 
-MP 	= $(HDIR)/mp.h
+OBJS:=$(addsuffix .o,typespec alloc gbc bitop boot main eval macros lex bds frame\
+	 predicate reference assignment bind let conditional block iteration mapfun\
+	 prog multival catch symbol cfun cmpaux package big number num_pred num_comp\
+	 num_arith num_sfun num_co num_log num_rand earith character  sequence list\
+	 hash array string regexpr structure toplevel file read backq print format\
+	 pathname unixfsys unixfasl error unixtime unixsys unixsave funlink  fat_string\
+	 run_process nfunlink usig usig2 utils makefun sockets gmp_wrappers clxsocket\
+	init_pari nsocket new_init sfasl $(RL_OBJS))
+OBJS:=$(OBJS) $(EXTRAS)
 
-CMPINCLUDE_FILES=${HDIR}/compbas.h ${HDIR}/enum.h ${HDIR}/object.h ${HDIR}/vs.h \
-	${HDIR}/bds.h ${HDIR}/frame.h \
-	${HDIR}/lex.h ${HDIR}/eval.h    ${HDIR}/funlink.h \
-	${HDIR}/att_ext.h ${HDIR}/compbas2.h ${HDIR}/compat.h ${HDIR}/cmponly.h
-
-OTHERS=${HDIR}/notcomp.h ${HDIR}/rgbc.h ${HDIR}/stacks.h 
-
-HFILES	= $(HDIR)/include.h $(CMPINCLUDE_FILES) $(OTHERS) 
-
-# these are made elsewhere...
-MPFILES= 
-
-OBJS	= $(OD)typespec.o $(OD)alloc.o $(OD)gbc.o \
-	$(OD)bitop.o $(OD)boot.o $(OD)main.o $(OD)eval.o \
-	$(OD)macros.o $(OD)lex.o $(OD)bds.o \
-	$(OD)frame.o $(OD)predicate.o $(OD)reference.o \
-	$(OD)assignment.o $(OD)bind.o $(OD)let.o \
-	$(OD)conditional.o $(OD)block.o $(OD)iteration.o \
-	$(OD)mapfun.o $(OD)prog.o $(OD)multival.o \
-	$(OD)catch.o $(OD)symbol.o $(OD)cfun.o \
-	$(OD)cmpaux.o $(OD)package.o $(OD)big.o \
-	$(OD)number.o $(OD)num_pred.o $(OD)num_comp.o \
-	$(OD)num_arith.o $(OD)num_sfun.o $(OD)num_co.o \
-	$(OD)num_log.o $(OD)num_rand.o $(OD)earith.o \
-	$(OD)character.o  $(OD)sequence.o \
-	$(OD)list.o $(OD)hash.o $(OD)array.o \
-	$(OD)string.o $(OD)regexpr.o $(OD)structure.o $(OD)toplevel.o \
-	$(OD)file.o $(OD)read.o $(OD)backq.o \
-	$(OD)print.o $(OD)format.o $(OD)pathname.o \
-	$(OD)unixfsys.o $(OD)unixfasl.o $(OD)error.o \
-	$(OD)unixtime.o $(OD)unixsys.o $(OD)unixsave.o \
-	$(OD)funlink.o  \
-	$(OD)fat_string.o ${ODIR}/run_process.o \
-	$(OD)nfunlink.o $(OD)usig.o $(OD)usig2.o $(OD)utils.o \
-	$(OD)makefun.o $(OD)sockets.o $(OD)gmp_wrappers.o $(OD)clxsocket.o  \
-	$(OD)init_pari.o $(OD)nsocket.o $(NEW_INIT) $(MPFILES) $(SFASL) $(EXTRAS) \
-	$(RL_OBJS)
-
-INI_FILES=$(patsubst %.o,%.ini,${OBJS} boot.o)
-INI_FILES:=$(filter-out boot.ini,$(INI_FILES))
+INI_FILES=$(patsubst %.o,%.ini,${OBJS})
+INI_FILES:=$(filter-out new_init.ini,$(filter-out boot.ini,$(INI_FILES)))
 
 OBJECTS:=$(OBJS) $(LIBFILES) new_init.o  $(GCLIB) $(LAST_FILE)  $(FIRST_FILE) 
 
-all:  $(OBJECTS) #plt.o
+all:  $(OBJECTS)
 
-# AUX_INFO=-aux-info $*.X
 boot.o: boot.c $(DECL) boot.h
 	$(CC) -c $(CFLAGS) $(DEFS) -fPIC $*.c $(AUX_INFO) 
 
@@ -87,11 +46,9 @@ boot.o: boot.c $(DECL) boot.h
 	$(CC) -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO)
 	rm $*.c
 
-CPP=
-
 boot.ini: boot.c grab_defs
-	[ -e $(DECL) ] || touch $(DECL)
-	$(CC) -DNO_DEFUN -DNO_BOOT_H $(CFLAGS) $(DEFS) -E $*.c | sed -e 's,DEFUN,\nDEFUN,g' -e 's,^.* DEFUNB,DEFUNB,g' -e 's/DEF,//g' -e 's:\"[ ]*):\"):g' | ./grab_defs > $@
+	$(CC) -DINICOMP -DNO_DEFUN -DNO_BOOT_H $(CFLAGS) $(DEFS) -E $*.c |\
+		 sed -e 's,DEFUN,\nDEFUN,g' -e 's,^.* DEFUNB,DEFUNB,g' -e 's/DEF,//g' -e 's:\"[ ]*):\"):g' | ./grab_defs > $@
 
 boot.h: boot.ini
 	echo '#include "make-init.h"' > $@
@@ -99,24 +56,18 @@ boot.h: boot.ini
 	cat $< >> $@
 	echo '}' >> $@
 
-%.ini: %.c grab_defs #plt.h
-	[ -e $(DECL) ] || touch $(DECL)
-	$(CC) -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c | sed -e 's,^.* DEFUNB,DEFUNB,g' -e 's/DEF,//g' -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
+%.ini: %.c grab_defs
+	$(CC) -DINICOMP -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c |\
+		 sed -e 's,^.* DEFUNB,DEFUNB,g' -e 's/DEF,//g' -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
 
 %.ini: %.d $(DPP) grab_defs
-	[ -e $(DECL) ] || touch $(DECL)
 	$(DPP) $*
-	$(CC) -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c | sed -e 's,^.* DEFUNB,DEFUNB,g' -e 's/DEF,//g' | sed -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
+	$(CC) -DINICOMP -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c |\
+		 sed -e 's,^.* DEFUNB,DEFUNB,g' -e 's/DEF,//g' | sed -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
 	rm $*.c
-
-go:
-	$(MAKE) "CFLAGS=${CFLAGS} -pg"
 
 $(DPP):	../bin/dpp.c
 	${CC} ${DEFS} -o $@ $<
-
-new-init: 
-	$(MAKE) new_init.c decls1
 
 new_init.c: ${INI_FILES}
 	echo '#include "make-init.h"' > new_init.c
@@ -129,12 +80,6 @@ new_init.o: new_init.c $(DECL)
 	$(CC) -c $(NIFLAGS) $(DEFS) $< -o $@
 endif
 
-decls1: $(INI_FILES)
-	echo '#include "make-decl.h"' > foo.c
-	cat ${INI_FILES} |sed 's,DEFBFUN,DEFUN,g' >> foo.c
-	${CC} -E -I${HDIR} foo.c | sed -n -e '/#/d' -e '/DO_/d' -e '/[a-zA-Z;]/p' > tmpx
-	../xbin/move-if-changed mv tmpx ${HDIR}/new_decl.h
-
 $(DECL): $(HDIR)/make-decl.h $(INI_FILES)
 	echo '#include "make-decl.h"' > foo.c
 	cat ${INI_FILES} |sed 's,DEFBFUN,DEFUN,g' >> foo.c
@@ -145,155 +90,13 @@ $(DECL): $(HDIR)/make-decl.h $(INI_FILES)
 grab_defs: grab_defs.c
 	${CC} $(OFLAGS) -o grab_defs  grab_defs.c
 
-#
-# This section added to ensure that ld generates symbol values for undefined
-# symbols in external dynamic libraries with binutils >=2.14.90.0.8
-# CM 20040227
-#
-
-#def: $(OBJECTS)
-#	nm $^ | awk '/ [TBCD] / {print $$3}' | sort |uniq >def
-
-#undef: $(OBJECTS)
-#	nm $^ | awk '/ [U] / {print $$2}' | sort |uniq >undef
-
-#undef.h: undef def
-#	join -v1 $^ | \
-#	awk '{if (i++) printf("MY_PLT(%s),\n",a);a=$$1} END {printf("MY_PLT(%s)\n",a)}'>$@
-
-#void.h: undef def
-#	join -v1 $^ | \
-#	awk '/my_plt/ {next} {printf("extern void *%s;\n",$$1);}'>$@
-
-plttest.o: plttest.c 
-	$(CC) -c $(CFLAGS) $(DEFS) -fno-builtin $*.c $(AUX_INFO) 
-
-pltd.h: plttest.o
-	nm $< | $(AWK) '/ U / {if (NF!=2) next;a=$$2;if (k) sub("^_","",a);\
-                            b=a;gsub("_"," ",b);\
-                            if (!match(j,b) && !match(b,"IO") && !match(b,"^\\.")) printf("extern int %s();\n",a)}' \
-                        j="$$(cpp plttest.c | sed 's,^ .*[^a-zA-Z_,]\([a-zA-Z_]*\)(.*,\1,g' |\
-			      $(AWK) '/main *\(/ {i=1;next;} /^}/ {i=0;} \
-                                   {if (i && substr($$0,1,1)!=" ") print}' | tr '\012' ' ' | tr -s ' ')" \
-			k=$(LEADING_UNDERSCORE) |\
-			sort | \
-			$(AWK) '{A[++k]=$$0} END {for (i=1;i<=k;i++) \
-				printf("%s\n",A[i]);}' >$@
-
-plt.h: plttest.o pltd.h 
-	nm $< | $(AWK) '/ U / {a=$$2;if (k) sub("^_","",a);\
-                            if (!match(a,"^\\.")) print a;}' \
-			k=$(LEADING_UNDERSCORE) |\
-			sort | \
-			grep -v 'restFP' | grep -v 'saveFP'  | \
-			grep -v _gp_disp | \
-			$(AWK) '{gsub("\\$$.*","");A[++k]=$$0} END {for (i=1;i<=k;i++) \
-				printf("MY_PLT(%s)%s\n",A[i],i==k ? "" : ",");}' >$@
-#	rm $@
-#	touch $@
-	echo Plt table:
-	cat $@
-
-plt.o: plt.c plt.h
-	$(CC) -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO) 
-
-cfun.o: cfun.c
-	$(CC) -D_GNU_SOURCE -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO) 
-
-
-ALIB=${LIBFILES} #user_init.o ${EXTRA_LIB}
-
 $(GCLIB): ${ALIB} 
 	rm -f gcllib.a
 	$(AR) gcllib.a ${ALIB}
 	${RANLIB} gcllib.a
+
 clean:
-	rm -f $(OBJS) ${ALIB} new_init.o  $(LAST_FILE) $(FIRST_FILE) *.a grab_defs$(EXE) *.ini tmpx foo.c cmpinclude.h new_init.c $(DECL) def undef udef.h void.h plt.h pltd.h plttest.o TAGS boot.h
-
-fsavres.o: /lib/libc.a
-	ar xv /lib/libc.a fsavres.o
-
-sockets.o: sockets.c
-	${CC} ${CFLAGS} $(DEFS) ${X11_INCLUDE} -c  sockets.c
-
-clxsocket.o:
-	${CC} ${CFLAGS} $(DEFS) ${X11_INCLUDE} -c  clxsocket.c
-littleXwin.o:
-	${CC} ${CFLAGS} $(DEFS) ${X11_INCLUDE} -c  littleXwin.o
-
-character.o: $(HFILES)
-file.o:	$(HFILES) file.d
-hash.o: $(HFILES) ${MP}
-list.o:	$(HFILES)
-package.o: $(HFILES)
-ifeq ($(PATHNAME_BUG),)
-pathname.o: $(HFILES)
-else
-pathname.o: pathname.c $(HFILES)
-	${CC} $(filter-out -O%,${CFLAGS}) -O1 -c $(DEFS) $< $(AUX_INFO) 
-endif
-print.o: $(HFILES) ${MP}
-read.o: $(HFILES) ${MP}
-sequence.o: $(HFILES)
-string.o: $(HFILES)
-symbol.o: $(HFILES)
-
-utils.o: $(HFILES)
-alloc.o: $(HFILES)
-array.o: $(HFILES)
-assignment.o: $(HFILES)
-backq.o: $(HFILES)
-bds.o: $(HFILES)
-big.o: $(HFILES) ${MP} gmp_big.c pari_big.c
-bind.o: $(HFILES) 
-bitop.o: $(HFILES)
-block.o: $(HFILES)
-catch.o: $(HFILES)
-cfun.o: $(HFILES)
-cmpaux.o: $(HFILES) ${MP}
-conditional.o: $(HFILES)
-earith.o: $(HFILES)
-error.o: $(HFILES)
-eval.o: $(HFILES)
-format.o: $(HFILES)
-frame.o: $(HFILES)
-gbc.o: $(HFILES) ${MP}
-interrupt.o: $(HFILES)
-iteration.o: $(HFILES)
-let.o: $(HFILES)
-lex.o: $(HFILES)
-macros.o: $(HFILES)
-main.o: $(HFILES)
-mapfun.o: $(HFILES)
-multival.o: $(HFILES)
-mpi.o: $(MP)
-num_arith.o: $(HFILES) $(HDIR)/num_include.h ${MP}
-num_co.o: $(HFILES) $(HDIR)/num_include.h ${MP}
-num_comp.o: $(HFILES) $(HDIR)/num_include.h ${MP}
-num_log.o: $(HFILES) $(HDIR)/num_include.h ${MP}
-num_pred.o: $(HFILES) $(HDIR)/num_include.h ${MP}
-num_rand.o: $(HFILES) $(HDIR)/num_include.h ${MP}
-num_sfun.o: $(HFILES) $(HDIR)/num_include.h ${MP}
-number.o: $(HFILES) $(HDIR)/num_include.h ${MP}
-predicate.o: $(HFILES)
-prog.o: $(HFILES)
-reference.o: $(HFILES)
-structure.o: $(HFILES)
-toplevel.o: $(HFILES)
-typespec.o: $(HFILES) ${MP}
-unixfasl.o: $(HFILES)
-unixfsys.o: $(HFILES)
-unixint.o: $(HFILES)
-unixsave.o: $(HFILES) $(UNIX_SAVE_DEP)
-unixsys.o: $(HFILES)
-unixtime.o: $(HFILES) unixtime.c
-funlink.o: $(HFILES)
-fat_string.o: $(HFILES)
-fasdump.o: $(HFILES)
-bitblit2.o: $(HFILES)
-regexpr.o:$(HFILES) regexp.c
-sockets.o:$(HFILES) ../gcl-tk/comm.c ../gcl-tk/sheader.h
-nsocket.ini:nsocket.c $(HFILES)
-mingwin.o:mingwin.c $(HFILES)
+	rm -f $(OBJS) ${ALIB} new_init.o  $(LAST_FILE) $(FIRST_FILE) *.a grab_defs$(EXE) *.ini tmpx foo.c
+	rm -f  cmpinclude.h new_init.c $(DECL) def undef udef.h void.h TAGS boot.h
 
 .INTERMEDIATE: $(patsubst %.d,%.c,$(shell ls -1 *.d))
