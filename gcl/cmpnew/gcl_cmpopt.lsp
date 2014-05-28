@@ -309,6 +309,7 @@
 ;;*
 ;(si::putprop '* 'super-range 'type-propagator)
 (push '((t t) t #.(flags ans)"immnum_times(#0,#1)") (get 'si::number-times 'inline-always))
+(push '((fixnum fixnum) integer #.(flags ans rfa)"safe_mul(#0,#1)") (get 'si::number-times 'inline-always))
 (push '((cnum cnum) cnum #.(flags)"(#0)*(#1)") (get 'si::number-times 'inline-always))
 
 ;;/
@@ -768,7 +769,7 @@
 ;;INTEGER-LENGTH
 (push '((t) t #.(compiler::flags) "immnum_length(#0)") (get 'integer-length 'compiler::inline-always))
 (push '((fixnum) fixnum #.(flags rfa set) 
-	#.(format nil "({register fixnum _x=abs(#0),_t=~s;for (;_t>=0 && !((_x>>_t)&1);_t--);_t+1;})" (integer-length most-positive-fixnum)))
+	#.(format nil "({register fixnum _x=labs(#0),_t=~s;for (;_t>=0 && !((_x>>_t)&1);_t--);_t+1;})" (integer-length most-positive-fixnum)))
    (get 'integer-length 'inline-always))
 
 
@@ -959,7 +960,6 @@
 
 (push '((t t) t #.(compiler::flags) "immnum_truncate(#0,#1)") (get 'truncate 'compiler::inline-always))
 #+intdiv
-;(si::putprop 'truncate 'floor-propagator 'type-propagator)
 (push '((fixnum fixnum) (returns-exactly fixnum fixnum) #.(flags rfa)"({fixnum _t=(#0)/(#1);@1(#0)-_t*(#1)@ _t;})")
    (get 'truncate 'inline-always))
 (push '((fixnum) (returns-exactly fixnum fixnum) #.(flags rfa)"({fixnum _t=(#0);@1(#0)-_t@ _t;})")
