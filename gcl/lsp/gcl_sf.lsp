@@ -86,7 +86,7 @@
  (defun cmp-norm-tpp (x) x)
 
  (defun mtpp (k y &aux (zz (car y))(z (if (consp zz) (car zz) zz))(u (when (consp zz) (eq (cdr zz) '|unsigned|))))
-   (cond ((caddr y) (unless u (sferr "bar" k y)) (cmp-norm-tpp `(unsigned-byte ,(1+ (caddr y)))))
+   (cond ((caddr y) (unless u (sferr "bar" k y)) (cmp-norm-tpp `(unsigned-byte ,(caddr y))))
 	 ((when (keywordp z) (eq k :object)) (mktp z));(get z 'lisp-type))
 	 ((mktp k));((get k 'lisp-type))
 	 (t)))
@@ -101,8 +101,8 @@
  (defun m+ (a o) (if (zerop o) a `(c+ ,a ,o)))
  
  
- (defun gk (b y &aux (k (car y))(k (if (consp k) (car k) k)))
-   (cond ((< b (ks k)) (or (car (rassoc b +ks+ :key #'(lambda (x) (bz (car x))))) (baboon)))
+ (defun gk (b y &aux (k (car y))(u (when (consp k) (eq (cdr k) '|unsigned|)))(k (if (consp k) (car k) k)))
+   (cond ((< b (ks k)) (or (caar (member-if #'(lambda (x) (and (eql (bz (cadr x)) b) (eql (caddr x) (if u 1 0)))) +ks+)) (baboon)))
 	 ((car (assoc k +ks+)))
 	 ((keywordp k) :object)
 	 (:fixnum)))
