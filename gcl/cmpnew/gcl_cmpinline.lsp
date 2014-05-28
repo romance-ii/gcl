@@ -1144,13 +1144,13 @@
 
 (defun wt-stack-list* (x l &optional n (st "Cnil") (lst "Cnil"))
   (let ((z (or n (length x))))
-    (wt-nl "!" z "? Cnil : (alloca_val=alloca((" z ")*sizeof(struct cons)+sizeof(object)),");FIXME double eval
-    (wt-nl "({object _b=(void *)alloca_val;if (((unsigned long)_b)&sizeof(_b)) _b++;")
+    (wt-nl "!" z "? Cnil : ({void *v=alloca((" z ")*sizeof(struct cons)+sizeof(object));");FIXME double eval
+    (wt-nl "({object _b=v;if (((unsigned long)_b)&sizeof(_b)) _b++;")
     (wt-nl "{register struct cons *_p=(void *)_b;")
     (cond (n (wt-nl "{struct cons *_e=_p+(" n "-1);")
 	     (wt-nl "for (;_p<_e;_p++) {_p->c_car=" st ";_p->c_cdr=(object)(_p+1);}}")
-	     (wt-nl "_p->c_car=" lst ";_p->c_cdr=Cnil;}_b;}))"))
-	  ((dolist (x x (wt-nl "_p[-1].c_cdr=" l ";}_b;}))"))
+	     (wt-nl "_p->c_car=" lst ";_p->c_cdr=Cnil;}_b;});})"))
+	  ((dolist (x x (wt-nl "_p[-1].c_cdr=" l ";}_b;});})"))
 	     (wt-nl "_p->c_car=" x ";_p->c_cdr=(object)(_p+1);_p++;"))))))
 
 (defun list-inline (&rest x)
