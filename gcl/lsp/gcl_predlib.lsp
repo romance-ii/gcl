@@ -960,30 +960,30 @@
 ;; RANGE-TYPES
 
 (defun adj-bnd (nx fn bot top &optional (hmin top) (hmax top))
-  (cond ((unless (eq bot '*) (funcall fn nx bot)) '*)
+  (cond ((eq nx '*) bot)
+	((unless (eq bot '*) (funcall fn nx bot)) bot)
 	((funcall fn nx hmin) nx)
 	((funcall fn nx hmax) hmax)
-	((or (eq top '*) (funcall fn nx top))  nx)))
-  
+	((or (eq top '*) (funcall fn nx top)) nx)))
+
 (defun adj-bndd (nx inc bot top &optional (hmin top) (hmax top))
   (if (> inc 0) (adj-bnd nx '<= bot top hmin hmax) (adj-bnd nx '>= top bot hmax hmin)))
 
 (defun ctp-bnd (x tp inc &aux (a (atom x))(nx (if a x (car x))))
-  (cond ((eq nx '*) nx)
-	((isinf nx) (when (or (< nx 0 inc) (< inc 0 nx)) '*))
+  (cond ((isinf nx) (when (or (< nx 0 inc) (< inc 0 nx)) '*))
 	((case tp
-	       ((immfix bfix bignum integer)
-		(let* ((nx (if (unless a (integerp nx)) (+ nx inc) nx))
-		       (nx (if (> inc 0) (ceiling nx) (floor nx))))
-		  (case tp
-			(immfix (adj-bndd nx inc most-negative-immfix most-positive-immfix))
-			(bfix (adj-bndd nx inc most-negative-fixnum most-positive-fixnum
-					#.(1- most-negative-immfix) #.(1+ most-positive-immfix)))
-			(bignum (adj-bndd nx inc '* '* #.(1- most-negative-fixnum) #.(1+ most-positive-fixnum)))
-			(integer nx))))
-	       (ratio (let ((z (rational nx))) (if (unless (integerp z) a) z (list z))))
-	       (short-float (let ((z (float nx 0.0s0))) (if a z (list z))))
-	       (long-float (let ((z (float nx 0.0))) (if a z (list z))))))))
+	   ((immfix bfix bignum integer)
+	    (let* ((nx (if (unless a (integerp nx)) (+ nx inc) nx))
+		   (nx (if (eq nx '*) nx (if (> inc 0) (ceiling nx) (floor nx)))))
+	      (case tp
+		(immfix (adj-bndd nx inc most-negative-immfix most-positive-immfix))
+		(bfix (adj-bndd nx inc most-negative-fixnum most-positive-fixnum
+				#.(1- most-negative-immfix) #.(1+ most-positive-immfix)))
+		(bignum (adj-bndd nx inc '* '* #.(1- most-negative-fixnum) #.(1+ most-positive-fixnum)))
+		(integer nx))))
+	   (ratio (let ((z (if (eq nx '*) nx (rational nx)))) (if (unless (integerp z) a) z (list z))))
+	   (short-float (let ((z (if (eq nx '*) nx (float nx 0.0s0)))) (if a z (list z))))
+	   (long-float (let ((z (if (eq nx '*) nx (float nx 0.0)))) (if a z (list z))))))))
 
 (defun number-range-fixup (x tp)
   (lremove-if-not (lambda (x) (let* ((a (car x))(d (cdr x))
