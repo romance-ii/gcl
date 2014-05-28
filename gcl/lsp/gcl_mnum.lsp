@@ -89,7 +89,7 @@
 	     body)))))
 
  (defmacro defmabs (x &optional n)
-   (let* ((i (mdlsym (string-concatenate "l" x)))
+   (let* ((i 'babs);(mdlsym (string-concatenate "l" x)))
 	  (b (mdlsym (string-concatenate "f" x)))
 	  (f (mdlsym (string-concatenate "f" x "f")))
 	  (c (mdlsym (string-concatenate "c" x)))
@@ -155,7 +155,8 @@
 		      (rational    (,b (float x 0.0) (float z 0.0)))))))))))
 
 
-
+(defun babs (x) (declare (fixnum x)) (lit :fixnum "labs(" (:fixnum x) ")"));this is a builtin in recent gcc
+(setf (get 'babs 'compiler::cmp-inline) t)
  
 (defmabs "abs")
 
