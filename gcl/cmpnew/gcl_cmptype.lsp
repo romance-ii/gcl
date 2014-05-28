@@ -840,6 +840,16 @@
 (si::putprop 'si::mpz_mul_2exp 'ash-propagator 'type-propagator)
 (si::putprop 'si::mpz_fdiv_q_2exp 'ash-propagator 'type-propagator)
 
+(defun <<-propagator (f t1 t2)
+  (when (type>= #tfixnum t1)
+   (super-range (lambda (x y) (if (> (si::clzl x) y) (funcall f x y) (return-from <<-propagator nil))) t1 t2)))
+(si::putprop 'si::<< '<<-propagator 'type-propagator)
+
+(defun >>-propagator (f t1 t2)
+  (when (and (type>= #tfixnum t1) (type>= #t(integer 0 #.(integer-length most-positive-fixnum)) t2))
+   (super-range f t1 t2)))
+(si::putprop 'si::>> '>>-propagator 'type-propagator)
+
 (defun pexpt (x y)
   (cond ((or (typep x #tfloat) 
 	     (= (abs x) 1) 
@@ -882,6 +892,14 @@
 			(super-range f (type-and #t(real * (0)) t1))))))
 (si::putprop 'si::clzl 'clzl-propagator 'type-propagator)
 (si::putprop 'si::clzl t 'cmp-inline);FIXME no declaim
+
+(defun ctzl-propagator (f t1 &aux r)
+  (when (type>= #tfixnum t1)
+    (dotimes (i si::fixnum-length r)
+      (let ((j (ash 1 i)))
+	(setq r (type-or1 r (when (type-and t1 (object-type j)) (object-type (funcall f j)))))))))
+(si::putprop 'si::ctzl 'ctzl-propagator 'compiler::type-propagator)
+(si::putprop 'si::ctzl t 'compiler::cmp-inline);FIXME no declaim
 
 (defun abs-propagator (f t1)
   (when t1
