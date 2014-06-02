@@ -1294,6 +1294,9 @@
 (defun maybe-inline-src (fun fms src &aux fm)
   (when src
     (cond ((setq fm (type-fm fun fms)) (known-type-p fm))
+	  ((member fun '(row-major-aref si::row-major-aset si::row-major-aref-int si::set-array array-element-type));FIXME
+	   (flet ((tst (tp) (not (or (type>= tp #tarray) (type>= tp #tvector)))))
+	     (tst (info-type (if (eq fun 'si::row-major-aset) (cadadr fms) (cadar fms))))))
 	  ((< (cons-count src) 30))
 	  ((not (symbolp fun)))
 	  ((let* ((n (symbol-package fun))(n (when n (package-name n)))(p (find-package :lib))) 
