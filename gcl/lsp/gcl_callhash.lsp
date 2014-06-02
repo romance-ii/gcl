@@ -261,7 +261,7 @@
 					;(load "sys-proclaim.lisp")
   (setq compiler::*keep-gaz* t compiler::*tmp-dir* "" si::*disable-recompile* t)
   (si::chdir "../pcl")
-  (funcall (find-symbol "COMPILE-PCL" :pcl) t))
+  (funcall (find-symbol "COMPILE-PCL" :pcl)))
 
 (defun do-recomp (&rest excl &aux r *sig-discovery-props* *compile-verbose*)
   (labels ((d (&aux (*sig-discovery* t)(q (remove-duplicates (mapcar 'car (mapcan 'needs-recompile r)))))
@@ -274,8 +274,8 @@
 		 (fl (remove-duplicates (mapcar (lambda (x) (file x)) fl) :test 'string=))
 		 (fl (set-difference fl (cons "pcl_" excl) :test (lambda (x y) (search y x)))))
 	    (compiler::cdebug)
-;	    (format t "~%Recompiling original source files ...")
-;	    (mapc (lambda (x) (format t "~s~%" x) (compile-file x)) (remove nil fl))
+	    (format t "~%Recompiling original source files ...")
+	    (mapc (lambda (x) (format t "~s~%" x) (compile-file x)) (remove nil fl))
 	    (when pclp
 	      (do-pcl *sig-discovery-props*)))))
 
