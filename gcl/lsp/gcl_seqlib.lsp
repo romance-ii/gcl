@@ -212,10 +212,9 @@
   (declare (optimize (safety 1)))
   (check-type s sequence)
   (check-type start seqind)
-  (unless end (setq end array-dimension-limit))
-  (check-type end seqind)
+  (check-type end (or null seqind))
 
-  (let ((s s)(start start)(end end))
+  (let ((s s)(start start)(end (or end array-dimension-limit)))
     (declare (sequence s) (seqind start end))
     (cond ((listp s)
 	   (do ((i start (1+ i))(r)(rp)(p (nthcdr start s) (cdr p))) ((or (>= i end) (endp p)) r)
