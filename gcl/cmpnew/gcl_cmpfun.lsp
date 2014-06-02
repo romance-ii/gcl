@@ -1048,7 +1048,7 @@
 			   ((get-vbind x))
 			   (+opaque+))) nargs)))
 ;    (when dot (setf (cdr (last y 2)) (car (last y)))) ;FIXME bump-pcons -- get rid of pcons entirely
-    (let ((s (when dot (car (last y))))(tp (info-type (cadar (last nargs)))));FIXME
+    (let* ((s (when dot (car (last y))))(s (when s (unless (typep s 'proper-list) s)))(tp (info-type (cadar (last nargs)))));FIXME
       (cond ((when s (type>= #tproper-list tp)) #tproper-cons)
 	    ((when s (type-and #tnull tp)) #tcons)
 	    (t (when dot (setf (cdr (last y 2)) (car (last y)))) (object-type y))))))
