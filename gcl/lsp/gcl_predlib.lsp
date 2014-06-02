@@ -299,7 +299,7 @@
 (defun equal-is-eq (x) (typep x (funcall (get 'equal-is-eq-tp 'deftype-definition))))
 (defun equalp-is-eq (x) (typep x (funcall (get 'equalp-is-eq-tp 'deftype-definition))))
 
-(defun seqindp (x) (and (fixnump x) (>= x 0) (<= x array-dimension-limit)))
+(defun seqindp (x) (and (fixnump x) (>= x 0) (< x array-dimension-limit)))
 (si::putprop 'seqindp t 'compiler::cmp-inline)
 
 (deftype non-negative-char () `(non-negative-byte ,char-length))
@@ -1621,7 +1621,7 @@
 	   (rt (if (or (not (cadr rt)) (car mt)) rt `(nil nil))))
       (values (not (car rt))  (not (cadr rt))))))
 
-(deftype seqind (&aux (s array-dimension-limit)) `(,(if (<= s most-positive-immfix) 'immfix 'fixnum) 0 ,s))
+(deftype seqind (&aux (s (1- array-dimension-limit))) `(,(if (<= s most-positive-immfix) 'immfix 'fixnum) 0 ,s))
 (deftype rnkind (&aux (s array-rank-limit)) `(,(if (<= s most-positive-immfix) 'immfix 'fixnum) 0 ,s))
 (deftype mod (n) `(,(cond ((<= (1- n) most-positive-immfix) 'immfix)((<= (1- n) most-positive-fixnum) 'fixnum)('integer))
 		   0 ,(1- n)))

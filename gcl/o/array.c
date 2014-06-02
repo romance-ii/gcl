@@ -62,8 +62,8 @@ Iarray_element_type(object);
 DEFCONST("ARRAY-RANK-LIMIT", sLarray_rank_limit, LISP,
 	 make_fixnum(ARRAY_RANK_LIMIT),"");
 
-DEFCONST("ARRAY-DIMENSION-LIMIT", sLarray_dimension_limit,LISP,make_fixnum(((1UL<<31)>>3)-1),"");
-DEFCONST("ARRAY-TOTAL-SIZE-LIMIT", sLarray_total_size_limit,LISP,make_fixnum(((1UL<<31)>>3)-1),"");
+DEFCONST("ARRAY-DIMENSION-LIMIT", sLarray_dimension_limit,LISP,make_fixnum(((1UL<<31)>>3)),"");
+DEFCONST("ARRAY-TOTAL-SIZE-LIMIT", sLarray_total_size_limit,LISP,make_fixnum(((1UL<<31)>>3)),"");
 
 DEF_ORDINARY("BIT",sLbit,LISP,"");
 
