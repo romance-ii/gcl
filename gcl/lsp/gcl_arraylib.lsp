@@ -91,11 +91,11 @@
 ;;   `(let ((q (array-total-size ,a)))
 ;;      (unless (< ,i q) (error 'type-error :datum ,i :expected-type `(integer 0 (,q))))))
 
-#.`(defun row-major-aref (a i)
-     (declare (optimize (safety 1)))
-     (check-type a array)
-     (check-type i seqind)
-					;      (check-bounds a i)
+(defun array-in-bound (i)
+  (< i (array-total-size *array*)))
+(declaim (inline array-in-bound))
+
+#.`(defun row-major-aref-int (a i)
      (ecase
 	 (c-array-elttype a)
        ,@(mapcar (lambda (y &aux (x (pop y)))
@@ -105,12 +105,19 @@
 			(bit `(0-byte-array-self a i))
 			(otherwise `(,(caddr y) (c-array-self a) i nil nil)))))
 		 *array-type-info*)))
+(declaim (inline row-major-aref-int))
+
+(defun row-major-aref (a i)
+     (declare (optimize (safety 1)))
+     (check-type a array)
+     (check-type i seqind)
+     (let ((*array* a)) (check-type i (satisfies array-in-bound)))
+     (row-major-aref-int a i))
 
 #.`(defun row-major-aset (v a i)
      (declare (optimize (safety 1)))
      (check-type a array)
      (check-type i seqind)
-					;	(check-bounds a i)
      (ecase
 	 (c-array-elttype a)
        ,@(mapcar (lambda (y &aux (x (pop y)))
