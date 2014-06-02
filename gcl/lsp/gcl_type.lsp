@@ -189,7 +189,8 @@
 	 ((not t1) t2);FIXME atomic type logic requires eq -> and
 	 ((not t2) t1)
 	 ((when (setq c1 (t-to-nil (car (atomic-tp t1))) c2 (t-to-nil (car (atomic-tp t2)))) nil))
-	 (c1 (if (or (eql c1 c2) (unless (cmpt t2) (typep c1 t2))) t2 (if (consp c1) (type-or1 (if (cdr c1) +cons+ +proper-cons+) t2) (to t1 t2))))
+	 (c1 (if (or (eql c1 c2) (unless (cmpt t2) (typep c1 t2))) t2 
+	       (if (consp c1) (type-or1 (if (cdr (last c1)) +cons+ +proper-cons+) t2) (to t1 t2))))
 	 (c2 (if (unless (cmpt t1) (typep c2 t1)) t1 (if (consp c2) (type-or1 t1 (if (cdr c2) +cons+ +proper-cons+)) (to t1 t2))))
 	 ((when (setq h1 (gethash t1 *or-tp-hash*)) (multiple-value-setq (r f) (gethash t2 h1)) f) r)
 	 ((when (setq h2 (gethash t2 *or-tp-hash*)) (multiple-value-setq (r f) (gethash t1 h2)) f) r)
