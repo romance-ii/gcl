@@ -2007,8 +2007,8 @@
 ;; 	     (let ((x (pop body))) (if (stringp x) (unless doc (push x doc)) (push x d)))) body))
 
 
-(defun blla (l a last body &optional n nr f kbb
-	       &aux r k lvp np negp ff rr ke tmp nkys post aok bk wv rv keb
+(defun blla (l a last body &optional n nr f
+	       &aux r k lvp np negp ff rr ke tmp nkys post aok bk wv rv keb kbb
 	       (l (let ((s (last l))) (if (cdr s) (append (butlast l) (list (car s) '&rest (cdr s))) l)))
 	       (l (subst '&rest '&body l))
 	       (l (let ((al (member '&aux l))) (append (ldiff l al) (cons (setq ke (tmpsym)) al))))
@@ -2052,9 +2052,13 @@
 	      (bind 'k (pop ex))
 	      (bind 'v (if ex (pop ex) `(if ,(la nil t) ,(la nil 'done) ,(nokv 'k))))
 	      (bind kbb `(case k ,@nkys)))
-	  (bind kbb `(do (k v) ((not ,(la nil t))) 
-			 (setq k ,(la nil 'done) v (if ,(la nil t) ,(la nil 'done) ,(nokv 'k)))
-			 (case k ,@nkys)))
+	  (bind kbb (if n;;FIXME this must be inlined, as it uses va_arg
+			`(do (k v) ((not ,(la nil t))) 
+			     (setq k ,(la nil 'done) v (if ,(la nil t) ,(la nil 'done) ,(nokv 'k)))
+			     (case k ,@nkys))
+		      `(labels ((kb (k v) (case k ,@nkys))
+				(kbb (x) (when x (kb (car x) (if (cdr x) (cadr x) ,(nokv 'k)))(kbb (cddr x)))))
+			       (kbb ,(lvp)))))
 	  (dolist (l (nreverse post)) (apply #'bind l)))
     ;; (post nil
     ;; 	  (setq nkys (nreverse nkys))
