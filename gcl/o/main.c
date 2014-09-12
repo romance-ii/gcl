@@ -1068,49 +1068,6 @@ DEFUN("FUNCTION-BY-ADDRESS",object,fSfunction_by_address,SI,1,1,NONE,OI,OO,OO,OO
 
 #ifdef PRINT_INSN
 
-#include "dis-asm.h"
-
-static char b[4096],*bp;
-
-static int
-my_fprintf(void *v,const char *f,...) {
-  va_list va;
-  int r;
-  va_start(va,f);
-  bp+=(r=vsnprintf(bp,sizeof(b)-(bp-b),f,va));
-  va_end(va);
-  return r;
-}
-
-static int
-my_read(bfd_vma memaddr, bfd_byte *myaddr, unsigned int length, struct disassemble_info *dinfo) {
-  memcpy(myaddr,(void *)memaddr,length);
-  return 0;
-}
-
-static void
-my_pa(bfd_vma addr,struct disassemble_info *dinfo) {
-  dinfo->fprintf_func(dinfo->stream,"%p",(void *)addr);
-}
-
-DEFUN("DISASSEMBLE-INSTRUCTION",object,fSdisassemble_instruction,SI,1,1,NONE,OI,OO,OO,OO,(fixnum addr),"") {
-  static disassemble_info i;
-  /* static int k; */
-  int j;
-
-  /* if (!k) {init_disassemble_info(&i,NULL,my_fprintf);k=1;} */
-  memset(&i,0,sizeof(i));
-  i.fprintf_func=my_fprintf;
-  i.read_memory_func=my_read;
-  i.print_address_func=my_pa;
-  bp=b;
-  
-  j=PRINT_INSN(addr,&i);
-  my_fprintf(NULL," ;");
-  return MMcons(make_simple_string(b),make_fixnum(j));
-}
-
-
 #define MC(b_) v.uc_mcontext.b_
 #define REG_LIST(a_,b_) list(3,make_fixnum((void *)&(a_)-(void *)(b_)),make_fixnum(sizeof(a_)),make_fixnum(sizeof(*a_)))
 #define MCF(b_) (((struct _fpstate *)MC(fpregs))->b_)
@@ -1166,5 +1123,56 @@ DEFCONST("+FE-LIST+",sSPfe_listP,SI,list(5,
 					 list(3,sLfloating_point_underflow,make_fixnum(FPE_FLTUND),make_fixnum(FE_UNDERFLOW)),
 					 list(3,sLfloating_point_inexact,make_fixnum(FPE_FLTRES),make_fixnum(FE_INEXACT)),
 					 list(3,sLfloating_point_invalid_operation,make_fixnum(FPE_FLTINV),make_fixnum(FE_INVALID))),"");
+
+static object disassemble_instruction(fixnum);
+
+DEFUN("DISASSEMBLE-INSTRUCTION",object,fSdisassemble_instruction,SI,1,1,NONE,OI,OO,OO,OO,(fixnum addr),"") {
+  return disassemble_instruction(addr);
+}
+
+#include "dis-asm.h"
+
+static char b[4096],*bp;
+
+static int
+my_fprintf(void *v,const char *f,...) {
+  va_list va;
+  int r;
+  va_start(va,f);
+  bp+=(r=vsnprintf(bp,sizeof(b)-(bp-b),f,va));
+  va_end(va);
+  return r;
+}
+
+static int
+my_read(bfd_vma memaddr, bfd_byte *myaddr, unsigned int length, struct disassemble_info *dinfo) {
+  memcpy(myaddr,(void *)memaddr,length);
+  return 0;
+}
+
+static void
+my_pa(bfd_vma addr,struct disassemble_info *dinfo) {
+  dinfo->fprintf_func(dinfo->stream,"%p",(void *)addr);
+}
+
+static object
+disassemble_instruction(fixnum addr) {
+
+  static disassemble_info i;
+  /* static int k; */
+  int j;
+
+  /* if (!k) {init_disassemble_info(&i,NULL,my_fprintf);k=1;} */
+  memset(&i,0,sizeof(i));
+  i.fprintf_func=my_fprintf;
+  i.read_memory_func=my_read;
+  i.print_address_func=my_pa;
+  bp=b;
+  
+  j=PRINT_INSN(addr,&i);
+  my_fprintf(NULL," ;");
+  return MMcons(make_simple_string(b),make_fixnum(j));
+}
+
 
 #endif
