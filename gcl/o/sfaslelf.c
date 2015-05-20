@@ -352,7 +352,7 @@ parse_map(void *v1,Shdr **sec1,Shdr **sece,
     *dst1=v1+sec->sh_offset;
   }
 
-  for (*end=0,sec=*sec1;sec<*sece;sec++) 
+  for (*end=fhp->e_shoff+fhp->e_shnum*fhp->e_shentsize,sec=*sec1;sec<*sece;sec++) 
     *end=ulmax(*end,sec->sh_offset+sec->sh_size);
 
   return 0;
