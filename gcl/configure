@@ -7471,6 +7471,12 @@ rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
 fi
 
 
+if test "$use" = "386-macosx" ; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: emulating sbrk for mac" >&5
+$as_echo "emulating sbrk for mac" >&6; };
+   HAVE_SBRK=0
+fi
+
 if test "$HAVE_SBRK" = "1" ; then
 
    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ADDR_COMPAT_LAYOUT constant" >&5
@@ -8550,9 +8556,8 @@ main ()
 	FILE *fp = fopen("conftest1","w");
 
 	for (i=2,k=1;i;k=i,i<<=1);
-	l=$cstack_address + ($cstack_direction==1 ? $enable_cssize : 0);
-	m=$dbegin + ((unsigned long)$enable_maxpage << $PAGEWIDTH);
-	l=l<m ? m : l;
+	l=$cstack_address;
+	l=$cstack_direction==1 ? (l<k ? k-1 : -1) : l;
 	for (i=j=k;j && i<l;j>>=1,i|=j);
 	if (j<(k>>3)) i=0;
 	j=1;
@@ -8572,7 +8577,7 @@ _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
   mem_top=`cat conftest1`
 else
-  mem_top=0
+  mem_top="0x0"
 fi
 rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
   conftest.$ac_objext conftest.beam conftest.$ac_ext
@@ -8580,7 +8585,7 @@ fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $mem_top" >&5
 $as_echo "$mem_top" >&6; }
-if test "$mem_top" != "0" ; then
+if test "$mem_top" != "0x0" ; then
    { $as_echo "$as_me:${as_lineno-$LINENO}: checking finding upper mem half range" >&5
 $as_echo_n "checking finding upper mem half range... " >&6; }
    if test "$cross_compiling" = yes; then :
@@ -8613,7 +8618,7 @@ _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
   mem_range=`cat conftest1`
 else
-  mem_range=0
+  mem_range="0x0"
 fi
 rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
   conftest.$ac_objext conftest.beam conftest.$ac_ext
@@ -8621,7 +8626,7 @@ fi
 
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $mem_range" >&5
 $as_echo "$mem_range" >&6; }
-   if test "$mem_range" != "0" ; then
+   if test "$mem_range" != "0x0" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define MEM_TOP $mem_top

@@ -1333,6 +1333,11 @@ AC_RUN_IFELSE([
 	AC_MSG_RESULT(yes)],
 	[AC_MSG_RESULT([no: WARNING you must be able to emulate sbrk: as on mingw or macosx])])
 
+if test "$use" = "386-macosx" ; then
+   AC_MSG_RESULT(emulating sbrk for mac);
+   HAVE_SBRK=0
+fi
+
 if test "$HAVE_SBRK" = "1" ; then
 
    AC_MSG_CHECKING([for ADDR_COMPAT_LAYOUT constant])
@@ -1906,9 +1911,8 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[
 	FILE *fp = fopen("conftest1","w");
 
 	for (i=2,k=1;i;k=i,i<<=1);
-	l=$cstack_address + ($cstack_direction==1 ? $enable_cssize : 0);
-	m=$dbegin + ((unsigned long)$enable_maxpage << $PAGEWIDTH);
-	l=l<m ? m : l;
+	l=$cstack_address;
+	l=$cstack_direction==1 ? (l<k ? k-1 : -1) : l;
 	for (i=j=k;j && i<l;j>>=1,i|=j);
 	if (j<(k>>3)) i=0;
 	j=1;
@@ -1920,9 +1924,9 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[
 	fprintf(fp,"0x%lx",i);
 	fclose(fp);
 	return 0;
-]])],[mem_top=`cat conftest1`],[mem_top=0])
+]])],[mem_top=`cat conftest1`],[mem_top="0x0"])
 AC_MSG_RESULT($mem_top)
-if test "$mem_top" != "0" ; then
+if test "$mem_top" != "0x0" ; then
    AC_MSG_CHECKING(finding upper mem half range)
    AC_RUN_IFELSE([AC_LANG_PROGRAM([[
    #include <stdio.h>
@@ -1934,9 +1938,9 @@ if test "$mem_top" != "0" ; then
    fprintf(fp,"0x%lx",j>>1);
    fclose(fp);
    return 0;
-   ]])],[mem_range=`cat conftest1`],[mem_range=0])
+   ]])],[mem_range=`cat conftest1`],[mem_range="0x0"])
    AC_MSG_RESULT($mem_range)
-   if test "$mem_range" != "0" ; then 
+   if test "$mem_range" != "0x0" ; then 
 	AC_DEFINE_UNQUOTED(MEM_TOP,$mem_top,[beginning address for immediate fixnum range])
         AC_DEFINE_UNQUOTED(MEM_RANGE,$mem_range,[size of immediate fixnum address space])
    fi
